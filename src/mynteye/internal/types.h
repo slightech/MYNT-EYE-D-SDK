@@ -22,7 +22,7 @@
 #include <string>
 #include <vector>
 
-#include "mynteye/mynteye.h"
+#include "mynteye/stubs/global.h"
 
 MYNTEYE_BEGIN_NAMESPACE
 
