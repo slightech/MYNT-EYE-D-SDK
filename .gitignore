@@ -1,0 +1,36 @@
+.DS_Store
+
+/output/
+/modules/build/
+/samples/build/
+/sdk/samples/build/
+/sdk/samples/bin/
+/sdk/samples/lib/
+/test/build/
+/test/gtest/build/
+/tools/build/
+
+# win
+
+/platforms/win/deps/opencv/
+/platforms/win/deps/mingw/
+
+# qt
+
+/apps/build*/
+/apps/**/*.pro.user
+
+# pkg
+
+/mynteye-*
+
+# others
+
+/*.yml
+/images/
+/samples/depthmap/disparity.png
+
+/opencv*
+
+/pkg.nsi
+/pkginfo.sh
