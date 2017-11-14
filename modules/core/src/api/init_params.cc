@@ -11,7 +11,8 @@ InitParams::InitParams(const DeviceInfo &info)
       color_info_index(-1),
       depth_info_index(-1),
       state_ae(true),
-      state_awb(true) {
+      state_awb(true),
+      ir_intensity(0) {
     DBG_LOGD(__func__);
 }
 

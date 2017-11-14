@@ -208,6 +208,14 @@ ErrorCode CameraPrivate::Open(const InitParams &params) {
         throw std::runtime_error(format_string("Error: Depth data type (%d) not supported.", depth_data_type_));
     }
 
+    if (params.ir_intensity > 0) {
+        if (SetFWRegister(0xE0, params.ir_intensity)) {
+            LOGI("-- IR intensity: %d", params.ir_intensity);
+        } else {
+            LOGI("-- IR intensity: %d (failed)", params.ir_intensity);
+        }
+    }
+
     ReleaseBuf();
 
     int ret = EtronDI_OpenDevice2(etron_di_, &dev_sel_info_,
@@ -355,4 +363,34 @@ void CameraPrivate::ReleaseBuf() {
         delete depth_img_buf_;
         depth_img_buf_ = nullptr;
     }
+}
+
+bool CameraPrivate::GetSensorRegister(int id, unsigned short address, unsigned short *value, int flag) {
+    if (!IsOpened()) throw std::runtime_error("Error: Camera not opened.");
+    return ETronDI_OK == EtronDI_GetSensorRegister(etron_di_, &dev_sel_info_, id, address, value, flag, SENSOR_BOTH);
+}
+
+bool CameraPrivate::GetHWRegister(unsigned short address, unsigned short *value, int flag) {
+    if (!IsOpened()) throw std::runtime_error("Error: Camera not opened.");
+    return ETronDI_OK == EtronDI_GetHWRegister(etron_di_, &dev_sel_info_, address, value, flag);
+}
+
+bool CameraPrivate::GetFWRegister(unsigned short address, unsigned short *value, int flag) {
+    if (!IsOpened()) throw std::runtime_error("Error: Camera not opened.");
+    return ETronDI_OK == EtronDI_GetFWRegister(etron_di_, &dev_sel_info_, address, value, flag);
+}
+
+bool CameraPrivate::SetSensorRegister(int id, unsigned short address, unsigned short value, int flag) {
+    if (!IsOpened()) throw std::runtime_error("Error: Camera not opened.");
+    return ETronDI_OK == EtronDI_SetSensorRegister(etron_di_, &dev_sel_info_, id, address, value, flag, SENSOR_BOTH);
+}
+
+bool CameraPrivate::SetHWRegister(unsigned short address, unsigned short value, int flag) {
+    if (!IsOpened()) throw std::runtime_error("Error: Camera not opened.");
+    return ETronDI_OK == EtronDI_SetHWRegister(etron_di_, &dev_sel_info_, address, value, flag);
+}
+
+bool CameraPrivate::SetFWRegister(unsigned short address, unsigned short value, int flag) {
+    if (!IsOpened()) throw std::runtime_error("Error: Camera not opened.");
+    return ETronDI_OK == EtronDI_SetFWRegister(etron_di_, &dev_sel_info_, address, value, flag);
 }

@@ -65,7 +65,15 @@ int main(int argc, char const *argv[]) {
     }
 
     cout << "Open device: " << dev_info.index << ", " << dev_info.name << endl << endl;
-    cam.Open(InitParams(dev_info));
+
+    InitParams params(dev_info);
+    // Warning: IR + DEPTH_GRAY, have an exception ==
+    //   Thread 1 "camera" received signal SIGSEGV, Segmentation fault.
+    //   0x00007ffff614d254 in CVideoDevice::convert_depth_y_to_buffer(unsigned char*, unsigned char*, unsigned int, unsigned int, bool, unsigned short) () from .../libeSPDI.so.3.0.14
+    //params.depth_mode = DepthMode::DEPTH_GRAY;
+    params.ir_intensity = 4;
+
+    cam.Open(params);
 
     cout << endl;
     if (!cam.IsOpened()) {

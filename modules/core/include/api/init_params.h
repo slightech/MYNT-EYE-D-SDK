@@ -50,6 +50,11 @@ struct MYNTEYE_API InitParams {
      */
     bool state_awb;
 
+    /**
+     * IR (Infrared), default 0.
+     */
+    std::uint8_t ir_intensity;
+
     /** Constructor. */
     InitParams(const DeviceInfo &info);
 

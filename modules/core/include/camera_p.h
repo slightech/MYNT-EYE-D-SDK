@@ -25,6 +25,14 @@ public:
     ErrorCode SetAutoExposureEnabled(bool enabled);
     ErrorCode SetAutoWhiteBalanceEnabled(bool enabled);
 
+    bool GetSensorRegister(int id, unsigned short address, unsigned short *value, int flag = FG_Address_1Byte);
+    bool GetHWRegister(unsigned short address, unsigned short *value, int flag = FG_Address_1Byte);
+    bool GetFWRegister(unsigned short address, unsigned short *value, int flag = FG_Address_1Byte);
+
+    bool SetSensorRegister(int id, unsigned short address, unsigned short value, int flag = FG_Address_1Byte);
+    bool SetHWRegister(unsigned short address, unsigned short value, int flag = FG_Address_1Byte);
+    bool SetFWRegister(unsigned short address, unsigned short value, int flag = FG_Address_1Byte);
+
     ErrorCode Open(const InitParams &params);
 
     bool IsOpened();
