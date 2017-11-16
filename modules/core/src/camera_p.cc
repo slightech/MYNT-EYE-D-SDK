@@ -148,13 +148,13 @@ ErrorCode CameraPrivate::SetAutoWhiteBalanceEnabled(bool enabled) {
 }
 
 ErrorCode CameraPrivate::Open(const InitParams &params) {
-    dev_sel_info_.index = params.dev_info.index;
+    dev_sel_info_.index = params.dev_index;
 
-    if (params.dev_info.type == PUMA) {
+    //if (params.dev_info.type == PUMA) {
         depth_data_type_ = 2;  // 1: 11 bits. 2: 14 bits
         EtronDI_SetDepthDataType(etron_di_, &dev_sel_info_, depth_data_type_);
         DBG_LOGI("EtronDI_SetDepthDataType: %d", depth_data_type_);
-    }
+    //}
 
     SetAutoExposureEnabled(params.state_ae);
     SetAutoWhiteBalanceEnabled(params.state_awb);
@@ -181,10 +181,10 @@ ErrorCode CameraPrivate::Open(const InitParams &params) {
     }
     LOGI("-- Depth mode: %s", dtc_name);
 
-    if (params.dev_info.index != stream_info_dev_index_) {
+    if (params.dev_index != stream_info_dev_index_) {
         std::vector<StreamInfo> color_infos;
         std::vector<StreamInfo> depth_infos;
-        GetResolutions(params.dev_info.index, color_infos, depth_infos);
+        GetResolutions(params.dev_index, color_infos, depth_infos);
     }
     if (params.color_info_index > -1) {
         color_res_index_ = params.color_info_index;
@@ -197,9 +197,9 @@ ErrorCode CameraPrivate::Open(const InitParams &params) {
         stream_color_info_ptr_[color_res_index_].nHeight,
         stream_color_info_ptr_[color_res_index_].bFormatMJPG ? "MJPG" : "YUYV");
     LOGI("-- Depth Stream: %dx%d %s",
-        stream_depth_info_ptr_[color_res_index_].nWidth,
-        stream_depth_info_ptr_[color_res_index_].nHeight,
-        stream_depth_info_ptr_[color_res_index_].bFormatMJPG ? "MJPG" : "YUYV");
+        stream_depth_info_ptr_[depth_res_index_].nWidth,
+        stream_depth_info_ptr_[depth_res_index_].nHeight,
+        stream_depth_info_ptr_[depth_res_index_].bFormatMJPG ? "MJPG" : "YUYV");
 
     if (stream_color_info_ptr_[color_res_index_].bFormatMJPG) {
         throw std::runtime_error("Error: Color stream format MJPG not supported now.");

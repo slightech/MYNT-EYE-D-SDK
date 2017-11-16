@@ -16,9 +16,9 @@ namespace mynteye {
 struct MYNTEYE_API InitParams {
 
     /**
-     * Device info.
+     * Device index.
      */
-    DeviceInfo dev_info;
+    std::int32_t dev_index;
 
     /**
      * Framerate, default 30.
@@ -56,7 +56,8 @@ struct MYNTEYE_API InitParams {
     std::uint8_t ir_intensity;
 
     /** Constructor. */
-    InitParams(const DeviceInfo &info);
+    InitParams();
+    InitParams(const std::int32_t &dev_index);
 
     /** Destructor. */
     ~InitParams();

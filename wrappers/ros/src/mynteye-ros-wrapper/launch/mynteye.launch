@@ -1,0 +1,36 @@
+<launch>
+
+  <arg name="dev_index"     default="0" />
+  <arg name="color_index"   default="4" />
+  <arg name="depth_index"   default="1" />
+  <arg name="ir_intensity"  default="0" />
+
+  <arg name="depth_gray"        default="1" /> <!-- Have exception -->
+  <arg name="depth_colorful"    default="2" />
+
+  <arg name="color_frame" default="mynteye_color" />
+  <arg name="depth_frame" default="mynteye_depth" />
+
+  <node name="mynteye_wrapper_node" pkg="mynteye_wrapper" type="mynteye_wrapper_node" output="screen">
+
+    <!-- Camera params -->
+    <param name="dev_index"     value="$(arg dev_index)" />
+    <param name="framerate"     value="30" />
+    <param name="depth_mode"    value="$(arg depth_colorful)" />
+    <param name="color_index"   value="$(arg color_index)" />
+    <param name="depth_index"   value="$(arg depth_index)" />
+    <param name="state_ae"      value="true" />
+    <param name="state_awb"     value="true" />
+    <param name="ir_intensity"  value="$(arg ir_intensity)" />
+
+    <!-- Frame ids -->
+    <param name="color_frame" value="$(arg color_frame)" />
+    <param name="depth_frame" value="$(arg depth_frame)" />
+
+    <!-- Topic names -->
+    <param name="color_topic" value="mynteye/color" />
+    <param name="depth_topic" value="mynteye/depth" />
+
+  </node>
+
+</launch>

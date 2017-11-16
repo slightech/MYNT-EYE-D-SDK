@@ -6,7 +6,8 @@ include CommonDefs.mk
 help:
 	@echo "Usage:"
 	@echo "  make help"
-	@echo "  make all                       build all parts"
+	@echo "  make all                       build all"
+	@echo "  make ros                       build ros wrapper"
 	@echo "  make clean                     clean"
 	@echo "  make cleanall                  clean all"
 	@echo "Usage More:"
@@ -27,6 +28,11 @@ clean:
 .PHONY: cleanall
 cleanall: clean
 	@$(call rm_f,build-*,./apps/)
+	@$(call rm,./wrappers/ros/build/)
+	@$(call rm,./wrappers/ros/devel/)
+	@$(call rm,./wrappers/ros/install/)
+	@$(call rm,./wrappers/ros/.catkin_workspace)
+	@$(call rm,./wrappers/ros/src/CMakeLists.txt)
 
 .PHONY: host
 host:
@@ -63,3 +69,8 @@ include:
 	@$(call mkdir,./output/include)
 	@$(call echo,Copy modules/core/include/api/ ...,1;35)
 	@$(call cp,./modules/core/include/api,./output/include)
+
+.PHONY: ros
+ros: sdk
+	@$(call echo,Make $@ ...)
+	@cd ./wrappers/ros && catkin_make
