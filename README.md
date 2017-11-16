@@ -17,15 +17,23 @@ $ ./samples/build/output/bin/camera
 $ make ros
 ```
 
-**Publish:**
+**Core:**
 
 ```
 $ roscore
 ```
 
+**RViz Display:**
+
 ```
 $ source ./wrappers/ros/devel/setup.bash
+$ roslaunch mynteye_wrapper display.launch
+```
 
+**Publish:**
+
+```
+$ source ./wrappers/ros/devel/setup.bash
 $ roslaunch mynteye_wrapper mynteye.launch
 ```
 
@@ -33,6 +41,5 @@ $ roslaunch mynteye_wrapper mynteye.launch
 
 ```
 $ source ./wrappers/ros/devel/setup.bash
-
 $ rosrun mynteye_wrapper mynteye_listener
 ```
