@@ -57,6 +57,7 @@ public:
         header.stamp = stamp;
         header.frame_id = color_frame_id;
         pub_color.publish(cv_bridge::CvImage(header, enc::BGR8, img).toImageMsg());
+        //NODELET_INFO_STREAM("Publish color");
     }
 
     void publishDepth(cv::Mat img, ros::Time stamp) {
@@ -71,7 +72,9 @@ public:
             pub_depth.publish(cv_bridge::CvImage(header, enc::BGR8, img).toImageMsg());
         } else {
             NODELET_ERROR_STREAM("Depth mode unsupported");
+            return;
         }
+        //NODELET_INFO_STREAM("Publish depth");
     }
 
     void device_poll() {
@@ -83,6 +86,8 @@ public:
             return;
         }
         NODELET_INFO_STREAM("Open camera success");
+
+        ros::Rate loop_rate(params.framerate);
 
         cv::Mat color, depth;
         // Main loop
@@ -105,6 +110,8 @@ public:
                         }
                     }
                 }
+
+                loop_rate.sleep();
             }
         }
 

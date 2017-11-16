@@ -11,8 +11,8 @@ namespace enc = sensor_msgs::image_encodings;
 class MYNTEYEListener {
 public:
     MYNTEYEListener() : it_(nh_), color_count_(0) {
-        color_sub_ =  it_.subscribe("mynteye/color", 100, &MYNTEYEListener::colorCallback, this);
-        depth_sub_ =  it_.subscribe("mynteye/depth", 100, &MYNTEYEListener::depthCallback, this);
+        color_sub_ =  it_.subscribe("mynteye/color", 1, &MYNTEYEListener::colorCallback, this);
+        depth_sub_ =  it_.subscribe("mynteye/depth", 1, &MYNTEYEListener::depthCallback, this);
 
         cv::namedWindow("color", cv::WINDOW_AUTOSIZE);
         cv::namedWindow("depth", cv::WINDOW_AUTOSIZE);
@@ -30,6 +30,9 @@ public:
             ROS_ERROR_STREAM("cv_bridge exception: " << e.what());
             return;
         }
+        ++color_count_;
+        //ROS_INFO_STREAM("color: " << color_count_);
+
         cv::imshow("color", cv_ptr->image);
         cv::waitKey(3);
     }

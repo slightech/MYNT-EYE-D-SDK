@@ -3,7 +3,7 @@
   <arg name="dev_index"     default="0" />
   <arg name="color_index"   default="4" />
   <arg name="depth_index"   default="1" />
-  <arg name="ir_intensity"  default="0" />
+  <arg name="ir_intensity"  default="4" />
 
   <arg name="depth_gray"        default="1" /> <!-- Have exception -->
   <arg name="depth_colorful"    default="2" />
