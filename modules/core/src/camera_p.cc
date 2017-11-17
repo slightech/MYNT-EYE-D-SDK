@@ -252,7 +252,7 @@ ErrorCode CameraPrivate::RetrieveImage(cv::Mat &color, cv::Mat &depth) {
     }
     if (!depth_img_buf_) {
         if (dtc_ == DEPTH_IMG_COLORFUL_TRANSFER || dtc_ == DEPTH_IMG_GRAY_TRANSFER) {
-            depth_img_buf_ = (unsigned char*)calloc(depth_img_width*depth_img_height*3, sizeof(unsigned char));
+            depth_img_buf_ = (unsigned char*)calloc(depth_img_width*2*depth_img_height*3, sizeof(unsigned char));
         } else {
             depth_img_buf_ = (unsigned char*)calloc(depth_img_width*depth_img_height*2, sizeof(unsigned char));
         }
