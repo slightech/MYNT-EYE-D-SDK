@@ -1,9 +1,9 @@
 
-# Etron SDK
+# MYNTEYE SDK
 
-## Prerequisites
+## Install
 
-**Install ROS Kinetic:**
+**ROS Kinetic:**
 
 ```
 cd ~
@@ -11,32 +11,38 @@ wget https://raw.githubusercontent.com/oroca/oroca-ros-pkg/master/ros_install.sh
 chmod 755 ./ros_install.sh && bash ./ros_install.sh catkin_ws kinetic
 ```
 
-* OpenCV (ROS Kinetic)
-* JPEG (System)
-
-> Only Linux x64 & aarch64 are supported.
-
-> PC and TX2, with Ubuntu 16.04 (GCC 5), have been tested pass.
-
-## Build
+**SDK:**
 
 ```
-$ make all
+$ cd <sdk>
+$ ./install.sh
 ```
 
 ## Samples
+
+### Build
+
+```
+$ cd <sdk>
+$ make samples
+```
+
+### Run
 
 ```
 $ ./samples/build/output/bin/camera
 ```
 
-## ROS Wrapper
+## ROS Wrappers
+
+### Build
 
 ```
+$ cd <sdk>
 $ make ros
 ```
 
-**Core:**
+### Run
 
 ```
 $ roscore

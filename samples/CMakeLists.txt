@@ -14,9 +14,15 @@ include(${PRO_DIR}/cmake/DetectCXX11.cmake)
 
 # variables
 
-set(SDK_DIR ${PRO_DIR}/output)
+set(SDK_DIR ${PRO_DIR})
+if(EXISTS ${PRO_DIR}/output)
+  set(SDK_DIR ${PRO_DIR}/output)
+endif()
 
 set(SDK_INCLUDE_DIRS ${SDK_DIR}/include)
+if(NOT EXISTS ${SDK_DIR}/include)
+  set(SDK_INCLUDE_DIRS ${PRO_DIR}/modules/core/include/api)
+endif()
 
 set(SDK_LIB_DIR ${SDK_DIR}/lib)
 if(MINGW)

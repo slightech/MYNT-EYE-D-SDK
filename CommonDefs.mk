@@ -4,6 +4,8 @@ _COMMON_DEFS_MAKE_ := 1
 COMMA := ,
 EMPTY :=
 SPACE := $(EMPTY) $(EMPTY)
+QUOTE := "
+QUOTE_SINGLE := '
 
 # Host detection
 #   https://stackoverflow.com/questions/714100/os-detecting-makefile
@@ -71,10 +73,10 @@ ifeq ($(HOST_OS),Linux)
     UNAME_A = $(shell uname -a)
     ifneq ($(findstring tegra,$(UNAME_A)),)
         HOST_NAME := Tegra
+    else ifneq ($(findstring jetsonbot,$(UNAME_A)),)
+        HOST_NAME := Tegra
     #else ifneq ($(findstring firefly,$(UNAME_A)),)
     #    HOST_NAME := Firefly
-    else ifeq ($(HOST_ARCH),AArch64)
-        HOST_NAME := Linux-AArch64
     endif
 endif
 
@@ -173,10 +175,7 @@ endif
 # Package
 
 PKGVERSION := $(shell ./scripts/version.sh)
-PKGNAME := mynteye-$(PKGVERSION)-$(HOST_NAME)
-ifneq ($(HOST_NAME),Linux-AArch64)
-    PKGNAME := $(PKGNAME)-$(HOST_ARCH)
-endif
+PKGNAME := mynteye-$(PKGVERSION)-$(HOST_NAME)-$(HOST_ARCH)
 ifeq ($(HOST_OS),Linux)
     PKGNAME := $(PKGNAME)-gcc$(shell gcc -dumpversion | cut -c 1-1)
 endif
@@ -246,6 +245,24 @@ define cmake_build
 	build_dir="$2"; [ -z "$2" ] && build_dir=..; \
 	build_options="$3"; \
 	$(call cd,$${work_dir}) && $(CMAKE) $${build_options} $(CMAKE_OPTIONS) $${build_dir} $(CMAKE_OPTIONS_AFTER) && $(BUILD)
+endef
+
+define get_platform_path
+	host_os=$(call lower, $(HOST_OS)); \
+	host_name=$(call lower, $(HOST_NAME)); \
+	host_arch=$(call lower, $(HOST_ARCH)); \
+	plat_dir="$1"; _force="$2"; _wd=`pwd`; cd $${plat_dir}; \
+	[ -z "$${plat_name}" ] && [ -d "$${host_name}-$${host_arch}" ] && plat_name="$${host_name}-$${host_arch}"; \
+	[ -z "$${plat_name}" ] && [ -d "$${host_name}" ] && plat_name="$${host_name}"; \
+	[ -z "$${plat_name}" ] && [ -d "$${host_os}-$${host_arch}" ] && plat_name="$${host_os}-$${host_arch}"; \
+	[ -z "$${plat_name}" ] && [ -d "$${host_os}" ] && plat_name="$${host_os}"; \
+	if [ -z "$${plat_name}" ]; then \
+		$(ECHO) "Can't not find proper platform in $${plat_dir}"; \
+		[ -z "$${_force}" ] || exit 1; \
+	else \
+		plat_path="$${plat_dir}/$${plat_name}"; \
+	fi; \
+	cd $${_wd}
 endef
 
 endif # _COMMON_DEFS_MAKE_

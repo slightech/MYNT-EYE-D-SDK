@@ -45,7 +45,9 @@ else()
 endif()
 
 get_filename_component(SDK_DIR "${PROJECT_SOURCE_DIR}/../../../.." ABSOLUTE)
-set(SDK_DIR ${SDK_DIR}/output)
+if(EXISTS ${SDK_DIR}/output)
+  set(SDK_DIR ${SDK_DIR}/output)
+endif()
 message(STATUS "SDK_DIR: ${SDK_DIR}")
 
 set(SDK_INCLUDE_DIRS ${SDK_DIR}/include)
