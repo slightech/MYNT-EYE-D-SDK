@@ -70,6 +70,8 @@ message(STATUS "OpenCV_LIBS: ${OpenCV_LIBS}")
 
 find_package(eSPDI REQUIRED)
 
+find_package(JPEG REQUIRED)
+
 # modules
 
 include_directories(

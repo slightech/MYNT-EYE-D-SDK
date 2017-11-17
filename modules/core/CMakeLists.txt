@@ -13,6 +13,7 @@ include_directories(
   ${MYNTEYE_CORE_INCLUDES}
   ${OpenCV_INCLUDE_DIRS}
   ${eSPDI_INCLUDE_DIRS}
+  ${JPEG_INCLUDE_DIR}
 )
 
 file(GLOB_RECURSE MYNTEYE_CORE_SRCS "src/*.cc")
@@ -21,7 +22,7 @@ make_shared_library(${MYNTEYE_CORE}
   SRCS
     ${MYNTEYE_CORE_SRCS}
   LINKLIBS
-    ${OpenCV_LIBS} ${eSPDI_LIBS}
+    ${OpenCV_LIBS} ${eSPDI_LIBS} ${JPEG_LIBRARIES}
 )
 
 set(MYNTEYE_CORE ${MYNTEYE_CORE} PARENT_SCOPE)

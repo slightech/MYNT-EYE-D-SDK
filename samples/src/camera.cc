@@ -66,6 +66,7 @@ int main(int argc, char const *argv[]) {
 
     cout << "Open device: " << dev_info.index << ", " << dev_info.name << endl << endl;
 
+    // Warning: Color stream format MJPG doesn't work.
     InitParams params(dev_info.index);
     //params.depth_mode = DepthMode::DEPTH_GRAY;
     //params.color_info_index = 4;
@@ -104,6 +105,7 @@ int main(int argc, char const *argv[]) {
         t = (double)cv::getTickCount() - t;
         fps = cv::getTickFrequency() / t;
     }
+    (void)(fps);
 
     cam.Close();
     cv::destroyAllWindows();

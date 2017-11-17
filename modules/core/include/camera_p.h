@@ -6,7 +6,22 @@
 
 #include "eSPDI.h"
 
+#include <setjmp.h>
+
+extern "C" {
+
+#include <jpeglib.h>
+
+}
+
 namespace mynteye {
+
+struct my_error_mgr {
+  struct jpeg_error_mgr pub;
+  jmp_buf setjmp_buffer;
+};
+
+typedef struct my_error_mgr *my_error_ptr;
 
 class CameraPrivate {
 public:
@@ -51,6 +66,8 @@ private:
 
     void ReleaseBuf();
 
+    int MJPEG_TO_RGB24_LIBJPEG(unsigned char *jpg, int nJpgSize, unsigned char *rgb);
+
     void *etron_di_;
 
     DEVSELINFO dev_sel_info_;
@@ -70,6 +87,7 @@ private:
     unsigned long int color_image_size_;
     unsigned long int depth_image_size_;
     unsigned char *color_img_buf_;
+    unsigned char *color_rgb_buf_;
     unsigned char *depth_img_buf_;
 };
 

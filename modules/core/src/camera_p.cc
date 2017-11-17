@@ -8,6 +8,23 @@
 
 using namespace mynteye;
 
+namespace {
+
+METHODDEF(void)
+my_error_exit(j_common_ptr cinfo) {
+  /* cinfo->err really points to a my_error_mgr struct, so coerce pointer */
+  my_error_ptr myerr = (my_error_ptr) cinfo->err;
+
+  /* Always display the message. */
+  /* We could postpone this until after returning, if we chose. */
+  (*cinfo->err->output_message) (cinfo);
+
+  /* Return control to the setjmp point */
+  longjmp(myerr->setjmp_buffer, 1);
+}
+
+}  // namespace
+
 CameraPrivate::CameraPrivate(Camera *q)
     : q_ptr(q), etron_di_(nullptr), dev_sel_info_({-1}), stream_info_dev_index_(-1) {
     DBG_LOGD(__func__);
@@ -28,6 +45,7 @@ CameraPrivate::CameraPrivate(Camera *q)
     color_image_size_ = 0;
     depth_image_size_ = 0;
     color_img_buf_ = nullptr;
+    color_rgb_buf_ = nullptr;
     depth_img_buf_ = nullptr;
 }
 
@@ -201,9 +219,6 @@ ErrorCode CameraPrivate::Open(const InitParams &params) {
         stream_depth_info_ptr_[depth_res_index_].nHeight,
         stream_depth_info_ptr_[depth_res_index_].bFormatMJPG ? "MJPG" : "YUYV");
 
-    if (stream_color_info_ptr_[color_res_index_].bFormatMJPG) {
-        throw std::runtime_error("Error: Color stream format MJPG not supported now.");
-    }
     if (depth_data_type_ != 1 && depth_data_type_ != 2) {
         throw std::runtime_error(format_string("Error: Depth data type (%d) not supported.", depth_data_type_));
     }
@@ -246,9 +261,13 @@ ErrorCode CameraPrivate::RetrieveImage(cv::Mat &color, cv::Mat &depth) {
     unsigned int color_img_height = (unsigned int)(stream_color_info_ptr_[color_res_index_].nHeight);
     unsigned int depth_img_width  = (unsigned int)(stream_depth_info_ptr_[depth_res_index_].nWidth);
     unsigned int depth_img_height = (unsigned int)(stream_depth_info_ptr_[depth_res_index_].nHeight);
+    bool is_mjpeg = stream_color_info_ptr_[color_res_index_].bFormatMJPG;
 
     if (!color_img_buf_) {
         color_img_buf_ = (unsigned char*)calloc(color_img_width*color_img_height*2, sizeof(unsigned char));
+    }
+    if (is_mjpeg && !color_rgb_buf_) {
+        color_rgb_buf_ = (unsigned char*)calloc(color_img_width*color_img_height*3, sizeof(unsigned char));
     }
     if (!depth_img_buf_) {
         if (dtc_ == DEPTH_IMG_COLORFUL_TRANSFER || dtc_ == DEPTH_IMG_GRAY_TRANSFER) {
@@ -269,8 +288,14 @@ ErrorCode CameraPrivate::RetrieveImage(cv::Mat &color, cv::Mat &depth) {
     }
 
     // color
-    cv::Mat color_img(color_img_height, color_img_width, CV_8UC2, color_img_buf_);
-    cv::cvtColor(color_img, color, CV_YUV2BGR_YUY2);
+    if (is_mjpeg) {
+        MJPEG_TO_RGB24_LIBJPEG(color_img_buf_, color_image_size_, color_rgb_buf_);
+        cv::Mat color_img(color_img_height, color_img_width, CV_8UC3, color_rgb_buf_);
+        cv::cvtColor(color_img, color, CV_RGB2BGR);
+    } else {
+        cv::Mat color_img(color_img_height, color_img_width, CV_8UC2, color_img_buf_);
+        cv::cvtColor(color_img, color, CV_YUV2BGR_YUY2);
+    }
 
     // depth
     if (dtc_ == DEPTH_IMG_COLORFUL_TRANSFER || dtc_ == DEPTH_IMG_GRAY_TRANSFER) {
@@ -308,15 +333,15 @@ ErrorCode CameraPrivate::RetrieveColorImage(cv::Mat &mat) {
     unsigned int color_img_width  = (unsigned int)(stream_color_info_ptr_[color_res_index_].nWidth);
     unsigned int color_img_height = (unsigned int)(stream_color_info_ptr_[color_res_index_].nHeight);
 
-    /\*
     bool is_mjpeg = stream_color_info_ptr_[color_res_index_].bFormatMJPG;
     if (is_mjpeg) {
         MJPEG_TO_RGB24_LIBJPEG(color_img_buf_, color_image_size_, color_rgb_buf_);
+        cv::Mat img(color_img_height, color_img_width, CV_8UC3, color_rgb_buf_);
+        cv::cvtColor(img, mat, CV_RGB2BGR);
+    } else {
+        cv::Mat img(color_img_height, color_img_width, CV_8UC2, color_img_buf_);
+        cv::cvtColor(img, mat, CV_YUV2BGR_YUY2);
     }
-    *\/
-
-    cv::Mat img(color_img_height, color_img_width, CV_8UC2, color_img_buf_);
-    cv::cvtColor(img, mat, CV_YUV2BGR_YUY2);
     return ErrorCode::SUCCESS;
 }
 */
@@ -359,6 +384,10 @@ void CameraPrivate::ReleaseBuf() {
         delete color_img_buf_;
         color_img_buf_ = nullptr;
     }
+    if (color_rgb_buf_) {
+        delete color_rgb_buf_;
+        color_rgb_buf_ = nullptr;
+    }
     if (depth_img_buf_) {
         delete depth_img_buf_;
         depth_img_buf_ = nullptr;
@@ -393,4 +422,51 @@ bool CameraPrivate::SetHWRegister(unsigned short address, unsigned short value, 
 bool CameraPrivate::SetFWRegister(unsigned short address, unsigned short value, int flag) {
     if (!IsOpened()) throw std::runtime_error("Error: Camera not opened.");
     return ETronDI_OK == EtronDI_SetFWRegister(etron_di_, &dev_sel_info_, address, value, flag);
+}
+
+int CameraPrivate::MJPEG_TO_RGB24_LIBJPEG(unsigned char *jpg, int nJpgSize, unsigned char *rgb) {
+    struct jpeg_decompress_struct cinfo;
+    struct my_error_mgr jerr;
+
+    int rc;
+    int row_stride, width, height, pixel_size;
+
+    cinfo.err = jpeg_std_error(&jerr.pub);
+    jerr.pub.error_exit = my_error_exit;
+
+    if (setjmp(jerr.setjmp_buffer)) {
+        jpeg_destroy_decompress(&cinfo);
+        return 0;
+    }
+    
+    jpeg_create_decompress(&cinfo);
+    jpeg_mem_src(&cinfo, jpg, nJpgSize);
+
+    rc = jpeg_read_header(&cinfo, TRUE);
+
+    if (rc != 1) {
+        LOGE("Error: File does not seem to be a normal JPEG !!");
+    }
+    
+    jpeg_start_decompress(&cinfo);
+  
+    width = cinfo.output_width;
+    height = cinfo.output_height;
+    pixel_size = cinfo.output_components;
+
+    row_stride = width * pixel_size;
+
+    while (cinfo.output_scanline < cinfo.output_height) {
+        unsigned char *buffer_array[1];
+        //buffer_array[0] = rgb + (width * height * 3) - (cinfo.output_scanline) * row_stride;
+        buffer_array[0] = rgb + (cinfo.output_scanline) * row_stride;
+
+        jpeg_read_scanlines(&cinfo, buffer_array, 1);
+    }
+
+    jpeg_finish_decompress(&cinfo);
+    jpeg_destroy_decompress(&cinfo);
+
+    unused(height);
+    return 0;
 }
