@@ -6,13 +6,13 @@
 **Install ROS Kinetic:**
 
 ```
-cd ~
-wget https://raw.githubusercontent.com/oroca/oroca-ros-pkg/master/ros_install.sh && \
+$ cd ~
+$ wget https://raw.githubusercontent.com/oroca/oroca-ros-pkg/master/ros_install.sh && \
 chmod 755 ./ros_install.sh && bash ./ros_install.sh catkin_ws kinetic
 ```
 
 * OpenCV (ROS Kinetic)
-* JPEG (System)
+* JPEG
 
 > Only Linux x64 & aarch64 are supported.
 
