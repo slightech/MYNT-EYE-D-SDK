@@ -25,28 +25,28 @@ find_path(eSPDI_INCLUDE_DIRS
 set(CMAKE_FIND_LIBRARY_PREFIXES "")
 
 if(MSVC)
-  set(eSPDI_LIBPATH ${eSPDI_ROOT}/win/x64)
+  set(eSPDI_LIB_DIR ${eSPDI_ROOT}/win/x64)
   set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib")
 elseif(MINGW)
-  set(eSPDI_LIBPATH ${eSPDI_ROOT}/mingw/x64)
+  set(eSPDI_LIB_DIR ${eSPDI_ROOT}/mingw/x64)
   set(CMAKE_FIND_LIBRARY_SUFFIXES ".dll")
 elseif(APPLE)
-  set(eSPDI_LIBPATH ${eSPDI_ROOT}/mac/x64)
+  set(eSPDI_LIB_DIR ${eSPDI_ROOT}/mac/x64)
   set(CMAKE_FIND_LIBRARY_SUFFIXES ".dylib")
 elseif(UNIX)
   if(ARCH_AARCH64)
-    set(eSPDI_LIBPATH ${eSPDI_ROOT}/linux/aarch64)
+    set(eSPDI_LIB_DIR ${eSPDI_ROOT}/linux/aarch64)
   else()
-    set(eSPDI_LIBPATH ${eSPDI_ROOT}/linux/x64)
+    set(eSPDI_LIB_DIR ${eSPDI_ROOT}/linux/x64)
   endif()
-  set(CMAKE_FIND_LIBRARY_SUFFIXES ".so.3.0.14")
+  set(CMAKE_FIND_LIBRARY_SUFFIXES ".so")
 else()
   message(FATAL_ERROR "This platform not support now.")
 endif()
 
 find_library(eSPDI_LIBRARY
   NAMES libeSPDI
-  PATHS ${eSPDI_LIBPATH} ${CMAKE_EXTRA_LIBRARIES}
+  PATHS ${eSPDI_LIB_DIR} ${CMAKE_EXTRA_LIBRARIES}
   NO_SYSTEM_PATH
 )
 set(eSPDI_LIBS ${eSPDI_LIBRARY})
@@ -76,11 +76,16 @@ else()
   endif()
 endif()
 
-mark_as_advanced (
+#set(CMAKE_EXE_LINKER_FLAGS    "${CMAKE_EXE_LINKER_FLAGS}    -Wl,-rpath-link,${eSPDI_LIB_DIR}")
+#set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath-link,${eSPDI_LIB_DIR}")
+#set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -Wl,-rpath-link,${eSPDI_LIB_DIR}")
+
+mark_as_advanced(
   eSPDI_FOUND
   eSPDI_INCLUDE_DIRS
   eSPDI_LIBRARY
   eSPDI_LIBS
+  eSPDI_LIB_DIR
 )
 
 set(CMAKE_FIND_LIBRARY_PREFIXES ${CMAKE_FIND_LIBRARY_PREFIXES_ORIGIN})
