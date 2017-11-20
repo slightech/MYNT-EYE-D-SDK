@@ -175,7 +175,7 @@ endif
 # Package
 
 PKGVERSION := $(shell ./scripts/version.sh)
-PKGNAME := mynteye-$(PKGVERSION)-$(HOST_NAME)-$(HOST_ARCH)
+PKGNAME := mynteye-$(PKGVERSION)-$(HOST_OS)-$(HOST_ARCH)
 ifeq ($(HOST_OS),Linux)
     PKGNAME := $(PKGNAME)-gcc$(shell gcc -dumpversion | cut -c 1-1)
 endif
