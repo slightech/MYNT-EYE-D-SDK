@@ -8,6 +8,7 @@ help:
 	@echo "  make help"
 	@echo "  make all                       build all"
 	@echo "  make ros                       build ros wrapper"
+	@echo "  make pkg                       package sdk"
 	@echo "  make clean                     clean"
 	@echo "  make cleanall                  clean all"
 	@echo "Usage More:"

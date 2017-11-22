@@ -62,3 +62,17 @@ $ roslaunch mynteye_wrapper mynteye.launch
 $ source ./wrappers/ros/devel/setup.bash
 $ rosrun mynteye_wrapper mynteye_listener
 ```
+
+## Package
+
+```
+$ cd <sdk>
+$ make pkg
+```
+
+## Clean
+
+```
+$ cd <sdk>
+$ make cleanall
+```
