@@ -6,8 +6,8 @@
 **ROS Kinetic:**
 
 ```
-cd ~
-wget https://raw.githubusercontent.com/oroca/oroca-ros-pkg/master/ros_install.sh && \
+$ cd ~
+$ wget https://raw.githubusercontent.com/oroca/oroca-ros-pkg/master/ros_install.sh && \
 chmod 755 ./ros_install.sh && bash ./ros_install.sh catkin_ws kinetic
 ```
 
