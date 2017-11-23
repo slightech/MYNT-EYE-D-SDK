@@ -327,7 +327,7 @@ ErrorCode CameraPrivate::RetrieveImage(cv::Mat &color, cv::Mat &depth) {
         }
         ushort depth_dist = depth_max - depth_min;
         for (int i = 0; i < size; ++i) {
-            depth.data[i] = static_cast<uchar>((depth_raw_.data[i] - depth_min) / depth_dist + depth_min);
+            depth.data[i] = static_cast<uchar>(255 * (depth_raw_.data[i] - depth_min) / depth_dist);
         }
         //cv::normalize(depth_raw_, depth, 0, 255, cv::NORM_MINMAX, CV_8UC1);
     }
