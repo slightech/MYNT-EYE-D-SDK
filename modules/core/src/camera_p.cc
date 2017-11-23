@@ -308,14 +308,28 @@ ErrorCode CameraPrivate::RetrieveImage(cv::Mat &color, cv::Mat &depth) {
         const int h = static_cast<int>(depth_img_height);
         const int w = static_cast<int>(depth_img_width);
         const int size = h * w;
+        if (depth.rows != h || depth.cols != w || depth.type() != CV_8UC1) {
+            depth = cv::Mat(h, w, CV_8UC1);
+        }
         if (depth_raw_.rows != h || depth_raw_.cols != w) {
             depth_raw_ = cv::Mat(h, w, CV_16UC1);
         }
         uchar *data = depth_img.data;
-        for (int i = 0; i < size; ++i) {
-            depth_raw_.data[i] = (data[i*2] & 0xff) | ((data[i*2 + 1] & 0xff) << 8);  // ushort
+        // first depth pixel
+        ushort depth_pixel = (data[0] & 0xff) | ((data[1] & 0xff) << 8);
+        depth_raw_.data[0] = depth_min = depth_max = depth_pixel;
+        // other depth pixels
+        for (int i = 1; i < size; ++i) {
+            depth_pixel = (data[i*2] & 0xff) | ((data[i*2 + 1] & 0xff) << 8);  // ushort
+            depth_raw_.data[i] = depth_pixel;
+            if (depth_pixel < depth_min) depth_min = depth_pixel;
+            if (depth_pixel > depth_max) depth_max = depth_pixel;
         }
-        cv::normalize(depth_raw_, depth, 0, 255, cv::NORM_MINMAX, CV_8UC1);
+        ushort depth_dist = depth_max - depth_min;
+        for (int i = 0; i < size; ++i) {
+            depth.data[i] = static_cast<uchar>((depth_raw_.data[i] - depth_min) / depth_dist + depth_min);
+        }
+        //cv::normalize(depth_raw_, depth, 0, 255, cv::NORM_MINMAX, CV_8UC1);
     }
 
     return ErrorCode::SUCCESS;
