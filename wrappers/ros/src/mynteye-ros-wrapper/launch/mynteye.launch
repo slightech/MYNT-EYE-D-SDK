@@ -5,6 +5,8 @@
   <arg name="depth_index"   default="1" />
   <arg name="ir_intensity"  default="4" />
 
+  <!-- depth_non: transfer to gray by ourself. -->
+  <arg name="depth_non"         default="0" />
   <arg name="depth_gray"        default="1" />
   <arg name="depth_colorful"    default="2" />
 
@@ -16,7 +18,7 @@
     <!-- Camera params -->
     <param name="dev_index"     value="$(arg dev_index)" />
     <param name="framerate"     value="30" />
-    <param name="depth_mode"    value="$(arg depth_colorful)" />
+    <param name="depth_mode"    value="$(arg depth_non)" />
     <param name="color_index"   value="$(arg color_index)" />
     <param name="depth_index"   value="$(arg depth_index)" />
     <param name="state_ae"      value="true" />

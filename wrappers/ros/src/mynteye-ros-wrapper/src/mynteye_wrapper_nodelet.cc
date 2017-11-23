@@ -65,7 +65,9 @@ public:
         //header.seq = 0;
         header.stamp = stamp;
         header.frame_id = depth_frame_id;
-        if (depth_mode == 1) {  // DEPTH_GRAY
+        if (depth_mode == 0) {  // DEPTH_NON
+            pub_depth.publish(cv_bridge::CvImage(header, enc::MONO8, img).toImageMsg());
+        } else if (depth_mode == 1) {  // DEPTH_GRAY
             cv::cvtColor(img, img, CV_BGR2GRAY);
             pub_depth.publish(cv_bridge::CvImage(header, enc::MONO8, img).toImageMsg());
         } else if (depth_mode == 2) {  // DEPTH_COLORFUL
@@ -125,7 +127,7 @@ public:
         // Launch params
         dev_index = 0;
         framerate = 30;
-        depth_mode = 2;
+        depth_mode = 0;
         color_index = 0;
         depth_index = 0;
         state_ae = true;
