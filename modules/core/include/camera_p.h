@@ -89,6 +89,8 @@ private:
     unsigned char *color_img_buf_;
     unsigned char *color_rgb_buf_;
     unsigned char *depth_img_buf_;
+
+    cv::Mat depth_raw_;
 };
 
 }  // namespace mynteye

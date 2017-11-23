@@ -308,12 +308,14 @@ ErrorCode CameraPrivate::RetrieveImage(cv::Mat &color, cv::Mat &depth) {
         const int h = static_cast<int>(depth_img_height);
         const int w = static_cast<int>(depth_img_width);
         const int size = h * w;
-        cv::Mat depth_raw(h, w, CV_16UC1);
+        if (depth_raw_.rows != h || depth_raw_.cols != w) {
+            depth_raw_ = cv::Mat(h, w, CV_16UC1);
+        }
         uchar *data = depth_img.data;
         for (int i = 0; i < size; ++i) {
-            depth_raw.data[i] = (data[i*2] & 0xff) | ((data[i*2 + 1] & 0xff) << 8);  // ushort
+            depth_raw_.data[i] = (data[i*2] & 0xff) | ((data[i*2 + 1] & 0xff) << 8);  // ushort
         }
-        cv::normalize(depth_raw, depth, 0, 255, cv::NORM_MINMAX, CV_8UC1);
+        cv::normalize(depth_raw_, depth, 0, 255, cv::NORM_MINMAX, CV_8UC1);
     }
 
     return ErrorCode::SUCCESS;
