@@ -5,7 +5,6 @@
   <arg name="depth_index"   default="1" />
   <arg name="ir_intensity"  default="4" />
 
-  <!-- depth_non: transfer to gray by ourself. -->
   <arg name="depth_non"         default="0" />
   <arg name="depth_gray"        default="1" />
   <arg name="depth_colorful"    default="2" />
