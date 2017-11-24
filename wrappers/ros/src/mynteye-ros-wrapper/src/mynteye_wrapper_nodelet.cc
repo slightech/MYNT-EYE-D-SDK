@@ -66,12 +66,16 @@ public:
         header.stamp = stamp;
         header.frame_id = depth_frame_id;
         if (depth_mode == 0) {  // DEPTH_NON
-            pub_depth.publish(cv_bridge::CvImage(header, enc::MONO8, img).toImageMsg());
+            pub_depth.publish(cv_bridge::CvImage(header, enc::BGR8, img).toImageMsg());
         } else if (depth_mode == 1) {  // DEPTH_GRAY
             cv::cvtColor(img, img, CV_BGR2GRAY);
             pub_depth.publish(cv_bridge::CvImage(header, enc::MONO8, img).toImageMsg());
         } else if (depth_mode == 2) {  // DEPTH_COLORFUL
             pub_depth.publish(cv_bridge::CvImage(header, enc::BGR8, img).toImageMsg());
+        } else if (depth_mode == 3) {  // DEPTH_NON_16UC1
+            pub_depth.publish(cv_bridge::CvImage(header, enc::MONO16, img).toImageMsg());
+        } else if (depth_mode == 4) {  // DEPTH_NON_8UC1
+            pub_depth.publish(cv_bridge::CvImage(header, enc::MONO8, img).toImageMsg());
         } else {
             NODELET_ERROR_STREAM("Depth mode unsupported");
             return;

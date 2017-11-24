@@ -42,6 +42,8 @@ public:
         try {
             if (enc::isColor(msg->encoding)) {
                 cv_ptr = cv_bridge::toCvShare(msg, enc::BGR8);
+            } else if (msg->encoding == enc::MONO16) {
+                cv_ptr = cv_bridge::toCvShare(msg, enc::MONO16);
             } else {
                 cv_ptr = cv_bridge::toCvShare(msg, enc::MONO8);
             }

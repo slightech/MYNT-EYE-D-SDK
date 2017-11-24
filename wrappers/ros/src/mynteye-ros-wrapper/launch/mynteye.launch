@@ -9,6 +9,8 @@
   <arg name="depth_non"         default="0" />
   <arg name="depth_gray"        default="1" />
   <arg name="depth_colorful"    default="2" />
+  <arg name="depth_non_16uc1"   default="3" />
+  <arg name="depth_non_8uc1"    default="4" />
 
   <arg name="color_frame" default="mynteye_color" />
   <arg name="depth_frame" default="mynteye_depth" />
