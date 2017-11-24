@@ -72,7 +72,7 @@ int main(int argc, char const *argv[]) {
 
     // Warning: Color stream format MJPG doesn't work.
     InitParams params(dev_info.index);
-    params.depth_mode = DepthMode::DEPTH_NON;
+    params.depth_mode = DepthMode::DEPTH_NON_8UC1;
     //params.color_info_index = 4;
     //params.depth_info_index = 1;
     params.ir_intensity = 4;

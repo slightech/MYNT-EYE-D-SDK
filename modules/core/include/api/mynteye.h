@@ -100,6 +100,8 @@ ENUM(DepthMode) {
     DEPTH_NON,
     DEPTH_GRAY,
     DEPTH_COLORFUL,
+    DEPTH_NON_16UC1,
+    DEPTH_NON_8UC1,
     DEPTH_LAST
 };
 

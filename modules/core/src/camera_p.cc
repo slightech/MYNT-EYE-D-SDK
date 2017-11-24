@@ -194,9 +194,18 @@ ErrorCode CameraPrivate::Open(const InitParams &params) {
             dtc_ = DEPTH_IMG_COLORFUL_TRANSFER;
             dtc_name = "Colorful";
             break;
+        case DepthMode::DEPTH_NON_16UC1:
+            dtc_ = DEPTH_IMG_NON_TRANSFER;
+            dtc_name = "Non 16UC1";
+            break;
+        case DepthMode::DEPTH_NON_8UC1:
+            dtc_ = DEPTH_IMG_NON_TRANSFER;
+            dtc_name = "Non 8UC1";
+            break;
         default:
             break;
     }
+    depth_mode_ = params.depth_mode;
     LOGI("-- Depth mode: %s", dtc_name);
 
     if (params.dev_index != stream_info_dev_index_) {
@@ -304,35 +313,45 @@ ErrorCode CameraPrivate::RetrieveImage(cv::Mat &color, cv::Mat &depth) {
         cv::cvtColor(depth_img, depth, CV_RGB2BGR);
     } else {  // DEPTH_IMG_NON_TRANSFER
         cv::Mat depth_img(depth_img_height, depth_img_width, CV_8UC2, depth_img_buf_);
-        //cv::cvtColor(depth_img, depth, CV_YUV2BGR_YUY2);
-        const int h = static_cast<int>(depth_img_height);
-        const int w = static_cast<int>(depth_img_width);
-        if (depth.rows != h || depth.cols != w || depth.type() != CV_8UC1) {
-            depth = cv::Mat(h, w, CV_8UC1);
-        }
-        if (depth_raw_.rows != h || depth_raw_.cols != w) {
-            depth_raw_ = cv::Mat(h, w, CV_16UC1);
-        }
-        // initialize depth min,max
-        const cv::Vec2b &pixel = depth_img.at<cv::Vec2b>(0,0);
-        ushort depth_pixel = (pixel[0] & 0xff) | ((pixel[1] & 0xff) << 8);
-        depth_min = depth_max = depth_pixel;
-        // compute depth pixels
-        for (int i = 0; i < h; ++i) {  // row
-            for (int j = 0; j < w; ++j) {  // col
-                const cv::Vec2b &pixel = depth_img.at<cv::Vec2b>(i,j);
-                depth_pixel = (pixel[0] & 0xff) | ((pixel[1] & 0xff) << 8);
-                depth_raw_.at<ushort>(i,j) = depth_pixel;
-                if (depth_pixel < depth_min) depth_min = depth_pixel;
-                if (depth_pixel > depth_max) depth_max = depth_pixel;
+        if (depth_mode_ == DepthMode::DEPTH_NON) {
+            cv::cvtColor(depth_img, depth, CV_YUV2BGR_YUY2);
+        } else {
+            const int h = static_cast<int>(depth_img_height);
+            const int w = static_cast<int>(depth_img_width);
+            if (depth_raw_.rows != h || depth_raw_.cols != w) {
+                depth_raw_ = cv::Mat(h, w, CV_16UC1);
             }
-        }
-        // transfer depth to gray
-        ushort depth_dist = depth_max - depth_min;
-        for (int i = 0; i < h; ++i) {  // row
-            for (int j = 0; j < w; ++j) {  // col
-                const ushort depth_pixel = depth_raw_.at<ushort>(i,j);
-                depth.at<uchar>(i,j) = 255 * (depth_pixel - depth_min) / depth_dist;
+            // initialize depth min,max
+            const cv::Vec2b &pixel = depth_img.at<cv::Vec2b>(0,0);
+            ushort depth_pixel = (pixel[0] & 0xff) | ((pixel[1] & 0xff) << 8);
+            depth_min = depth_max = depth_pixel;
+            // compute depth pixels
+            for (int i = 0; i < h; ++i) {  // row
+                for (int j = 0; j < w; ++j) {  // col
+                    const cv::Vec2b &pixel = depth_img.at<cv::Vec2b>(i,j);
+                    depth_pixel = (pixel[0] & 0xff) | ((pixel[1] & 0xff) << 8);
+                    depth_raw_.at<ushort>(i,j) = depth_pixel;
+                    if (depth_pixel < depth_min) depth_min = depth_pixel;
+                    if (depth_pixel > depth_max) depth_max = depth_pixel;
+                }
+            }
+
+            if (depth_mode_ == DepthMode::DEPTH_NON_16UC1) {
+                depth = depth_raw_;
+            } else if (depth_mode_ == DepthMode::DEPTH_NON_8UC1) {
+                if (depth.rows != h || depth.cols != w || depth.type() != CV_8UC1) {
+                    depth = cv::Mat(h, w, CV_8UC1);
+                }
+                // transfer depth to gray
+                ushort depth_dist = depth_max - depth_min;
+                for (int i = 0; i < h; ++i) {  // row
+                    for (int j = 0; j < w; ++j) {  // col
+                        const ushort depth_pixel = depth_raw_.at<ushort>(i,j);
+                        depth.at<uchar>(i,j) = 255 * (depth_pixel - depth_min) / depth_dist;
+                    }
+                }
+            } else {
+                throw new std::runtime_error("Error: Depth mode is not supported.");
             }
         }
     }

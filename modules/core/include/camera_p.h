@@ -90,6 +90,7 @@ private:
     unsigned char *color_rgb_buf_;
     unsigned char *depth_img_buf_;
 
+    DepthMode depth_mode_;
     cv::Mat depth_raw_;
     ushort depth_min;
     ushort depth_max;
