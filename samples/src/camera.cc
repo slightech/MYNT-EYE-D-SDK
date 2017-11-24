@@ -30,16 +30,20 @@ int main(int argc, char const *argv[]) {
         }
         cout << dashes << endl;
 
-        size_t i;
-        cout << "Please select a device to open, index: ";
-        cin >> i;
-        cout << endl;
-        if (i < 0 || i >= n) {
-            cerr << "Error: Index out of range" << endl;
-            return 1;
+        if (n <= 2) {
+            dev_info = dev_infos[0];
+            cout << "Auto select a device to open, index: 0"<< endl;
+        } else {
+            size_t i;
+            cout << "Please select a device to open, index: ";
+            cin >> i;
+            cout << endl;
+            if (i < 0 || i >= n) {
+                cerr << "Error: Index out of range" << endl;
+                return 1;
+            }
+            dev_info = dev_infos[i];
         }
-
-        dev_info = dev_infos[i];
     }
 
     {
@@ -68,7 +72,7 @@ int main(int argc, char const *argv[]) {
 
     // Warning: Color stream format MJPG doesn't work.
     InitParams params(dev_info.index);
-    //params.depth_mode = DepthMode::DEPTH_GRAY;
+    params.depth_mode = DepthMode::DEPTH_NON;
     //params.color_info_index = 4;
     //params.depth_info_index = 1;
     params.ir_intensity = 4;
