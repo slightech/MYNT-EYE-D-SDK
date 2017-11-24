@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 project(mynteye)
 
 set(MYNTEYE_VERSION_MAJOR 1)
-set(MYNTEYE_VERSION_MINOR 0)
+set(MYNTEYE_VERSION_MINOR 1)
 
 get_filename_component(PRO_DIR ${PROJECT_SOURCE_DIR} DIRECTORY)
 
