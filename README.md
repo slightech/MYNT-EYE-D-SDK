@@ -1,5 +1,5 @@
 
-# Etron SDK
+# MYNT EYE SDK - Depth Edition
 
 ## Prerequisites
 
