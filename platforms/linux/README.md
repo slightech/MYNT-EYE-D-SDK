@@ -54,7 +54,7 @@ chmod 755 ./ros_install.sh && bash ./ros_install.sh catkin_ws kinetic
 
 ## Install SDK
 
-**SDK:**
+Edit `<sdk>/sdk.cfg` to set your OpenCV directory etc., then install:
 
 ```
 $ cd <sdk>

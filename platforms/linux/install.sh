@@ -31,10 +31,13 @@ fi
 
 ecol "Change rpath ..."
 
-# default rpath here
-RPATH_ROS=/opt/ros/kinetic/lib
+source "$BASE_DIR/sdk.cfg"
 
-patchelf --set-rpath $RPATH_ROS:$BASE_DIR/lib/3rdparty $BASE_DIR/lib/libmynteye_core.so
+# default rpath here
+RPATH_OPENCV=/usr/local/lib
+[ -z "$SDK_OpenCV_LIB_DIR" ] || RPATH_OPENCV=$SDK_OpenCV_LIB_DIR
+
+patchelf --set-rpath $RPATH_OPENCV:$BASE_DIR/lib/3rdparty $BASE_DIR/lib/libmynteye_core.so
 
 ecol "Change rpath done"
 

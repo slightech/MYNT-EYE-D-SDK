@@ -1,0 +1,3 @@
+# OpenCV library path, `install.sh` will set this as a rpath to search OpenCV libraries.
+# Besides, you could `export LD_LIBRARY_PATH=<library path, such as /usr/local/lib>:$LD_LIBRARY_PATH` in `~/.bashrc` to search your OpenCV libraries.
+SDK_OpenCV_LIB_DIR=@SDK_OpenCV_LIB_DIR@

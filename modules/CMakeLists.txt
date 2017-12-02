@@ -143,3 +143,16 @@ configure_file(
   "${PRO_DIR}/cmake/templates/pkginfo.sh.in"
   "${PRO_DIR}/pkginfo.sh"
 )
+
+# platforms/linux/sdk.cfg
+
+if(OpenCV_INCLUDE_DIRS MATCHES ".*/ros/.*")
+  set(SDK_OpenCV_LIB_DIR /opt/ros/kinetic/lib)
+else()
+  set(SDK_OpenCV_LIB_DIR /usr/local/lib)
+endif()
+
+configure_file(
+  "${PRO_DIR}/cmake/templates/platforms/linux/sdk.cfg.in"
+  "${PRO_DIR}/platforms/linux/sdk.cfg"
+)
