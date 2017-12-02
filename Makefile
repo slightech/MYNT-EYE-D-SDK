@@ -25,6 +25,7 @@ clean:
 	@$(call rm,./output/)
 	@$(call rm,./modules/build/)
 	@$(call rm,./samples/build/)
+	@$(call rm,./pkginfo.sh)
 	@$(FIND) . -type f -name ".DS_Store" -print0 | xargs -0 rm -f
 
 .PHONY: cleanall
@@ -105,7 +106,7 @@ pkg: sdk cleanros
 		./scripts/_cp_subs.sh $${plat_path} ./output; \
 	fi
 
-	@dst=$(PKGNAME)-opencv-ros-kinetic; \
+	@$(shell sh ./pkginfo.sh); dst=$(PKGNAME)-opencv-$$OpenCV_VERSION; \
 	$(call echo,Copy ./output to $$dst ...,1;35); \
 	$(call rm,$$dst); $(ECHO) "CP: ./output > $$dst"; cp -Rp "./output/." "$$dst"; \
 	rm -f $$dst/tools/*.bat; \

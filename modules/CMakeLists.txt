@@ -136,3 +136,10 @@ if(eSPDI_LIBRARY)
     endif()
   endforeach()
 endif()
+
+# pkginfo.sh
+
+configure_file(
+  "${PRO_DIR}/cmake/templates/pkginfo.sh.in"
+  "${PRO_DIR}/pkginfo.sh"
+)
