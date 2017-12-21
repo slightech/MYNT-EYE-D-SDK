@@ -96,3 +96,9 @@ make_executable(camera
   LINKLIBS
     ${OpenCV_LIBS} ${SDK_LIB_CORE}
 )
+
+make_executable(camera2
+  SRCS src/camera2.cc
+  LINKLIBS
+    ${OpenCV_LIBS} ${SDK_LIB_CORE}
+)
