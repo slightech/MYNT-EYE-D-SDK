@@ -6,7 +6,7 @@
 
 #include "camera.h"
 
-#define WIN_FLAGS cv::WINDOW_AUTOSIZE | cv::WINDOW_KEEPRATIO | cv::WINDOW_GUI_NORMAL
+#define WIN_FLAGS cv::WINDOW_AUTOSIZE
 
 namespace {
 
