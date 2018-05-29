@@ -37,17 +37,6 @@ if(OS_LINUX)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCC)
-  execute_process(COMMAND gcc -dumpfullversion COMMAND cut -c 1-3 COMMAND tr -d '\n' OUTPUT_VARIABLE GCC_VERSION)
-  message(STATUS "GCC_VERSION_TEST: ${GCC_VERSION}")
-  string(REGEX MATCHALL "[0-9]+" GCC_VERSION_COMPONMENTS ${GCC_VERSION})
-  list(GET GCC_VERSION_COMPONMENTS 0 GCC_MAJOR)
-  list(GET GCC_VERSION_COMPONMENTS 1 GCC_MINOR)
-  message(STATUS "GCC_VERSION: ${GCC_VERSION}")
-  message(STATUS "GCC_MAJOR: ${GCC_MAJOR}")
-  message(STATUS "GCC_MINOR: ${GCC_MINOR}")
-endif()
-
-if(CMAKE_COMPILER_IS_GNUCC)
   # GCC 5 changes, Dual ABI: https://gcc.gnu.org/gcc-5/changes.html#libstdcxx
   #add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
 endif()
