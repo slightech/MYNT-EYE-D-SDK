@@ -102,3 +102,5 @@ make_executable(camera2
   LINKLIBS
     ${OpenCV_LIBS} ${SDK_LIB_CORE}
 )
+
+add_subdirectory(socket)
