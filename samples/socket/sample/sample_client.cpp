@@ -15,21 +15,21 @@ using namespace mynteye;
 
 void AssertCond(bool assert_cond, const char* fail_msg) {
   if (!assert_cond) {
-    printf("Error: %s\nUsage: ./pic-client <port> <rows> <cols>\n", fail_msg);
+    printf("Error: %s\nUsage: ./pic-client <serverip> <port> <rows> <cols>\n", fail_msg);
     exit(1);
   }
 }
 
 void ParseArgs(int argc, char** argv) {
-  AssertCond(argc == 4, "Wrong number of arguments");
+  AssertCond(argc == 5, "Wrong number of arguments");
 }
 
 int main(int argc, char **argv) {
     ParseArgs(argc, argv);
-    int port = atoi(argv[1]);
-    int cols = atoi(argv[2]);
-    int rows = atoi(argv[3]);
-    const char hostname[] = "localhost";
+    const char hostname[] = argv[1];
+    int port = atoi(argv[2]);
+    int cols = atoi(argv[3]);
+    int rows = atoi(argv[4]);
     std::unique_ptr<SocketClient> client_ptr(new SocketClient(hostname, port));
     client_ptr->ConnectToServer();
     client_ptr->SendImageDims(cols, rows);

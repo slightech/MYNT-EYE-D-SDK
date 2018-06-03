@@ -6,9 +6,8 @@
 
 #include <opencv2/opencv.hpp>
 
-SocketServer::SocketServer(int port, std::string out_path) :
+SocketServer::SocketServer(int port) :
     image_dims_(cv::Size2i(0, 0)),
-    out_path_(out_path),
     client_len_(0),
     server_addr_size_(sizeof(server_addr_)),
     port_(port),
@@ -137,9 +136,6 @@ void SocketServer::ReceiveImage(cv::Mat& image) {
       image.at<ushort>(i,j) = ptr[image_ptr++];
     }
   }
-  std::ostringstream oss;
-  oss << out_path_ << "/pic_" << std::to_string(pic_count_++) << ".jpg";
-  pic_filename_ = oss.str();
 }
 
 void SocketServer::WriteImage(cv::Mat& image) {
