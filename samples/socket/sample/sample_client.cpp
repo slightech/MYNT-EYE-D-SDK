@@ -26,7 +26,7 @@ void ParseArgs(int argc, char** argv) {
 
 int main(int argc, char **argv) {
     ParseArgs(argc, argv);
-    const char hostname[] = argv[1];
+    const char* hostname = argv[1];
     int port = atoi(argv[2]);
     int cols = atoi(argv[3]);
     int rows = atoi(argv[4]);

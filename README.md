@@ -1,5 +1,5 @@
 
-# MYNT EYE SDK - Depth Edition
+# MYNT EYE SDK - Depth Edition Quick Start Guide
 
 > Only Linux x64 & aarch64 are supported.
 
@@ -7,44 +7,49 @@
 
 ## Prerequisites
 
-### With OpenCV Basic
+### 1. Install With OpenCV Basic
 
-**OpenCV, with same verion:**
+If you have installed opencv already or you want use it in ROS, you can skip this part.
+
+**1.1 OpenCV with GTK or VTK**
 
 ```
 $ git clone https://github.com/opencv/opencv.git
 $ cd opencv/
-$ git checkout tags/3.2.0
+$ git checkout tags/3.4.0
 
 $ cd opencv/
 $ mkdir build
 $ cd build/
 
-$ cmake \
--DCMAKE_BUILD_TYPE=RELEASE \
--DCMAKE_INSTALL_PREFIX=/usr/local \
-\
--DWITH_CUDA=OFF \
-\
--DBUILD_DOCS=OFF \
--DBUILD_EXAMPLES=OFF \
--DBUILD_TESTS=OFF \
--DBUILD_PERF_TESTS=OFF \
-..
+$ cmake ..
 
-$ make -j
+$ make -j4
 $ sudo make install
 ```
 
-**JPEG:**
+**1.2 JPEG:**
 
 ```
 $ sudo apt-get install libjpeg-dev
 ```
+**1.3 Build:**
 
-### With OpenCV ROS
+```
+$ make all
+```
 
-**ROS Kinetic:**
+**1.4 Samples**
+
+```
+$ ./samples/build/output/bin/camera
+```
+
+### 2. Install With OpenCV ROS
+
+If you won't use ROS(The Robot Operating System), you can skip this part.
+
+**2.1 Install ROS Kinetic:**
 
 ```
 $ cd ~
@@ -54,19 +59,7 @@ chmod 755 ./ros_install.sh && bash ./ros_install.sh catkin_ws kinetic
 
 > ROS Kinetic will install OpenCV, JPEG.
 
-## Build
-
-```
-$ make all
-```
-
-## Samples
-
-```
-$ ./samples/build/output/bin/camera
-```
-
-## ROS Wrapper
+**2.2 Build ROS Wrapper**
 
 ```
 $ make ros
@@ -99,9 +92,9 @@ $ source ./wrappers/ros/devel/setup.bash
 $ rosrun mynteye_wrapper mynteye_listener
 ```
 
-## Package
+## 3. Package
 
-If wanna package with specified OpenCV version:
+If you wanna package with specified OpenCV version:
 
 ```
 $ make cleanall
@@ -118,7 +111,7 @@ $ cd <sdk>
 $ make pkg
 ```
 
-## Clean
+## 4. Clean
 
 ```
 $ cd <sdk>
