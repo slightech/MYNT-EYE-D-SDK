@@ -114,7 +114,7 @@ int main(int argc, char **argv) {
     cout << "\033[1;32mPress ESC/Q on Windows to terminate\033[0m" << endl;
 
     // cv::namedWindow("client_color", cv::WINDOW_AUTOSIZE);
-    cv::namedWindow("client_depth", cv::WINDOW_AUTOSIZE);
+    // cv::namedWindow("client_depth", cv::WINDOW_AUTOSIZE);
 
     double t, fps = 0;
     cv::Mat color, depth;
@@ -123,7 +123,7 @@ int main(int argc, char **argv) {
 
         if (cam.RetrieveImage(color, depth) == ErrorCode::SUCCESS) {
             // cv::imshow("client_color", color);
-            cv::imshow("client_depth", depth);
+            // cv::imshow("client_depth", depth);
             client_ptr->SendImage(depth);
         }
 

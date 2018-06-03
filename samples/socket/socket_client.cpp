@@ -7,7 +7,7 @@
 #include <sys/types.h> 
 #include <sys/socket.h>
 
-#include <opencv2/highgui.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 SocketClient::SocketClient(const char* hostname, int port) :
     hostname_ (hostname),

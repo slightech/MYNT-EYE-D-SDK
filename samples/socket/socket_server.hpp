@@ -9,7 +9,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
-#include <opencv2/core.hpp>
+#include <opencv2/core/core.hpp>
 
 class SocketServer {
  public:

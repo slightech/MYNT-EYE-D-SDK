@@ -4,7 +4,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include <opencv2/imgcodecs.hpp>
+#include <opencv2/opencv.hpp>
 
 SocketServer::SocketServer(int port, std::string out_path) :
     image_dims_(cv::Size2i(0, 0)),

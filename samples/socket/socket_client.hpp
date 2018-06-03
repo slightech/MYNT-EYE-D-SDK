@@ -1,7 +1,7 @@
 #ifndef SOCKET_CLIENT_HPP
 #define SOCKET_CLIENT_HPP
 
-#include <opencv2/core.hpp>
+#include <opencv2/core/core.hpp>
 
 class SocketClient {
  public:
