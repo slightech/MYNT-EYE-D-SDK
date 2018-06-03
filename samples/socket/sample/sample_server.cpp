@@ -26,13 +26,13 @@ void AssertCond(bool assert_cond, const char* fail_msg) {
 }
 
 void ParseArgs(int argc, char** argv) {
-  AssertCond(argc == 3, "Wrong number of arguments");
+  AssertCond(argc == 2, "Wrong number of arguments");
 }
 
 int main(int argc, char** argv) {
   ParseArgs(argc, argv);
   int port = atoi(argv[1]);
-  std::unique_ptr<SocketServer> server_ptr(new SocketServer(port, argv[2]));
+  std::unique_ptr<SocketServer> server_ptr(new SocketServer(port));
   server_ptr->ConnectToNetwork();
   server_ptr->ReceiveImageDims();
   cv::namedWindow("depth", cv::WINDOW_AUTOSIZE);

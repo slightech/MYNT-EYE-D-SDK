@@ -13,7 +13,7 @@
 
 class SocketServer {
  public:
-  SocketServer(int port, std::string out_path);
+  SocketServer(int port);
   void ConnectToNetwork();
   void ReceiveImageDims();
   void ReceiveImage(cv::Mat& image);
