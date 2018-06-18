@@ -1,4 +1,3 @@
-
 # MYNT EYE SDK - Depth Edition Quick Start Guide
 
 > Only Linux x64 & aarch64 are supported.
@@ -11,7 +10,21 @@
 
 If you have installed opencv already or you want use it in ROS, you can skip this part.
 
-**1.1 OpenCV with GTK or VTK**
+**1.1 Install dependency (OpenCV need GTK or VTK for GUI)**
+
+```
+$ sudo apt-get install libjpeg-dev libgtk-3-dev 
+```
+
+**1.2 Install OpenCV with apt or compile (Choose one)**
+
+***1.2.1 Install OpenCV with apt***
+
+```
+$ sudo apt-get install libopencv-dev 
+```
+
+***1.2.2 Install OpenCV by Compile***
 
 ```
 $ git clone https://github.com/opencv/opencv.git
@@ -28,14 +41,11 @@ $ make -j4
 $ sudo make install
 ```
 
-**1.2 JPEG:**
+
+**1.3 Build SDK:**
 
 ```
-$ sudo apt-get install libjpeg-dev
-```
-**1.3 Build:**
-
-```
+$ cd <sdk>
 $ make all
 ```
 
@@ -97,6 +107,7 @@ $ rosrun mynteye_wrapper mynteye_listener
 If you wanna package with specified OpenCV version:
 
 ```
+$ cd <sdk>
 $ make cleanall
 $ export OpenCV_DIR=<install prefix>
 
