@@ -85,22 +85,30 @@ message(STATUS "OpenCV_INCLUDE_DIRS: ${OpenCV_INCLUDE_DIRS}")
 message(STATUS "OpenCV_LIBS: ${OpenCV_LIBS}")
 
 # samples
+find_package(PCL QUIET)
 
 include_directories(
+  ${PCL_INCLUDE_DIRS}
   ${SDK_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
 )
 
-make_executable(camera
-  SRCS src/camera.cc
+make_executable(get_image
+  SRCS src/get_image.cc
   LINKLIBS
     ${OpenCV_LIBS} ${SDK_LIB_CORE}
 )
 
-make_executable(camera2
-  SRCS src/camera2.cc
+make_executable(get_depth
+  SRCS src/get_depth.cc
   LINKLIBS
     ${OpenCV_LIBS} ${SDK_LIB_CORE}
+)
+
+make_executable(get_points
+  SRCS src/get_points.cc
+  LINKLIBS
+    ${OpenCV_LIBS} ${SDK_LIB_CORE} ${PCL_LIBRARIES}
 )
 
 add_subdirectory(socket)
