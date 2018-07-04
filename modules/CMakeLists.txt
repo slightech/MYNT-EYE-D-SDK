@@ -106,6 +106,7 @@ endif()
 if(eSPDI_LIBRARY)
   set(__espdi_libs "")
   set(__espdi_symlinks "")
+  list(APPEND eSPDI_LIBS ${eSPDI_3PARTY_LIBS})
   foreach(__espdi_lib ${eSPDI_LIBS})
     string(REGEX MATCH "^${PRO_DIR}/*" __match "${__espdi_lib}")
     if(__match)
@@ -122,7 +123,7 @@ if(eSPDI_LIBRARY)
     endif()
   endforeach()
 
-  # Copy libs brefore symlinks
+  # Copy libs before symlinks
   list(APPEND __espdi_libs ${__espdi_symlinks})
 
   message(STATUS "Copy eSPDI_LIBS to ${__lib_dir}")

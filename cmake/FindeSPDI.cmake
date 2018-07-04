@@ -48,6 +48,11 @@ find_library(eSPDI_LIBRARY
 )
 set(eSPDI_LIBS ${eSPDI_LIBRARY})
 
+if(OS_WIN)
+list(APPEND eSPDI_3PARTY_LIBS "${eSPDI_LIB_DIR}/eys_world.dll")
+list(APPEND eSPDI_3PARTY_LIBS "${eSPDI_LIB_DIR}/opencv_world300.dll")
+endif()
+
 if(eSPDI_INCLUDE_DIRS AND eSPDI_LIBS)
   set(eSPDI_FOUND TRUE)
 else()
