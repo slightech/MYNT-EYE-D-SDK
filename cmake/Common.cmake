@@ -4,6 +4,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/Utils.cmake)
 #   https://stackoverflow.com/questions/9160335/os-specific-instructions-in-cmake-how-to
 if(MSVC OR MSYS OR MINGW)
   set(OS_WIN TRUE)
+  add_definitions(-DOS_WIN)
 elseif(APPLE)
   set(OS_MAC TRUE)
 elseif(UNIX)

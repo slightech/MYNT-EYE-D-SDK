@@ -85,10 +85,7 @@ message(STATUS "OpenCV_INCLUDE_DIRS: ${OpenCV_INCLUDE_DIRS}")
 message(STATUS "OpenCV_LIBS: ${OpenCV_LIBS}")
 
 # samples
-find_package(PCL QUIET)
-
 include_directories(
-  ${PCL_INCLUDE_DIRS}
   ${SDK_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
 )
@@ -105,10 +102,14 @@ make_executable(get_depth
     ${OpenCV_LIBS} ${SDK_LIB_CORE}
 )
 
+find_package(PCL QUIET)
+if(PCL_FOUND)
+
+include_directories(${PCL_INCLUDE_DIRS})
+
 make_executable(get_points
   SRCS src/get_points.cc
   LINKLIBS
     ${OpenCV_LIBS} ${SDK_LIB_CORE} ${PCL_LIBRARIES}
 )
-
-add_subdirectory(socket)
+endif()

@@ -255,6 +255,15 @@ ErrorCode CameraPrivate::Open(const InitParams &params) {
 
     ReleaseBuf();
 
+#ifdef OS_WIN
+    int ret = EtronDI_OpenDevice2(etron_di_, &dev_sel_info_,
+        stream_color_info_ptr_[color_res_index_].nWidth,
+        stream_color_info_ptr_[color_res_index_].nHeight,
+        stream_color_info_ptr_[color_res_index_].bFormatMJPG,
+        stream_depth_info_ptr_[depth_res_index_].nWidth,
+        stream_depth_info_ptr_[depth_res_index_].nHeight,
+        false, NULL, &framerate_);
+#else
     int ret = EtronDI_OpenDevice2(etron_di_, &dev_sel_info_,
         stream_color_info_ptr_[color_res_index_].nWidth,
         stream_color_info_ptr_[color_res_index_].nHeight,
@@ -262,6 +271,7 @@ ErrorCode CameraPrivate::Open(const InitParams &params) {
         stream_depth_info_ptr_[depth_res_index_].nWidth,
         stream_depth_info_ptr_[depth_res_index_].nHeight,
         dtc_, false, NULL, &framerate_);
+#endif
 
     if (ETronDI_OK == ret) {
         return ErrorCode::SUCCESS;

@@ -31,10 +31,11 @@
 #define  ETronDI_GET_IMAGE_FAIL          -26
 #define  ETronDI_NOT_SUPPORT_RES         -27
 #define  ETronDI_CALLBACK_REGISTER_FAIL  -28
-#define  ETronDI_CLOSE_DEVICE_FAIL	     -29
+#define  ETronDI_CLOSE_DEVICE_FAIL	 	 -29
 #define  ETronDI_GET_CALIBRATIONLOG_FAIL -30
 #define  ETronDI_SET_CALIBRATIONLOG_FAIL -31
 #define  ETronDI_DEVICE_NOT_SUPPORT	     -32
+#define  ETronDI_DEVICE_BUSY		     -33
 
 // for 3D Scanner +    
 #define  ETronDI_ILLEGAL_ANGLE                -40
@@ -64,6 +65,15 @@
 #define  ETronDI_GET_CT_PROP_RANGE_STEP_FAIL  -64
 #define  ETronDI_GET_PU_PROP_RANGE_STEP_FAIL  -65
 // For AEAWB - 
+
+// for Dewarping + Stitching +
+#define  ETronDI_INVALID_USERDATA             -70
+#define  ETronDI_MAP_LUT_FAIL                 -71
+#define  ETronDI_APPEND_TO_FILE_FRONT_FAIL    -72
+// for Dewarping + Stitching -
+
+#define ETronDI_TOO_MANY_DEVICE               -80
+#define ETronDI_ACCESS_MP4_EXTRA_DATA_FAIL    -81
 
 //define Error Code by Wolf 2015/08/07 +
 
@@ -106,11 +116,17 @@ typedef enum
 // register address define -
 
 // For Depth Data Type
-#define ETronDI_DEPTH_DATA_DEFAULT				0
-#define ETronDI_DEPTH_DATA_8_BITS				1
-#define ETronDI_DEPTH_DATA_14_BITS				2
-#define ETronDI_DEPTH_DATA_8_BITS_x80			3
-#define ETronDI_DEPTH_DATA_11_BITS				4
+#define ETronDI_DEPTH_DATA_OFF_RAW			0 /* raw (depth off, only raw color) */
+#define ETronDI_DEPTH_DATA_DEFAULT			0 /* raw (depth off, only raw color) */
+#define ETronDI_DEPTH_DATA_8_BITS				1 /* rectify, 1 byte per pixel */
+#define ETronDI_DEPTH_DATA_14_BITS				2 /* rectify, 2 byte per pixel */
+#define ETronDI_DEPTH_DATA_8_BITS_x80			3 /* rectify, 2 byte per pixel but using 1 byte only */
+#define ETronDI_DEPTH_DATA_11_BITS				4 /* rectify, 2 byte per pixel but using 11 bit only */
+#define ETronDI_DEPTH_DATA_OFF_RECTIFY		5 /* rectify (depth off, only rectify color) */
+#define ETronDI_DEPTH_DATA_8_BITS_RAW			6 /* raw */
+#define ETronDI_DEPTH_DATA_14_BITS_RAW		7 /* raw */
+#define ETronDI_DEPTH_DATA_8_BITS_x80_RAW	8 /* raw */
+#define ETronDI_DEPTH_DATA_11_BITS_RAW		9 /* raw */
 
 // for Flash Read/Write +
 // Firmware (size in KBytes)
@@ -234,14 +250,14 @@ typedef enum{
 	DEPTH_IMG_COLORFUL_TRANSFER
 }DEPTH_TRANSFER_CTRL;
 
-// for AEAWB Control +
 
-typedef enum
-{
+// for Sensor type name +
+typedef enum {
     ETRONDI_SENSOR_TYPE_H22 = 0,
     ETRONDI_SENSOR_TYPE_OV7740,
     ETRONDI_SENSOR_TYPE_AR0134
 } SENSOR_TYPE_NAME; 
+// for Sensor type name -
 
 typedef enum
 {
@@ -291,42 +307,66 @@ typedef enum
 #define PU_PROPERTY_ID_WHITE_BALANCE_CTRL 			10
 #define PU_PROPERTY_ID_WHITE_BALANCE_AUTO_CTRL 	    11
 
-// for AEAWB Control -
-
 // for Rectify Log +
 
 typedef struct eSPCtrl_RectLogData {
 	union {
-		unsigned char uByteArray[1024];
+		unsigned char uByteArray[1024];/**< union data defined as below struct { }*/
 		struct {
-			unsigned short	InImgWidth;
-			unsigned short	InImgHeight;
-			unsigned short	OutImgWidth;
-			unsigned short	OutImgHeight;
-			int		        RECT_ScaleEnable;
-			int		        RECT_CropEnable;
-			unsigned short	RECT_ScaleWidth;
-			unsigned short	RECT_ScaleHeight;
-			float	        CamMat1[9];
-			float	        CamDist1[8];
-			float			CamMat2[9];
-			float			CamDist2[8];
-			float			RotaMat[9];
-			float			TranMat[3];
-			float			LRotaMat[9];
-			float			RRotaMat[9];
-			float			NewCamMat1[12];
-			float			NewCamMat2[12];
-			unsigned short	RECT_Crop_Row_BG;
-			unsigned short	RECT_Crop_Row_ED;
-			unsigned short	RECT_Crop_Col_BG_L;
-			unsigned short	RECT_Crop_Col_ED_L;
-			unsigned char	RECT_Scale_Col_M;
-			unsigned char	RECT_Scale_Col_N;
-			unsigned char	RECT_Scale_Row_M;
-			unsigned char	RECT_Scale_Row_N;
-			float			RECT_AvgErr;
-			unsigned short	nLineBuffers;
+			unsigned short	InImgWidth;/**< Input image width(SideBySide image) */
+			unsigned short	InImgHeight;/**< Input image height */
+			unsigned short	OutImgWidth;/**< Output image width(SideBySide image) */
+			unsigned short	OutImgHeight;/**< Output image height */
+			int		        RECT_ScaleEnable;/**< Rectified image scale */
+			int		        RECT_CropEnable;/**< Rectified image crop */
+			unsigned short	RECT_ScaleWidth;/**< Input image width(Single image) *RECT_Scale_Col_N /RECT_Scale_Col_M */
+			unsigned short	RECT_ScaleHeight;/**< Input image height(Single image) *RECT_Scale_Row_N /RECT_Scale_Row_M */
+			float	        CamMat1[9];/**< Left Camera Matrix
+								fx, 0, cx, 0, fy, cy, 0, 0, 1 
+								fx,fy : focus  ; cx,cy : principle point */
+			float	        CamDist1[8];/**< Left Camera Distortion Matrix
+								k1, k2, p1, p2, k3, k4, k5, k6 
+								k1~k6 : radial distort ; p1,p2 : tangential distort */
+			float			CamMat2[9];/**< Right Camera Matrix
+								fx, 0, cx, 0, fy, cy, 0, 0, 1  
+								fx,fy : focus  ; cx,cy : principle point */
+			float			CamDist2[8];/**< Right Camera Distortion Matrix
+								k1, k2, p1, p2, k3, k4, k5, k6 
+								k1~k6 : radial distort ; p1,p2 : tangential distort */
+			float			RotaMat[9];/**< Rotation matrix between the left and right camera coordinate systems. 
+								| [0] [1] [2] |       |Xcr|
+								| [3] [4] [5] |   *   |Ycr|            => cr = right camera coordinate
+								| [6] [7] [8] |       |Zcr| */
+			float			TranMat[3];/**< Translation vector between the coordinate systems of the cameras. 
+								|[0]|      |Xcr|
+								|[1]|   +  |Ycr|	             => cr = right camera coordinate
+								|[2]|      |Zcr| */
+			float			LRotaMat[9];/**< 3x3 rectification transform (rotation matrix) for the left camera. 
+								| [0] [1] [2] |       |Xcl|
+								| [3] [4] [5] |   *   |Ycl|            => cl = left camera coordinate
+								| [6] [7] [8] |       |Zcl| */
+			float			RRotaMat[9];/**< 3x3 rectification transform (rotation matrix) for the left camera.
+								| [0] [1] [2] |       |Xcr|
+								| [3] [4] [5] |   *   |Ycr|            => cr = right camera coordinate
+								| [6] [7] [8] |       |Zcr| */
+			float			NewCamMat1[12];/**< 3x4 projection matrix in the (rectified) coordinate systems for the left camera. 
+								fx' 0 cx' 0 0 fy' cy' 0 0 0 1 0 
+								fx',fy' : rectified focus ; cx', cy; : rectified principle point */
+			float			NewCamMat2[12];/**< 3x4 projection matrix in the (rectified) coordinate systems for the rightt camera. 
+								fx' 0 cx' TranMat[0]* 0 fy' cy' 0 0 0 1 0 
+								fx',fy' : rectified focus ; cx', cy; : rectified principle point */
+			unsigned short	RECT_Crop_Row_BG;/**< Rectidied image crop row begin */
+			unsigned short	RECT_Crop_Row_ED;/**< Rectidied image crop row end */
+			unsigned short	RECT_Crop_Col_BG_L;/**< Rectidied image crop column begin */
+			unsigned short	RECT_Crop_Col_ED_L;/**< Rectidied image crop column end */
+			unsigned char	RECT_Scale_Col_M;/**< Rectified image scale column factor M */
+			unsigned char	RECT_Scale_Col_N;/**< Rectified image scale column factor N
+								Rectified image scale column ratio =  Scale_Col_N/ Scale_Col_M */
+			unsigned char	RECT_Scale_Row_M;/**< Rectified image scale row factor M */
+			unsigned char	RECT_Scale_Row_N;/**< Rectified image scale row factor N */
+			float			RECT_AvgErr;/**< Reprojection error */
+			unsigned short	nLineBuffers;/**< Linebuffer for Hardware limitation < 60 */
+            float ReProjectMat[16];
 		};
 	};
 } eSPCtrl_RectLogData;
