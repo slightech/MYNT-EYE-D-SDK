@@ -1,6 +1,7 @@
 # MYNT EYE SDK - Depth Edition Quick Start Guide
 
 > Support platforms:
+
 * Linux x64 & aarch64
 
     [SDK Quick Start Guide for Linux](docs/guide_build_linux.md)
