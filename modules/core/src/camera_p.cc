@@ -245,7 +245,7 @@ ErrorCode CameraPrivate::Open(const InitParams &params) {
         throw std::runtime_error(format_string("Error: Depth data type (%d) not supported.", depth_data_type_));
     }
 
-    if (params.ir_intensity > 0) {
+    if (params.ir_intensity >= 0) {
         if (SetFWRegister(0xE0, params.ir_intensity)) {
             LOGI("-- IR intensity: %d", params.ir_intensity);
         } else {
