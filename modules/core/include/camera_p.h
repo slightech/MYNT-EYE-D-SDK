@@ -90,7 +90,9 @@ private:
     PETRONDI_STREAM_INFO stream_depth_info_ptr_;
     int color_res_index_;
     int depth_res_index_;
+#ifndef OS_WIN
     DEPTH_TRANSFER_CTRL dtc_;
+#endif
     int framerate_;
 
     std::int32_t stream_info_dev_index_;

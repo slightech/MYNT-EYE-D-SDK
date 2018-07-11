@@ -151,7 +151,7 @@ int main(int argc, char const *argv[]) {
     }
     cout << "Open device success" << endl << endl;
 
-    cout << "\033[1;32mPress ESC/Q on Windows to terminate\033[0m" << endl;
+    cout << "Press ESC/Q on Windows to terminate" << endl;
 
     cv::namedWindow("color", cv::WINDOW_AUTOSIZE);
     cv::namedWindow("depth", cv::WINDOW_AUTOSIZE);

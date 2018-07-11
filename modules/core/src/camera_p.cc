@@ -50,7 +50,9 @@ CameraPrivate::CameraPrivate(Camera *q)
     stream_depth_info_ptr_ = (PETRONDI_STREAM_INFO)malloc(sizeof(ETRONDI_STREAM_INFO)*64);
     color_res_index_ = 0;
     depth_res_index_ = 0;
+#ifndef OS_WIN
     dtc_ = DEPTH_IMG_NON_TRANSFER;
+#endif
     framerate_ = 30;
 
     color_serial_number_ = 0;
@@ -192,7 +194,7 @@ ErrorCode CameraPrivate::Open(const InitParams &params) {
 
     if (params.framerate > 0) framerate_ = params.framerate;
     LOGI("-- Framerate: %d", framerate_);
-
+#ifndef OS_WIN
     std::string dtc_name = "Unknown";
     switch (params.depth_mode) {
         case DepthMode::DEPTH_NON:
@@ -218,8 +220,8 @@ ErrorCode CameraPrivate::Open(const InitParams &params) {
         default:
             break;
     }
+#endif
     depth_mode_ = params.depth_mode;
-    LOGI("-- Depth mode: %s", dtc_name);
 
     if (params.dev_index != stream_info_dev_index_) {
         std::vector<StreamInfo> color_infos;
@@ -301,6 +303,16 @@ ErrorCode CameraPrivate::RetrieveImage(cv::Mat &color, cv::Mat &depth) {
     if (is_mjpeg && !color_rgb_buf_) {
         color_rgb_buf_ = (unsigned char*)calloc(color_img_width*color_img_height*3, sizeof(unsigned char));
     }
+#ifdef OS_WIN 
+    if (!depth_img_buf_) { 
+        depth_img_buf_ = (unsigned char*)calloc(depth_img_width*depth_img_height*2, sizeof(unsigned char)); 
+    } 
+ 
+    int ret = EtronDI_Get2Image(etron_di_, &dev_sel_info_, 
+        (BYTE*)color_img_buf_, (BYTE*)depth_img_buf_, 
+        &color_image_size_, &depth_image_size_, 
+        &color_serial_number_, &depth_serial_number_); 
+#else 
     if (!depth_img_buf_) {
         if (dtc_ == DEPTH_IMG_COLORFUL_TRANSFER || dtc_ == DEPTH_IMG_GRAY_TRANSFER) {
             depth_img_buf_ = (unsigned char*)calloc(depth_img_width*2*depth_img_height*3, sizeof(unsigned char));
@@ -313,7 +325,7 @@ ErrorCode CameraPrivate::RetrieveImage(cv::Mat &color, cv::Mat &depth) {
         (BYTE*)color_img_buf_, (BYTE*)depth_img_buf_,
         &color_image_size_, &depth_image_size_,
         &color_serial_number_, &depth_serial_number_, depth_data_type_);
-
+#endif
     if (ETronDI_OK != ret) {
         DBG_LOGI("EtronDI_Get2Image: %d", ret);
         return ErrorCode::ERROR_CAMERA_RETRIEVE_FAILED;
@@ -329,6 +341,10 @@ ErrorCode CameraPrivate::RetrieveImage(cv::Mat &color, cv::Mat &depth) {
         cv::cvtColor(color_img, color, CV_YUV2BGR_YUY2);
     }
 
+#ifdef OS_WIN 
+    cv::Mat depth_img(depth_img_height, depth_img_width, CV_8UC3, depth_img_buf_); 
+    cv::cvtColor(depth_img, depth, CV_RGB2BGR); 
+#else 
     // depth
     if (dtc_ == DEPTH_IMG_COLORFUL_TRANSFER || dtc_ == DEPTH_IMG_GRAY_TRANSFER) {
         // Depth data type: 11 bits & 14 bits
@@ -378,7 +394,7 @@ ErrorCode CameraPrivate::RetrieveImage(cv::Mat &color, cv::Mat &depth) {
             }
         }
     }
-
+#endif
     return ErrorCode::SUCCESS;
     /*
     switch (view) {
@@ -468,7 +484,11 @@ void CameraPrivate::ReleaseBuf() {
 
 bool CameraPrivate::GetSensorRegister(int id, unsigned short address, unsigned short *value, int flag) {
     if (!IsOpened()) throw std::runtime_error("Error: Camera not opened.");
-    return ETronDI_OK == EtronDI_GetSensorRegister(etron_di_, &dev_sel_info_, id, address, value, flag, SENSOR_BOTH);
+    #ifdef OS_WIN 
+    return ETronDI_OK == EtronDI_GetSensorRegister(etron_di_, &dev_sel_info_, id, address, value, flag, 2); 
+    #else 
+    return ETronDI_OK == EtronDI_GetSensorRegister(etron_di_, &dev_sel_info_, id, address, value, flag, SENSOR_BOTH); 
+    #endif
 }
 
 bool CameraPrivate::GetHWRegister(unsigned short address, unsigned short *value, int flag) {
@@ -483,7 +503,11 @@ bool CameraPrivate::GetFWRegister(unsigned short address, unsigned short *value,
 
 bool CameraPrivate::SetSensorRegister(int id, unsigned short address, unsigned short value, int flag) {
     if (!IsOpened()) throw std::runtime_error("Error: Camera not opened.");
-    return ETronDI_OK == EtronDI_SetSensorRegister(etron_di_, &dev_sel_info_, id, address, value, flag, SENSOR_BOTH);
+    #ifdef OS_WIN 
+    return ETronDI_OK == EtronDI_SetSensorRegister(etron_di_, &dev_sel_info_, id, address, value, flag, 2); 
+    #else 
+    return ETronDI_OK == EtronDI_SetSensorRegister(etron_di_, &dev_sel_info_, id, address, value, flag, SENSOR_BOTH); 
+    #endif 
 }
 
 bool CameraPrivate::SetHWRegister(unsigned short address, unsigned short value, int flag) {

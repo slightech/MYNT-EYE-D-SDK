@@ -2,14 +2,7 @@
 #define LIB_ESPDI_H
 
 #include "eSPDI_def.h"
-
-#ifdef OS_WIN
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-#endif
-
+#include "eSPDI_version.h"
 int  EtronDI_Init(void **ppHandleEtronDI, bool bIsLogEnabled);
 int  EtronDI_FindDevice(void *pHandleEtronDI);
 void EtronDI_Release(void **ppHandleEtronDI);
@@ -62,22 +55,13 @@ int  EtronDI_GetDeviceResolutionList(void *pHandleEtronDI, PDEVSELINFO pDevSelIn
 int  EtronDI_OpenDevice(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, 
 						 int nWidth, int nHeight, bool bImageL, bool bDepth,
 						 void *phWndNotice=0, CONTROL_MODE cm=IMAGE_SN_NONSYNC);									  
-
-#ifdef OS_WIN
-int EtronDI_OpenDevice2(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, 
-						int nEP0Width, int nEP0Height, BOOL bEP0MJPG, 
-						int nEP1Width, int nEP1Height,
-						BOOL bIsOutputRGB24=false, void *phWndNotice=NULL, 
-						int *nFPS=NULL, BYTE bCtrlMode=0);
-#else
+                                     			
 int  EtronDI_OpenDevice2(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, 
 						  int nEP0Width, int nEP0Height, bool bEP0MJPG, 
 						  int nEP1Width, int nEP1Height, 
 						  DEPTH_TRANSFER_CTRL dtc=DEPTH_IMG_NON_TRANSFER,
 						  bool bIsOutputRGB24=false, void *phWndNotice=0, 
-						  int *pFPS=0, CONTROL_MODE cm=IMAGE_SN_NONSYNC);
-#endif
-
+						  int *pFPS=0, CONTROL_MODE cm=IMAGE_SN_NONSYNC);	
 int  EtronDI_OpenDeviceMBL(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo,
                           int nEP0Width, int nEP0Height, bool bEP0MJPG,
                           int nEP1Width, int nEP1Height,
@@ -218,18 +202,11 @@ int EtronDI_InjectExtraDataToMp4(void* pHandleEtronDI, PDEVSELINFO pDevSelInfo,
 		const char* filename, const char* data, int dataLen);
 int EtronDI_RetrieveExtraDataFromMp4(void* pHandleEtronDI, PDEVSELINFO pDevSelInfo, 
 		const char* filename, char* data, int* dataLen);
-// int EtronDI_EncryptString(const char* src, char* dst);
-// int EtronDI_DecryptString(const char* src, char* dst);
-// int EtronDI_EncryptString(const char* src1, const char* src2, char* dst);
-// int EtronDI_DecryptString(const char* src, char* dst1, char* dst2);
+int EtronDI_EncryptString(const char* src, char* dst);
+int EtronDI_DecryptString(const char* src, char* dst);
+int EtronDI_EncryptString(const char* src1, const char* src2, char* dst);
+int EtronDI_DecryptString(const char* src, char* dst1, char* dst2);
 #endif
 int EtronDI_GetAutoExposureMode(void* pHandleEtronDI, PDEVSELINFO pDevSelInfo, unsigned short* mode);
 int EtronDI_SetAutoExposureMode(void* pHandleEtronDI, PDEVSELINFO pDevSelInfo, unsigned short mode);
-
-#ifdef OS_WIN
-#ifdef __cplusplus
-}
-#endif
-#endif
-
 #endif // LIB_ESPDI_H
