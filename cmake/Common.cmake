@@ -1,4 +1,6 @@
-include(${CMAKE_CURRENT_LIST_DIR}/Utils.cmake)
+set(CUR_DIR ${CMAKE_CURRENT_LIST_DIR})
+
+include(${CUR_DIR}/Utils.cmake)
 
 # OS specific instructions in CMAKE: How to?
 #   https://stackoverflow.com/questions/9160335/os-specific-instructions-in-cmake-how-to
@@ -42,24 +44,31 @@ if(CMAKE_COMPILER_IS_GNUCC)
   #add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
 endif()
 
-macro(exe2bat exe_dir exe_name dll_search_paths)
-  if(OS_WIN)
-    message(STATUS "Generating ${exe_name}.bat")
-    set(__exe_name ${exe_name})
-    file(TO_NATIVE_PATH ${MYNTEYE_SDK_ROOT} __mynteye_sdk_root)
+set(__exe2bat_relative_path false)
+
+macro(exe2bat exe_name exe_dir dll_search_paths)
+  message(STATUS "Generating ${exe_name}.bat")
+  set(__exe_name ${exe_name})
+  if(__exe2bat_relative_path)
     set(__dll_relative_search_paths "")
     foreach(path ${dll_search_paths})
       file(RELATIVE_PATH __relative_path "${exe_dir}" "${path}")
       file(TO_NATIVE_PATH ${__relative_path} __relative_path)
       list(APPEND __dll_relative_search_paths ${__relative_path})
     endforeach()
-    #message(STATUS __dll_relative_search_paths: "${__dll_relative_search_paths}")
     set(__dll_search_paths "${__dll_relative_search_paths}")
-    configure_file(
-      "${PRO_DIR}/cmake/templates/exe.bat.in"
-      "${exe_dir}/${__exe_name}.bat"
-    )
+  else()
+    set(__dll_native_search_paths "")
+    foreach(path ${dll_search_paths})
+      file(TO_NATIVE_PATH ${path} __native_path)
+      list(APPEND __dll_native_search_paths ${__native_path})
+    endforeach()
+    set(__dll_search_paths "${__dll_native_search_paths}")
   endif()
+  configure_file(
+    "${CUR_DIR}/templates/exe.bat.in"
+    "${exe_dir}/${__exe_name}.bat"
+  )
 endmacro()
 
 # make_shared_library(NAME
@@ -127,9 +136,17 @@ macro(make_executable NAME)
       RUNTIME_OUTPUT_DIRECTORY_DEBUG    "${THIS_OUTDIR}"
       RUNTIME_OUTPUT_DIRECTORY_RELEASE  "${THIS_OUTDIR}"
     )
-    exe2bat("${THIS_OUTDIR}" "${NAME}" "${DLL_SEARCH_PATHS}")
-  else()
-    exe2bat("${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" "${NAME}" "${DLL_SEARCH_PATHS}")
+  endif()
+  if(OS_WIN)
+    set(__dll_search_paths "${PRO_DIR}/output/bin;${PRO_DIR}/output/bin/3rdparty")
+    if(OpenCV_LIB_SEARCH_PATH)
+      set(__dll_search_paths "${__dll_search_paths};${OpenCV_LIB_SEARCH_PATH}")
+    endif()
+    if(THIS_OUTDIR)
+      exe2bat("${NAME}" "${THIS_OUTDIR}" "${__dll_search_paths}")
+    else()
+      exe2bat("${NAME}" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" "${__dll_search_paths}")
+    endif()
   endif()
   if(THIS_THREAD)
     # cmake and libpthread
@@ -159,17 +176,4 @@ macro(set_outdir ARCHIVE_OUTPUT_DIRECTORY LIBRARY_OUTPUT_DIRECTORY RUNTIME_OUTPU
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${CONFIG} ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${CONFIG} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
   endforeach()
-  # For exe2bat
-  if(OS_WIN)
-    if(NOT PRO_DIR)
-      message(FATAL_ERROR "PRO_DIR variable not found. Please set it.")
-    endif()
-    set(MYNTEYE_SDK_ROOT ${PRO_DIR}/output)
-    set(WIN_DIR ${PRO_DIR}/platforms/win)
-    if(MINGW)
-      set(DLL_SEARCH_PATHS "${PRO_DIR}/output/bin;${PRO_DIR}/output/bin/3rdparty;${WIN_DIR}/deps/opencv/x64/mingw/bin")
-    else()
-      set(DLL_SEARCH_PATHS "${PRO_DIR}/output/bin;${PRO_DIR}/output/bin/3rdparty;${WIN_DIR}/deps/opencv/x64/vc14/bin")
-    endif()
-  endif()
 endmacro()
