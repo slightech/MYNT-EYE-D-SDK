@@ -213,7 +213,7 @@ CameraPrivate::CameraPrivate(Camera *q)
     depth_rgb_buf_ = nullptr;
 
 #ifdef OS_WIN
-    DmColorMode14(color_palette_z14_, 0/*normal*/);
+    DmColorMode14(color_palette_z14_, 3/*far*/);
 #endif
 }
 
