@@ -432,7 +432,7 @@ ErrorCode CameraPrivate::Open(const InitParams &params) {
     // 0x02: enable post-process, for Depth Map module only
     // 0x04: stitch images if this bit is set, for fisheye spherical module only
     // 0x08: use OpenCL in stitching. This bit effective only when bit-2 is set.
-    BYTE ctrlMode = 0x02;
+    BYTE ctrlMode = 0x01;
 
     int ret = EtronDI_OpenDeviceEx(etron_di_, &dev_sel_info_,
         color_res_index_, toRgb,
