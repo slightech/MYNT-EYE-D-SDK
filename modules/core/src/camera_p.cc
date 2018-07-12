@@ -36,6 +36,154 @@ my_error_exit(j_common_ptr cinfo) {
   longjmp(myerr->setjmp_buffer, 1);
 }
 
+#ifdef OS_WIN
+
+//k= 0~1.00
+//maps k to a pixel color RGB
+void ColorMap(double k, double& R, double& G, double& B) {
+    double r;
+
+    if (k < 0.0) k = 0.0;
+    if (k > 1.0) k = 1.0;
+    if (k < 0.1) {
+        r = k / 0.1;
+        R = G = B = 128.0 + r * 127.0; //128~255
+    } else if (k < 0.2) {
+        k -= .1;
+        r = k / 0.1;
+        R = 255.0;
+        G = B = (1.0 - r) * 255.0;//255~0
+    } else if (k < 0.35) {
+        k -= .2;
+        r = k / 0.15;
+        B = 0.0; //B
+        G = r * 255.0; // 0~255
+        R = 255.0; //R
+    } else if (k < 0.5) {
+        k -= 0.35;
+        r = k / 0.15;
+        B = 0.0;
+        G = (1.0 - r / 4.0) * 255.0;  //255~196
+        R = (1.0 - r / 2.0) * 255.0; //255~128
+    } else if (k < 0.6) {
+        k -= 0.5;
+        r = k / 0.1;
+        B = r * 128.0; //B 0~128
+        G = 196.0; //Gc
+        R = (1.0 - r) * 128.0; //R 128~0
+    } else if (k < 0.7) {
+        k -= 0.6;
+        r = k / 0.1;
+        B = 128.0 + r * 127.0; //B 128~255
+        G = 196.0; //G
+        R = 0.0; //R
+    } else if (k < 0.8) {
+        k -= 0.7;
+        r = k / 0.1;
+        B = 255; //B
+        G = (1.0 - r) * 196.0; //G 196~0
+        R = 0; //R
+    } else if (k < 0.9) {
+        k -= 0.8;
+        r = k / 0.1;
+        B = (1.0 - r / 2.0) * 255.0; //B 255~128
+        G = 0.0; //G
+        R = r * 128.0; //R=0~128
+    } else {
+        k -= .9;
+        r = k / .1;
+        R = B = (1 - r) * 128; //B 128~0
+        G = 0; //G
+    }
+}
+
+// ENABLE_LONG_DEPTHCOLOR_MAP
+void DmColorMode14(RGBQUAD *pallete, int mode = 0) {
+#define CP1 0.75
+#define CP2 0.25
+    int length = 16384;
+    int i;
+    double R, G, B;
+    int t1, t2; //focus region, 0.25~0.75 mapping area
+    switch (mode) {
+    case 1: //near
+        t1 = 512*8;
+        t2 = 1024 * 8;
+        break;
+    case 2: //midle
+        t1 = 200 * 8;
+        t2 = 512 * 8;
+        break;
+    case 3: //far
+        t1 = 5 * 8;
+        t2 = 256 * 8;
+        break;
+    default: //normal
+        t1 = 256 * 8;
+        t2 = 512 * 8;
+        break;
+    }
+    double m, b; //y=mx+b
+                 //0~t1
+    m = (CP1 - 1.0) / (double)t1;
+    b = 1.0;
+    for (i = 0; i<t1; i++) {
+        ColorMap(m* (double)i + b, R, G, B);
+        pallete[i].rgbBlue = (BYTE)B;
+        pallete[i].rgbGreen = (BYTE)G;
+        pallete[i].rgbRed = (BYTE)R;
+        pallete[i].rgbReserved = 0;
+    }
+    m = (CP2 - CP1) / (double)(t2 - t1);
+    b = CP1 - m*(double)t1;
+    for (; i<t2; i++) {
+        ColorMap(m* (double)i + b, R, G, B);
+        pallete[i].rgbBlue = (BYTE)B;
+        pallete[i].rgbGreen = (BYTE)G;
+        pallete[i].rgbRed = (BYTE)R;
+        pallete[i].rgbReserved = 0;
+    }
+    m = (0 - CP2) / (double)(2048 - t2);
+    b = CP2 - m*(double)t2;
+    for (; i<length; i++) {
+        ColorMap(m* (double)i + b, R, G, B);
+        pallete[i].rgbBlue = (BYTE)B;
+        pallete[i].rgbGreen = (BYTE)G;
+        pallete[i].rgbRed = (BYTE)R;
+        pallete[i].rgbReserved = 0;
+    }
+}
+
+void UpdateZ14DisplayImage_DIB24(RGBQUAD *pColorPaletteZ14, BYTE *pDepthZ14, BYTE *pDepthDIB24, int cx, int cy) {
+    int x,y,nBPS;
+    WORD *pWSL,*pWS;
+    BYTE *pDL,*pD;
+    RGBQUAD *pClr;
+
+    if ((cx<=0) || (cy<=0)) return;
+
+    nBPS = ((cx*3+3)/4)*4;
+    pWSL = (WORD*)pDepthZ14;
+    // pDL = pDepthDIB24 + (cy-1)*nBPS;
+    pDL = pDepthDIB24;
+    for (y=0; y<cy; y++) {
+        pWS = pWSL;
+        pD = pDL;
+        for (x=0; x<cx; x++) {
+            pClr = &(pColorPaletteZ14[pWS[x]]);
+            pD[0] = pClr->rgbBlue; //B
+            pD[1] = pClr->rgbGreen; //G
+            pD[2] = pClr->rgbRed; //R
+            pD += 3;
+        }
+        pWSL += cx;
+        // pDL -= nBPS;
+        pDL += nBPS;
+    }
+}
+
+#endif
+
 }  // namespace
 
 CameraPrivate::CameraPrivate(Camera *q)
@@ -62,6 +210,9 @@ CameraPrivate::CameraPrivate(Camera *q)
     color_img_buf_ = nullptr;
     color_rgb_buf_ = nullptr;
     depth_img_buf_ = nullptr;
+    depth_rgb_buf_ = nullptr;
+
+    DmColorMode14(color_palette_z14_, 0/*normal*/);
 }
 
 CameraPrivate::~CameraPrivate() {
@@ -387,7 +538,12 @@ ErrorCode CameraPrivate::RetrieveImage(cv::Mat &color, cv::Mat &depth) {
                 cv::normalize(depth_raw_, depth, 0, 255, cv::NORM_MINMAX, CV_8UC1);
                 break;
             case DepthMode::DEPTH_COLORFUL:
-                // break;
+                if (!depth_rgb_buf_) {
+                    depth_rgb_buf_ = (unsigned char*)calloc(depth_img_width*depth_img_height*3, sizeof(unsigned char));
+                }
+                UpdateZ14DisplayImage_DIB24(color_palette_z14_, depth_img_buf_, depth_rgb_buf_, depth_img_width, depth_img_height);
+                depth = cv::Mat(depth_img_height, depth_img_width, CV_8UC3, depth_rgb_buf_);
+                break;
             case DepthMode::DEPTH_NON:
             case DepthMode::DEPTH_NON_16UC1:
             default:
@@ -625,6 +781,10 @@ void CameraPrivate::ReleaseBuf() {
     if (depth_img_buf_) {
         delete depth_img_buf_;
         depth_img_buf_ = nullptr;
+    }
+    if (depth_rgb_buf_) {
+        delete depth_rgb_buf_;
+        depth_rgb_buf_ = nullptr;
     }
 }
 

@@ -27,6 +27,10 @@ extern "C" {
 
 }
 
+#ifdef OS_WIN
+#include <Windows.h>
+#endif
+
 #include <mutex>
 
 namespace mynteye {
@@ -93,6 +97,7 @@ private:
     bool is_color_mjpg_;
 
     int depth_data_size_;
+    RGBQUAD color_palette_z14_[16384];
 #endif
 
     void *etron_di_;
@@ -118,6 +123,7 @@ private:
     unsigned char *color_img_buf_;
     unsigned char *color_rgb_buf_;
     unsigned char *depth_img_buf_;
+    unsigned char *depth_rgb_buf_;
 
     DepthMode depth_mode_;
     cv::Mat depth_raw_;
