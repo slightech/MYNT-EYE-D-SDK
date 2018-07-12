@@ -27,6 +27,8 @@ extern "C" {
 
 }
 
+#include <mutex>
+
 namespace mynteye {
 
 struct my_error_mgr {
@@ -80,6 +82,18 @@ private:
     void ReleaseBuf();
 
     int MJPEG_TO_RGB24_LIBJPEG(unsigned char *jpg, int nJpgSize, unsigned char *rgb);
+
+#ifdef OS_WIN
+    static void ImgCallback(EtronDIImageType::Value imgType, int imgId,
+        unsigned char *imgBuf, int imgSize, int width, int height,
+        int serialNumber, void *pParam);
+
+    std::mutex mtx_imgs_;
+    bool is_color_rgb24_;
+    bool is_color_mjpg_;
+
+    int depth_data_size_;
+#endif
 
     void *etron_di_;
 
