@@ -68,6 +68,12 @@ message(STATUS "OpenCV_VERSION: ${OpenCV_VERSION}")
 message(STATUS "OpenCV_INCLUDE_DIRS: ${OpenCV_INCLUDE_DIRS}")
 message(STATUS "OpenCV_LIBS: ${OpenCV_LIBS}")
 
+if(OS_WIN)
+  get_filename_component(OpenCV_LIB_SEARCH_PATH "${OpenCV_LIB_PATH}/../bin" ABSOLUTE)
+else()
+  set(OpenCV_LIB_SEARCH_PATH "${OpenCV_LIB_PATH}")
+endif()
+
 find_package(eSPDI REQUIRED)
 
 find_package(JPEG REQUIRED)
