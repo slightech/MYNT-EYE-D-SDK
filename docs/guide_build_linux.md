@@ -45,6 +45,12 @@ sudo apt-get update
 sudo apt-get install libpcl-all
 ```
 
+### 1.3 Link libGL.so for TX1/TX2 compile bug (Optional)
+
+```
+sudo ln -sf /usr/lib/aarch64-linux-gnu/tegra/libGL.so /usr/lib/aarch64-linux-gnu/libGL.so
+```
+
 ## 2. Build SDK
 
 ```
