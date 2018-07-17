@@ -112,6 +112,8 @@ make_executable(get_depth
 find_package(PCL QUIET)
 if(PCL_FOUND)
 
+list(REMOVE_ITEM PCL_LIBRARIES "vtkproj4")
+
 include_directories(${PCL_INCLUDE_DIRS})
 
 make_executable(get_points
