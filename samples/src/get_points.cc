@@ -30,7 +30,7 @@ typedef pcl::PointXYZRGBA PointT;
 typedef pcl::PointCloud<PointT> PointCloud;
 
 PointCloud::Ptr cloud ( new PointCloud );
-pcl::visualization::CloudViewer viewer("pcd viewer");  
+pcl::visualization::PCLVisualizer viewer("point cloud viewer");  
 
 // TODO replace the real camera param
 const float camera_factor = 1000.0;
@@ -68,7 +68,9 @@ void show_points(cv::Mat rgb, cv::Mat depth) {
         }
     }
 
-    viewer.showCloud(cloud);
+    pcl::visualization::PointCloudColorHandlerRGBField<PointT> color (cloud);
+    viewer.updatePointCloud<PointT>(cloud, color, "sample cloud");
+    viewer.spinOnce();
     // clear points
     cloud->points.clear();
 }
@@ -153,6 +155,15 @@ int main(int argc, char const *argv[]) {
 
     cout << "Press ESC/Q on Windows to terminate" << endl;
 
+    {
+        viewer.setBackgroundColor(0, 0, 0);
+        viewer.addCoordinateSystem(1.0);
+        viewer.initCameraParameters();
+        viewer.addPointCloud<PointT>(cloud, "sample cloud");
+        viewer.setCameraPosition(0,0,-2,0,-1,0,0);
+        viewer.setSize(1280, 720);
+    }
+    
     cv::namedWindow("color", cv::WINDOW_AUTOSIZE);
     cv::namedWindow("depth", cv::WINDOW_AUTOSIZE);
 
