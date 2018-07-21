@@ -44,14 +44,14 @@ struct MYNTEYE_API InitParams {
     DepthMode depth_mode;
 
     /**
-     * Color stream info, default -1
+     * Stream mode, default STREAM_1280x720
      */
-    std::int32_t color_info_index;
+    StreamMode stream_mode;
 
     /**
-     * Depth stream info, default -1
+     * Stream format, default STREAM_YUYV
      */
-    std::int32_t depth_info_index;
+    StreamFormat stream_format;
 
     /**
      * Auto-exposure, default true.

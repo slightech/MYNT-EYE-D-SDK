@@ -86,8 +86,7 @@ int main(int argc, char const *argv[]) {
     // Warning: Color stream format MJPG doesn't work.
     InitParams params(dev_info.index);
     params.depth_mode = DepthMode::DEPTH_COLORFUL;
-    //params.color_info_index = 4;
-    //params.depth_info_index = 1;
+    // params.stream_mode = StreamMode::STREAM_1280x720;
     params.ir_intensity = 4;
 
     cam.Open(params);
