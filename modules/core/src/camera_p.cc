@@ -191,7 +191,7 @@ CameraPrivate::CameraPrivate(Camera *q)
     DBG_LOGD(__func__);
 
     int ret = EtronDI_Init(&etron_di_, false);
-    DBG_LOGI("EtronDI_Init: %d", ret);
+    DBG_LOGI("MYNT EYE Init: %d", ret);
     unused(ret);
 
     stream_color_info_ptr_ = (PETRONDI_STREAM_INFO)malloc(sizeof(ETRONDI_STREAM_INFO)*64);
@@ -303,6 +303,91 @@ void CameraPrivate::GetResolutions(const std::int32_t &dev_index,
     stream_info_dev_index_ = dev_index;
 }
 
+void CameraPrivate::GetResolutionIndex(const std::int32_t &dev_index, const StreamMode &stream_mode, 
+    const StreamFormat &stream_format, int &color_res_index, int &depth_res_index) {
+
+    color_res_index = -1;
+    depth_res_index = -1;
+    int width = 0, height = 0;
+    switch (stream_mode) {
+        case StreamMode::STREAM_1280x480:
+            width = 1280;
+            height = 480;
+            break;
+        case StreamMode::STREAM_1280x720:
+            width = 1280;
+            height = 720;
+            break;
+        case StreamMode::STREAM_2560x720:
+            width = 2560;
+            height = 720;
+            break;
+        // case StreamMode::STREAM_2560x960:
+        //     width = 2560;
+        //     height = 960;
+        //     break;
+        case StreamMode::STREAM_640x480:
+            width = 640;
+            height = 480;
+            break;
+        default:
+            break;
+    }
+
+    std::string format;
+    switch (stream_format) {
+        case StreamFormat::STREAM_MJPG:
+            format = "MJPG";
+            break;
+        case StreamFormat::STREAM_YUYV:
+            format = "YUYV";
+            break;
+        default:
+            break;
+    }
+
+
+    memset(stream_color_info_ptr_, 0, sizeof(ETRONDI_STREAM_INFO)*64);
+    memset(stream_depth_info_ptr_, 0, sizeof(ETRONDI_STREAM_INFO)*64);
+
+    DEVSELINFO dev_sel_info{dev_index};
+    EtronDI_GetDeviceResolutionList(etron_di_, &dev_sel_info, 64, stream_color_info_ptr_, 64, stream_depth_info_ptr_);
+
+    PETRONDI_STREAM_INFO stream_temp_info_ptr = stream_color_info_ptr_;
+    int i = 0;
+    while (i < 64) {
+        if (stream_temp_info_ptr->nWidth == width && stream_temp_info_ptr->nHeight == height 
+            && stream_format == (stream_temp_info_ptr->bFormatMJPG ? StreamFormat::STREAM_MJPG : StreamFormat::STREAM_YUYV)) {
+            color_res_index = i;
+            break;
+        }
+        stream_temp_info_ptr++;
+        i++;
+    }
+
+    if (color_res_index == -1) {
+        LOGE("Error: Color Mode width[%d] height[%d] format[%s] not support. Please check the resolution list.", width, height, format);
+        color_res_index = 0;
+    }
+
+    stream_temp_info_ptr = stream_depth_info_ptr_;
+    i = 0;
+    while (i < 64) {
+        if (stream_temp_info_ptr->nHeight == height 
+            && stream_format == (stream_temp_info_ptr->bFormatMJPG ? StreamFormat::STREAM_MJPG : StreamFormat::STREAM_YUYV)) {
+            depth_res_index = i;
+            break;
+        }
+        stream_temp_info_ptr++;
+        i++;
+    }
+
+    if (depth_res_index == -1) {
+        LOGE("Error: Depth Mode width[%d] height[%d] format[%s] not support. Please check the resolution list.", width, height, format);
+        depth_res_index = 0;
+    }
+}
+
 ErrorCode CameraPrivate::SetAutoExposureEnabled(bool enabled) {
     bool ok;
     if (enabled) {
@@ -339,7 +424,7 @@ ErrorCode CameraPrivate::Open(const InitParams &params) {
     //if (params.dev_info.type == PUMA) {
         depth_data_type_ = 2;  // 1: 11 bits. 2: 14 bits
         EtronDI_SetDepthDataType(etron_di_, &dev_sel_info_, depth_data_type_);
-        DBG_LOGI("EtronDI_SetDepthDataType: %d", depth_data_type_);
+        DBG_LOGI("SetDepthDataType: %d", depth_data_type_);
     //}
 
     SetAutoExposureEnabled(params.state_ae);
@@ -381,12 +466,9 @@ ErrorCode CameraPrivate::Open(const InitParams &params) {
         std::vector<StreamInfo> depth_infos;
         GetResolutions(params.dev_index, color_infos, depth_infos);
     }
-    if (params.color_info_index > -1) {
-        color_res_index_ = params.color_info_index;
-    }
-    if (params.depth_info_index > -1) {
-        depth_res_index_ = params.depth_info_index;
-    }
+
+    GetResolutionIndex(params.dev_index, params.stream_mode, params.stream_format, 
+        color_res_index_, depth_res_index_);
     LOGI("-- Color Stream: %dx%d %s",
         stream_color_info_ptr_[color_res_index_].nWidth,
         stream_color_info_ptr_[color_res_index_].nHeight,

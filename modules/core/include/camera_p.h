@@ -55,6 +55,8 @@ public:
     void GetDevices(std::vector<DeviceInfo> &dev_infos);
     void GetResolutions(const std::int32_t &dev_index,
         std::vector<StreamInfo> &color_infos, std::vector<StreamInfo> &depth_infos);
+    void GetResolutionIndex(const std::int32_t &dev_index, const StreamMode &stream_mode,
+        const StreamFormat &stream_format, int &color_res_index, int &depth_res_index);
 
     ErrorCode SetAutoExposureEnabled(bool enabled);
     ErrorCode SetAutoWhiteBalanceEnabled(bool enabled);
