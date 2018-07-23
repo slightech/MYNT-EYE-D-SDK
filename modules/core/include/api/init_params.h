@@ -70,7 +70,7 @@ struct MYNTEYE_API InitParams {
 
     /** Constructor. */
     InitParams();
-    InitParams(const std::int32_t &dev_index);
+    explicit InitParams(const std::int32_t &dev_index);
 
     /** Destructor. */
     ~InitParams();

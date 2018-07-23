@@ -49,7 +49,7 @@
 #endif
 
 #if defined(CXX11) || defined(CXX0X)
-    #define ENUM(name) enum class name : std::int8_t
+    #define ENUM(name) enum class name : std::int32_t
 #else
     #define ENUM(name) enum name
 #endif
