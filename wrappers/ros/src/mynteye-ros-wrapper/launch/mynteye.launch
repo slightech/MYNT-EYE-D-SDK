@@ -1,10 +1,19 @@
 <launch>
 
   <arg name="dev_index"     default="0" />
-  <arg name="color_index"   default="4" />
-  <arg name="depth_index"   default="1" />
   <arg name="ir_intensity"  default="4" />
 
+  <!-- Stream mode -->
+  <arg name="stream_1280x720"   default="0" />
+  <arg name="stream_2560x720"   default="1" />
+  <arg name="stream_1280x480"   default="2" />
+  <arg name="stream_640x480"    default="3" />
+
+  <!-- Stream format -->
+  <arg name="stream_mjpg"       default="0" />
+  <arg name="stream_yuyv"       default="1" />
+
+  <!-- Depth mode -->
   <arg name="depth_non"         default="0" />
   <arg name="depth_gray"        default="1" />
   <arg name="depth_colorful"    default="2" />
@@ -20,8 +29,8 @@
     <param name="dev_index"     value="$(arg dev_index)" />
     <param name="framerate"     value="30" />
     <param name="depth_mode"    value="$(arg depth_non)" />
-    <param name="color_index"   value="$(arg color_index)" />
-    <param name="depth_index"   value="$(arg depth_index)" />
+    <param name="stream_mode"   value="$(arg stream_1280x720)" />
+    <param name="stream_format" value="$(arg stream_yuyv)" />
     <param name="state_ae"      value="true" />
     <param name="state_awb"     value="true" />
     <param name="ir_intensity"  value="$(arg ir_intensity)" />

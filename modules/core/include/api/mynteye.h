@@ -125,7 +125,7 @@ ENUM(DepthMode) {
 ENUM(StreamFormat) {
     STREAM_MJPG,
     STREAM_YUYV,
-    STREAM_LAST
+    STREAM_FORMAT_LAST
 };
 
 ENUM(StreamMode) {
@@ -134,7 +134,7 @@ ENUM(StreamMode) {
     // STREAM_2560x960,
     STREAM_1280x480,
     STREAM_640x480,
-    STREAM_LAST
+    STREAM_MODE_LAST
 };
 
 }  // namespace mynteye
