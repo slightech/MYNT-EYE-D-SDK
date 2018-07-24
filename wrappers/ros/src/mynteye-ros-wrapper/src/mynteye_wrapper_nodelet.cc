@@ -6,6 +6,11 @@
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
+#include <sensor_msgs/PointCloud2.h>
+#include <sensor_msgs/point_cloud2_iterator.h>
+
+#include <tf/tf.h>
+#include <tf2_ros/static_transform_broadcaster.h>
 
 #include <boost/make_shared.hpp>
 #include <boost/thread/thread.hpp>
@@ -27,6 +32,8 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
     image_transport::Publisher pub_color;
     image_transport::Publisher pub_depth;
+    ros::Publisher pub_points;
+    tf2_ros::StaticTransformBroadcaster static_tf_broadcaster;
 
     // Launch params
     int dev_index;
@@ -38,8 +45,10 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     bool state_awb;
     int ir_intensity;
 
+    std::string base_frame_id;
     std::string color_frame_id;
     std::string depth_frame_id;
+    std::string points_frame_id;
 
     // MYNTEYE objects
     mynteye::InitParams params;
@@ -83,6 +92,115 @@ public:
         //NODELET_INFO_STREAM("Publish depth");
     }
 
+    const float camera_factor = 1000.0;
+
+    const double camera_cx = 682.3;
+    const double camera_cy = 254.9;
+    const double camera_fx = 979.8;
+    const double camera_fy = 942.8;
+
+    void publishPoints(cv::Mat img, cv::Mat depth, ros::Time stamp) {
+        if (pub_points.getNumSubscribers() == 0)
+            return;
+
+        sensor_msgs::PointCloud2 msg;
+        msg.header.stamp = stamp;
+        msg.header.frame_id = points_frame_id;
+        msg.width = img.cols;
+        msg.height = img.rows;
+        msg.is_dense = true;
+
+        sensor_msgs::PointCloud2Modifier modifier(msg);
+
+        modifier.setPointCloud2Fields(
+            4, "x", 1, sensor_msgs::PointField::FLOAT32, "y", 1,
+            sensor_msgs::PointField::FLOAT32, "z", 1,
+            sensor_msgs::PointField::FLOAT32, "rgb", 1,
+            sensor_msgs::PointField::FLOAT32);
+
+        modifier.setPointCloud2FieldsByString(2, "xyz", "rgb");
+
+        sensor_msgs::PointCloud2Iterator<float> iter_x(msg, "x");
+        sensor_msgs::PointCloud2Iterator<float> iter_y(msg, "y");
+        sensor_msgs::PointCloud2Iterator<float> iter_z(msg, "z");
+
+        sensor_msgs::PointCloud2Iterator<uint8_t> iter_r(msg, "r");
+        sensor_msgs::PointCloud2Iterator<uint8_t> iter_g(msg, "g");
+        sensor_msgs::PointCloud2Iterator<uint8_t> iter_b(msg, "b");
+
+        for (int m = 0; m < depth.rows; m++) {
+            for (int n = 0; n < depth.cols; n++) {
+                // get depth value at (m, n)
+                unsigned short d = depth.ptr<unsigned short>(m)[n];
+                // when d is equal 0 or 4096 means no depth
+                if (d == 0 || d == 4096)
+                    continue;
+
+                *iter_z = float(d) / camera_factor;
+                *iter_x = (n - camera_cx) * *iter_z / camera_fx;
+                *iter_y = (m - camera_cy) * *iter_z / camera_fy;
+
+                *iter_r = img.ptr<uchar>(m)[n * 3 + 2];
+                *iter_g = img.ptr<uchar>(m)[n * 3 + 1];
+                *iter_b = img.ptr<uchar>(m)[n * 3];
+
+                ++iter_x;
+                ++iter_y;
+                ++iter_z;
+                ++iter_r;
+                ++iter_g;
+                ++iter_b;
+            }
+        }
+
+        pub_points.publish(msg);
+    }
+
+    void publishStaticTransforms() {
+        ros::Time tf_stamp = ros::Time::now();
+        // The left frame is used as the base frame.
+        geometry_msgs::TransformStamped b2l_msg;
+        b2l_msg.header.stamp = tf_stamp;
+        b2l_msg.header.frame_id = base_frame_id;
+        b2l_msg.child_frame_id = color_frame_id;
+        b2l_msg.transform.translation.x = 0;
+        b2l_msg.transform.translation.y = 0;
+        b2l_msg.transform.translation.z = 0;
+        b2l_msg.transform.rotation.x = 0;
+        b2l_msg.transform.rotation.y = 0;
+        b2l_msg.transform.rotation.z = 0;
+        b2l_msg.transform.rotation.w = 1;
+        static_tf_broadcaster.sendTransform(b2l_msg);
+
+        // Transform left frame to depth frame
+        geometry_msgs::TransformStamped b2d_msg;
+        b2d_msg.header.stamp = tf_stamp;
+        b2d_msg.header.frame_id = color_frame_id;
+        b2d_msg.child_frame_id = depth_frame_id;
+        b2d_msg.transform.translation.x = 0;
+        b2d_msg.transform.translation.y = 0;
+        b2d_msg.transform.translation.z = 0;
+        b2d_msg.transform.rotation.x = 0;
+        b2d_msg.transform.rotation.y = 0;
+        b2d_msg.transform.rotation.z = 0;
+        b2d_msg.transform.rotation.w = 1;
+        static_tf_broadcaster.sendTransform(b2d_msg);
+
+        // Transform left frame to points frame
+        geometry_msgs::TransformStamped b2p_msg;
+        b2p_msg.header.stamp = tf_stamp;
+        b2p_msg.header.frame_id = color_frame_id;
+        b2p_msg.child_frame_id = points_frame_id;
+        b2p_msg.transform.translation.x = 0;
+        b2p_msg.transform.translation.y = 0;
+        b2p_msg.transform.translation.z = 0;
+        b2p_msg.transform.rotation.x = 0;
+        b2p_msg.transform.rotation.y = 0;
+        b2p_msg.transform.rotation.z = 0;
+        b2p_msg.transform.rotation.w = 1;
+        static_tf_broadcaster.sendTransform(b2p_msg);
+    }
+
     void device_poll() {
         using namespace mynteye;
 
@@ -114,6 +232,7 @@ public:
                         if (depth_SubNumber > 0) {
                             publishDepth(depth, t);
                         }
+                        publishPoints(color, depth, t);
                     }
                 }
 
@@ -147,17 +266,25 @@ public:
         nh_ns.getParam("state_awb", state_awb);
         nh_ns.getParam("ir_intensity", ir_intensity);
 
+        base_frame_id = "mynteye_link";
         color_frame_id = "mynteye_color";
         depth_frame_id = "mynteye_depth";
+        points_frame_id = "mynteye_points";
+        nh_ns.getParam("base_frame_id", base_frame_id);
         nh_ns.getParam("color_frame", color_frame_id);
         nh_ns.getParam("depth_frame", depth_frame_id);
+        nh_ns.getParam("points_frame", points_frame_id);
+        NODELET_INFO_STREAM("base_frame: " << base_frame_id);
         NODELET_INFO_STREAM("color_frame: " << color_frame_id);
         NODELET_INFO_STREAM("depth_frame: " << depth_frame_id);
+        NODELET_INFO_STREAM("points_frame: " << points_frame_id);
 
         std::string color_topic = "mynteye/color";
         std::string depth_topic = "mynteye/depth";
+        std::string points_topic = "mynteye/points";
         nh_ns.getParam("color_topic", color_topic);
         nh_ns.getParam("depth_topic", depth_topic);
+        nh_ns.getParam("points_topic", points_topic);
 
         // MYNTEYE objects
         mynteye.reset(new mynteye::Camera);
@@ -212,6 +339,10 @@ public:
         NODELET_INFO_STREAM("Advertized on topic " << color_topic);
         pub_depth = it_mynteye.advertise(depth_topic, 1);  // depth
         NODELET_INFO_STREAM("Advertized on topic " << depth_topic);
+        pub_points = nh.advertise<sensor_msgs::PointCloud2>(points_topic, 1);
+        NODELET_INFO_STREAM("Advertized on topic " << points_topic);
+
+        publishStaticTransforms();
 
         device_poll_thread = boost::shared_ptr<boost::thread>
             (new boost::thread(boost::bind(&MYNTEYEWrapperNodelet::device_poll, this)));
