@@ -50,4 +50,8 @@
 
   </node>
 
+  <node pkg="tf" type="static_transform_publisher" name="link1_broadcaster" args="0 0 0 0 1.5708 0 mynteye_link mynteye_color 100" />
+  <node pkg="tf" type="static_transform_publisher" name="link2_broadcaster" args="0 0 0 0 0 0 mynteye_color mynteye_depth 100" />
+  <node pkg="tf" type="static_transform_publisher" name="link3_broadcaster" args="0 0 0 0 0 0 mynteye_color mynteye_points 100" />
+
 </launch>

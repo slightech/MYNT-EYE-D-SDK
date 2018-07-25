@@ -342,7 +342,7 @@ public:
         pub_points = nh.advertise<sensor_msgs::PointCloud2>(points_topic, 1);
         NODELET_INFO_STREAM("Advertized on topic " << points_topic);
 
-        publishStaticTransforms();
+     // publishStaticTransforms();
 
         device_poll_thread = boost::shared_ptr<boost::thread>
             (new boost::thread(boost::bind(&MYNTEYEWrapperNodelet::device_poll, this)));
