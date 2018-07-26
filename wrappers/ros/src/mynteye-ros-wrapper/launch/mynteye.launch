@@ -23,7 +23,7 @@
   <arg name="base_frame"        default="mynteye_link" />
   <arg name="color_frame"       default="mynteye_color" />
   <arg name="depth_frame"       default="mynteye_depth" />
-  <arg name="points_frame"      default="mynteye_points" />
+  <arg name="points_frame"      default="mynteye_points_optical" />
 
   <node name="mynteye_wrapper_node" pkg="mynteye_wrapper" type="mynteye_wrapper_node" output="screen">
 
@@ -50,8 +50,14 @@
 
   </node>
 
-  <node pkg="tf" type="static_transform_publisher" name="link1_broadcaster" args="0 0 0 0 1.5708 0 mynteye_link mynteye_color 100" />
-  <node pkg="tf" type="static_transform_publisher" name="link2_broadcaster" args="0 0 0 0 0 0 mynteye_color mynteye_depth 100" />
-  <node pkg="tf" type="static_transform_publisher" name="link3_broadcaster" args="0 0 0 0 0 0 mynteye_color mynteye_points 100" />
+  <arg name="pi/2" value="1.5707963267948966" />
+  <arg name="optical_rotate" value="0 0 0 -$(arg pi/2) 0 -$(arg pi/2)" />
+
+  <node pkg="tf" type="static_transform_publisher" name="link1_broadcaster" args="0 0 0 0 0 0 mynteye_link mynteye_color 100" />
+  <node pkg="tf" type="static_transform_publisher" name="link2_broadcaster" args="0 0 0 0 0 0 mynteye_link mynteye_depth 100" />
+  <node pkg="tf" type="static_transform_publisher" name="link3_broadcaster" args="0 0 0 0 0 0 mynteye_link mynteye_points 100" />
+  <node pkg="tf" type="static_transform_publisher" name="link4_broadcaster" args="$(arg optical_rotate) mynteye_link mynteye_color_optical 100" />
+  <node pkg="tf" type="static_transform_publisher" name="link5_broadcaster" args="$(arg optical_rotate) mynteye_link mynteye_depth_optical 100" />
+  <node pkg="tf" type="static_transform_publisher" name="link6_broadcaster" args="$(arg optical_rotate) mynteye_link mynteye_points_optical 100" />
 
 </launch>

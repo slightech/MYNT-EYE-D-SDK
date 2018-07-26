@@ -156,51 +156,6 @@ public:
         pub_points.publish(msg);
     }
 
-    void publishStaticTransforms() {
-        ros::Time tf_stamp = ros::Time::now();
-        // The left frame is used as the base frame.
-        geometry_msgs::TransformStamped b2l_msg;
-        b2l_msg.header.stamp = tf_stamp;
-        b2l_msg.header.frame_id = base_frame_id;
-        b2l_msg.child_frame_id = color_frame_id;
-        b2l_msg.transform.translation.x = 0;
-        b2l_msg.transform.translation.y = 0;
-        b2l_msg.transform.translation.z = 0;
-        b2l_msg.transform.rotation.x = 0;
-        b2l_msg.transform.rotation.y = 0;
-        b2l_msg.transform.rotation.z = 0;
-        b2l_msg.transform.rotation.w = 1;
-        static_tf_broadcaster.sendTransform(b2l_msg);
-
-        // Transform left frame to depth frame
-        geometry_msgs::TransformStamped b2d_msg;
-        b2d_msg.header.stamp = tf_stamp;
-        b2d_msg.header.frame_id = color_frame_id;
-        b2d_msg.child_frame_id = depth_frame_id;
-        b2d_msg.transform.translation.x = 0;
-        b2d_msg.transform.translation.y = 0;
-        b2d_msg.transform.translation.z = 0;
-        b2d_msg.transform.rotation.x = 0;
-        b2d_msg.transform.rotation.y = 0;
-        b2d_msg.transform.rotation.z = 0;
-        b2d_msg.transform.rotation.w = 1;
-        static_tf_broadcaster.sendTransform(b2d_msg);
-
-        // Transform left frame to points frame
-        geometry_msgs::TransformStamped b2p_msg;
-        b2p_msg.header.stamp = tf_stamp;
-        b2p_msg.header.frame_id = color_frame_id;
-        b2p_msg.child_frame_id = points_frame_id;
-        b2p_msg.transform.translation.x = 0;
-        b2p_msg.transform.translation.y = 0;
-        b2p_msg.transform.translation.z = 0;
-        b2p_msg.transform.rotation.x = 0;
-        b2p_msg.transform.rotation.y = 0;
-        b2p_msg.transform.rotation.z = 0;
-        b2p_msg.transform.rotation.w = 1;
-        static_tf_broadcaster.sendTransform(b2p_msg);
-    }
-
     void device_poll() {
         using namespace mynteye;
 
@@ -341,8 +296,6 @@ public:
         NODELET_INFO_STREAM("Advertized on topic " << depth_topic);
         pub_points = nh.advertise<sensor_msgs::PointCloud2>(points_topic, 1);
         NODELET_INFO_STREAM("Advertized on topic " << points_topic);
-
-     // publishStaticTransforms();
 
         device_poll_thread = boost::shared_ptr<boost::thread>
             (new boost::thread(boost::bind(&MYNTEYEWrapperNodelet::device_poll, this)));
