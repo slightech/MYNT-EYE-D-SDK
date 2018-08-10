@@ -1,26 +1,30 @@
+
 #ifndef LIB_ESPDI_H
 #define LIB_ESPDI_H
 
 #include "eSPDI_def.h"
+
+//#ifdef __cplusplus
+//extern "C"
+//{
+//#endif 
+
 int  EtronDI_Init(void **ppHandleEtronDI, bool bIsLogEnabled);
 int  EtronDI_FindDevice(void *pHandleEtronDI);
 void EtronDI_Release(void **ppHandleEtronDI);
 int  EtronDI_RefreshDevice(void *pHandleEtronDI);
-int EtronDI_SwitchBaseline(int index);
-bool EtronDI_IsMLBaseLine(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo);
-int EtronDI_DoFusion(unsigned char **pDepthBufList, double *pDepthMerge, unsigned char *pDepthMergeFlag, int nDWidth, int nDHeight, double fFocus, double *pBaseline, double *pWRNear, double *pWRFar, double *pWRFusion, int nMergeNum, bool bdepth2Byte11bit, int method);
 
 int  EtronDI_GetDeviceNumber(void *pHandleEtronDI);
 int  EtronDI_GetDeviceInfo(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo ,DEVINFORMATION* pdevinfo);
 int  EtronDI_SelectDevice(void *pHandleEtronDI, int dev_index);
 
 // register APIs +
-int  EtronDI_GetSensorRegister(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int nId, unsigned short address, unsigned short *pValue, int flag, SENSORMODE_INFO SensorMode);
-int  EtronDI_SetSensorRegister(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int nId, unsigned short address, unsigned short nValue,  int flag, SENSORMODE_INFO SensorMode);
-int  EtronDI_GetFWRegister(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, unsigned short address, unsigned short *pValue, int flag);
-int  EtronDI_SetFWRegister(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, unsigned short address, unsigned short nValue,  int flag);
-int  EtronDI_GetHWRegister(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, unsigned short address, unsigned short *pValue, int flag);
-int  EtronDI_SetHWRegister(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, unsigned short address, unsigned short nValue,  int flag);
+int  EtronDI_GetSensorRegister( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int nId, unsigned short address, unsigned short *pValue, int flag, SENSORMODE_INFO SensorMode);
+int  EtronDI_SetSensorRegister( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int nId, unsigned short address, unsigned short nValue,  int flag, SENSORMODE_INFO SensorMode);
+int  EtronDI_GetFWRegister( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, unsigned short address, unsigned short *pValue, int flag);
+int  EtronDI_SetFWRegister( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, unsigned short address, unsigned short nValue,  int flag);
+int  EtronDI_GetHWRegister( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, unsigned short address, unsigned short *pValue, int flag);
+int  EtronDI_SetHWRegister( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, unsigned short address, unsigned short nValue,  int flag);
 // register APIs -
 
 // File ID +
@@ -47,57 +51,26 @@ int  EtronDI_WriteFlashData  (void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, FLA
 // File ID -
 
 // image +
-int  EtronDI_GetDeviceResolutionList(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, 
+int  EtronDI_GetDeviceResolutionList( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, 
 									  int nMaxCount, ETRONDI_STREAM_INFO *pStreamInfo0, 
 									  int nMaxCount1, ETRONDI_STREAM_INFO *pStreamInfo1);
 									  
-int  EtronDI_OpenDevice(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, 
+int  EtronDI_OpenDevice( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, 
 						 int nWidth, int nHeight, bool bImageL, bool bDepth,
 						 void *phWndNotice=0, CONTROL_MODE cm=IMAGE_SN_NONSYNC);									  
                                      			
-int  EtronDI_OpenDevice2(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, 
+int  EtronDI_OpenDevice2( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, 
 						  int nEP0Width, int nEP0Height, bool bEP0MJPG, 
 						  int nEP1Width, int nEP1Height, 
 						  DEPTH_TRANSFER_CTRL dtc=DEPTH_IMG_NON_TRANSFER,
 						  bool bIsOutputRGB24=false, void *phWndNotice=0, 
 						  int *pFPS=0, CONTROL_MODE cm=IMAGE_SN_NONSYNC);	
-int  EtronDI_OpenDeviceMBL(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo,
-                          int nEP0Width, int nEP0Height, bool bEP0MJPG,
-                          int nEP1Width, int nEP1Height,
-                          DEPTH_TRANSFER_CTRL dtc=DEPTH_IMG_NON_TRANSFER,
-                          bool bIsOutputRGB24=false, void *phWndNotice=0,
-                          int *pFPS=0, CONTROL_MODE cm=IMAGE_SN_NONSYNC);
 
+int  EtronDI_CloseDevice( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo);
 
-int  EtronDI_CloseDeviceMBL(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo);
-
-int  EtronDI_CloseDevice(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo);
-
-int  EtronDI_GetImage(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo,
+int  EtronDI_GetImage ( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo,
                         BYTE *pBuf, unsigned long int *pImageSize,
                         int *pSerial = 0, int nDepthDataType =0);
-
-int  EtronDI_GetColorImage(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo,
-                        BYTE *pBuf, unsigned long int *pImageSize,
-                        int *pSerial = 0, int nDepthDataType =0);
-
-int  EtronDI_GetDepthImage(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo,
-                        BYTE *pBuf, unsigned long int *pImageSize,
-                        int *pSerial = 0, int nDepthDataType =0);
-
-int  EtronDI_Get_Color_30_mm_depth(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo,
-                        BYTE *pBuf, unsigned long int *pImageSize,
-                        int *pSerial = 0, int nDepthDataType =0);
-
-int  EtronDI_Get_60_mm_depth(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo,
-                        BYTE *pBuf, unsigned long int *pImageSize,
-                        int *pSerial = 0, int nDepthDataType =0);
-
-int  EtronDI_Get_150_mm_depth(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo,
-                        BYTE *pBuf, unsigned long int *pImageSize,
-                        int *pSerial = 0, int nDepthDataType =0);
-
-
 int  EtronDI_Get2Image (void *pHandleEtronDI, PDEVSELINFO pDevSelInfo,
                         BYTE *pColorImgBuf, BYTE *pDepthImgBuf,
                         unsigned long int *pColorImageSize, unsigned long int *pDepthImageSize,
@@ -105,35 +78,38 @@ int  EtronDI_Get2Image (void *pHandleEtronDI, PDEVSELINFO pDevSelInfo,
 // image -			
 
 // for AEAWB Control +
-int  EtronDI_GetExposureTime(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int nSensorMode, float *pfExpTimeMS);
-int  EtronDI_SetExposureTime(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int nSensorMode, float fExpTimeMS);
-int  EtronDI_GetGlobalGain(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int nSensorMode, float *pfGlobalGain);
-int  EtronDI_SetGlobalGain(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int nSensorMode, float fGlobalGain);
-int  EtronDI_SetSensorTypeName(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, SENSOR_TYPE_NAME stn);
-int  EtronDI_GetColorGain(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int nSensorMode, float *pfGainR, float *pfGainG, float *pfGainB);
-int  EtronDI_SetColorGain(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int nSensorMode, float fGainR, float fGainG, float fGainB);
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-int  EtronDI_GetAccMeterValue(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int *pX, int *pY, int *pZ);
+
+#if 0
+int  EtronDI_GetAEStatus  (void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, PAE_STATUS pAEStatus);
+int  EtronDI_GetAWBStatus (void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, PAWB_STATUS pAWBStatus);
 #endif
+
+int  EtronDI_SetSensorTypeName( void *pHandleEtronDI, SENSOR_TYPE_NAME stn);
+int  EtronDI_GetExposureTime( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int nSensorMode, float *pfExpTimeMS);
+int  EtronDI_SetExposureTime( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int nSensorMode, float fExpTimeMS);
+int  EtronDI_GetGlobalGain( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int nSensorMode, float *pfGlobalGain);
+int  EtronDI_SetGlobalGain( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int nSensorMode, float fGlobalGain);
+int  EtronDI_GetColorGain( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int nSensorMode, float *pfGainR, float *pfGainG, float *pfGainB);
+int  EtronDI_SetColorGain( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int nSensorMode, float fGainR, float fGainG, float fGainB);
+int  EtronDI_GetAccMeterValue( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int *pX, int *pY, int *pZ);
 
 int  EtronDI_EnableAE     (void *pHandleEtronDI, PDEVSELINFO pDevSelInfo);
 int  EtronDI_DisableAE    (void *pHandleEtronDI, PDEVSELINFO pDevSelInfo);
 int  EtronDI_EnableAWB    (void *pHandleEtronDI, PDEVSELINFO pDevSelInfo);
 int  EtronDI_DisableAWB   (void *pHandleEtronDI, PDEVSELINFO pDevSelInfo);
 
-int  EtronDI_GetGPIOValue(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int nGPIOIndex, BYTE *pValue);
-int  EtronDI_SetGPIOValue(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int nGPIOIndex, BYTE nValue);
-int  EtronDI_SetGPIOCtrl(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int nGPIOIndex, BYTE nValue);
+int  EtronDI_GetGPIOValue( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int nGPIOIndex, BYTE *pValue);
+int  EtronDI_SetGPIOValue( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int nGPIOIndex, BYTE nValue);
 
-int  EtronDI_GetCTPropVal(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int nId, long int *pValue);
-int  EtronDI_SetCTPropVal(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int nId, long int nValue);
+int  EtronDI_GetCTPropVal( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int nId, long int *pValue);
+int  EtronDI_SetCTPropVal( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int nId, long int nValue);
 
-int  EtronDI_GetPUPropVal(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int nId, long int *pValue);
-int  EtronDI_SetPUPropVal(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int nId, long int nValue);
+int  EtronDI_GetPUPropVal( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int nId, long int *pValue);
+int  EtronDI_SetPUPropVal( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int nId, long int nValue);
 
 #if 0
-int  EtronDI_GetCTRangeAndStep(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int nId, long int *pMax, long int *pMin, long int *pStep, long int *pDefault, long int *pFlags);
-int  EtronDI_GetPURangeAndStep(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int nId, long int *pMax, long int *pMin, long int *pStep, long int *pDefault, long int *pFlags);
+int  EtronDI_GetCTRangeAndStep( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int nId, long int *pMax, long int *pMin, long int *pStep, long int *pDefault, long int *pFlags);
+int  EtronDI_GetPURangeAndStep( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int nId, long int *pMax, long int *pMin, long int *pStep, long int *pDefault, long int *pFlags);
 #endif
 
 // for AEAWB Control -		
@@ -153,59 +129,115 @@ int EtronDI_GetIRMode(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, unsigned sh
 // ~IR support
 
 // for Calibration Log +
-int  EtronDI_GetRectifyLogData(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, eSPCtrl_RectLogData *pData, int index);
-int  EtronDI_GetRectifyMatLogData(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, eSPCtrl_RectLogData *pData, int index);
+int  EtronDI_GetRectifyLogData(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, eSPCtrl_RectLogData *pData);
 // for Calibration Log -
-// for Post Process +
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-int  EtronDI_EnablePostProcess(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, bool bEnable);
-int  EtronDI_PostInitial(void *pHandleEtronDI);
-int  EtronDI_PostEnd(void *pHandleEtronDI);
-int  EtronDI_ProcessFrame(void *pHandleEtronDI, unsigned char *pYUY2Buf, unsigned char *pDepthBuf, unsigned char *OutputBuf, int width, int height);
-int  EtronDI_PostSetParam(void *pHandleEtronDI, int Idx, int Val);	
-int  EtronDI_PostGetParam(void *pHandleEtronDI, int Idx, int *pVal);	
-#endif
 
-int EtronDI_CreateSwPostProc(int depthBits, void** handle);
-int EtronDI_ReleaseSwPostProc(void** handle);
-int EtronDI_DoSwPostProc(void *pHandleEtronDI, unsigned char* colorBuf, bool isColorRgb24,
-    unsigned char* depthBuf, unsigned char* outputBuf, int width, int height);
-int EtronDI_Convert_Depth_Y_To_Buffer(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, unsigned char *depth_y, unsigned char *rgb, unsigned int width, unsigned int height, bool color, unsigned short nDepthDataType);
-int EtronDI_Convert_Depth_Y_To_Buffer_offset(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, unsigned char *depth_y, unsigned char *rgb, unsigned int width, unsigned int height, bool color, unsigned short nDepthDataType, int offset);
+// for Post Process +
+int  EtronDI_EnablePostProcess( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, bool bEnable);
+int  EtronDI_PostInitial( void *pHandleEtronDI);
+int  EtronDI_PostEnd( void *pHandleEtronDI);
+int  EtronDI_ProcessFrame( void *pHandleEtronDI, unsigned char *pYUY2Buf, unsigned char *pDepthBuf, unsigned char *OutputBuf, int width, int height);
+int  EtronDI_PostSetParam( void *pHandleEtronDI, int Idx, int Val);	
+int  EtronDI_PostGetParam( void *pHandleEtronDI, int Idx, int *pVal);	
 // for Post Process -
+
 // for sensorif +
-int  EtronDI_EnableSensorIF(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, bool bIsEnable);
+int  EtronDI_EnableSensorIF( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, bool bIsEnable);
 // for sensorif -
 
-#ifndef __WEYE__ 
+// for 3D Motor Control +
+
+int  EtronDI_MotorInit( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, unsigned short nMinSpeedPerStep); 
+
+// motor_id :
+//     0 : master
+//     1 : slave
+
+// direction :
+//     true  : clockwise
+//     false : anti-clockwise
+
+// bIsStep :
+//     true  : step
+//     false : angle
+
+// bIsTime :
+//     true  : time per step
+//     false : step per second
+
+// bIsInfinnity :
+//     true  : Infinity enable
+//     false : Infinity disable
+int  EtronDI_MotorStart ( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int motor_id, bool direction, double angle, long step, int timeperstep, float *steppersecond, bool bIsStep, bool bIsTime, bool bIsInfinity); 
+int  EtronDI_MotorStart_IndexCheckOption( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int motor_id, bool direction, double angle, long step, int timeperstep, float *steppersecond, bool bIsStep, bool bIsTime, bool bIsInfinity, bool bIsIgnoreHomeIndexTouched); 
+ 
+int  EtronDI_MotorStop( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo);
+int  EtronDI_GetMotorCurrentState( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, bool* bIsRunning);
+int  EtronDI_GetMotorCurrentState_IndexCheckOption( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, bool* bIsRunning, long* nRemainStepNum, int *nHomeIndexNum);
+int  EtronDI_GetMotorAngle( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, double *angle);
+int  EtronDI_GetMotorStep( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, long *step);    
+int  EtronDI_GetMotorTimePerStep( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, unsigned short *nTimePerStep);
+int  EtronDI_GetMotorStepPerSecond( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, float *fpStepPerSecond);
+int  EtronDI_GetMotorDirection( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, bool *direction);
+int  EtronDI_GetCurrentMotor( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int *motor_id); 
+
 // for Gyro +
-int EtronDI_InitialUAC(void);
-int EtronDI_GetUACData(unsigned char *buffer, int length);
-int EtronDI_ReleaseUAC(void);
-int EtronDI_InitialFlexibleGyro(void* pHandleEtronDI, PDEVSELINFO pDevSelInfo);
-int EtronDI_ReleaseFlexibleGyro(void* pHandleEtronDI, PDEVSELINFO pDevSelInfo);
-int EtronDI_GetFlexibleGyroData(void* pHandleEtronDI,PDEVSELINFO pDevSelInfo, int length, unsigned char* pGyroData);
-int EtronDI_GetFlexibleGyroLength(void* pHandleEtronDI, PDEVSELINFO pDevSelInfo, unsigned short* GyroLen);
-int EtronDI_GetImageInterrupt(void);
+// bPowerMode :
+//     true  : Normal
+//     false : Power Down
+// bIsZEnable :
+//     true  : Enable
+//     false : Disable
+// bIsYEnable :
+//     true  : Enable
+//     false : Disable
+// bIsXEnable :
+//     true  : Enable
+//     false : Disable
+int  EtronDI_GyroInit( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, 
+                       SENSITIVITY_LEVEL_L3G sll3g, 
+					   bool bPowerMode, 
+					   bool bIsZEnable, 
+					   bool bIsYEnable, 
+					   bool bIsXEnable);
+					   
+int  EtronDI_ReadGyro( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, GYRO_ANGULAR_RATE_DATA *gard);
 // for Gyro -
-#endif
 
-int EtronDI_GenerateLutFile(void* pHandleEtronDI, PDEVSELINFO pDevSelInfo, const char* filename);
-int EtronDI_SaveLutData(void* pHandleEtronDI, PDEVSELINFO pDevSelInfo, const char* filename);
-int EtronDI_GetLutData(void* pHandleEtronDI, PDEVSELINFO pDevSelInfo, BYTE* buffer, int nSize);
 
-int EtronDI_EncryptMP4(void* pHandleEtronDI, PDEVSELINFO pDevSelInfo, const char* filename);
-int EtronDI_DecryptMP4(void* pHandleEtronDI, PDEVSELINFO pDevSelInfo, const char* filename);
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-int EtronDI_InjectExtraDataToMp4(void* pHandleEtronDI, PDEVSELINFO pDevSelInfo, 
-		const char* filename, const char* data, int dataLen);
-int EtronDI_RetrieveExtraDataFromMp4(void* pHandleEtronDI, PDEVSELINFO pDevSelInfo, 
-		const char* filename, char* data, int* dataLen);
-int EtronDI_EncryptString(const char* src, char* dst);
-int EtronDI_DecryptString(const char* src, char* dst);
-int EtronDI_EncryptString(const char* src1, const char* src2, char* dst);
-int EtronDI_DecryptString(const char* src, char* dst1, char* dst2);
-#endif
-int EtronDI_GetAutoExposureMode(void* pHandleEtronDI, PDEVSELINFO pDevSelInfo, unsigned short* mode);
-int EtronDI_SetAutoExposureMode(void* pHandleEtronDI, PDEVSELINFO pDevSelInfo, unsigned short mode);
+// for accelerometer and magnetometer +
+int  EtronDI_AccelInit( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, SENSITIVITY_LEVEL_LSM sllsm);
+//DLLAPI int  ESPAPI Compass_Init( unsigned short nSensitivity_Level);
+int  EtronDI_ReadAccel( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, ACCELERATION_DATA *ad);
+int  EtronDI_ReadCompass( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, COMPASS_DATA *cd);
+// for accelerometer and magnetometer -
+
+
+// for pressure +
+int  EtronDI_PsInit( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, OUTPUT_DATA_RATE odr);
+int  EtronDI_ReadPressure( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int *nPressure);
+int  EtronDI_ReadTemperature( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, short *nTemperature);
+// for pressure -
+
+
+// for LED and Laser +
+int  EtronDI_SetLaserPowerState( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, POWER_STATE ps);
+int  EtronDI_SetDesktopLEDPowerState( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, POWER_STATE ps);
+int  EtronDI_GetLaserPowerState( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, POWER_STATE *ps);
+int  EtronDI_GetDesktopLEDPowerState( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, POWER_STATE *ps);
+int  EtronDI_SetMobileLEDBrightnessLevel( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, BRIGHTNESS_LEVEL bl);
+int  EtronDI_GetMobileLEDBrightnessLevel( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, BRIGHTNESS_LEVEL *pbl);
+// for LED and Laser -
+
+// Return home +
+int  EtronDI_MotorStartReturnHome( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo);
+int  EtronDI_IsMotorReturnHomeRunning( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo);
+// Return home -
+
+// for 3D Motor Control -
+
+//#ifdef __cplusplus
+//}
+//#endif
+
 #endif // LIB_ESPDI_H
