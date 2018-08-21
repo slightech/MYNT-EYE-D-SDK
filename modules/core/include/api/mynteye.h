@@ -49,7 +49,7 @@
 #endif
 
 #if defined(CXX11) || defined(CXX0X)
-    #define ENUM(name) enum class name : std::int8_t
+    #define ENUM(name) enum class name : std::int32_t
 #else
     #define ENUM(name) enum name
 #endif
@@ -125,7 +125,16 @@ ENUM(DepthMode) {
 ENUM(StreamFormat) {
     STREAM_MJPG,
     STREAM_YUYV,
-    STREAM_LAST
+    STREAM_FORMAT_LAST
+};
+
+ENUM(StreamMode) {
+    STREAM_1280x720,
+    STREAM_2560x720,
+    // STREAM_2560x960,
+    STREAM_1280x480,
+    STREAM_640x480,
+    STREAM_MODE_LAST
 };
 
 ENUM(StreamMode) {

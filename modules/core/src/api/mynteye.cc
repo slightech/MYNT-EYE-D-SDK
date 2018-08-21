@@ -21,7 +21,7 @@ std::ostream &operator<<(std::ostream &os, const StreamFormat &code) {
             os << "STREAM_MJPG"; break;
         case StreamFormat::STREAM_YUYV:
             os << "STREAM_YUYV"; break;
-        case StreamFormat::STREAM_LAST:
+        case StreamFormat::STREAM_FORMAT_LAST:
             os << "STREAM_LAST"; break;
         default:
             os << "UNKNOWN"; break;
