@@ -137,15 +137,6 @@ ENUM(StreamMode) {
     STREAM_MODE_LAST
 };
 
-ENUM(StreamMode) {
-    STREAM_1280x720,
-    STREAM_2560x720,
-    // STREAM_2560x960,
-    STREAM_1280x480,
-    STREAM_640x480,
-    STREAM_LAST
-};
-
 }  // namespace mynteye
 
 MYNTEYE_API std::ostream &operator<<(std::ostream &os, const mynteye::StreamFormat &code);
