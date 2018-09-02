@@ -191,7 +191,7 @@ CameraPrivate::CameraPrivate(Camera *q)
     DBG_LOGD(__func__);
 
     int ret = EtronDI_Init(&etron_di_, false);
-    DBG_LOGI("EtronDI_Init: %d", ret);
+    DBG_LOGI("MYNT EYE Init: %d", ret);
     unused(ret);
 
     stream_color_info_ptr_ = (PETRONDI_STREAM_INFO)malloc(sizeof(ETRONDI_STREAM_INFO)*64);
@@ -424,7 +424,7 @@ ErrorCode CameraPrivate::Open(const InitParams &params) {
     //if (params.dev_info.type == PUMA) {
         depth_data_type_ = 2;  // 1: 11 bits. 2: 14 bits
         EtronDI_SetDepthDataType(etron_di_, &dev_sel_info_, depth_data_type_);
-        DBG_LOGI("EtronDI_SetDepthDataType: %d", depth_data_type_);
+        DBG_LOGI("SetDepthDataType: %d", depth_data_type_);
     //}
 
     SetAutoExposureEnabled(params.state_ae);
