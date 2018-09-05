@@ -95,30 +95,39 @@ endif()
 include_directories(
   ${SDK_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
+  src
 )
 
 make_executable(get_image
-  SRCS src/get_image.cc
+  SRCS
+    src/get_image.cc
+    src/util/cam_utils.cc
+    src/util/cv_painter.cc
   LINKLIBS
     ${OpenCV_LIBS} ${SDK_LIB_CORE}
 )
 
 make_executable(get_depth
-  SRCS src/get_depth.cc
+  SRCS
+    src/get_depth.cc
+    src/util/cam_utils.cc
+    src/util/cv_painter.cc
   LINKLIBS
     ${OpenCV_LIBS} ${SDK_LIB_CORE}
 )
 
 find_package(PCL QUIET)
 if(PCL_FOUND)
+  list(REMOVE_ITEM PCL_LIBRARIES "vtkproj4")
 
-list(REMOVE_ITEM PCL_LIBRARIES "vtkproj4")
+  include_directories(${PCL_INCLUDE_DIRS})
 
-include_directories(${PCL_INCLUDE_DIRS})
-
-make_executable(get_points
-  SRCS src/get_points.cc
-  LINKLIBS
-    ${OpenCV_LIBS} ${SDK_LIB_CORE} ${PCL_LIBRARIES}
-)
+  make_executable(get_points
+    SRCS
+      src/get_points.cc
+      src/util/cam_utils.cc
+      src/util/cv_painter.cc
+    LINKLIBS
+      ${OpenCV_LIBS} ${SDK_LIB_CORE} ${PCL_LIBRARIES}
+  )
 endif()

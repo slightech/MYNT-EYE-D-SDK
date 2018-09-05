@@ -11,119 +11,68 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#include <iomanip>
 #include <iostream>
 
 #include <opencv2/highgui/highgui.hpp>
 
 #include "camera.h"
 
+#include "util/cam_utils.h"
+#include "util/counter.h"
+#include "util/cv_painter.h"
+
 using namespace std;
 using namespace mynteye;
 
 int main(int argc, char const *argv[]) {
-    string dashes(80, '-');
+  Camera cam;
+  DeviceInfo dev_info;
+  if (!util::select(cam, &dev_info)) {
+    return 1;
+  }
+  util::print_stream_infos(cam, dev_info.index);
 
-    Camera cam;
+  cout << "Open device: " << dev_info.index << ", "
+      << dev_info.name << endl << endl;
 
-    DeviceInfo dev_info;
-    {
-        vector<DeviceInfo> dev_infos = cam.GetDevices();
-        size_t n = dev_infos.size();
-        if (n <= 0) {
-            cerr << "Error: Device not found" << endl;
-            return 1;
-        }
+  // Warning: Color stream format MJPG doesn't work.
+  InitParams params(dev_info.index);
+  params.depth_mode = DepthMode::DEPTH_COLORFUL;
+  // params.stream_mode = StreamMode::STREAM_640x480;
+  params.ir_intensity = 4;
 
-        cout << dashes << endl;
-        cout << "Index | Device Information" << endl;
-        cout << dashes << endl;
-        for (auto &&info : dev_infos) {
-            cout << setw(5) << info.index << " | " << info << endl;
-        }
-        cout << dashes << endl;
+  cam.Open(params);
 
-        if (n <= 2) {
-            dev_info = dev_infos[0];
-            cout << "Auto select a device to open, index: 0"<< endl;
-        } else {
-            size_t i;
-            cout << "Please select a device to open, index: ";
-            cin >> i;
-            cout << endl;
-            if (i < 0 || i >= n) {
-                cerr << "Error: Index out of range" << endl;
-                return 1;
-            }
-            dev_info = dev_infos[i];
-        }
+  cout << endl;
+  if (!cam.IsOpened()) {
+    cerr << "Error: Open camera failed" << endl;
+    return 1;
+  }
+  cout << "Open device success" << endl << endl;
+
+  cout << "Press ESC/Q on Windows to terminate" << endl;
+
+  cv::namedWindow("color", cv::WINDOW_AUTOSIZE);
+  cv::namedWindow("depth", cv::WINDOW_AUTOSIZE);
+
+  cv::Mat color, depth;
+  util::Counter counter;
+  for (;;) {
+    counter.Update();
+
+    if (cam.RetrieveImage(color, depth) == ErrorCode::SUCCESS) {
+      util::draw(color, util::to_string(counter.fps(), 5, 1), util::TOP_RIGHT);
+      cv::imshow("color", color);
+      cv::imshow("depth", depth);
     }
 
-    {
-        vector<StreamInfo> color_infos;
-        vector<StreamInfo> depth_infos;
-        cam.GetResolutions(dev_info.index, color_infos, depth_infos);
-
-        cout << dashes << endl;
-        cout << "Index | Color Stream Information" << endl;
-        cout << dashes << endl;
-        for (auto &&info : color_infos) {
-            cout << setw(5) << info.index << " | " << info << endl;
-        }
-        cout << dashes << endl << endl;
-
-        cout << dashes << endl;
-        cout << "Index | Depth Stream Information" << endl;
-        cout << dashes << endl;
-        for (auto &&info : depth_infos) {
-            cout << setw(5) << info.index << " | " << info << endl;
-        }
-        cout << dashes << endl << endl;
+    char key = static_cast<char>(cv::waitKey(1));
+    if (key == 27 || key == 'q' || key == 'Q') {  // ESC/Q
+      break;
     }
+  }
 
-    cout << "Open device: " << dev_info.index << ", " << dev_info.name << endl << endl;
-
-    // Warning: Color stream format MJPG doesn't work.
-    InitParams params(dev_info.index);
-    params.depth_mode = DepthMode::DEPTH_COLORFUL;
-    // params.stream_mode = StreamMode::STREAM_1280x720;
-    params.ir_intensity = 4;
-
-    cam.Open(params);
-
-    cout << endl;
-    if (!cam.IsOpened()) {
-        cerr << "Error: Open camera failed" << endl;
-        return 1;
-    }
-    cout << "Open device success" << endl << endl;
-
-    cout << "Press ESC/Q on Windows to terminate" << endl;
-
-    cv::namedWindow("color", cv::WINDOW_AUTOSIZE);
-    cv::namedWindow("depth", cv::WINDOW_AUTOSIZE);
-
-    double t, fps = 0;
-    cv::Mat color, depth;
-    for (;;) {
-        t = (double)cv::getTickCount();
-
-        if (cam.RetrieveImage(color, depth) == ErrorCode::SUCCESS) {
-            cv::imshow("color", color);
-            cv::imshow("depth", depth);
-        }
-
-        char key = (char)cv::waitKey(10);
-        if (key == 27 || key == 'q' || key == 'Q') {  // ESC/Q
-            break;
-        }
-
-        t = (double)cv::getTickCount() - t;
-        fps = cv::getTickFrequency() / t;
-    }
-    (void)(fps);
-
-    cam.Close();
-    cv::destroyAllWindows();
-    return 0;
+  cam.Close();
+  cv::destroyAllWindows();
+  return 0;
 }

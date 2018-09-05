@@ -26,18 +26,19 @@ Camera::~Camera() {
     DBG_LOGD(__func__);
 }
 
-std::vector<DeviceInfo> Camera::GetDevices() {
+std::vector<DeviceInfo> Camera::GetDevices() const {
     std::vector<DeviceInfo> device_infos;
     GetDevices(device_infos);
     return device_infos;
 }
 
-void Camera::GetDevices(std::vector<DeviceInfo> &dev_infos) {
+void Camera::GetDevices(std::vector<DeviceInfo> &dev_infos) const {
     d_ptr->GetDevices(dev_infos);
 }
 
 void Camera::GetResolutions(const std::int32_t &dev_index,
-        std::vector<StreamInfo> &color_infos, std::vector<StreamInfo> &depth_infos) {
+        std::vector<StreamInfo> &color_infos,
+        std::vector<StreamInfo> &depth_infos) const {
     d_ptr->GetResolutions(dev_index, color_infos, depth_infos);
 }
 

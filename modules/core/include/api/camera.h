@@ -35,10 +35,11 @@ public:
     Camera();
     ~Camera();
 
-    std::vector<DeviceInfo> GetDevices();
-    void GetDevices(std::vector<DeviceInfo> &dev_infos);
+    std::vector<DeviceInfo> GetDevices() const;
+    void GetDevices(std::vector<DeviceInfo> &dev_infos) const;
     void GetResolutions(const std::int32_t &dev_index,
-        std::vector<StreamInfo> &color_infos, std::vector<StreamInfo> &depth_infos);
+        std::vector<StreamInfo> &color_infos,
+        std::vector<StreamInfo> &depth_infos) const;
 
     ErrorCode Open();
     ErrorCode Open(const InitParams &params);
