@@ -1,6 +1,8 @@
 ifndef _COMMON_DEFS_MAKE_
 _COMMON_DEFS_MAKE_ := 1
 
+SHELL := /bin/bash
+
 COMMA := ,
 EMPTY :=
 SPACE := $(EMPTY) $(EMPTY)
@@ -15,69 +17,73 @@ ifeq ($(OS),Windows_NT)
 HOST_OS := Win
 
 ifeq ($(PROCESSOR_ARCHITEW6432),AMD64)
+  HOST_ARCH := x64
+else
+  ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
     HOST_ARCH := x64
-else
-    ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
-        HOST_ARCH := x64
-    else ifeq ($(PROCESSOR_ARCHITECTURE),x86)
-        HOST_ARCH := x86
-    else
-        DUMMY := $(error "Can't detect host arch")
-    endif
-endif
-
-UNAME_S = $(shell uname -s)
-ifneq ($(UNAME_S),)
-ifneq ($(findstring MINGW,$(UNAME_S)),)
-    HOST_OS := MinGW
-endif
-endif
-
-else
-
-UNAME_S = $(shell uname -s)
-ifneq ($(findstring Linux,$(UNAME_S)),)
-    HOST_OS := Linux
-else ifneq ($(findstring Darwin,$(UNAME_S)),)
-    HOST_OS := Mac
-else ifneq ($(findstring MINGW,$(UNAME_S)),)
-    HOST_OS := MinGW
-else ifneq ($(findstring MSYS,$(UNAME_S)),)
-    # Need MSYS on Windows
-    HOST_OS := Win
-else
-    DUMMY := $(error "Can't detect host os")
-endif
-
-UNAME_M = $(shell uname -m)
-ifneq ($(findstring x86_64,$(UNAME_M)),)
-    HOST_ARCH := x64
-else ifneq ($(findstring x86,$(UNAME_M)),)
+  else ifeq ($(PROCESSOR_ARCHITECTURE),x86)
     HOST_ARCH := x86
-else ifneq ($(findstring i686,$(UNAME_M)),)
-    HOST_ARCH := x86
-else ifneq ($(findstring i386,$(UNAME_M)),)
-    HOST_ARCH := x86
-else ifneq ($(findstring arm,$(UNAME_M)),)
-    HOST_ARCH := Arm
-else ifneq ($(findstring aarch64,$(UNAME_M)),)
-    HOST_ARCH := AArch64
-else
+  else
     DUMMY := $(error "Can't detect host arch")
+  endif
+endif
+
+else
+
+UNAME_S := $(shell uname -s)
+ifneq ($(findstring Linux,$(UNAME_S)),)
+  HOST_OS := Linux
+else ifneq ($(findstring Darwin,$(UNAME_S)),)
+  HOST_OS := Mac
+else ifneq ($(findstring MINGW,$(UNAME_S)),)
+  HOST_OS := Win
+else ifneq ($(findstring MSYS,$(UNAME_S)),)
+  # Need MSYS on Windows
+  HOST_OS := Win
+else
+  DUMMY := $(error "Can't detect host os")
+endif
+
+UNAME_M := $(shell uname -m)
+ifneq ($(findstring x86_64,$(UNAME_M)),)
+  HOST_ARCH := x64
+else ifneq ($(findstring x86,$(UNAME_M)),)
+  HOST_ARCH := x86
+else ifneq ($(findstring i686,$(UNAME_M)),)
+  HOST_ARCH := x86
+else ifneq ($(findstring i386,$(UNAME_M)),)
+  HOST_ARCH := x86
+else ifneq ($(findstring arm,$(UNAME_M)),)
+  HOST_ARCH := Arm
+else ifneq ($(findstring aarch64,$(UNAME_M)),)
+  HOST_ARCH := AArch64
+else
+  DUMMY := $(error "Can't detect host arch")
 endif
 
 endif
 
 HOST_NAME := $(HOST_OS)
-ifeq ($(HOST_OS),Linux)
-    UNAME_A = $(shell uname -a)
-    ifneq ($(findstring tegra,$(UNAME_A)),)
-        HOST_NAME := Tegra
-    else ifneq ($(findstring jetsonbot,$(UNAME_A)),)
-        HOST_NAME := Tegra
-    #else ifneq ($(findstring firefly,$(UNAME_A)),)
-    #    HOST_NAME := Firefly
+ifeq ($(HOST_OS),Win)
+  UNAME_S := $(shell uname -s)
+  ifneq ($(UNAME_S),)
+    ifneq ($(findstring MINGW,$(UNAME_S)),)
+      HOST_NAME := MinGW
+    else ifneq ($(findstring MSYS,$(UNAME_S)),)
+      HOST_NAME := MSYS
     endif
+  endif
+else ifeq ($(HOST_OS),Linux)
+  UNAME_A := $(shell uname -a)
+  ifneq ($(findstring tegra,$(UNAME_A)),)
+    HOST_NAME := Tegra
+  else ifneq ($(findstring jetsonbot,$(UNAME_A)),)
+    HOST_NAME := Tegra
+  else ifneq ($(findstring firefly,$(UNAME_A)),)
+   HOST_NAME := Firefly
+  else ifneq ($(findstring ubuntu,$(UNAME_A)),)
+   HOST_NAME := Ubuntu
+  endif
 endif
 
 # Function
@@ -88,16 +94,17 @@ lower = $(shell echo $1 | tr '[:upper:]' '[:lower:]')
 
 # Command
 
-FIND := find
+SH := $(SHELL)
+ECHO := echo -e
+FIND := $(shell ./scripts/getfind.sh)
 
-ifeq ($(HOST_OS),MinGW)
-    ECHO := echo -e
+ifeq ($(HOST_OS),Win)
+  ifeq ($(HOST_NAME),MinGW)
     CC := x86_64-w64-mingw32-gcc
     CXX := x86_64-w64-mingw32-g++
     MAKE := mingw32-make
     BUILD := $(MAKE)
-else ifeq ($(HOST_OS),Win)
-    ECHO := echo -e
+  else
     CC := cl
     CXX := cl
     MAKE := make
@@ -108,36 +115,41 @@ else ifeq ($(HOST_OS),Win)
     # MSBuild builds defaults to debug configuration
     #   https://stackoverflow.com/questions/1629779/msbuild-builds-defaults-to-debug-configuration
     BUILD := msbuild.exe ALL_BUILD.vcxproj /property:Configuration=Release
-    FIND := $(shell ./scripts/getfind.sh)
+  endif
 else
-    # mac & linux
-    ECHO := echo
-    # Set realpath for linux because of compiler not found with wrong path when cmake again
-    CC := /usr/bin/cc
-    CXX := /usr/bin/c++
-    MAKE := make
-    BUILD := $(MAKE)
+  # mac & linux
+  # Set realpath for linux because of compiler not found with wrong path when cmake again
+  CC := /usr/bin/cc
+  CXX := /usr/bin/c++
+  MAKE := make
+  BUILD := $(MAKE)
 endif
 
 ifeq ($(HOST_OS),Mac)
-    LDD := otool -L
+  LDD := otool -L
 else
-    LDD := ldd
+  LDD := ldd
 endif
 
 # CMake
 
-CMAKE := cmake -DCMAKE_BUILD_TYPE=Release
+CMAKE := cmake
+# CMAKE := $(CMAKE) -DCMAKE_BUILD_TYPE=Debug
+CMAKE := $(CMAKE) -DCMAKE_BUILD_TYPE=Release
 ifneq ($(CC),)
-    CMAKE := $(CMAKE) -DCMAKE_C_COMPILER=$(CC)
+  CMAKE := $(CMAKE) -DCMAKE_C_COMPILER=$(CC)
 endif
 ifneq ($(CXX),)
-    CMAKE := $(CMAKE) -DCMAKE_CXX_COMPILER=$(CXX)
+  CMAKE := $(CMAKE) -DCMAKE_CXX_COMPILER=$(CXX)
 endif
-ifneq ($(HOST_OS),Win)
-    ifneq ($(MAKE),)
-        CMAKE := $(CMAKE) -DCMAKE_MAKE_PROGRAM=$(MAKE)
+ifneq ($(MAKE),)
+  ifeq ($(HOST_OS),Win)
+    ifeq ($(HOST_NAME),MinGW)
+      CMAKE := $(CMAKE) -DCMAKE_MAKE_PROGRAM=$(MAKE)
     endif
+  else
+    CMAKE := $(CMAKE) -DCMAKE_MAKE_PROGRAM=$(MAKE)
+  endif
 endif
 
 CMAKE_OPTIONS :=
@@ -184,9 +196,9 @@ endif
 # Package
 
 PKGVERSION := $(shell ./scripts/version.sh)
-PKGNAME := mynteye-d$(PKGVERSION)-$(HOST_OS)-$(HOST_ARCH)
+PKGNAME := mynteye-$(PKGVERSION)-$(HOST_NAME)-$(HOST_ARCH)
 ifeq ($(HOST_OS),Linux)
-    PKGNAME := $(PKGNAME)-gcc$(shell gcc -dumpversion | cut -c 1-1)
+  PKGNAME := $(PKGNAME)-gcc$(shell gcc -dumpversion | cut -c 1-1)
 endif
 PKGNAME := $(call lower,$(PKGNAME))
 
@@ -194,12 +206,12 @@ PKGNAME := $(call lower,$(PKGNAME))
 
 define echo
 	text="$1"; options="$2"; \
-	[ -z "$2" ] && options="1;35;47"; \
+	[ -z "$2" ] && options="1;33"; \
 	$(ECHO) "\033[$${options}m$${text}\033[0m"
 endef
 
 define rm
-	[ ! -e "$1" ] || (rm -rf "$1" && $(ECHO) "RM: $1")
+	[ ! -h "$1" ] && [ ! -e "$1" ] || (rm -rf "$1" && $(ECHO) "RM: $1")
 endef
 
 define rm_f
