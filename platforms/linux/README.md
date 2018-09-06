@@ -73,7 +73,7 @@ $ make samples
 ### Run
 
 ```
-$ ./samples/build/output/bin/camera
+$ ./samples/_output/bin/get_image
 ```
 
 ## The ROS Wrapper

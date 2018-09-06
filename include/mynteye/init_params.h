@@ -17,9 +17,9 @@
 
 #include <string>
 
-#include "dev_info.h"
-#include "mynteye.h"
-#include "stream_info.h"
+#include "mynteye/dev_info.h"
+#include "mynteye/mynteye.h"
+#include "mynteye/stream_info.h"
 
 namespace mynteye {
 

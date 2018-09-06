@@ -15,7 +15,7 @@
 
 #include <opencv2/highgui/highgui.hpp>
 
-#include "camera.h"
+#include "mynteye/camera.h"
 
 #include "util/cam_utils.h"
 #include "util/counter.h"

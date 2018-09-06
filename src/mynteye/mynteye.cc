@@ -11,5 +11,20 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#define MYNTEYE_VERSION_MAJOR 1
-#define MYNTEYE_VERSION_MINOR 1
+#include "mynteye/mynteye.h"
+
+using namespace mynteye;
+
+std::ostream &operator<<(std::ostream &os, const StreamFormat &code) {
+    switch (code) {
+        case StreamFormat::STREAM_MJPG:
+            os << "STREAM_MJPG"; break;
+        case StreamFormat::STREAM_YUYV:
+            os << "STREAM_YUYV"; break;
+        case StreamFormat::STREAM_FORMAT_LAST:
+            os << "STREAM_LAST"; break;
+        default:
+            os << "UNKNOWN"; break;
+    }
+    return os;
+}

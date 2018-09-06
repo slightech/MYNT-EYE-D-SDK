@@ -11,13 +11,13 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#include "camera_p.h"
+#include "mynteye/internal/camera_p.h"
 
 #include <stdexcept>
 
 #include <opencv2/imgproc/imgproc.hpp>
 
-#include "log.hpp"
+#include "mynteye/common/log.hpp"
 
 using namespace mynteye;
 
@@ -303,7 +303,7 @@ void CameraPrivate::GetResolutions(const std::int32_t &dev_index,
     stream_info_dev_index_ = dev_index;
 }
 
-void CameraPrivate::GetResolutionIndex(const std::int32_t &dev_index, const StreamMode &stream_mode, 
+void CameraPrivate::GetResolutionIndex(const std::int32_t &dev_index, const StreamMode &stream_mode,
     const StreamFormat &stream_format, int &color_res_index, int &depth_res_index) {
 
     color_res_index = -1;
@@ -356,7 +356,7 @@ void CameraPrivate::GetResolutionIndex(const std::int32_t &dev_index, const Stre
     PETRONDI_STREAM_INFO stream_temp_info_ptr = stream_color_info_ptr_;
     int i = 0;
     while (i < 64) {
-        if (stream_temp_info_ptr->nWidth == width && stream_temp_info_ptr->nHeight == height 
+        if (stream_temp_info_ptr->nWidth == width && stream_temp_info_ptr->nHeight == height
             && stream_format == (stream_temp_info_ptr->bFormatMJPG ? StreamFormat::STREAM_MJPG : StreamFormat::STREAM_YUYV)) {
             color_res_index = i;
             break;
@@ -373,7 +373,7 @@ void CameraPrivate::GetResolutionIndex(const std::int32_t &dev_index, const Stre
     stream_temp_info_ptr = stream_depth_info_ptr_;
     i = 0;
     while (i < 64) {
-        if (stream_temp_info_ptr->nHeight == height 
+        if (stream_temp_info_ptr->nHeight == height
             && stream_format == (stream_temp_info_ptr->bFormatMJPG ? StreamFormat::STREAM_MJPG : StreamFormat::STREAM_YUYV)) {
             depth_res_index = i;
             break;
@@ -467,7 +467,7 @@ ErrorCode CameraPrivate::Open(const InitParams &params) {
         GetResolutions(params.dev_index, color_infos, depth_infos);
     }
 
-    GetResolutionIndex(params.dev_index, params.stream_mode, params.stream_format, 
+    GetResolutionIndex(params.dev_index, params.stream_mode, params.stream_format,
         color_res_index_, depth_res_index_);
     LOGI("-- Color Stream: %dx%d %s",
         stream_color_info_ptr_[color_res_index_].nWidth,

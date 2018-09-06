@@ -11,9 +11,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#include "init_params.h"
+#include "mynteye/init_params.h"
 
-#include "log.hpp"
+#include "mynteye/common/log.hpp"
 
 using namespace mynteye;
 

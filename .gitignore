@@ -1,8 +1,8 @@
 .DS_Store
 
-/output/
-/modules/build/
-/samples/build/
+_build/
+_output/
+_install/
 
 # qt
 
@@ -20,6 +20,7 @@
 # others
 
 /mynteye-*
+!/mynteye-*cmake*
 
 /pkginfo.sh
 /platforms/linux/sdk.cfg

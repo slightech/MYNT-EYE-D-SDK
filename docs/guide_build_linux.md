@@ -9,7 +9,7 @@
 #### 1.1.1 Install OpenCV dependencies (OpenCV need GTK or VTK for GUI)
 
 ```
-sudo apt-get install libjpeg-dev libgtk-3-dev 
+sudo apt-get install libjpeg-dev libgtk-3-dev
 ```
 
 #### 1.1.2 Install OpenCV with apt or compile (Choose one)
@@ -61,18 +61,19 @@ make all
 ## 3. Run Samples
 
 1) get_image shows the left camera image and colorful depthmap
+
 ```
-./samples/build/output/bin/get_image
+./samples/_output/bin/get_image
 ```
 
 2) get_depth shows the left camera image, 16UC1 depthmap and depth value(mm) on mouse pointed pixal
 ```
-./samples/build/output/bin/get_depth
+./samples/_output/bin/get_depth
 ```
 
 3) get_points shows the left camera image, 16UC1 depthmap and point cloud view
 ```
-./samples/build/output/bin/get_points
+./samples/_output/bin/get_points
 ```
 
 ## 4 Install With OpenCV ROS

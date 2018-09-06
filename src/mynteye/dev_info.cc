@@ -11,14 +11,22 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#include "stream_info.h"
+#include "mynteye/dev_info.h"
+
+#include <iomanip>
 
 using namespace mynteye;
 
-std::ostream &operator<<(std::ostream &os, const StreamInfo &info) {
+std::ostream &operator<<(std::ostream &os, const DeviceInfo &info) {
+    std::ios fmt{nullptr};
+    fmt.copyfmt(os);
     os << "index: " << info.index
-        << ", width: " << info.width
-        << ", height: " << info.height
-        << ", format: " << info.format;
+        << ", name: " << info.name
+        << ", type: " << info.type
+        << ", pid: 0x" << std::hex << info.pid
+        << ", vid: 0x" << std::hex << info.vid
+        << ", chip_id: 0x" << std::hex << info.chip_id
+        << ", fw_version: " << info.fw_version;
+    os.copyfmt(fmt);
     return os;
 }

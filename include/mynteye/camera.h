@@ -21,10 +21,10 @@
 
 #include <opencv2/core/core.hpp>
 
-#include "dev_info.h"
-#include "init_params.h"
-#include "mynteye.h"
-#include "stream_info.h"
+#include "mynteye/dev_info.h"
+#include "mynteye/init_params.h"
+#include "mynteye/mynteye.h"
+#include "mynteye/stream_info.h"
 
 namespace mynteye {
 

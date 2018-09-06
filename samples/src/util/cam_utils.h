@@ -20,7 +20,7 @@
 #include <memory>
 #include <utility>
 
-#include "camera.h"
+#include "mynteye/camera.h"
 
 namespace mynteye {
 namespace util {

@@ -11,45 +11,60 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#ifndef MYNTEYE_API_STREAM_INFO_H_
-#define MYNTEYE_API_STREAM_INFO_H_
+#ifndef MYNTEYE_API_DEV_INFO_H_
+#define MYNTEYE_API_DEV_INFO_H_
 #pragma once
 
 #include <string>
 
-#include "mynteye.h"
+#include "mynteye/mynteye.h"
 
 namespace mynteye {
 
 /**
- * Stream information.
+ * Device information.
  */
-struct MYNTEYE_API StreamInfo {
+struct MYNTEYE_API DeviceInfo {
 
     /**
-     * The stream index.
+     * The device index.
      */
     std::int32_t index;
 
     /**
-     * The stream width.
+     * The device name.
      */
-    std::int32_t width;
+    std::string name;
 
     /**
-     * The stream height.
+     * The device type.
      */
-    std::int32_t height;
+    std::uint16_t type;
 
     /**
-     * The stream format.
+     * The product id.
      */
-    StreamFormat format;
+    std::uint16_t pid;
+
+    /**
+     * The vendor id.
+     */
+    std::uint16_t vid;
+
+    /**
+     * The chip id.
+     */
+    std::uint16_t chip_id;
+
+    /**
+     * The firmware version.
+     */
+    std::string fw_version;
 
 };
 
 }  // namespace mynteye
 
-MYNTEYE_API std::ostream &operator<<(std::ostream &os, const mynteye::StreamInfo &info);
+MYNTEYE_API std::ostream &operator<<(std::ostream &os, const mynteye::DeviceInfo &info);
 
-#endif  // MYNTEYE_API_STREAM_INFO_H_
+#endif  // MYNTEYE_API_DEV_INFO_H_

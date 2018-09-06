@@ -15,7 +15,7 @@
 #define MYNTEYE_CORE_CAMERA_P_H_
 #pragma once
 
-#include "camera.h"
+#include "mynteye/camera.h"
 
 #include "eSPDI.h"
 

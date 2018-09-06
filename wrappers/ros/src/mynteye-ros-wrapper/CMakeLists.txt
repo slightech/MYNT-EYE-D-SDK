@@ -34,29 +34,15 @@ checkPackage("roscpp" "")
 checkPackage("sensor_msgs" "")
 checkPackage("std_msgs" "")
 
-find_package(OpenCV REQUIRED)
-if(OpenCV_FOUND)
-  if(OpenCV_VERSION VERSION_LESS 3.0)
-    add_definitions(-DUSE_OPENCV2)
-  else()
-    add_definitions(-DUSE_OPENCV3)
-  endif()
-else()
-  message(FATAL_ERROR "OpenCV not found. Allow set OpenCV_DIR to find it.")
-endif()
+catkin_package()
 
 get_filename_component(SDK_DIR "${PROJECT_SOURCE_DIR}/../../../.." ABSOLUTE)
-if(EXISTS ${SDK_DIR}/output)
-  set(SDK_DIR ${SDK_DIR}/output)
-endif()
-message(STATUS "SDK_DIR: ${SDK_DIR}")
 
-set(SDK_INCLUDE_DIRS ${SDK_DIR}/include)
-set(SDK_LIB_DIR ${SDK_DIR}/lib)
-set(SDK_CORE_LIBRARY ${SDK_LIB_DIR}/libmynteye_core.so)
-set(SDK_LIBS ${SDK_CORE_LIBRARY})
+LIST(APPEND CMAKE_PREFIX_PATH ${SDK_DIR}/_install/lib/cmake)
+find_package(mynteye REQUIRED)
+message(STATUS "Found mynteye: ${mynteye_VERSION}")
 
-catkin_package()
+include(${SDK_DIR}/cmake/DetectOpenCV.cmake)
 
 # targets
 
@@ -65,13 +51,12 @@ add_compile_options(-std=c++11)
 include_directories(
   ${catkin_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
-  ${SDK_INCLUDE_DIRS}
 )
 
 set(LINK_LIBRARIES
   ${catkin_LIBRARIES}
   ${OpenCV_LIBS}
-  ${SDK_LIBS}
+  mynteye_core
 )
 
 add_executable(mynteye_listener src/mynteye_listener.cc)

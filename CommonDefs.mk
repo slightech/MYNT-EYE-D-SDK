@@ -1,3 +1,16 @@
+# Copyright 2018 Slightech Co., Ltd. All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 ifndef _COMMON_DEFS_MAKE_
 _COMMON_DEFS_MAKE_ := 1
 
@@ -104,6 +117,7 @@ ifeq ($(HOST_OS),Win)
     CXX := x86_64-w64-mingw32-g++
     MAKE := mingw32-make
     BUILD := $(MAKE)
+    INSTALL := $(MAKE) install
   else
     CC := cl
     CXX := cl
@@ -115,6 +129,7 @@ ifeq ($(HOST_OS),Win)
     # MSBuild builds defaults to debug configuration
     #   https://stackoverflow.com/questions/1629779/msbuild-builds-defaults-to-debug-configuration
     BUILD := msbuild.exe ALL_BUILD.vcxproj /property:Configuration=Release
+    INSTALL := msbuild.exe INSTALL.vcxproj /property:Configuration=Release
   endif
 else
   # mac & linux
@@ -122,7 +137,8 @@ else
   CC := /usr/bin/cc
   CXX := /usr/bin/c++
   MAKE := make
-  BUILD := $(MAKE)
+  BUILD := $(MAKE) -j2
+  INSTALL := $(MAKE) install
 endif
 
 ifeq ($(HOST_OS),Mac)
@@ -266,6 +282,11 @@ define cmake_build
 	build_dir="$2"; [ -z "$2" ] && build_dir=..; \
 	build_options="$3"; \
 	$(call cd,$${work_dir}) && $(CMAKE) $${build_options} $(CMAKE_OPTIONS) $${build_dir} $(CMAKE_OPTIONS_AFTER) && $(BUILD)
+endef
+
+define make_install
+	build_dir="$1"; \
+	$(call cd,$${build_dir}) && $(INSTALL)
 endef
 
 define get_platform_path

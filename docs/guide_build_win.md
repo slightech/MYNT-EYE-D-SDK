@@ -70,18 +70,19 @@ make all
 ## 3. Run Samples
 
 1) get_image shows the left camera image and colorful depthmap
+
 ```
-./samples/build/output/bin/get_image.bat
+./samples/_output/bin/get_image.bat
 ```
 
 2) get_depth shows the left camera image, 16UC1 depthmap and depth value(mm) on mouse pointed pixal
 ```
-./samples/build/output/bin/get_depth.bat
+./samples/_output/bin/get_depth.bat
 ```
 
 3) get_points shows the left camera image, 16UC1 depthmap and point cloud view
 ```
-./samples/build/output/bin/get_points.bat
+./samples/_output/bin/get_points.bat
 ```
 
 ## 4. Clean
