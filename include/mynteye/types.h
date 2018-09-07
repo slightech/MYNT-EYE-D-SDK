@@ -43,7 +43,7 @@ enum class ErrorCode : std::int32_t {
   /** Camera retrieve the image failed. */
   ERROR_CAMERA_RETRIEVE_FAILED,
   /** Last guard. */
-  ERROR_LAST
+  ERROR_CODE_LAST
 };
 
 /**
@@ -56,7 +56,34 @@ enum class ImageType : std::int32_t {
   /** Depth. */
   IMAGE_DEPTH,
   /** Last guard. */
-  IMAGE_LAST
+  IMAGE_TYPE_LAST
+};
+
+/**
+ * @ingroup enumerations
+ * @brief List image formats.
+ */
+enum class ImageFormat : std::int32_t {
+  IMAGE_BGR_24,   // 8UC3
+  IMAGE_RGB_24,   // 8UC3
+  IMAGE_GRAY_8,   // 8UC1
+  IMAGE_GRAY_16,  // 16UC1
+  IMAGE_GRAY_24,  // 8UC3
+  IMAGE_YUYV,     // 8UC2
+  IMAGE_MJPG,
+  // color
+  COLOR_BGR   = IMAGE_BGR_24,  // > COLOR_RGB
+  COLOR_RGB   = IMAGE_RGB_24,  // > COLOR_BGR
+  COLOR_YUYV  = IMAGE_YUYV,    // > COLOR_BGR, COLOR_RGB
+  COLOR_MJPG  = IMAGE_MJPG,    // > COLOR_BGR, COLOR_RGB
+  // depth
+  DEPTH_RAW     = IMAGE_GRAY_16,  // > DEPTH_GRAY
+  DEPTH_GRAY    = IMAGE_GRAY_8,
+  DEPTH_GRAY_24 = IMAGE_GRAY_24,
+  DEPTH_BGR     = IMAGE_BGR_24,   // > DEPTH_RGB
+  DEPTH_RGB     = IMAGE_RGB_24,   // > DEPTH_BGR
+  /** Last guard. */
+  IMAGE_FORMAT_LAST
 };
 
 /**
@@ -64,12 +91,10 @@ enum class ImageType : std::int32_t {
  * @brief List depth modes.
  */
 enum class DepthMode : std::int32_t {
-  DEPTH_NON,
-  DEPTH_GRAY,
-  DEPTH_COLORFUL,
-  DEPTH_NON_16UC1,
-  DEPTH_NON_8UC1,
-  DEPTH_LAST
+  DEPTH_RAW,       // ImageFormat::DEPTH_RAW
+  DEPTH_GRAY,      // ImageFormat::DEPTH_GRAY_24
+  DEPTH_COLORFUL,  // ImageFormat::DEPTH_RGB
+  DEPTH_MODE_LAST
 };
 
 /**
@@ -87,7 +112,7 @@ enum class StreamMode : std::int32_t {
 
 /**
  * @ingroup enumerations
- * @brief List stream format.
+ * @brief List stream formats.
  */
 enum class StreamFormat : std::int32_t {
   STREAM_MJPG,

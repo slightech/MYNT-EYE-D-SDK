@@ -35,8 +35,20 @@ struct my_error_mgr {
 
 typedef struct my_error_mgr* my_error_ptr;
 
-extern int MJPEG_TO_RGB24_LIBJPEG(unsigned char* jpg, int nJpgSize,
+extern int MJPEG_TO_RGB_LIBJPEG(unsigned char* jpg, int nJpgSize,
     unsigned char* rgb);
+
+extern int YUYV_TO_RGB(unsigned char* yuv, unsigned char* rgb,
+    unsigned int width, unsigned int height);
+
+extern int YUYV_TO_BGR(unsigned char* yuv, unsigned char* bgr,
+    unsigned int width, unsigned int height);
+
+extern void RGB_TO_BGR(unsigned char* rgb,
+    unsigned int width, unsigned int height);
+
+extern void BGR_TO_RGB(unsigned char* bgr,
+    unsigned int width, unsigned int height);
 
 MYNTEYE_END_NAMESPACE
 

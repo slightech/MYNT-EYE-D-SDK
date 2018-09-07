@@ -22,8 +22,6 @@
 #include "util/counter.h"
 #include "util/cv_painter.h"
 
-#define WIN_FLAGS cv::WINDOW_AUTOSIZE
-
 namespace {
 
 class DepthRegion {
@@ -163,7 +161,7 @@ int main(int argc, char const* argv[]) {
 
   // Warning: Color stream format MJPG doesn't work.
   InitParams params(dev_info.index);
-  params.depth_mode = DepthMode::DEPTH_NON_16UC1;
+  params.depth_mode = DepthMode::DEPTH_RAW;
   // params.stream_mode = StreamMode::STREAM_1280x720;
   params.ir_intensity = 4;
 
@@ -178,9 +176,9 @@ int main(int argc, char const* argv[]) {
 
   cout << "Press ESC/Q on Windows to terminate" << endl;
 
-  cv::namedWindow("color", WIN_FLAGS);
-  cv::namedWindow("depth", WIN_FLAGS);
-  cv::namedWindow("region", WIN_FLAGS);
+  cv::namedWindow("color");
+  cv::namedWindow("depth");
+  cv::namedWindow("region");
 
   DepthRegion depth_region(3);
   auto depth_info = [](
@@ -202,15 +200,15 @@ int main(int argc, char const* argv[]) {
     return os.str();
   };
 
-  cv::Mat color, depth;
   util::Counter counter;
   for (;;) {
     counter.Update();
 
-    if (cam.RetrieveImage(ImageType::IMAGE_COLOR, &color)
-            == ErrorCode::SUCCESS &&
-        cam.RetrieveImage(ImageType::IMAGE_DEPTH, &depth)
-            == ErrorCode::SUCCESS) {
+    auto image_color = cam.RetrieveImage(ImageType::IMAGE_COLOR);
+    auto image_depth = cam.RetrieveImage(ImageType::IMAGE_DEPTH);
+    if (image_color && image_depth) {
+      cv::Mat color = image_color->To(ImageFormat::COLOR_BGR)->ToMat();
+      cv::Mat depth = image_depth->To(ImageFormat::DEPTH_RAW)->ToMat();
       util::draw(color, util::to_string(counter.fps(), 5, 1), util::TOP_RIGHT);
 
       cv::setMouseCallback("color", OnDepthMouseCallback, &depth_region);

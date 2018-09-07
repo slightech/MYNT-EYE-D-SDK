@@ -26,6 +26,8 @@
 
 #include "eSPDI.h"
 
+#include "mynteye/image.h"
+
 MYNTEYE_BEGIN_NAMESPACE
 
 class CameraPrivate {
@@ -71,7 +73,7 @@ class CameraPrivate {
   bool IsOpened() const;
   void CheckOpened() const;
 
-  ErrorCode RetrieveImage(const ImageType& type, cv::Mat* image);
+  Image::pointer RetrieveImage(const ImageType& type, ErrorCode* code);
 
   void Close();
 
@@ -80,8 +82,8 @@ class CameraPrivate {
  private:
   void OnInit();
 
-  ErrorCode RetrieveImageColor(cv::Mat* color);
-  ErrorCode RetrieveImageDepth(cv::Mat* depth);
+  Image::pointer RetrieveImageColor(ErrorCode* code);
+  Image::pointer RetrieveImageDepth(ErrorCode* code);
 
   void ReleaseBuf();
 
@@ -108,10 +110,9 @@ class CameraPrivate {
   int depth_serial_number_;
   image_size_t color_image_size_;
   image_size_t depth_image_size_;
-  unsigned char* color_img_buf_;
-  unsigned char* color_rgb_buf_;
-  unsigned char* depth_img_buf_;
-  unsigned char* depth_rgb_buf_;
+  Image::pointer color_image_buf_;
+  Image::pointer depth_image_buf_;
+  unsigned char* depth_buf_;
 
 #ifdef MYNTEYE_OS_WIN
   std::mutex mtx_imgs_;

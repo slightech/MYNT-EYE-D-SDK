@@ -37,6 +37,7 @@ int main(int argc, char const* argv[]) {
 
   // Warning: Color stream format MJPG doesn't work.
   InitParams params(dev_info.index);
+  // params.depth_mode = DepthMode::DEPTH_GRAY;
   params.depth_mode = DepthMode::DEPTH_COLORFUL;
   // params.stream_mode = StreamMode::STREAM_640x480;
   params.ir_intensity = 4;
@@ -52,18 +53,18 @@ int main(int argc, char const* argv[]) {
 
   cout << "Press ESC/Q on Windows to terminate" << endl;
 
-  cv::namedWindow("color", cv::WINDOW_AUTOSIZE);
-  cv::namedWindow("depth", cv::WINDOW_AUTOSIZE);
+  cv::namedWindow("color");
+  cv::namedWindow("depth");
 
-  cv::Mat color, depth;
   util::Counter counter;
   for (;;) {
     counter.Update();
 
-    if (cam.RetrieveImage(ImageType::IMAGE_COLOR, &color)
-            == ErrorCode::SUCCESS &&
-        cam.RetrieveImage(ImageType::IMAGE_DEPTH, &depth)
-            == ErrorCode::SUCCESS) {
+    auto image_color = cam.RetrieveImage(ImageType::IMAGE_COLOR);
+    auto image_depth = cam.RetrieveImage(ImageType::IMAGE_DEPTH);
+    if (image_color && image_depth) {
+      cv::Mat color = image_color->To(ImageFormat::COLOR_BGR)->ToMat();
+      cv::Mat depth = image_depth->To(ImageFormat::DEPTH_BGR)->ToMat();
       util::draw(color, util::to_string(counter.fps(), 5, 1), util::TOP_RIGHT);
       cv::imshow("color", color);
       cv::imshow("depth", depth);

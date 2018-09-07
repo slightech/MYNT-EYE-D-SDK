@@ -19,9 +19,8 @@
 #include <memory>
 #include <vector>
 
-#include <opencv2/core/core.hpp>
-
 #include "mynteye/device_info.h"
+#include "mynteye/image.h"
 #include "mynteye/init_params.h"
 #include "mynteye/stream_info.h"
 
@@ -47,7 +46,9 @@ class MYNTEYE_API Camera {
 
   bool IsOpened() const;
 
-  ErrorCode RetrieveImage(const ImageType& type, cv::Mat* image);
+  /** Return nullptr if failed. */
+  Image::pointer RetrieveImage(const ImageType& type);
+  Image::pointer RetrieveImage(const ImageType& type, ErrorCode* code);
 
   void Close();
 

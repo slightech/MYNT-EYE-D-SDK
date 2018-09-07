@@ -43,10 +43,9 @@ CameraPrivate::CameraPrivate(Camera* camera)
   depth_serial_number_ = 0;
   color_image_size_ = 0;
   depth_image_size_ = 0;
-  color_img_buf_ = nullptr;
-  color_rgb_buf_ = nullptr;
-  depth_img_buf_ = nullptr;
-  depth_rgb_buf_ = nullptr;
+  color_image_buf_ = nullptr;
+  depth_image_buf_ = nullptr;
+  depth_buf_ = nullptr;
 
   OnInit();
 }
@@ -367,10 +366,6 @@ ErrorCode CameraPrivate::Open(const InitParams& params) {
 #ifdef MYNTEYE_OS_LINUX
   std::string dtc_name = "Unknown";
   switch (params.depth_mode) {
-    case DepthMode::DEPTH_NON:
-      dtc_ = DEPTH_IMG_NON_TRANSFER;
-      dtc_name = "Non";
-      break;
     case DepthMode::DEPTH_GRAY:
       dtc_ = DEPTH_IMG_GRAY_TRANSFER;
       dtc_name = "Gray";
@@ -379,15 +374,10 @@ ErrorCode CameraPrivate::Open(const InitParams& params) {
       dtc_ = DEPTH_IMG_COLORFUL_TRANSFER;
       dtc_name = "Colorful";
       break;
-    case DepthMode::DEPTH_NON_16UC1:
-      dtc_ = DEPTH_IMG_NON_TRANSFER;
-      dtc_name = "Non 16UC1";
-      break;
-    case DepthMode::DEPTH_NON_8UC1:
-      dtc_ = DEPTH_IMG_NON_TRANSFER;
-      dtc_name = "Non 8UC1";
-      break;
+    case DepthMode::DEPTH_RAW:
     default:
+      dtc_ = DEPTH_IMG_NON_TRANSFER;
+      dtc_name = "Raw";
       break;
   }
 #endif
@@ -478,13 +468,17 @@ void CameraPrivate::CheckOpened() const {
   if (!IsOpened()) throw std::runtime_error("Error: Camera not opened.");
 }
 
-ErrorCode CameraPrivate::RetrieveImage(const ImageType& type, cv::Mat* image) {
-  if (!IsOpened()) return ErrorCode::ERROR_CAMERA_NOT_OPENED;
+Image::pointer CameraPrivate::RetrieveImage(const ImageType& type,
+    ErrorCode* code) {
+  if (!IsOpened()) {
+    *code = ErrorCode::ERROR_CAMERA_NOT_OPENED;
+    return nullptr;
+  }
   switch (type) {
     case ImageType::IMAGE_COLOR:
-      return RetrieveImageColor(image);
+      return RetrieveImageColor(code);
     case ImageType::IMAGE_DEPTH:
-      return RetrieveImageDepth(image);
+      return RetrieveImageDepth(code);
     default:
       throw new std::runtime_error("RetrieveImage: ImageType is unknown");
   }
@@ -499,20 +493,10 @@ void CameraPrivate::Close() {
 }
 
 void CameraPrivate::ReleaseBuf() {
-  if (color_img_buf_) {
-    delete color_img_buf_;
-    color_img_buf_ = nullptr;
-  }
-  if (color_rgb_buf_) {
-    delete color_rgb_buf_;
-    color_rgb_buf_ = nullptr;
-  }
-  if (depth_img_buf_) {
-    delete depth_img_buf_;
-    depth_img_buf_ = nullptr;
-  }
-  if (depth_rgb_buf_) {
-    delete depth_rgb_buf_;
-    depth_rgb_buf_ = nullptr;
+  color_image_buf_ = nullptr;
+  depth_image_buf_ = nullptr;
+  if (!depth_buf_) {
+    delete depth_buf_;
+    depth_buf_ = nullptr;
   }
 }

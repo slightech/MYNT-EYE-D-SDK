@@ -61,8 +61,13 @@ bool Camera::IsOpened() const {
   return p_->IsOpened();
 }
 
-ErrorCode Camera::RetrieveImage(const ImageType& type, cv::Mat* image) {
-  return p_->RetrieveImage(type, image);
+Image::pointer Camera::RetrieveImage(const ImageType& type) {
+  ErrorCode code = ErrorCode::SUCCESS;
+  return RetrieveImage(type, &code);
+}
+
+Image::pointer Camera::RetrieveImage(const ImageType& type, ErrorCode* code) {
+  return p_->RetrieveImage(type, code);
 }
 
 void Camera::Close() {
