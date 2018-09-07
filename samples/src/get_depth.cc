@@ -207,7 +207,10 @@ int main(int argc, char const* argv[]) {
   for (;;) {
     counter.Update();
 
-    if (cam.RetrieveImage(&color, &depth) == ErrorCode::SUCCESS) {
+    if (cam.RetrieveImage(ImageType::IMAGE_COLOR, &color)
+            == ErrorCode::SUCCESS &&
+        cam.RetrieveImage(ImageType::IMAGE_DEPTH, &depth)
+            == ErrorCode::SUCCESS) {
       util::draw(color, util::to_string(counter.fps(), 5, 1), util::TOP_RIGHT);
 
       cv::setMouseCallback("color", OnDepthMouseCallback, &depth_region);

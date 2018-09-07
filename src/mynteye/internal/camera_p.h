@@ -17,31 +17,12 @@
 
 #include "mynteye/camera.h"
 
-#include <setjmp.h>
-
-extern "C" {
-
-#include <jpeglib.h>
-
-}
-
-#ifdef OS_WIN
-#include <Windows.h>
-#endif
-
 #include <mutex>
 #include <vector>
 
 #include "eSPDI.h"
 
 MYNTEYE_BEGIN_NAMESPACE
-
-struct my_error_mgr {
-  struct jpeg_error_mgr pub;
-  jmp_buf setjmp_buffer;
-};
-
-typedef struct my_error_mgr* my_error_ptr;
 
 class CameraPrivate {
  public:
@@ -83,21 +64,22 @@ class CameraPrivate {
 
   ErrorCode Open(const InitParams& params);
 
-  bool IsOpened();
+  bool IsOpened() const;
+  void CheckOpened() const;
 
-  ErrorCode RetrieveImage(cv::Mat* color, cv::Mat* depth);
+  ErrorCode RetrieveImage(const ImageType& type, cv::Mat* image);
 
   void Close();
 
   Camera* camera_;
 
  private:
+  ErrorCode RetrieveImageColor(cv::Mat* color);
+  ErrorCode RetrieveImageDepth(cv::Mat* depth);
+
   void ReleaseBuf();
 
-  int MJPEG_TO_RGB24_LIBJPEG(unsigned char* jpg, int nJpgSize,
-      unsigned char* rgb);
-
-#ifdef OS_WIN
+#ifdef MYNTEYE_OS_WIN
   static void ImgCallback(EtronDIImageType::Value imgType, int imgId,
       unsigned char* imgBuf, int imgSize, int width, int height,
       int serialNumber, void *pParam);
@@ -119,7 +101,7 @@ class CameraPrivate {
   PETRONDI_STREAM_INFO stream_depth_info_ptr_;
   int color_res_index_;
   int depth_res_index_;
-#ifndef OS_WIN
+#ifndef MYNTEYE_OS_WIN
   DEPTH_TRANSFER_CTRL dtc_;
 #endif
   int framerate_;

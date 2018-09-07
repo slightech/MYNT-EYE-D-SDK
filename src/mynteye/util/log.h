@@ -38,7 +38,7 @@ inline std::mutex& __get_mutex() {
   return mtx;
 }
 
-#ifdef OS_ANDROID
+#ifdef MYNTEYE_OS_ANDROID
 
 #include <android/log.h>
 
@@ -73,7 +73,7 @@ void log_print(const int& prio, const std::string& format,
 #define LOGW(...) log_print(ANDROID_LOG_WARN, __VA_ARGS__)
 #define LOGE(...) log_print(ANDROID_LOG_ERROR, __VA_ARGS__)
 
-#elif defined(OS_IPHONE)
+#elif defined(MYNTEYE_OS_IPHONE)
 
 #include <CoreFoundation/CoreFoundation.h>
 

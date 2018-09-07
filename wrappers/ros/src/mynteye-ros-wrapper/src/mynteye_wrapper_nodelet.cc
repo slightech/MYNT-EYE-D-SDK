@@ -179,19 +179,33 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       // Check for subscribers
       int color_SubNumber = pub_color.getNumSubscribers();
       int depth_SubNumber = pub_depth.getNumSubscribers();
-      bool runLoop = (color_SubNumber + depth_SubNumber) > 0;
+      int points_SubNumber = pub_points.getNumSubscribers();
+      bool runLoop = (color_SubNumber + depth_SubNumber + points_SubNumber) > 0;
 
+      bool color_ok, depth_ok;
       if (runLoop) {
         ros::Time t = ros::Time::now();
 
-        if (color_SubNumber > 0 || depth_SubNumber > 0) {
-          if (mynteye->RetrieveImage(&color, &depth) == ErrorCode::SUCCESS) {
-            if (color_SubNumber > 0) {
-              publishColor(color, t);
-            }
-            if (depth_SubNumber > 0) {
-              publishDepth(depth, t);
-            }
+        color_ok = false;
+        if (color_SubNumber > 0) {
+          if (mynteye->RetrieveImage(ImageType::IMAGE_COLOR, &color)
+              == ErrorCode::SUCCESS) {
+            color_ok = true;
+            publishColor(color, t);
+          }
+        }
+
+        depth_ok = false;
+        if (depth_SubNumber > 0) {
+          if (mynteye->RetrieveImage(ImageType::IMAGE_DEPTH, &depth)
+              == ErrorCode::SUCCESS) {
+            depth_ok = true;
+            publishDepth(depth, t);
+          }
+        }
+
+        if (points_SubNumber > 0) {
+          if (color_ok && depth_ok) {
             publishPoints(color, depth, t);
           }
         }

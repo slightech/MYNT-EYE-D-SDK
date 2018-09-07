@@ -24,6 +24,7 @@ Camera::Camera() : p_(new CameraPrivate(this)) {
 
 Camera::~Camera() {
   DBG_LOGD(__func__);
+  p_.release();
 }
 
 std::vector<DeviceInfo> Camera::GetDevices() const {
@@ -60,8 +61,8 @@ bool Camera::IsOpened() const {
   return p_->IsOpened();
 }
 
-ErrorCode Camera::RetrieveImage(cv::Mat* color, cv::Mat* depth) {
-  return p_->RetrieveImage(color, depth);
+ErrorCode Camera::RetrieveImage(const ImageType& type, cv::Mat* image) {
+  return p_->RetrieveImage(type, image);
 }
 
 void Camera::Close() {

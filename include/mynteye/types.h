@@ -26,7 +26,7 @@ MYNTEYE_BEGIN_NAMESPACE
  * @ingroup enumerations
  * @brief List error codes.
  */
-enum ErrorCode {
+enum class ErrorCode : std::int32_t {
   /** Standard code for successful behavior. */
   SUCCESS = 0,
   /** Standard code for unsuccessful behavior. */
@@ -48,34 +48,22 @@ enum ErrorCode {
 
 /**
  * @ingroup enumerations
- * @brief List view types.
+ * @brief List image types.
  */
-enum ViewType {
-  /** Image. */
-  VIEW_IMAGE,
+enum class ImageType : std::int32_t {
+  /** Color. */
+  IMAGE_COLOR,
   /** Depth. */
-  VIEW_DEPTH,
+  IMAGE_DEPTH,
   /** Last guard. */
-  VIEW_LAST
-};
-
-/**
- * @ingroup enumerations
- * @brief List device types.
- */
-enum DeviceType {
-  DEVICE_OTHERS = 0,
-  DEVICE_AXES1,
-  DEVICE_PUMA,
-  DEVICE_KIWI,
-  DEVICE_LAST
+  IMAGE_LAST
 };
 
 /**
  * @ingroup enumerations
  * @brief List depth modes.
  */
-enum DepthMode {
+enum class DepthMode : std::int32_t {
   DEPTH_NON,
   DEPTH_GRAY,
   DEPTH_COLORFUL,
@@ -84,12 +72,11 @@ enum DepthMode {
   DEPTH_LAST
 };
 
-
 /**
  * @ingroup enumerations
  * @brief List stream mode.
  */
-enum StreamMode {
+enum class StreamMode : std::int32_t {
   STREAM_1280x720,
   STREAM_2560x720,
   // STREAM_2560x960,
@@ -102,7 +89,7 @@ enum StreamMode {
  * @ingroup enumerations
  * @brief List stream format.
  */
-enum StreamFormat {
+enum class StreamFormat : std::int32_t {
   STREAM_MJPG,
   STREAM_YUYV,
   STREAM_FORMAT_LAST

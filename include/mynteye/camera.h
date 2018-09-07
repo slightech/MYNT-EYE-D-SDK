@@ -47,7 +47,7 @@ class MYNTEYE_API Camera {
 
   bool IsOpened() const;
 
-  ErrorCode RetrieveImage(cv::Mat* color, cv::Mat* depth);
+  ErrorCode RetrieveImage(const ImageType& type, cv::Mat* image);
 
   void Close();
 
