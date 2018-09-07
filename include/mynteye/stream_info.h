@@ -11,45 +11,43 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#ifndef MYNTEYE_API_STREAM_INFO_H_
-#define MYNTEYE_API_STREAM_INFO_H_
+#ifndef MYNTEYE_STREAM_INFO_H_
+#define MYNTEYE_STREAM_INFO_H_
 #pragma once
 
-#include <string>
+#include "mynteye/stubs/global.h"
+#include "mynteye/types.h"
 
-#include "mynteye/mynteye.h"
-
-namespace mynteye {
+MYNTEYE_BEGIN_NAMESPACE
 
 /**
  * Stream information.
  */
 struct MYNTEYE_API StreamInfo {
+  /**
+   * The stream index.
+   */
+  std::int32_t index;
 
-    /**
-     * The stream index.
-     */
-    std::int32_t index;
+  /**
+   * The stream width.
+   */
+  std::int32_t width;
 
-    /**
-     * The stream width.
-     */
-    std::int32_t width;
+  /**
+   * The stream height.
+   */
+  std::int32_t height;
 
-    /**
-     * The stream height.
-     */
-    std::int32_t height;
-
-    /**
-     * The stream format.
-     */
-    StreamFormat format;
-
+  /**
+   * The stream format.
+   */
+  StreamFormat format;
 };
 
-}  // namespace mynteye
+MYNTEYE_END_NAMESPACE
 
-MYNTEYE_API std::ostream &operator<<(std::ostream &os, const mynteye::StreamInfo &info);
+MYNTEYE_API
+std::ostream& operator<<(std::ostream& os, const mynteye::StreamInfo& info);
 
-#endif  // MYNTEYE_API_STREAM_INFO_H_
+#endif  // MYNTEYE_STREAM_INFO_H_

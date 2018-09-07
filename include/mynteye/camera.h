@@ -11,8 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#ifndef MYNTEYE_API_CAMERA_H_
-#define MYNTEYE_API_CAMERA_H_
+#ifndef MYNTEYE_CAMERA_H_
+#define MYNTEYE_CAMERA_H_
 #pragma once
 
 #include <cstdint>
@@ -21,42 +21,42 @@
 
 #include <opencv2/core/core.hpp>
 
-#include "mynteye/dev_info.h"
+#include "mynteye/device_info.h"
 #include "mynteye/init_params.h"
-#include "mynteye/mynteye.h"
 #include "mynteye/stream_info.h"
 
-namespace mynteye {
+MYNTEYE_BEGIN_NAMESPACE
 
 class CameraPrivate;
 
 class MYNTEYE_API Camera {
-public:
-    Camera();
-    ~Camera();
+ public:
+  Camera();
+  ~Camera();
 
-    std::vector<DeviceInfo> GetDevices() const;
-    void GetDevices(std::vector<DeviceInfo> &dev_infos) const;
-    void GetResolutions(const std::int32_t &dev_index,
-        std::vector<StreamInfo> &color_infos,
-        std::vector<StreamInfo> &depth_infos) const;
+  std::vector<DeviceInfo> GetDevices() const;
+  void GetDevices(std::vector<DeviceInfo>* dev_infos) const;
 
-    ErrorCode Open();
-    ErrorCode Open(const InitParams &params);
+  void GetResolutions(
+      const std::int32_t& dev_index,
+      std::vector<StreamInfo>* color_infos,
+      std::vector<StreamInfo>* depth_infos) const;
 
-    bool IsOpened();
+  ErrorCode Open();
+  ErrorCode Open(const InitParams& params);
 
-    ErrorCode RetrieveImage(cv::Mat &color, cv::Mat &depth);
-    //ErrorCode RetrieveImage(cv::Mat &mat, const View &view);
+  bool IsOpened() const;
 
-    void Close();
+  ErrorCode RetrieveImage(cv::Mat* color, cv::Mat* depth);
 
-private:
-    std::unique_ptr<CameraPrivate> d_ptr;
+  void Close();
 
-    friend class CameraPrivate;
+ private:
+  std::unique_ptr<CameraPrivate> p_;
+
+  friend class CameraPrivate;
 };
 
-}  // namespace mynteye
+MYNTEYE_END_NAMESPACE
 
-#endif  // MYNTEYE_API_CAMERA_H_
+#endif  // MYNTEYE_CAMERA_H_

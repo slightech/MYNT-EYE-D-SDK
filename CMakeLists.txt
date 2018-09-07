@@ -43,8 +43,8 @@ if(NOT MYNTEYE_NAMESPACE)
 endif()
 
 configure_file(
-  include/mynteye/mynteye_config.h.in
-  include/mynteye/mynteye_config.h @ONLY
+  include/mynteye/stubs/global_config.h.in
+  include/mynteye/stubs/global_config.h @ONLY
 )
 
 # flags

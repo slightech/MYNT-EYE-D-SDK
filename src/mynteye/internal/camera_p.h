@@ -11,13 +11,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#ifndef MYNTEYE_CORE_CAMERA_P_H_
-#define MYNTEYE_CORE_CAMERA_P_H_
+#ifndef MYNTEYE_INTERNAL_CAMERA_P_H_
+#define MYNTEYE_INTERNAL_CAMERA_P_H_
 #pragma once
 
 #include "mynteye/camera.h"
-
-#include "eSPDI.h"
 
 #include <setjmp.h>
 
@@ -32,107 +30,117 @@ extern "C" {
 #endif
 
 #include <mutex>
+#include <vector>
 
-namespace mynteye {
+#include "eSPDI.h"
+
+MYNTEYE_BEGIN_NAMESPACE
 
 struct my_error_mgr {
   struct jpeg_error_mgr pub;
   jmp_buf setjmp_buffer;
 };
 
-typedef struct my_error_mgr *my_error_ptr;
+typedef struct my_error_mgr* my_error_ptr;
 
 class CameraPrivate {
-public:
-    CameraPrivate(Camera *q);
-    /*
-    CameraPrivate(const CameraPrivate &other);
-    CameraPrivate(CameraPrivate &&other);
-    CameraPrivate &operator=(const CameraPrivate &other);
-    */
-    ~CameraPrivate();
+ public:
+  using image_size_t = unsigned long int;  // NOLINT
 
-    void GetDevices(std::vector<DeviceInfo> &dev_infos);
-    void GetResolutions(const std::int32_t &dev_index,
-        std::vector<StreamInfo> &color_infos, std::vector<StreamInfo> &depth_infos);
-    void GetResolutionIndex(const std::int32_t &dev_index, const StreamMode &stream_mode,
-        const StreamFormat &stream_format, int &color_res_index, int &depth_res_index);
+  explicit CameraPrivate(Camera* camera);
+  ~CameraPrivate();
 
-    ErrorCode SetAutoExposureEnabled(bool enabled);
-    ErrorCode SetAutoWhiteBalanceEnabled(bool enabled);
+  void GetDevices(std::vector<DeviceInfo>* dev_infos);
+  void GetResolutions(const std::int32_t& dev_index,
+      std::vector<StreamInfo>* color_infos,
+      std::vector<StreamInfo>* depth_infos);
 
-    bool GetSensorRegister(int id, unsigned short address, unsigned short *value, int flag = FG_Address_1Byte);
-    bool GetHWRegister(unsigned short address, unsigned short *value, int flag = FG_Address_1Byte);
-    bool GetFWRegister(unsigned short address, unsigned short *value, int flag = FG_Address_1Byte);
+  void GetResolutionIndex(const InitParams& params,
+      int* color_res_index,
+      int* depth_res_index);
+  void GetResolutionIndex(const std::int32_t& dev_index,
+      const StreamMode& stream_mode,
+      const StreamFormat& stream_format,
+      int* color_res_index,
+      int* depth_res_index);
 
-    bool SetSensorRegister(int id, unsigned short address, unsigned short value, int flag = FG_Address_1Byte);
-    bool SetHWRegister(unsigned short address, unsigned short value, int flag = FG_Address_1Byte);
-    bool SetFWRegister(unsigned short address, unsigned short value, int flag = FG_Address_1Byte);
+  ErrorCode SetAutoExposureEnabled(bool enabled);
+  ErrorCode SetAutoWhiteBalanceEnabled(bool enabled);
 
-    ErrorCode Open(const InitParams &params);
+  bool GetSensorRegister(int id, std::uint16_t address, std::uint16_t* value,
+      int flag = FG_Address_1Byte);
+  bool GetHWRegister(std::uint16_t address, std::uint16_t* value,
+      int flag = FG_Address_1Byte);
+  bool GetFWRegister(std::uint16_t address, std::uint16_t* value,
+      int flag = FG_Address_1Byte);
 
-    bool IsOpened();
+  bool SetSensorRegister(int id, std::uint16_t address, std::uint16_t value,
+      int flag = FG_Address_1Byte);
+  bool SetHWRegister(std::uint16_t address, std::uint16_t value,
+      int flag = FG_Address_1Byte);
+  bool SetFWRegister(std::uint16_t address, std::uint16_t value,
+      int flag = FG_Address_1Byte);
 
-    ErrorCode RetrieveImage(cv::Mat &color, cv::Mat &depth);
-    //ErrorCode RetrieveImage(cv::Mat &mat, const View &view);
+  ErrorCode Open(const InitParams& params);
 
-    void Close();
+  bool IsOpened();
 
-    /** q-ptr that points to the API class */
-    Camera *q_ptr;
+  ErrorCode RetrieveImage(cv::Mat* color, cv::Mat* depth);
 
-private:
-    //ErrorCode RetrieveColorImage(cv::Mat &mat);
-    //ErrorCode RetrieveDepthImage(cv::Mat &mat);
+  void Close();
 
-    void ReleaseBuf();
+  Camera* camera_;
 
-    int MJPEG_TO_RGB24_LIBJPEG(unsigned char *jpg, int nJpgSize, unsigned char *rgb);
+ private:
+  void ReleaseBuf();
+
+  int MJPEG_TO_RGB24_LIBJPEG(unsigned char* jpg, int nJpgSize,
+      unsigned char* rgb);
 
 #ifdef OS_WIN
-    static void ImgCallback(EtronDIImageType::Value imgType, int imgId,
-        unsigned char *imgBuf, int imgSize, int width, int height,
-        int serialNumber, void *pParam);
+  static void ImgCallback(EtronDIImageType::Value imgType, int imgId,
+      unsigned char* imgBuf, int imgSize, int width, int height,
+      int serialNumber, void *pParam);
 
-    std::mutex mtx_imgs_;
-    bool is_color_rgb24_;
-    bool is_color_mjpg_;
+  std::mutex mtx_imgs_;
+  bool is_color_rgb24_;
+  bool is_color_mjpg_;
 
-    int depth_data_size_;
-    RGBQUAD color_palette_z14_[16384];
+  int depth_data_size_;
+  RGBQUAD color_palette_z14_[16384];
 #endif
 
-    void *etron_di_;
+  void* etron_di_;
 
-    DEVSELINFO dev_sel_info_;
-    int depth_data_type_;
+  DEVSELINFO dev_sel_info_;
+  int depth_data_type_;
 
-    PETRONDI_STREAM_INFO stream_color_info_ptr_;
-    PETRONDI_STREAM_INFO stream_depth_info_ptr_;
-    int color_res_index_;
-    int depth_res_index_;
+  PETRONDI_STREAM_INFO stream_color_info_ptr_;
+  PETRONDI_STREAM_INFO stream_depth_info_ptr_;
+  int color_res_index_;
+  int depth_res_index_;
 #ifndef OS_WIN
-    DEPTH_TRANSFER_CTRL dtc_;
+  DEPTH_TRANSFER_CTRL dtc_;
 #endif
-    int framerate_;
+  int framerate_;
 
-    std::int32_t stream_info_dev_index_;
+  std::int32_t stream_info_dev_index_;
 
-    int color_serial_number_;
-    int depth_serial_number_;
-    unsigned long int color_image_size_;
-    unsigned long int depth_image_size_;
-    unsigned char *color_img_buf_;
-    unsigned char *color_rgb_buf_;
-    unsigned char *depth_img_buf_;
-    unsigned char *depth_rgb_buf_;
+  int color_serial_number_;
+  int depth_serial_number_;
+  image_size_t color_image_size_;
+  image_size_t depth_image_size_;
+  unsigned char* color_img_buf_;
+  unsigned char* color_rgb_buf_;
+  unsigned char* depth_img_buf_;
+  unsigned char* depth_rgb_buf_;
 
-    DepthMode depth_mode_;
-    cv::Mat depth_raw_;
-    ushort depth_min;
-    ushort depth_max;
+  DepthMode depth_mode_;
+  cv::Mat depth_raw_;
+  ushort depth_min_;
+  ushort depth_max_;
 };
 
-}  // namespace mynteye
+MYNTEYE_END_NAMESPACE
 
-#endif  // MYNTEYE_CORE_CAMERA_P_H_
+#endif  // MYNTEYE_INTERNAL_CAMERA_P_H_

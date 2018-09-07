@@ -24,7 +24,7 @@
 using namespace std;
 using namespace mynteye;
 
-int main(int argc, char const *argv[]) {
+int main(int argc, char const* argv[]) {
   Camera cam;
   DeviceInfo dev_info;
   if (!util::select(cam, &dev_info)) {
@@ -60,7 +60,7 @@ int main(int argc, char const *argv[]) {
   for (;;) {
     counter.Update();
 
-    if (cam.RetrieveImage(color, depth) == ErrorCode::SUCCESS) {
+    if (cam.RetrieveImage(&color, &depth) == ErrorCode::SUCCESS) {
       util::draw(color, util::to_string(counter.fps(), 5, 1), util::TOP_RIGHT);
       cv::imshow("color", color);
       cv::imshow("depth", depth);

@@ -24,3 +24,5 @@ _install/
 
 /pkginfo.sh
 /platforms/linux/sdk.cfg
+
+/.vscode/

@@ -62,7 +62,7 @@ void print_stream_infos(const Camera& cam, const std::int32_t& dev_index) {
 
   std::vector<StreamInfo> color_infos;
   std::vector<StreamInfo> depth_infos;
-  cam.GetResolutions(dev_index, color_infos, depth_infos);
+  cam.GetResolutions(dev_index, &color_infos, &depth_infos);
 
   std::cout << dashes << std::endl;
   std::cout << "Index | Color Stream Information" << std::endl;

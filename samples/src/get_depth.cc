@@ -40,7 +40,7 @@ public:
   /**
    * 鼠标事件：默认不选中区域，随鼠标移动而显示。单击后，则会选中区域来显示。你可以再单击已选中区域或双击未选中区域，取消选中。
    */
-  void OnMouse(const int &event, const int &x, const int &y, const int &flags) {
+  void OnMouse(const int& event, const int& x, const int& y, const int& flags) {
     if (event != CV_EVENT_MOUSEMOVE && event != CV_EVENT_LBUTTONDOWN) {
       return;
     }
@@ -68,11 +68,11 @@ public:
   }
 
   template<typename T>
-  void ShowElems(const cv::Mat &depth,
-      std::function<std::string(const T &elem)> elem2string,
+  void ShowElems(const cv::Mat& depth,
+      std::function<std::string(const T& elem)> elem2string,
       int elem_space = 40,
-      std::function<std::string(const cv::Mat &depth, const cv::Point &point,
-          const std::uint32_t &n)> getinfo = nullptr) {
+      std::function<std::string(const cv::Mat& depth, const cv::Point& point,
+          const std::uint32_t& n)> getinfo = nullptr) {
     if (!show_) return;
 
     int space = std::move(elem_space);
@@ -140,8 +140,8 @@ private:
   cv::Point point_;
 };
 
-void OnDepthMouseCallback(int event, int x, int y, int flags, void *userdata) {
-  DepthRegion *region = reinterpret_cast<DepthRegion*>(userdata);
+void OnDepthMouseCallback(int event, int x, int y, int flags, void* userdata) {
+  DepthRegion* region = reinterpret_cast<DepthRegion*>(userdata);
   region->OnMouse(event, x, y, flags);
 }
 
@@ -150,7 +150,7 @@ void OnDepthMouseCallback(int event, int x, int y, int flags, void *userdata) {
 using namespace std;
 using namespace mynteye;
 
-int main(int argc, char const *argv[]) {
+int main(int argc, char const* argv[]) {
   Camera cam;
   DeviceInfo dev_info;
   if (!util::select(cam, &dev_info)) {
@@ -183,7 +183,8 @@ int main(int argc, char const *argv[]) {
   cv::namedWindow("region", WIN_FLAGS);
 
   DepthRegion depth_region(3);
-  auto depth_info = [](const cv::Mat &depth, const cv::Point &point, const std::uint32_t &n) {
+  auto depth_info = [](
+      const cv::Mat& depth, const cv::Point& point, const std::uint32_t& n) {
     /*
     int row_beg = point.y - n, row_end = point.y + n + 1;
     int col_beg = point.x - n, col_end = point.x + n + 1;
@@ -206,7 +207,7 @@ int main(int argc, char const *argv[]) {
   for (;;) {
     counter.Update();
 
-    if (cam.RetrieveImage(color, depth) == ErrorCode::SUCCESS) {
+    if (cam.RetrieveImage(&color, &depth) == ErrorCode::SUCCESS) {
       util::draw(color, util::to_string(counter.fps(), 5, 1), util::TOP_RIGHT);
 
       cv::setMouseCallback("color", OnDepthMouseCallback, &depth_region);
@@ -218,7 +219,7 @@ int main(int argc, char const *argv[]) {
       depth_region.DrawRect(depth);
       cv::imshow("depth", depth);
 
-      depth_region.ShowElems<ushort>(depth, [](const ushort &elem) {
+      depth_region.ShowElems<ushort>(depth, [](const ushort& elem) {
         return std::to_string(elem);
       }, 80, depth_info);
     }

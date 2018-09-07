@@ -13,12 +13,12 @@
 // limitations under the License.
 #include "mynteye/stream_info.h"
 
-using namespace mynteye;
+MYNTEYE_USE_NAMESPACE
 
-std::ostream &operator<<(std::ostream &os, const StreamInfo &info) {
-    os << "index: " << info.index
-        << ", width: " << info.width
-        << ", height: " << info.height
-        << ", format: " << info.format;
-    return os;
+std::ostream& operator<<(std::ostream& os, const StreamInfo& info) {
+  os << "index: " << info.index
+    << ", width: " << info.width
+    << ", height: " << info.height
+    << ", format: " << info.format;
+  return os;
 }

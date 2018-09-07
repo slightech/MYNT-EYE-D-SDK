@@ -137,7 +137,7 @@ else
   CC := /usr/bin/cc
   CXX := /usr/bin/c++
   MAKE := make
-  BUILD := $(MAKE) -j2
+  BUILD := $(MAKE)
   INSTALL := $(MAKE) install
 endif
 
