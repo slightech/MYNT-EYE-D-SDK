@@ -15,7 +15,10 @@
 
 #ifdef MYNTEYE_OS_WIN
 
-#include <Windows.h>
+#include <opencv2/imgproc/imgproc.hpp>
+
+#include "mynteye/util/convertor.h"
+#include "mynteye/util/log.h"
 
 MYNTEYE_USE_NAMESPACE
 
@@ -166,6 +169,10 @@ void UpdateZ14DisplayImage_DIB24(RGBQUAD* pColorPaletteZ14, BYTE* pDepthZ14,
 }
 
 }  // namespace
+
+void CameraPrivate::OnInit() {
+  DmColorMode14(color_palette_z14_, 0/*normal*/);
+}
 
 void CameraPrivate::ImgCallback(EtronDIImageType::Value imgType, int imgId,
       unsigned char* imgBuf, int imgSize, int width, int height,

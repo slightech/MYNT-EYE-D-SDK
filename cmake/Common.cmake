@@ -17,6 +17,8 @@ cmake_include_guard()
 
 include(CMakeParseArguments)
 
+set(CUR_DIR ${CMAKE_CURRENT_LIST_DIR})
+
 # OS specific instructions in CMAKE: How to?
 #   https://stackoverflow.com/questions/9160335/os-specific-instructions-in-cmake-how-to
 if(MSVC OR MSYS OR MINGW)
@@ -129,7 +131,7 @@ macro(exe2bat exe_name exe_dir dll_search_paths)
     set(__dll_search_paths "${__dll_native_search_paths}")
   endif()
   configure_file(
-    "${CMAKE_CURRENT_LIST_DIR}/templates/exe.bat.in"
+    "${CUR_DIR}/templates/exe.bat.in"
     "${exe_dir}/${__exe_name}.bat"
   )
 endmacro()

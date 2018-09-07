@@ -37,9 +37,6 @@ CameraPrivate::CameraPrivate(Camera* camera)
       (PETRONDI_STREAM_INFO)malloc(sizeof(ETRONDI_STREAM_INFO)*64);
   color_res_index_ = 0;
   depth_res_index_ = 0;
-#ifndef MYNTEYE_OS_WIN
-  dtc_ = DEPTH_IMG_NON_TRANSFER;
-#endif
   framerate_ = 10;
 
   color_serial_number_ = 0;
@@ -51,9 +48,7 @@ CameraPrivate::CameraPrivate(Camera* camera)
   depth_img_buf_ = nullptr;
   depth_rgb_buf_ = nullptr;
 
-#ifdef MYNTEYE_OS_WIN
-  DmColorMode14(color_palette_z14_, 0/*normal*/);
-#endif
+  OnInit();
 }
 
 CameraPrivate::~CameraPrivate() {
@@ -369,7 +364,7 @@ ErrorCode CameraPrivate::Open(const InitParams& params) {
 
   if (params.framerate > 0) framerate_ = params.framerate;
   LOGI("-- Framerate: %d", framerate_);
-#ifndef MYNTEYE_OS_WIN
+#ifdef MYNTEYE_OS_LINUX
   std::string dtc_name = "Unknown";
   switch (params.depth_mode) {
     case DepthMode::DEPTH_NON:

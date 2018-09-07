@@ -96,7 +96,7 @@
 MYNTEYE_BEGIN_NAMESPACE
 
 template <typename... T>
-MYNTEYE_API void UNUSED(T&&...) {}
+void UNUSED(T&&...) {}
 
 MYNTEYE_END_NAMESPACE
 

@@ -17,6 +17,10 @@
 
 #include "mynteye/camera.h"
 
+#ifdef MYNTEYE_OS_WIN
+#include <Windows.h>
+#endif
+
 #include <mutex>
 #include <vector>
 
@@ -74,6 +78,8 @@ class CameraPrivate {
   Camera* camera_;
 
  private:
+  void OnInit();
+
   ErrorCode RetrieveImageColor(cv::Mat* color);
   ErrorCode RetrieveImageDepth(cv::Mat* depth);
 
@@ -83,13 +89,6 @@ class CameraPrivate {
   static void ImgCallback(EtronDIImageType::Value imgType, int imgId,
       unsigned char* imgBuf, int imgSize, int width, int height,
       int serialNumber, void *pParam);
-
-  std::mutex mtx_imgs_;
-  bool is_color_rgb24_;
-  bool is_color_mjpg_;
-
-  int depth_data_size_;
-  RGBQUAD color_palette_z14_[16384];
 #endif
 
   void* etron_di_;
@@ -101,9 +100,6 @@ class CameraPrivate {
   PETRONDI_STREAM_INFO stream_depth_info_ptr_;
   int color_res_index_;
   int depth_res_index_;
-#ifndef MYNTEYE_OS_WIN
-  DEPTH_TRANSFER_CTRL dtc_;
-#endif
   int framerate_;
 
   std::int32_t stream_info_dev_index_;
@@ -116,6 +112,17 @@ class CameraPrivate {
   unsigned char* color_rgb_buf_;
   unsigned char* depth_img_buf_;
   unsigned char* depth_rgb_buf_;
+
+#ifdef MYNTEYE_OS_WIN
+  std::mutex mtx_imgs_;
+  bool is_color_rgb24_;
+  bool is_color_mjpg_;
+
+  int depth_data_size_;
+  RGBQUAD color_palette_z14_[16384];
+#else  // MYNTEYE_OS_LINUX
+  DEPTH_TRANSFER_CTRL dtc_;
+#endif
 
   DepthMode depth_mode_;
   cv::Mat depth_raw_;
