@@ -1,8 +1,4 @@
 <launch>
-
-  <arg name="dev_index"     default="0" />
-  <arg name="ir_intensity"  default="4" />
-
   <!-- Stream mode -->
   <arg name="stream_1280x720"   default="0" />
   <arg name="stream_2560x720"   default="1" />
@@ -18,44 +14,68 @@
   <arg name="depth_gray"        default="1" />
   <arg name="depth_colorful"    default="2" />
 
-  <arg name="base_frame"        default="mynteye_link" />
-  <arg name="color_frame"       default="mynteye_color" />
-  <arg name="depth_frame"       default="mynteye_depth" />
-  <arg name="points_frame"      default="mynteye_points_optical" />
+  <!-- Camera Params -->
+
+  <!-- Device index -->
+  <arg name="dev_index" default="0" />
+  <!-- Framerate -->
+  <arg name="framerate" default="10" />
+
+  <arg name="depth_mode" default="$(arg depth_raw)" />
+  <arg name="stream_mode" default="$(arg stream_1280x720)" />
+  <arg name="stream_format" default="$(arg stream_yuyv)" />
+
+  <!-- Auto-exposure -->
+  <arg name="state_ae" default="true" />
+  <!-- Auto-white balance -->
+  <arg name="state_awb" default="true" />
+  <!-- IR intensity -->
+  <arg name="ir_intensity" default="4" />
+
+  <!-- Node params -->
+
+  <arg name="mynteye"            default="mynteye" />
+  <arg name="base_frame"         default="$(arg mynteye)_link_frame" />
+  <arg name="color_frame"        default="$(arg mynteye)_color_frame" />
+  <arg name="depth_frame"        default="$(arg mynteye)_depth_frame" />
+  <arg name="points_frame"       default="$(arg mynteye)_points_frame" />
+
+  <arg name="color_topic"        default="$(arg mynteye)/color" />
+  <arg name="depth_topic"        default="$(arg mynteye)/depth" />
+  <arg name="points_topic"       default="$(arg mynteye)/points" />
 
   <node name="mynteye_wrapper_node" pkg="mynteye_wrapper" type="mynteye_wrapper_node" output="screen">
 
     <!-- Camera params -->
     <param name="dev_index"     value="$(arg dev_index)" />
-    <param name="framerate"     value="30" />
-    <param name="depth_mode"    value="$(arg depth_raw)" />
-    <param name="stream_mode"   value="$(arg stream_1280x720)" />
-    <param name="stream_format" value="$(arg stream_yuyv)" />
-    <param name="state_ae"      value="true" />
-    <param name="state_awb"     value="true" />
+    <param name="framerate"     value="$(arg framerate)" />
+    <param name="depth_mode"    value="$(arg depth_mode)" />
+    <param name="stream_mode"   value="$(arg stream_mode)" />
+    <param name="stream_format" value="$(arg stream_format)" />
+    <param name="state_ae"      value="$(arg state_ae)" />
+    <param name="state_awb"     value="$(arg state_awb)" />
     <param name="ir_intensity"  value="$(arg ir_intensity)" />
 
     <!-- Frame ids -->
-    <param name="base_frame"    value="$(arg base_frame)" />
-    <param name="color_frame"   value="$(arg color_frame)" />
-    <param name="depth_frame"   value="$(arg depth_frame)" />
-    <param name="points_frame"  value="$(arg points_frame)" />
+    <param name="base_frame"         value="$(arg base_frame)" />
+    <param name="color_frame"        value="$(arg color_frame)" />
+    <param name="depth_frame"        value="$(arg depth_frame)" />
+    <param name="points_frame"       value="$(arg points_frame)" />
 
     <!-- Topic names -->
-    <param name="color_topic"   value="mynteye/color" />
-    <param name="depth_topic"   value="mynteye/depth" />
-    <param name="points_topic"  value="mynteye/points" />
-
+    <param name="color_topic"        value="$(arg color_topic)" />
+    <param name="depth_topic"        value="$(arg depth_topic)" />
+    <param name="points_topic"       value="$(arg points_topic)" />
   </node>
 
   <arg name="pi/2" value="1.5707963267948966" />
   <arg name="optical_rotate" value="0 0 0 -$(arg pi/2) 0 -$(arg pi/2)" />
 
-  <node pkg="tf" type="static_transform_publisher" name="link1_broadcaster" args="0 0 0 0 0 0 mynteye_link mynteye_color 100" />
-  <node pkg="tf" type="static_transform_publisher" name="link2_broadcaster" args="0 0 0 0 0 0 mynteye_link mynteye_depth 100" />
-  <node pkg="tf" type="static_transform_publisher" name="link3_broadcaster" args="0 0 0 0 0 0 mynteye_link mynteye_points 100" />
-  <node pkg="tf" type="static_transform_publisher" name="link4_broadcaster" args="$(arg optical_rotate) mynteye_link mynteye_color_optical 100" />
-  <node pkg="tf" type="static_transform_publisher" name="link5_broadcaster" args="$(arg optical_rotate) mynteye_link mynteye_depth_optical 100" />
-  <node pkg="tf" type="static_transform_publisher" name="link6_broadcaster" args="$(arg optical_rotate) mynteye_link mynteye_points_optical 100" />
+  <node pkg="tf" type="static_transform_publisher" name="link1_broadcaster"
+      args="$(arg optical_rotate) $(arg base_frame) $(arg color_frame) 100" />
+  <node pkg="tf" type="static_transform_publisher" name="link2_broadcaster"
+      args="$(arg optical_rotate) $(arg base_frame) $(arg depth_frame) 100" />
+  <node pkg="tf" type="static_transform_publisher" name="link3_broadcaster"
+      args="$(arg optical_rotate) $(arg base_frame) $(arg points_frame) 100" />
 
 </launch>

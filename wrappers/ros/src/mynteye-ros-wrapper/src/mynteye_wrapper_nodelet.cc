@@ -33,7 +33,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   image_transport::Publisher pub_color;
   image_transport::Publisher pub_depth;
   ros::Publisher pub_points;
-  tf2_ros::StaticTransformBroadcaster static_tf_broadcaster;
+  // tf2_ros::StaticTransformBroadcaster static_tf_broadcaster;
 
   // Launch params
   int dev_index;
@@ -116,28 +116,27 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
     sensor_msgs::PointCloud2Modifier modifier(msg);
 
-    modifier.setPointCloud2Fields(
-        4, "x", 1, sensor_msgs::PointField::FLOAT32, "y", 1,
-        sensor_msgs::PointField::FLOAT32, "z", 1,
-        sensor_msgs::PointField::FLOAT32, "rgb", 1,
-        sensor_msgs::PointField::FLOAT32);
-
+    modifier.setPointCloud2Fields(4,
+        "x", 1, sensor_msgs::PointField::FLOAT32,
+        "y", 1, sensor_msgs::PointField::FLOAT32,
+        "z", 1, sensor_msgs::PointField::FLOAT32,
+        "rgb", 1, sensor_msgs::PointField::FLOAT32);
     modifier.setPointCloud2FieldsByString(2, "xyz", "rgb");
 
     sensor_msgs::PointCloud2Iterator<float> iter_x(msg, "x");
     sensor_msgs::PointCloud2Iterator<float> iter_y(msg, "y");
     sensor_msgs::PointCloud2Iterator<float> iter_z(msg, "z");
 
-    sensor_msgs::PointCloud2Iterator<uint8_t> iter_r(msg, "r");
-    sensor_msgs::PointCloud2Iterator<uint8_t> iter_g(msg, "g");
-    sensor_msgs::PointCloud2Iterator<uint8_t> iter_b(msg, "b");
+    sensor_msgs::PointCloud2Iterator<uchar> iter_r(msg, "r");
+    sensor_msgs::PointCloud2Iterator<uchar> iter_g(msg, "g");
+    sensor_msgs::PointCloud2Iterator<uchar> iter_b(msg, "b");
 
     for (int m = 0; m < depth.rows; m++) {
       for (int n = 0; n < depth.cols; n++) {
         // get depth value at (m, n)
         ushort d = depth.ptr<ushort>(m)[n];
         // when d is equal 0 or 4096 means no depth
-        if (d == 0 || d == 4096)
+        if (d <= 0 || d == 4096)
           continue;
 
         *iter_z = d / camera_factor;
@@ -148,12 +147,8 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
         *iter_g = img.ptr<uchar>(m)[n * 3 + 1];
         *iter_b = img.ptr<uchar>(m)[n * 3];
 
-        ++iter_x;
-        ++iter_y;
-        ++iter_z;
-        ++iter_r;
-        ++iter_g;
-        ++iter_b;
+        ++iter_x; ++iter_y; ++iter_z;  // NOLINT
+        ++iter_r; ++iter_g; ++iter_b;  // NOLINT
       }
     }
 
@@ -177,16 +172,15 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       int color_SubNumber = pub_color.getNumSubscribers();
       int depth_SubNumber = pub_depth.getNumSubscribers();
       int points_SubNumber = pub_points.getNumSubscribers();
+
       bool runLoop = (color_SubNumber + depth_SubNumber + points_SubNumber) > 0;
-
-      // publish points, the depth mode must be DEPTH_RAW.
-      bool points_subscribed = (points_SubNumber > 0) && (depth_mode == 0);
-
-      bool color_ok, depth_ok;
       if (runLoop) {
+        // publish points, the depth mode must be DEPTH_RAW.
+        bool points_subscribed = (points_SubNumber > 0) && (depth_mode == 0);
+
         ros::Time t = ros::Time::now();
 
-        color_ok = false;
+        bool color_ok = false;
         if (color_SubNumber > 0 || points_subscribed) {
           auto image_color = mynteye->RetrieveImage(
               mynteye::ImageType::IMAGE_COLOR);
@@ -196,7 +190,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
           }
         }
 
-        depth_ok = false;
+        bool depth_ok = false;
         if (depth_SubNumber > 0 || points_subscribed) {
           auto image_depth = mynteye->RetrieveImage(
               mynteye::ImageType::IMAGE_DEPTH);
@@ -206,10 +200,8 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
           }
         }
 
-        if (points_subscribed) {
-          if (color_ok && depth_ok) {
-            publishPoints(color, depth, t);
-          }
+        if (points_subscribed && color_ok && depth_ok) {
+          publishPoints(color, depth, t);
         }
       }
       loop_rate.sleep();
@@ -242,9 +234,9 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     nh_ns.getParam("ir_intensity", ir_intensity);
 
     base_frame_id = "mynteye_link";
-    color_frame_id = "mynteye_color";
-    depth_frame_id = "mynteye_depth";
-    points_frame_id = "mynteye_points";
+    color_frame_id = "mynteye_color_frame";
+    depth_frame_id = "mynteye_depth_frame";
+    points_frame_id = "mynteye_points_frame";
     nh_ns.getParam("base_frame_id", base_frame_id);
     nh_ns.getParam("color_frame", color_frame_id);
     nh_ns.getParam("depth_frame", depth_frame_id);
@@ -317,11 +309,9 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     pub_points = nh.advertise<sensor_msgs::PointCloud2>(points_topic, 1);
     NODELET_INFO_STREAM("Advertized on topic " << points_topic);
 
-    device_poll_thread = boost::shared_ptr<boost::thread>(
-        new boost::thread(
-            boost::bind(&MYNTEYEWrapperNodelet::device_poll, this)));
+    device_poll_thread = boost::shared_ptr<boost::thread>(new boost::thread(
+        boost::bind(&MYNTEYEWrapperNodelet::device_poll, this)));
   }
-
 };
 
 }  // namespace mynteye_wrapper
