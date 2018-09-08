@@ -62,7 +62,10 @@ set(LINK_LIBRARIES
 add_executable(mynteye_listener src/mynteye_listener.cc)
 target_link_libraries(mynteye_listener ${LINK_LIBRARIES})
 
-add_library(mynteye_wrapper src/mynteye_wrapper_nodelet.cc)
+add_library(mynteye_wrapper
+  src/mynteye_wrapper_nodelet.cc
+  src/pointcloud_generator.cc
+)
 target_link_libraries(mynteye_wrapper ${LINK_LIBRARIES})
 
 add_executable(mynteye_wrapper_node src/mynteye_wrapper_node.cc)

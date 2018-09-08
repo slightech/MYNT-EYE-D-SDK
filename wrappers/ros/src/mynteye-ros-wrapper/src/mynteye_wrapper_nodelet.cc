@@ -7,8 +7,6 @@
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
-#include <sensor_msgs/PointCloud2.h>
-#include <sensor_msgs/point_cloud2_iterator.h>
 
 #include <tf/tf.h>
 #include <tf2_ros/static_transform_broadcaster.h>
@@ -20,6 +18,8 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include "mynteye/camera.h"
+
+#include "pointcloud_generator.h"
 
 namespace mynteye_wrapper {
 
@@ -53,6 +53,8 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   // MYNTEYE objects
   mynteye::InitParams params;
   std::unique_ptr<mynteye::Camera> mynteye;
+
+  std::unique_ptr<PointCloudGenerator> pointcloud_generator;
 
   std::string dashes;
 
@@ -94,65 +96,6 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       return;
     }
     // NODELET_INFO_STREAM("Publish depth");
-  }
-
-  const float camera_factor = 1000.0;
-
-  const double camera_cx = 682.3;
-  const double camera_cy = 254.9;
-  const double camera_fx = 979.8;
-  const double camera_fy = 942.8;
-
-  void publishPoints(cv::Mat img, cv::Mat depth, ros::Time stamp) {
-    if (pub_points.getNumSubscribers() == 0)
-      return;
-
-    sensor_msgs::PointCloud2 msg;
-    msg.header.stamp = stamp;
-    msg.header.frame_id = points_frame_id;
-    msg.width = img.cols;
-    msg.height = img.rows;
-    msg.is_dense = true;
-
-    sensor_msgs::PointCloud2Modifier modifier(msg);
-
-    modifier.setPointCloud2Fields(4,
-        "x", 1, sensor_msgs::PointField::FLOAT32,
-        "y", 1, sensor_msgs::PointField::FLOAT32,
-        "z", 1, sensor_msgs::PointField::FLOAT32,
-        "rgb", 1, sensor_msgs::PointField::FLOAT32);
-    modifier.setPointCloud2FieldsByString(2, "xyz", "rgb");
-
-    sensor_msgs::PointCloud2Iterator<float> iter_x(msg, "x");
-    sensor_msgs::PointCloud2Iterator<float> iter_y(msg, "y");
-    sensor_msgs::PointCloud2Iterator<float> iter_z(msg, "z");
-
-    sensor_msgs::PointCloud2Iterator<uchar> iter_r(msg, "r");
-    sensor_msgs::PointCloud2Iterator<uchar> iter_g(msg, "g");
-    sensor_msgs::PointCloud2Iterator<uchar> iter_b(msg, "b");
-
-    for (int m = 0; m < depth.rows; m++) {
-      for (int n = 0; n < depth.cols; n++) {
-        // get depth value at (m, n)
-        ushort d = depth.ptr<ushort>(m)[n];
-        // when d is equal 0 or 4096 means no depth
-        if (d <= 0 || d == 4096)
-          continue;
-
-        *iter_z = d / camera_factor;
-        *iter_x = (n - camera_cx) * *iter_z / camera_fx;
-        *iter_y = (m - camera_cy) * *iter_z / camera_fy;
-
-        *iter_r = img.ptr<uchar>(m)[n * 3 + 2];
-        *iter_g = img.ptr<uchar>(m)[n * 3 + 1];
-        *iter_b = img.ptr<uchar>(m)[n * 3];
-
-        ++iter_x; ++iter_y; ++iter_z;  // NOLINT
-        ++iter_r; ++iter_g; ++iter_b;  // NOLINT
-      }
-    }
-
-    pub_points.publish(msg);
   }
 
   void device_poll() {
@@ -201,7 +144,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
         }
 
         if (points_subscribed && color_ok && depth_ok) {
-          publishPoints(color, depth, t);
+          pointcloud_generator->Push(color, depth, t);
         }
       }
       loop_rate.sleep();
@@ -308,6 +251,30 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     NODELET_INFO_STREAM("Advertized on topic " << depth_topic);
     pub_points = nh.advertise<sensor_msgs::PointCloud2>(points_topic, 1);
     NODELET_INFO_STREAM("Advertized on topic " << points_topic);
+
+    double cx, cy, fx, fy;
+    std::int32_t points_frequency;
+    nh_ns.getParam("cx", cx);
+    nh_ns.getParam("cy", cy);
+    nh_ns.getParam("fx", fx);
+    nh_ns.getParam("fy", fy);
+    nh_ns.getParam("points_frequency", points_frequency);
+
+    pointcloud_generator.reset(new PointCloudGenerator(
+      {
+        1000.0,  // factor, mm > m
+        cx > 0 ? cx : 682.3,  // cx
+        cy > 0 ? cy : 254.9,  // cy
+        fx > 0 ? fx : 979.8,  // fx
+        fy > 0 ? fy : 942.8,  // fy
+      },
+      [this](sensor_msgs::PointCloud2 msg) {
+        // msg.header.seq = 0;
+        // msg.header.stamp = ros::Time::now();
+        msg.header.frame_id = points_frame_id;
+        pub_points.publish(msg);
+        // NODELET_INFO_STREAM("Publish points");
+      }, points_frequency));
 
     device_poll_thread = boost::shared_ptr<boost::thread>(new boost::thread(
         boost::bind(&MYNTEYEWrapperNodelet::device_poll, this)));

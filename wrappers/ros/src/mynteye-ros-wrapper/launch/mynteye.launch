@@ -32,6 +32,15 @@
   <!-- IR intensity -->
   <arg name="ir_intensity" default="4" />
 
+  <!-- Camera Intrinsics for generating points -->
+  <arg name="cx" default="0" />
+  <arg name="cy" default="0" />
+  <arg name="fx" default="0" />
+  <arg name="fy" default="0" />
+
+  <!-- Generating points frequency, make slower then framerate -->
+  <arg name="points_frequency" default="2" />
+
   <!-- Node params -->
 
   <arg name="mynteye"            default="mynteye" />
@@ -56,16 +65,23 @@
     <param name="state_awb"     value="$(arg state_awb)" />
     <param name="ir_intensity"  value="$(arg ir_intensity)" />
 
+    <param name="cx" value="$(arg cx)" />
+    <param name="cy" value="$(arg cy)" />
+    <param name="fx" value="$(arg fx)" />
+    <param name="fy" value="$(arg fy)" />
+
+    <param name="points_frequency" value="$(arg points_frequency)" />
+
     <!-- Frame ids -->
-    <param name="base_frame"         value="$(arg base_frame)" />
-    <param name="color_frame"        value="$(arg color_frame)" />
-    <param name="depth_frame"        value="$(arg depth_frame)" />
-    <param name="points_frame"       value="$(arg points_frame)" />
+    <param name="base_frame"   value="$(arg base_frame)" />
+    <param name="color_frame"  value="$(arg color_frame)" />
+    <param name="depth_frame"  value="$(arg depth_frame)" />
+    <param name="points_frame" value="$(arg points_frame)" />
 
     <!-- Topic names -->
-    <param name="color_topic"        value="$(arg color_topic)" />
-    <param name="depth_topic"        value="$(arg depth_topic)" />
-    <param name="points_topic"       value="$(arg points_topic)" />
+    <param name="color_topic"  value="$(arg color_topic)" />
+    <param name="depth_topic"  value="$(arg depth_topic)" />
+    <param name="points_topic" value="$(arg points_topic)" />
   </node>
 
   <arg name="pi/2" value="1.5707963267948966" />

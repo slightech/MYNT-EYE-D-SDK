@@ -19,7 +19,7 @@
 
 MYNTEYE_BEGIN_NAMESPACE
 
-class Rate {
+class MYNTEYE_API Rate {
  public:
   using clock = times::clock;
 
