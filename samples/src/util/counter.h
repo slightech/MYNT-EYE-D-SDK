@@ -25,7 +25,7 @@ namespace util {
 
 class Counter {
  public:
-  using time_point = times::system_clock::time_point;
+  using clock = times::clock;
 
   explicit Counter(std::size_t fps_frame_count = 10)
     : count_(0), fps_(0), fps_frame_count_(fps_frame_count) {
@@ -66,11 +66,11 @@ class Counter {
   }
 
  private:
-  time_point time_beg_;
+  clock::time_point time_beg_;
   std::uint64_t count_;
   double fps_;
 
-  std::queue<time_point> fps_frame_times_;
+  std::queue<clock::time_point> fps_frame_times_;
   std::size_t fps_frame_count_;
 
   // std::mutex mtx_;

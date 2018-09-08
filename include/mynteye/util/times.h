@@ -30,7 +30,10 @@ MYNTEYE_BEGIN_NAMESPACE
 
 namespace times {
 
-using system_clock = std::chrono::system_clock;
+using clock = std::chrono::system_clock;
+
+// template<class Rep, class Period = std::ratio<1>>
+// using duration = std::chrono::duration<Rep, Period>;
 
 using nanoseconds = std::chrono::nanoseconds;
 using microseconds = std::chrono::microseconds;
@@ -48,26 +51,26 @@ Duration to_duration(const std::int64_t& t) {
 }
 
 template <typename Duration>
-system_clock::time_point to_time_point(const Duration& d) {
-  return system_clock::time_point(d);
+clock::time_point to_time_point(const Duration& d) {
+  return clock::time_point(d);
 }
 
 template <typename Duration>
-system_clock::time_point to_time_point(const std::int64_t& t) {
-  return system_clock::time_point(Duration{t});
+clock::time_point to_time_point(const std::int64_t& t) {
+  return clock::time_point(Duration{t});
 }
 
-inline system_clock::time_point to_time_point(std::tm* tm) {
-  return system_clock::from_time_t(std::mktime(tm));
+inline clock::time_point to_time_point(std::tm* tm) {
+  return clock::from_time_t(std::mktime(tm));
 }
 
-inline struct std::tm* to_local_tm(const system_clock::time_point& t) {
-  auto t_c = system_clock::to_time_t(t);
+inline struct std::tm* to_local_tm(const clock::time_point& t) {
+  auto t_c = clock::to_time_t(t);
   return std::localtime(&t_c);
 }
 
-inline struct std::tm* to_utc_tm(const system_clock::time_point& t) {
-  auto t_c = system_clock::to_time_t(t);
+inline struct std::tm* to_utc_tm(const clock::time_point& t) {
+  auto t_c = clock::to_time_t(t);
   return std::gmtime(&t_c);
 }
 
@@ -79,8 +82,8 @@ ToDuration cast(const FromDuration& d) {
 }
 
 template <typename Duration>
-Duration cast(const system_clock::duration& d) {
-  return cast<system_clock::duration, Duration>(d);
+Duration cast(const clock::duration& d) {
+  return cast<clock::duration, Duration>(d);
 }
 
 template <typename FromDuration, typename ToDuration>
@@ -89,13 +92,13 @@ std::int64_t cast(const std::int64_t& t) {
 }
 
 template <typename Duration>
-system_clock::time_point cast(const system_clock::time_point& d) {
+clock::time_point cast(const clock::time_point& d) {
   // C++17, floor
   return std::chrono::time_point_cast<Duration>(d);
 }
 
 template <typename Duration>
-system_clock::duration cast_mod(const system_clock::time_point& t) {
+clock::duration cast_mod(const clock::time_point& t) {
   return t - cast<Duration>(t);
 }
 
@@ -107,7 +110,7 @@ std::int64_t count(const FromDuration& d) {
 }
 
 template <typename Duration>
-std::int64_t count(const system_clock::duration& d) {
+std::int64_t count(const clock::duration& d) {
   return cast<Duration>(d).count();
 }
 
@@ -127,15 +130,15 @@ inline std::tm* day_end(std::tm* tm) {
   return tm;
 }
 
-inline system_clock::time_point day_beg(const system_clock::time_point& t) {
+inline clock::time_point day_beg(const clock::time_point& t) {
   return cast<days>(t);
 }
 
-inline system_clock::time_point day_end(const system_clock::time_point& t) {
-  return day_beg(t) + days(1) - system_clock::duration(1);
+inline clock::time_point day_end(const clock::time_point& t) {
+  return day_beg(t) + days(1) - clock::duration(1);
 }
 
-inline system_clock::duration day_time(const system_clock::time_point& t) {
+inline clock::duration day_time(const clock::time_point& t) {
   return cast_mod<days>(t);
 }
 
@@ -143,12 +146,12 @@ inline system_clock::duration day_time(const system_clock::time_point& t) {
 
 template <typename Duration>
 std::int64_t between(
-    const system_clock::time_point& t1, const system_clock::time_point& t2) {
+    const clock::time_point& t1, const clock::time_point& t2) {
   return count<Duration>(t2 - t1);
 }
 
 inline std::int64_t between_days(
-    const system_clock::time_point& t1, const system_clock::time_point& t2) {
+    const clock::time_point& t1, const clock::time_point& t2) {
   return between<days>(day_beg(t1), day_beg(t2));
 }
 
@@ -159,19 +162,19 @@ std::int64_t between_days(const std::int64_t& t1, const std::int64_t& t2) {
 
 // epoch
 
-inline system_clock::time_point epoch() {
-  return system_clock::time_point(system_clock::duration{0});
+inline clock::time_point epoch() {
+  return clock::time_point(clock::duration{0});
 }
 
 template <typename Duration>
-std::int64_t since_epoch(const system_clock::time_point& t) {
+std::int64_t since_epoch(const clock::time_point& t) {
   return count<Duration>(t.time_since_epoch());
 }
 
 // now
 
-inline system_clock::time_point now() {
-  return system_clock::now();
+inline clock::time_point now() {
+  return clock::now();
 }
 
 template <typename Duration>
@@ -182,7 +185,7 @@ std::int64_t now() {
 // string
 
 inline std::string to_string(
-    const system_clock::time_point& t, const std::tm* tm,
+    const clock::time_point& t, const std::tm* tm,
     const char* fmt = "%F %T", std::int32_t precision = 6) {
   std::stringstream ss;
 #if defined(MYNTEYE_OS_ANDROID) || defined(MYNTEYE_OS_LINUX)
@@ -204,13 +207,13 @@ inline std::string to_string(
 }
 
 inline std::string to_local_string(
-    const system_clock::time_point& t, const char* fmt = "%F %T",
+    const clock::time_point& t, const char* fmt = "%F %T",
     const std::int32_t& precision = 6) {
   return to_string(t, to_local_tm(t), fmt, precision);
 }
 
 inline std::string to_utc_string(
-    const system_clock::time_point& t, const char* fmt = "%F %T",
+    const clock::time_point& t, const char* fmt = "%F %T",
     const std::int32_t& precision = 6) {
   return to_string(t, to_utc_tm(t), fmt, precision);
 }
