@@ -60,36 +60,35 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   MYNTEYEWrapperNodelet() : dashes(std::string(30, '-')) {
   }
 
-  void publishColor(cv::Mat img, ros::Time stamp) {
+  void publishColor(mynteye::Image::pointer img, ros::Time stamp,
+      cv::Mat* mat) {
     std_msgs::Header header;
     // header.seq = 0;
     header.stamp = stamp;
     header.frame_id = color_frame_id;
-    pub_color.publish(cv_bridge::CvImage(header, enc::BGR8, img).toImageMsg());
+    *mat = img->To(mynteye::ImageFormat::COLOR_RGB)->ToMat();
+    pub_color.publish(cv_bridge::CvImage(header, enc::RGB8, *mat).toImageMsg());
     // NODELET_INFO_STREAM("Publish color");
   }
 
-  void publishDepth(cv::Mat img, ros::Time stamp) {
+  void publishDepth(mynteye::Image::pointer img, ros::Time stamp,
+      cv::Mat* mat) {
     std_msgs::Header header;
     // header.seq = 0;
     header.stamp = stamp;
     header.frame_id = depth_frame_id;
-    if (depth_mode == 0) {  // DEPTH_NON
+    if (depth_mode == 0) {  // DEPTH_RAW
+      *mat = img->To(mynteye::ImageFormat::DEPTH_RAW)->ToMat();
       pub_depth.publish(
-          cv_bridge::CvImage(header, enc::BGR8, img).toImageMsg());
+          cv_bridge::CvImage(header, enc::MONO16, *mat).toImageMsg());
     } else if (depth_mode == 1) {  // DEPTH_GRAY
-      cv::cvtColor(img, img, CV_BGR2GRAY);
+      *mat = img->To(mynteye::ImageFormat::DEPTH_GRAY_24)->ToMat();
       pub_depth.publish(
-          cv_bridge::CvImage(header, enc::MONO8, img).toImageMsg());
+          cv_bridge::CvImage(header, enc::RGB8, *mat).toImageMsg());
     } else if (depth_mode == 2) {  // DEPTH_COLORFUL
+      *mat = img->To(mynteye::ImageFormat::DEPTH_RGB)->ToMat();
       pub_depth.publish(
-          cv_bridge::CvImage(header, enc::BGR8, img).toImageMsg());
-    } else if (depth_mode == 3) {  // DEPTH_NON_16UC1
-      pub_depth.publish(
-          cv_bridge::CvImage(header, enc::MONO16, img).toImageMsg());
-    } else if (depth_mode == 4) {  // DEPTH_NON_8UC1
-      pub_depth.publish(
-          cv_bridge::CvImage(header, enc::MONO8, img).toImageMsg());
+          cv_bridge::CvImage(header, enc::RGB8, *mat).toImageMsg());
     } else {
       NODELET_ERROR_STREAM("Depth mode unsupported");
       return;
@@ -136,12 +135,12 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     for (int m = 0; m < depth.rows; m++) {
       for (int n = 0; n < depth.cols; n++) {
         // get depth value at (m, n)
-        unsigned short d = depth.ptr<unsigned short>(m)[n];
+        ushort d = depth.ptr<ushort>(m)[n];
         // when d is equal 0 or 4096 means no depth
         if (d == 0 || d == 4096)
           continue;
 
-        *iter_z = float(d) / camera_factor;
+        *iter_z = d / camera_factor;
         *iter_x = (n - camera_cx) * *iter_z / camera_fx;
         *iter_y = (m - camera_cy) * *iter_z / camera_fy;
 
@@ -162,8 +161,6 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   }
 
   void device_poll() {
-    using namespace mynteye;
-
     mynteye->Open(params);
     if (!mynteye->IsOpened()) {
       NODELET_ERROR_STREAM("Open camera failed");
@@ -173,8 +170,8 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
     ros::Rate loop_rate(params.framerate);
 
-    cv::Mat color, depth;
     // Main loop
+    cv::Mat color, depth;
     while (nh_ns.ok()) {
       // Check for subscribers
       int color_SubNumber = pub_color.getNumSubscribers();
@@ -182,29 +179,34 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       int points_SubNumber = pub_points.getNumSubscribers();
       bool runLoop = (color_SubNumber + depth_SubNumber + points_SubNumber) > 0;
 
+      // publish points, the depth mode must be DEPTH_RAW.
+      bool points_subscribed = (points_SubNumber > 0) && (depth_mode == 0);
+
       bool color_ok, depth_ok;
       if (runLoop) {
         ros::Time t = ros::Time::now();
 
         color_ok = false;
-        if (color_SubNumber > 0) {
-          if (mynteye->RetrieveImage(ImageType::IMAGE_COLOR, &color)
-              == ErrorCode::SUCCESS) {
+        if (color_SubNumber > 0 || points_subscribed) {
+          auto image_color = mynteye->RetrieveImage(
+              mynteye::ImageType::IMAGE_COLOR);
+          if (image_color) {
             color_ok = true;
-            publishColor(color, t);
+            publishColor(image_color, t, &color);
           }
         }
 
         depth_ok = false;
-        if (depth_SubNumber > 0) {
-          if (mynteye->RetrieveImage(ImageType::IMAGE_DEPTH, &depth)
-              == ErrorCode::SUCCESS) {
+        if (depth_SubNumber > 0 || points_subscribed) {
+          auto image_depth = mynteye->RetrieveImage(
+              mynteye::ImageType::IMAGE_DEPTH);
+          if (image_depth) {
             depth_ok = true;
-            publishDepth(depth, t);
+            publishDepth(image_depth, t, &depth);
           }
         }
 
-        if (points_SubNumber > 0) {
+        if (points_subscribed) {
           if (color_ok && depth_ok) {
             publishPoints(color, depth, t);
           }
@@ -222,7 +224,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
     // Launch params
     dev_index = 0;
-    framerate = 30;
+    framerate = 10;
     depth_mode = 0;
     stream_mode = 0;
     stream_format = 0;

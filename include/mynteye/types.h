@@ -91,9 +91,9 @@ enum class ImageFormat : std::int32_t {
  * @brief List depth modes.
  */
 enum class DepthMode : std::int32_t {
-  DEPTH_RAW,       // ImageFormat::DEPTH_RAW
-  DEPTH_GRAY,      // ImageFormat::DEPTH_GRAY_24
-  DEPTH_COLORFUL,  // ImageFormat::DEPTH_RGB
+  DEPTH_RAW      = 0,  // ImageFormat::DEPTH_RAW
+  DEPTH_GRAY     = 1,  // ImageFormat::DEPTH_GRAY_24
+  DEPTH_COLORFUL = 2,  // ImageFormat::DEPTH_RGB
   DEPTH_MODE_LAST
 };
 
@@ -102,11 +102,10 @@ enum class DepthMode : std::int32_t {
  * @brief List stream mode.
  */
 enum class StreamMode : std::int32_t {
-  STREAM_1280x720,
-  STREAM_2560x720,
-  // STREAM_2560x960,
-  STREAM_1280x480,
-  STREAM_640x480,
+  STREAM_1280x720 = 0,
+  STREAM_2560x720 = 1,
+  STREAM_1280x480 = 2,
+  STREAM_640x480  = 3,
   STREAM_MODE_LAST
 };
 
@@ -115,8 +114,8 @@ enum class StreamMode : std::int32_t {
  * @brief List stream formats.
  */
 enum class StreamFormat : std::int32_t {
-  STREAM_MJPG,
-  STREAM_YUYV,
+  STREAM_MJPG = 0,
+  STREAM_YUYV = 1,
   STREAM_FORMAT_LAST
 };
 

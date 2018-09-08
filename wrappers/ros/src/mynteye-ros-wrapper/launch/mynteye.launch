@@ -14,11 +14,9 @@
   <arg name="stream_yuyv"       default="1" />
 
   <!-- Depth mode -->
-  <arg name="depth_non"         default="0" />
+  <arg name="depth_raw"         default="0" />
   <arg name="depth_gray"        default="1" />
   <arg name="depth_colorful"    default="2" />
-  <arg name="depth_non_16uc1"   default="3" />
-  <arg name="depth_non_8uc1"    default="4" />
 
   <arg name="base_frame"        default="mynteye_link" />
   <arg name="color_frame"       default="mynteye_color" />
@@ -30,7 +28,7 @@
     <!-- Camera params -->
     <param name="dev_index"     value="$(arg dev_index)" />
     <param name="framerate"     value="30" />
-    <param name="depth_mode"    value="$(arg depth_non_16uc1)" />
+    <param name="depth_mode"    value="$(arg depth_raw)" />
     <param name="stream_mode"   value="$(arg stream_1280x720)" />
     <param name="stream_format" value="$(arg stream_yuyv)" />
     <param name="state_ae"      value="true" />

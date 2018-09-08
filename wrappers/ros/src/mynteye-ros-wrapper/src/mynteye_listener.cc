@@ -27,7 +27,7 @@ class MYNTEYEListener {
   void colorCallback(const sensor_msgs::ImageConstPtr& msg) {
     cv_bridge::CvImageConstPtr cv_ptr;
     try {
-      cv_ptr = cv_bridge::toCvShare(msg, enc::BGR8);
+      cv_ptr = cv_bridge::toCvShare(msg, enc::RGB8);
     } catch (cv_bridge::Exception& e) {
       ROS_ERROR_STREAM("cv_bridge exception: " << e.what());
       return;
@@ -43,7 +43,7 @@ class MYNTEYEListener {
     cv_bridge::CvImageConstPtr cv_ptr;
     try {
       if (enc::isColor(msg->encoding)) {
-        cv_ptr = cv_bridge::toCvShare(msg, enc::BGR8);
+        cv_ptr = cv_bridge::toCvShare(msg, enc::RGB8);
       } else if (msg->encoding == enc::MONO16) {
         cv_ptr = cv_bridge::toCvShare(msg, enc::MONO16);
       } else {

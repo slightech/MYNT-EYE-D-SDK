@@ -6,6 +6,9 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
+        - /Color Image1
+        - /Depth Image1
+        - /PointCloud21
       Splitter Ratio: 0.5
     Tree Height: 552
   - Class: rviz/Selection
@@ -56,7 +59,7 @@ Visualization Manager:
       Min Value: 0
       Name: Color Image
       Normalize Range: true
-      Queue Size: 2
+      Queue Size: 1
       Transport Hint: raw
       Unreliable: false
       Value: true
@@ -68,7 +71,7 @@ Visualization Manager:
       Min Value: 0
       Name: Depth Image
       Normalize Range: true
-      Queue Size: 2
+      Queue Size: 1
       Transport Hint: raw
       Unreliable: false
       Value: true
@@ -92,7 +95,7 @@ Visualization Manager:
       Min Intensity: 0
       Name: PointCloud2
       Position Transformer: XYZ
-      Queue Size: 10
+      Queue Size: 1
       Selectable: true
       Size (Pixels): 3
       Size (m): 0.00999999978
