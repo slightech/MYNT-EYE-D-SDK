@@ -17,6 +17,7 @@
 #include <string>
 
 #include "mynteye/util/log.h"
+#include "mynteye/util/rate.h"
 
 MYNTEYE_USE_NAMESPACE
 
@@ -38,6 +39,7 @@ CameraPrivate::CameraPrivate(Camera* camera)
   color_res_index_ = 0;
   depth_res_index_ = 0;
   framerate_ = 10;
+  rate_ = nullptr;
 
   color_serial_number_ = 0;
   depth_serial_number_ = 0;
@@ -363,6 +365,9 @@ ErrorCode CameraPrivate::Open(const InitParams& params) {
 
   if (params.framerate > 0) framerate_ = params.framerate;
   LOGI("-- Framerate: %d", framerate_);
+
+  rate_.reset(new Rate(framerate_));
+
 #ifdef MYNTEYE_OS_LINUX
   std::string dtc_name = "Unknown";
   switch (params.depth_mode) {
@@ -481,6 +486,12 @@ Image::pointer CameraPrivate::RetrieveImage(const ImageType& type,
       return RetrieveImageDepth(code);
     default:
       throw new std::runtime_error("RetrieveImage: ImageType is unknown");
+  }
+}
+
+void CameraPrivate::Wait() const {
+  if (rate_) {
+    rate_->Sleep();
   }
 }
 

@@ -50,6 +50,9 @@ class MYNTEYE_API Camera {
   Image::pointer RetrieveImage(const ImageType& type);
   Image::pointer RetrieveImage(const ImageType& type, ErrorCode* code);
 
+  /** Wait according to framerate. */
+  void Wait() const;
+
   void Close();
 
  private:

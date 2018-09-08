@@ -229,6 +229,7 @@ int main(int argc, char const* argv[]) {
     if (key == 27 || key == 'q' || key == 'Q') {  // ESC/Q
       break;
     }
+    cam.Wait();  // keep frequency
   }
 
   cam.Close();

@@ -70,6 +70,10 @@ Image::pointer Camera::RetrieveImage(const ImageType& type, ErrorCode* code) {
   return p_->RetrieveImage(type, code);
 }
 
+void Camera::Wait() const {
+  p_->Wait();
+}
+
 void Camera::Close() {
   p_->Close();
 }

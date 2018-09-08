@@ -21,6 +21,7 @@
 #include <Windows.h>
 #endif
 
+#include <memory>
 #include <mutex>
 #include <vector>
 
@@ -29,6 +30,8 @@
 #include "mynteye/image.h"
 
 MYNTEYE_BEGIN_NAMESPACE
+
+class Rate;
 
 class CameraPrivate {
  public:
@@ -75,6 +78,9 @@ class CameraPrivate {
 
   Image::pointer RetrieveImage(const ImageType& type, ErrorCode* code);
 
+  /** Wait according to framerate. */
+  void Wait() const;
+
   void Close();
 
   Camera* camera_;
@@ -103,6 +109,7 @@ class CameraPrivate {
   int color_res_index_;
   int depth_res_index_;
   int framerate_;
+  std::unique_ptr<Rate> rate_;
 
   std::int32_t stream_info_dev_index_;
 
