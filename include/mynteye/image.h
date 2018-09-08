@@ -27,7 +27,7 @@
 
 MYNTEYE_BEGIN_NAMESPACE
 
-class Image {
+class MYNTEYE_API Image {
  public:
   using pointer = std::shared_ptr<Image>;
 
@@ -105,7 +105,7 @@ class Image {
   MYNTEYE_DISABLE_MOVE(Image)
 };
 
-class ImageColor : public Image,
+class MYNTEYE_API ImageColor : public Image,
     public std::enable_shared_from_this<ImageColor> {
  public:
   using pointer = std::shared_ptr<ImageColor>;
@@ -128,7 +128,7 @@ class ImageColor : public Image,
   MYNTEYE_DISABLE_MOVE(ImageColor)
 };
 
-class ImageDepth : public Image,
+class MYNTEYE_API ImageDepth : public Image,
     public std::enable_shared_from_this<ImageDepth> {
  public:
   using pointer = std::shared_ptr<ImageDepth>;
