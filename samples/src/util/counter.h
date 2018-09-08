@@ -16,16 +16,23 @@
 #pragma once
 
 #include <cstdint>
+#include <queue>
 
-#include <opencv2/core/core.hpp>
+#include "mynteye/util/times.h"
 
 namespace mynteye {
 namespace util {
 
 class Counter {
-public:
-  Counter() : tick_beg_(0), fps_(0), count_(0) {
-    tick_beg_ = static_cast<double>(cv::getTickCount());
+ public:
+  using time_point = times::system_clock::time_point;
+
+  explicit Counter(std::size_t fps_frame_count = 10)
+    : count_(0), fps_(0), fps_frame_count_(fps_frame_count) {
+    time_beg_ = times::now();
+    if (fps_frame_count_ >= 2) {
+      fps_frame_times_.push(time_beg_);
+    }
   }
 
   double fps() const {
@@ -40,16 +47,32 @@ public:
 
   void Update() {
     // std::lock_guard<std::mutex> _(mtx_);
-    double tick_count = static_cast<double>(cv::getTickCount()) - tick_beg_;
-    double elapsed = tick_count / cv::getTickFrequency();
     ++count_;
-    fps_ = count_ / elapsed;
+
+    auto time_now = times::now();
+    if (fps_frame_count_ >= 2) {
+      if (fps_frame_times_.size() == fps_frame_count_) {
+        fps_frame_times_.pop();
+      }
+      fps_frame_times_.push(time_now);
+
+      auto elapsed = times::count<times::milliseconds>(
+          fps_frame_times_.back() - fps_frame_times_.front());
+      fps_ = 1000.f * (fps_frame_times_.size() - 1) / elapsed;
+    } else {
+      auto elapsed = times::count<times::milliseconds>(time_now - time_beg_);
+      fps_ = 1000.f * count_ / elapsed;
+    }
   }
 
-private:
-  double tick_beg_;
-  double fps_;
+ private:
+  time_point time_beg_;
   std::uint64_t count_;
+  double fps_;
+
+  std::queue<time_point> fps_frame_times_;
+  std::size_t fps_frame_count_;
+
   // std::mutex mtx_;
 };
 
