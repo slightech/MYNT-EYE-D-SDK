@@ -355,7 +355,7 @@ ErrorCode CameraPrivate::Open(const InitParams& params) {
   dev_sel_info_.index = params.dev_index;
 
   // if (params.dev_info.type == PUMA) {
-    depth_data_type_ = 2;  // 1: 11 bits. 2: 14 bits
+    depth_data_type_ = 2;  // ETronDI_DEPTH_DATA_14_BITS
     EtronDI_SetDepthDataType(etron_di_, &dev_sel_info_, depth_data_type_);
     DBG_LOGI("SetDepthDataType: %d", depth_data_type_);
   // }
