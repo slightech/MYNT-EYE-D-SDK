@@ -41,6 +41,10 @@ get_filename_component(SDK_DIR "${PROJECT_SOURCE_DIR}/../../../.." ABSOLUTE)
 LIST(APPEND CMAKE_PREFIX_PATH ${SDK_DIR}/_install/lib/cmake)
 find_package(mynteye REQUIRED)
 message(STATUS "Found mynteye: ${mynteye_VERSION}")
+if(NOT mynteye_WITH_OPENCV)
+  message(FATAL_ERROR "Please install OpenCV, then rebuild mynteye with it."
+      " Because these samples use OpenCV to show images.")
+endif()
 
 include(${SDK_DIR}/cmake/DetectOpenCV.cmake)
 

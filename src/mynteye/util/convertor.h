@@ -15,6 +15,8 @@
 #define MYNTEYE_UTIL_CONVERTOR_H_
 #pragma once
 
+#ifdef WITH_JPEG
+
 #include <stdio.h>
 #include <setjmp.h>
 
@@ -24,9 +26,13 @@ extern "C" {
 
 }
 
+#endif
+
 #include "mynteye/stubs/global.h"
 
 MYNTEYE_BEGIN_NAMESPACE
+
+#ifdef WITH_JPEG
 
 struct my_error_mgr {
   struct jpeg_error_mgr pub;
@@ -34,6 +40,8 @@ struct my_error_mgr {
 };
 
 typedef struct my_error_mgr* my_error_ptr;
+
+#endif
 
 extern int MJPEG_TO_RGB_LIBJPEG(unsigned char* jpg, int nJpgSize,
     unsigned char* rgb);

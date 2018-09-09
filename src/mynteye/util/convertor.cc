@@ -17,6 +17,8 @@
 
 MYNTEYE_BEGIN_NAMESPACE
 
+#ifdef WITH_JPEG
+
 namespace {
 
 METHODDEF(void)
@@ -34,8 +36,11 @@ my_error_exit(j_common_ptr cinfo) {
 
 }  // namespace
 
+#endif
+
 int MJPEG_TO_RGB_LIBJPEG(unsigned char* jpg, int nJpgSize,
     unsigned char* rgb) {
+#ifdef WITH_JPEG
   struct jpeg_decompress_struct cinfo;
   struct my_error_mgr jerr;
 
@@ -81,6 +86,10 @@ int MJPEG_TO_RGB_LIBJPEG(unsigned char* jpg, int nJpgSize,
 
   UNUSED(height);
   return 0;
+#else
+  throw new std::runtime_error(
+      "Can't convert MJPG to RGB, as libjpeg not found.");
+#endif
 }
 
 namespace {

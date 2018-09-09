@@ -13,6 +13,8 @@
 // limitations under the License.
 #include "mynteye/internal/camera_p.h"
 
+#include <string.h>
+
 #include <stdexcept>
 #include <string>
 

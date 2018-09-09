@@ -39,6 +39,7 @@ int get_image_size(const ImageFormat& format, const int& width,
   return width * height * get_image_bpp(format);
 }
 
+#ifdef WITH_OPENCV
 int get_mat_type(const ImageFormat& format) {
   switch (format) {
     case ImageFormat::IMAGE_BGR_24: return CV_8UC3;
@@ -50,6 +51,7 @@ int get_mat_type(const ImageFormat& format) {
     default: throw new std::runtime_error("ImageFormat not support to cv::Mat");
   }
 }
+#endif
 
 }  // namespace
 
@@ -80,9 +82,11 @@ Image::pointer Image::Create(ImageType type, ImageFormat format, int width,
   }
 }
 
+#ifdef WITH_OPENCV
 cv::Mat Image::ToMat() {
   return cv::Mat(height_, width_, get_mat_type(format_), data());
 }
+#endif
 
 Image::pointer Image::Clone() const {
   auto image = Create(type_, format_, width_, height_, false);

@@ -15,8 +15,6 @@
 
 #ifdef MYNTEYE_OS_LINUX
 
-#include <opencv2/imgproc/imgproc.hpp>
-
 #include "mynteye/util/convertor.h"
 #include "mynteye/util/log.h"
 

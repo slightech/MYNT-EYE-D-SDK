@@ -12,9 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-@PACKAGE_INIT@
+include(${CMAKE_CURRENT_LIST_DIR}/IncludeGuard.cmake)
+cmake_include_guard()
 
-set(mynteye_WITH_OPENCV @WITH_OPENCV@)
-set(mynteye_WITH_JPEG @WITH_JPEG@)
+if(JPEG_FIND_QUIET)
+  find_package(JPEG QUIET)
+else()
+  find_package(JPEG REQUIRED)
+endif()
 
-include("${CMAKE_CURRENT_LIST_DIR}/mynteye-targets.cmake")
+if(JPEG_FOUND)
+
+# After cmake version >= 3.12
+#message(STATUS "Found JPEG: ${JPEG_VERSION}")
+
+set(WITH_JPEG TRUE)
+add_definitions(-DWITH_JPEG)
+
+else()
+
+set(WITH_JPEG FALSE)
+
+endif()
+

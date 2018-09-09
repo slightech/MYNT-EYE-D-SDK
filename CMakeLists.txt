@@ -66,11 +66,13 @@ message(STATUS "CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
 
 LIST(APPEND CMAKE_MODULE_PATH ${MYNTEYE_ROOT}/cmake)
 
+set(OpenCV_FIND_QUIET TRUE)
 include(${MYNTEYE_ROOT}/cmake/DetectOpenCV.cmake)
 
-find_package(eSPDI REQUIRED)
+set(JPEG_FIND_QUIET TRUE)
+include(${MYNTEYE_ROOT}/cmake/DetectJPEG.cmake)
 
-find_package(JPEG REQUIRED)
+find_package(eSPDI REQUIRED)
 
 # targets
 
@@ -84,8 +86,8 @@ set_outdir(
 
 include_directories(
   ${OpenCV_INCLUDE_DIRS}
-  ${eSPDI_INCLUDE_DIRS}
   ${JPEG_INCLUDE_DIR}
+  ${eSPDI_INCLUDE_DIRS}
   ${MYNTEYE_ROOT}/include
   ${CMAKE_CURRENT_BINARY_DIR}/include
 )
@@ -100,7 +102,7 @@ file(GLOB_RECURSE MYNTEYE_CORE_SRCS "src/mynteye/*.cc")
 
 make_shared_library(${MYNTEYE_CORE}
   SRCS ${MYNTEYE_CORE_SRCS}
-  LINK_LIBS ${OpenCV_LIBS} ${eSPDI_LIBS} ${JPEG_LIBRARIES}
+  LINK_LIBS ${OpenCV_LIBS} ${JPEG_LIBRARIES} ${eSPDI_LIBS}
 )
 
 target_include_directories(${MYNTEYE_CORE} PUBLIC
@@ -239,3 +241,7 @@ install(EXPORT mynteye-targets
   #NAMESPACE mynteye::
   DESTINATION ${MYNTEYE_CMAKE_INSTALLDIR}
 )
+
+# summary
+
+include(${MYNTEYE_ROOT}/cmake/Summary.cmake)

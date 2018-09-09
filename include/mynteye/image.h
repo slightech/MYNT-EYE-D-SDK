@@ -20,7 +20,9 @@
 #include <memory>
 #include <vector>
 
+#ifdef WITH_OPENCV
 #include <opencv2/core/core.hpp>
+#endif
 
 #include "mynteye/stubs/global.h"
 #include "mynteye/types.h"
@@ -83,7 +85,9 @@ class MYNTEYE_API Image {
 
   virtual pointer To(ImageFormat format) = 0;
 
+#ifdef WITH_OPENCV
   cv::Mat ToMat();
+#endif
 
   pointer Clone() const;
 

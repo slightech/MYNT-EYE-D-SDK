@@ -133,9 +133,6 @@ class CameraPrivate {
 #endif
 
   DepthMode depth_mode_;
-  cv::Mat depth_raw_;
-  ushort depth_min_;
-  ushort depth_max_;
 };
 
 MYNTEYE_END_NAMESPACE
