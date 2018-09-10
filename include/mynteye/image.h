@@ -91,6 +91,8 @@ class MYNTEYE_API Image {
 
   pointer Clone() const;
 
+  bool ResetBuffer();
+
  protected:
   Image::pointer GetCache(const ImageFormat& format);
 
@@ -99,6 +101,8 @@ class MYNTEYE_API Image {
   int width_;
   int height_;
   bool is_buffer_;
+
+  ImageFormat raw_format_;
 
   std::vector<std::uint8_t> data_;
   std::size_t valid_size_;

@@ -199,9 +199,10 @@ void CameraPrivate::ImgCallback(EtronDIImageType::Value imgType, int imgId,
         p->color_image_buf_ = ImageColor::Create(ImageFormat::COLOR_MJPG,
             color_img_width, color_img_height, true);
       }
-
-      p->color_image_buf_->set_valid_size(imgSize);
+    } else {
+      p->color_image_buf_->ResetBuffer();
     }
+    p->color_image_buf_->set_valid_size(imgSize);
     std::copy(imgBuf, imgBuf + imgSize, p->color_image_buf_->data());
   } else if (EtronDIImageType::IsImageDepth(imgType)) {
     // LOGI("Image callback depth");
@@ -213,9 +214,10 @@ void CameraPrivate::ImgCallback(EtronDIImageType::Value imgType, int imgId,
 
       p->depth_image_buf_ = ImageDepth::Create(ImageFormat::DEPTH_RAW,
           depth_img_width, depth_img_height, true);
-
-      p->depth_image_buf_->set_valid_size(imgSize);
+    } else {
+      p->depth_image_buf_->ResetBuffer();
     }
+    p->depth_image_buf_->set_valid_size(imgSize);
     std::copy(imgBuf, imgBuf + imgSize, p->depth_image_buf_->data());
   } else {
     LOGE("Image callback failed. Unknown image type.");
@@ -281,7 +283,8 @@ Image::pointer CameraPrivate::RetrieveImageDepth(ErrorCode* code) {
       //   return depth_gray_buf;
       case DepthMode::DEPTH_COLORFUL:
         static auto depth_rgb_buf = ImageDepth::Create(ImageFormat::DEPTH_RGB,
-            depth_img_width, depth_img_height, false);
+            depth_img_width, depth_img_height, true);
+        depth_rgb_buf->ResetBuffer();
         UpdateZ14DisplayImage_DIB24(color_palette_z14_,
             depth_image_buf_->data(), depth_rgb_buf->data(),
             depth_img_width, depth_img_height);
