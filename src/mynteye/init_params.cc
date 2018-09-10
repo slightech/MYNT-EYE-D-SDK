@@ -27,7 +27,8 @@ InitParams::InitParams(const std::int32_t& dev_index)
     framerate(10),
     depth_mode(DepthMode::DEPTH_COLORFUL),
     stream_mode(StreamMode::STREAM_1280x720),
-    stream_format(StreamFormat::STREAM_YUYV),
+    color_stream_format(StreamFormat::STREAM_YUYV),
+    depth_stream_format(StreamFormat::STREAM_YUYV),
     state_ae(true),
     state_awb(true),
     ir_intensity(0) {

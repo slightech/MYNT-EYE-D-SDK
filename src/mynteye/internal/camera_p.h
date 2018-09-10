@@ -50,7 +50,8 @@ class CameraPrivate {
       int* depth_res_index);
   void GetResolutionIndex(const std::int32_t& dev_index,
       const StreamMode& stream_mode,
-      const StreamFormat& stream_format,
+      const StreamFormat& color_stream_format,
+      const StreamFormat& depth_stream_format,
       int* color_res_index,
       int* depth_res_index);
 

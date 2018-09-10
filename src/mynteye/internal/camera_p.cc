@@ -23,6 +23,48 @@
 
 MYNTEYE_USE_NAMESPACE
 
+namespace {
+
+void get_stream_size(const StreamMode& stream_mode, int* width, int* height) {
+  switch (stream_mode) {
+    case StreamMode::STREAM_1280x480:
+      *width = 1280;
+      *height = 480;
+      break;
+    case StreamMode::STREAM_1280x720:
+      *width = 1280;
+      *height = 720;
+      break;
+    case StreamMode::STREAM_2560x720:
+      *width = 2560;
+      *height = 720;
+      break;
+    // case StreamMode::STREAM_2560x960:
+    //   *width = 2560;
+    //   *height = 960;
+    //   break;
+    case StreamMode::STREAM_640x480:
+      *width = 640;
+      *height = 480;
+      break;
+    default:
+      throw new std::runtime_error("StreamMode is unknown");
+  }
+}
+
+std::string get_stream_format_string(const StreamFormat& stream_format) {
+  switch (stream_format) {
+    case StreamFormat::STREAM_MJPG:
+      return "MJPG";
+    case StreamFormat::STREAM_YUYV:
+      return "YUYV";
+    default:
+      throw new std::runtime_error("StreamFormat is unknown");
+  }
+}
+
+}  // namespace
+
 CameraPrivate::CameraPrivate(Camera* camera)
   : camera_(camera),
     etron_di_(nullptr),
@@ -163,13 +205,15 @@ void CameraPrivate::GetResolutionIndex(const InitParams& params,
     int* color_res_index,
     int* depth_res_index) {
   return GetResolutionIndex(
-      params.dev_index, params.stream_mode, params.stream_format,
+      params.dev_index, params.stream_mode,
+      params.color_stream_format, params.depth_stream_format,
       color_res_index, depth_res_index);
 }
 
 void CameraPrivate::GetResolutionIndex(const std::int32_t& dev_index,
     const StreamMode& stream_mode,
-    const StreamFormat& stream_format,
+    const StreamFormat& color_stream_format,
+    const StreamFormat& depth_stream_format,
     int *color_res_index,
     int *depth_res_index) {
   if (!color_res_index) {
@@ -185,44 +229,7 @@ void CameraPrivate::GetResolutionIndex(const std::int32_t& dev_index,
   *depth_res_index = -1;
 
   int width = 0, height = 0;
-  switch (stream_mode) {
-    case StreamMode::STREAM_1280x480:
-      width = 1280;
-      height = 480;
-      break;
-    case StreamMode::STREAM_1280x720:
-      width = 1280;
-      height = 720;
-      break;
-    case StreamMode::STREAM_2560x720:
-      width = 2560;
-      height = 720;
-      break;
-    // case StreamMode::STREAM_2560x960:
-    //   width = 2560;
-    //   height = 960;
-    //   break;
-    case StreamMode::STREAM_640x480:
-      width = 640;
-      height = 480;
-      break;
-    default:
-      throw new std::runtime_error(
-          "GetResolutionIndex: StreamMode is unknown");
-  }
-
-  std::string format;
-  switch (stream_format) {
-    case StreamFormat::STREAM_MJPG:
-      format = "MJPG";
-      break;
-    case StreamFormat::STREAM_YUYV:
-      format = "YUYV";
-      break;
-    default:
-      throw new std::runtime_error(
-          "GetResolutionIndex: StreamFormat is unknown");
-  }
+  get_stream_size(stream_mode, &width, &height);
 
   memset(stream_color_info_ptr_, 0, sizeof(ETRONDI_STREAM_INFO)*64);
   memset(stream_depth_info_ptr_, 0, sizeof(ETRONDI_STREAM_INFO)*64);
@@ -236,7 +243,7 @@ void CameraPrivate::GetResolutionIndex(const std::int32_t& dev_index,
   while (i < 64) {
     if (stream_temp_info_ptr->nWidth == width &&
         stream_temp_info_ptr->nHeight == height &&
-        stream_format == (stream_temp_info_ptr->bFormatMJPG ?
+        color_stream_format == (stream_temp_info_ptr->bFormatMJPG ?
             StreamFormat::STREAM_MJPG : StreamFormat::STREAM_YUYV)) {
       *color_res_index = i;
       break;
@@ -247,7 +254,8 @@ void CameraPrivate::GetResolutionIndex(const std::int32_t& dev_index,
 
   if (*color_res_index == -1) {
     LOGE("Error: Color Mode width[%d] height[%d] format[%s] not support. "
-        "Please check the resolution list.", width, height, format);
+        "Please check the resolution list.", width, height,
+        get_stream_format_string(color_stream_format));
     *color_res_index = 0;
   }
 
@@ -255,7 +263,7 @@ void CameraPrivate::GetResolutionIndex(const std::int32_t& dev_index,
   i = 0;
   while (i < 64) {
     if (stream_temp_info_ptr->nHeight == height &&
-        stream_format == (stream_temp_info_ptr->bFormatMJPG ?
+        depth_stream_format == (stream_temp_info_ptr->bFormatMJPG ?
             StreamFormat::STREAM_MJPG : StreamFormat::STREAM_YUYV)) {
       *depth_res_index = i;
       break;
@@ -266,7 +274,8 @@ void CameraPrivate::GetResolutionIndex(const std::int32_t& dev_index,
 
   if (*depth_res_index == -1) {
     LOGE("Error: Depth Mode width[%d] height[%d] format[%s] not support. "
-        "Please check the resolution list.", width, height, format);
+        "Please check the resolution list.", width, height,
+        get_stream_format_string(depth_stream_format));
     *depth_res_index = 0;
   }
 }

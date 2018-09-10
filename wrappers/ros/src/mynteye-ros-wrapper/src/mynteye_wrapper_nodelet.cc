@@ -40,7 +40,8 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   int framerate;
   int depth_mode;
   int stream_mode;
-  int stream_format;
+  int color_stream_format;
+  int depth_stream_format;
   bool state_ae;
   bool state_awb;
   int ir_intensity;
@@ -162,7 +163,8 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     framerate = 10;
     depth_mode = 0;
     stream_mode = 0;
-    stream_format = 0;
+    color_stream_format = 0;
+    depth_stream_format = 0;
     state_ae = true;
     state_awb = true;
     ir_intensity = 0;
@@ -171,7 +173,8 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     nh_ns.getParam("framerate", framerate);
     nh_ns.getParam("depth_mode", depth_mode);
     nh_ns.getParam("stream_mode", stream_mode);
-    nh_ns.getParam("stream_format", stream_format);
+    nh_ns.getParam("color_stream_format", color_stream_format);
+    nh_ns.getParam("depth_stream_format", depth_stream_format);
     nh_ns.getParam("state_ae", state_ae);
     nh_ns.getParam("state_awb", state_awb);
     nh_ns.getParam("ir_intensity", ir_intensity);
@@ -238,7 +241,10 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     params.framerate = framerate;
     params.depth_mode = static_cast<mynteye::DepthMode>(depth_mode);
     params.stream_mode = static_cast<mynteye::StreamMode>(stream_mode);
-    params.stream_format = static_cast<mynteye::StreamFormat>(stream_format);
+    params.color_stream_format =
+        static_cast<mynteye::StreamFormat>(color_stream_format);
+    params.depth_stream_format =
+        static_cast<mynteye::StreamFormat>(depth_stream_format);
     params.state_ae = state_ae;
     params.state_awb = state_awb;
     params.ir_intensity = ir_intensity;

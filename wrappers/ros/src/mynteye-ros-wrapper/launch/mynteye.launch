@@ -23,7 +23,8 @@
 
   <arg name="depth_mode" default="$(arg depth_raw)" />
   <arg name="stream_mode" default="$(arg stream_1280x720)" />
-  <arg name="stream_format" default="$(arg stream_yuyv)" />
+  <arg name="color_stream_format" default="$(arg stream_yuyv)" />
+  <arg name="depth_stream_format" default="$(arg stream_yuyv)" />
 
   <!-- Auto-exposure -->
   <arg name="state_ae" default="true" />
@@ -60,7 +61,8 @@
     <param name="framerate"     value="$(arg framerate)" />
     <param name="depth_mode"    value="$(arg depth_mode)" />
     <param name="stream_mode"   value="$(arg stream_mode)" />
-    <param name="stream_format" value="$(arg stream_format)" />
+    <param name="color_stream_format" value="$(arg color_stream_format)" />
+    <param name="depth_stream_format" value="$(arg depth_stream_format)" />
     <param name="state_ae"      value="$(arg state_ae)" />
     <param name="state_awb"     value="$(arg state_awb)" />
     <param name="ir_intensity"  value="$(arg ir_intensity)" />
