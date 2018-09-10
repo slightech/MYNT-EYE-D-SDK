@@ -500,9 +500,11 @@ Image::pointer CameraPrivate::RetrieveImage(const ImageType& type,
   }
 }
 
-void CameraPrivate::Wait() const {
+void CameraPrivate::Wait() {
   if (rate_) {
+    OnPreWait();
     rate_->Sleep();
+    OnPostWait();
   }
 }
 

@@ -24,6 +24,12 @@ void CameraPrivate::OnInit() {
   dtc_ = DEPTH_IMG_NON_TRANSFER;
 }
 
+void CameraPrivate::OnPreWait() {
+}
+
+void CameraPrivate::OnPostWait() {
+}
+
 // int ret = EtronDI_Get2Image(etron_di_, &dev_sel_info_,
 //     (BYTE*)color_img_buf_, (BYTE*)depth_img_buf_,
 //     &color_image_size_, &depth_image_size_,

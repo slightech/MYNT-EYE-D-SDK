@@ -58,6 +58,8 @@ extern void RGB_TO_BGR(unsigned char* rgb,
 extern void BGR_TO_RGB(unsigned char* bgr,
     unsigned int width, unsigned int height);
 
+extern void FLIP_UP_DOWN_C3(unsigned char* rgb, unsigned int width, unsigned int height);
+
 MYNTEYE_END_NAMESPACE
 
 #endif  // MYNTEYE_UTIL_CONVERTOR_H_

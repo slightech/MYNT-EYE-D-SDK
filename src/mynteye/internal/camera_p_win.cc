@@ -172,6 +172,12 @@ void CameraPrivate::OnInit() {
   DmColorMode14(color_palette_z14_, 0/*normal*/);
 }
 
+void CameraPrivate::OnPreWait() {
+}
+
+void CameraPrivate::OnPostWait() {
+}
+
 void CameraPrivate::ImgCallback(EtronDIImageType::Value imgType, int imgId,
       unsigned char* imgBuf, int imgSize, int width, int height,
       int serialNumber, void *pParam) {
@@ -180,161 +186,112 @@ void CameraPrivate::ImgCallback(EtronDIImageType::Value imgType, int imgId,
 
   if (EtronDIImageType::IsImageColor(imgType)) {
     // LOGI("Image callback color");
-    if (!p->color_img_buf_) {
+    if (!p->color_image_buf_) {
       unsigned int color_img_width  =(unsigned int)(
           p->stream_color_info_ptr_[p->color_res_index_].nWidth);
       unsigned int color_img_height =(unsigned int)(
           p->stream_color_info_ptr_[p->color_res_index_].nHeight);
-      p->color_img_buf_ = (unsigned char*)calloc(
-          color_img_width*color_img_height*3, sizeof(unsigned char));
+
+      if (imgType == EtronDIImageType::COLOR_RGB24) {
+        p->color_image_buf_ = ImageColor::Create(ImageFormat::COLOR_RGB,
+            color_img_width, color_img_height, true);
+      } else if (imgType == EtronDIImageType::COLOR_MJPG) {
+        p->color_image_buf_ = ImageColor::Create(ImageFormat::COLOR_MJPG,
+            color_img_width, color_img_height, true);
+      }
+
+      p->color_image_buf_->set_valid_size(imgSize);
     }
-
-    memcpy(p->color_img_buf_, imgBuf, imgSize);
-
-    p->is_color_rgb24_ = (imgType == EtronDIImageType::COLOR_RGB24);
-    p->is_color_mjpg_ = (imgType == EtronDIImageType::COLOR_MJPG);
+    std::copy(imgBuf, imgBuf + imgSize, p->color_image_buf_->data());
   } else if (EtronDIImageType::IsImageDepth(imgType)) {
     // LOGI("Image callback depth");
-    if (!p->depth_img_buf_) {
+    if (!p->depth_image_buf_) {
       unsigned int depth_img_width  = (unsigned int)(
           p->stream_depth_info_ptr_[p->depth_res_index_].nWidth);
       unsigned int depth_img_height = (unsigned int)(
           p->stream_depth_info_ptr_[p->depth_res_index_].nHeight);
-      p->depth_img_buf_ = (unsigned char*)calloc(
-          depth_img_width*depth_img_height*2, sizeof(unsigned char));
-      p->depth_data_size_ = depth_img_width*depth_img_height*2;
+
+      p->depth_image_buf_ = ImageDepth::Create(ImageFormat::DEPTH_RAW,
+          depth_img_width, depth_img_height, true);
+
+      p->depth_image_buf_->set_valid_size(imgSize);
     }
-    memcpy(p->depth_img_buf_, imgBuf, p->depth_data_size_);
+    std::copy(imgBuf, imgBuf + imgSize, p->depth_image_buf_->data());
   } else {
     LOGE("Image callback failed. Unknown image type.");
   }
 }
 
-ErrorCode CameraPrivate::RetrieveImageColor(cv::Mat* color_) {
+Image::pointer CameraPrivate::RetrieveImageColor(ErrorCode* code) {
   // LOGI("Retrieve image color");
-  if (!color_img_buf_) {
-    return ErrorCode::ERROR_CAMERA_RETRIEVE_FAILED;
+  if (!color_image_buf_) {
+    *code = ErrorCode::ERROR_CAMERA_RETRIEVE_FAILED;
+    return nullptr;
   }
   std::lock_guard<std::mutex> _(mtx_imgs_);
 
-  cv::Mat& color = *color_;
-
-  bool color_ok = false;
-  if (color_img_buf_) {
+  if (color_image_buf_) {
     unsigned int color_img_width  = (unsigned int)(
         stream_color_info_ptr_[color_res_index_].nWidth);
     unsigned int color_img_height = (unsigned int)(
         stream_color_info_ptr_[color_res_index_].nHeight);
-    if (is_color_mjpg_) {  // mjpg
-      if (!color_rgb_buf_) {
-        color_rgb_buf_ = (unsigned char*)calloc(
-            color_img_width*color_img_height*3, sizeof(unsigned char));
-      }
-      MJPEG_TO_RGB24_LIBJPEG(color_img_buf_, color_image_size_, color_rgb_buf_);
-      cv::Mat color_img(color_img_height, color_img_width, CV_8UC3,
-          color_rgb_buf_);
-      cv::cvtColor(color_img, color, CV_RGB2BGR);
-      color_ok = true;
-    } else if (is_color_rgb24_) {  // rgb24
-      cv::Mat color_img(color_img_height, color_img_width, CV_8UC3,
-          color_img_buf_);
-      cv::flip(color_img, color, 0);
-      color_ok = true;
+
+    if (color_image_buf_->format() == ImageFormat::COLOR_MJPG) {  // mjpg
+      *code = ErrorCode::SUCCESS;
+      // return clone as it will be changed in imgcallback
+      return color_image_buf_->Clone();
+    } else if (color_image_buf_->format() == ImageFormat::COLOR_RGB) {  // rgb24
+      FLIP_UP_DOWN_C3(color_image_buf_->data(),
+          color_img_width, color_img_height);
+      *code = ErrorCode::SUCCESS;
+      // return clone as it will be changed in imgcallback
+      return color_image_buf_->Clone();
     } else {
       LOGE("Unknown image color type.");
     }
   }
 
-  return color_ok ? ErrorCode::SUCCESS :
-     ErrorCode::ERROR_CAMERA_RETRIEVE_FAILED;
+  *code = ErrorCode::ERROR_CAMERA_RETRIEVE_FAILED;
+  return nullptr;
 }
 
-ErrorCode CameraPrivate::RetrieveImageDepth(cv::Mat* depth_) {
+Image::pointer CameraPrivate::RetrieveImageDepth(ErrorCode* code) {
   // LOGI("Retrieve image depth");
-  if (!depth_img_buf_) {
-    return ErrorCode::ERROR_CAMERA_RETRIEVE_FAILED;
+  if (!depth_image_buf_) {
+    *code = ErrorCode::ERROR_CAMERA_RETRIEVE_FAILED;
+    return nullptr;
   }
   std::lock_guard<std::mutex> _(mtx_imgs_);
 
-  cv::Mat& depth = *depth_;
-
-  bool depth_ok = false;
-  if (depth_img_buf_) {
+  if (depth_image_buf_) {
     // DEPTH_14BITS for ETronDI_DEPTH_DATA_14_BITS
     unsigned int depth_img_width  = (unsigned int)(
         stream_depth_info_ptr_[depth_res_index_].nWidth);
     unsigned int depth_img_height = (unsigned int)(
         stream_depth_info_ptr_[depth_res_index_].nHeight);
 
-    depth_raw_ = cv::Mat(depth_img_height, depth_img_width, CV_16UC1,
-        depth_img_buf_);
-
     switch (depth_mode_) {
-      case DepthMode::DEPTH_GRAY:
-      case DepthMode::DEPTH_NON_8UC1:
-        cv::normalize(depth_raw_, depth, 0, 255, cv::NORM_MINMAX, CV_8UC1);
-        break;
+      case DepthMode::DEPTH_RAW:
+        *code = ErrorCode::SUCCESS;
+        // return clone as it will be changed in imgcallback
+        return depth_image_buf_->Clone();
+      // case DepthMode::DEPTH_GRAY:
+      //   // cv::normalize(depth_raw_, depth, 0, 255, cv::NORM_MINMAX, CV_8UC1);
+      //   *code = ErrorCode::SUCCESS;
+      //   return depth_gray_buf;
       case DepthMode::DEPTH_COLORFUL:
-        if (!depth_rgb_buf_) {
-          depth_rgb_buf_ = (unsigned char*)calloc(
-              depth_img_width*depth_img_height*3, sizeof(unsigned char));
-        }
-        UpdateZ14DisplayImage_DIB24(color_palette_z14_, depth_img_buf_,
-            depth_rgb_buf_, depth_img_width, depth_img_height);
-        depth = cv::Mat(depth_img_height, depth_img_width, CV_8UC3,
-            depth_rgb_buf_);
-        break;
-      case DepthMode::DEPTH_NON:
-      case DepthMode::DEPTH_NON_16UC1:
-      default:
-        depth = depth_raw_;
-        break;
+        static auto depth_rgb_buf = ImageDepth::Create(ImageFormat::DEPTH_RGB,
+            depth_img_width, depth_img_height, false);
+        UpdateZ14DisplayImage_DIB24(color_palette_z14_,
+            depth_image_buf_->data(), depth_rgb_buf->data(),
+            depth_img_width, depth_img_height);
+        *code = ErrorCode::SUCCESS;
+        return depth_rgb_buf;
     }
-
-    depth_ok = true;
-
-    // test the depth value: 2 bytes, unshort
-
-    /*
-    const int h = static_cast<int>(depth_img_height);
-    const int w = static_cast<int>(depth_img_width);
-    if (depth_raw_.rows != h || depth_raw_.cols != w) {
-      depth_raw_ = cv::Mat(h, w, CV_16UC1);
-    }
-    for (int i = 0; i < h; ++i) {  // row
-      for (int j = 0; j < w; ++j) {  // col
-        depth_raw_.at<ushort>(i,j) = *(WORD*)(&depth_img_buf_[(i*w+j) * sizeof(WORD)]);
-      }
-    }
-    */
-
-    /*
-    cv::Mat depth_img(depth_img_height, depth_img_width, CV_8UC2, depth_img_buf_);
-
-    const int h = static_cast<int>(depth_img_height);
-    const int w = static_cast<int>(depth_img_width);
-    if (depth_raw_.rows != h || depth_raw_.cols != w) {
-      depth_raw_ = cv::Mat(h, w, CV_16UC1);
-    }
-    // initialize depth min,max
-    const cv::Vec2b& pixel = depth_img.at<cv::Vec2b>(0,0);
-    ushort depth_pixel = (pixel[0] & 0xff) | ((pixel[1] & 0xff) << 8);
-    depth_min_ = depth_max_ = depth_pixel;
-    // compute depth pixels
-    for (int i = 0; i < h; ++i) {  // row
-      for (int j = 0; j < w; ++j) {  // col
-        const cv::Vec2b& pixel = depth_img.at<cv::Vec2b>(i,j);
-        depth_pixel = (pixel[0] & 0xff) | ((pixel[1] & 0xff) << 8);
-        depth_raw_.at<ushort>(i,j) = depth_pixel;
-        if (depth_pixel < depth_min_) depth_min_ = depth_pixel;
-        if (depth_pixel > depth_max_) depth_max_ = depth_pixel;
-      }
-    }
-    */
   }
 
-  return depth_ok ? ErrorCode::SUCCESS :
-     ErrorCode::ERROR_CAMERA_RETRIEVE_FAILED;
+  *code = ErrorCode::ERROR_CAMERA_RETRIEVE_FAILED;
+  return nullptr;
 }
 
 #endif

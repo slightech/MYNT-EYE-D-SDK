@@ -177,8 +177,8 @@ Image::pointer ImageDepth::To(ImageFormat format) {
   switch (format_) {  // src
     case ImageFormat::DEPTH_RAW:
       if (format == ImageFormat::DEPTH_GRAY) {
-        ushort* depths = reinterpret_cast<ushort*>(data());
-        ushort depth, depth_min, depth_max;
+        std::uint16_t* depths = reinterpret_cast<std::uint16_t*>(data());
+        std::uint16_t depth, depth_min, depth_max;
         depth = depth_min = depth_max = *(depths);
         for (int i = 0; i < height_; ++i) {  // row
           for (int j = 0; j < width_; ++j) {  // col
@@ -191,7 +191,7 @@ Image::pointer ImageDepth::To(ImageFormat format) {
         auto image = GetCache(format);
         auto data = image->data();
         int offset;
-        ushort depth_dist = depth_max - depth_min;
+        std::uint16_t depth_dist = depth_max - depth_min;
         for (int i = 0; i < height_; ++i) {  // row
           for (int j = 0; j < width_; ++j) {  // col
             offset = (i * width_) + j;

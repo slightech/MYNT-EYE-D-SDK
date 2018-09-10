@@ -226,4 +226,31 @@ void BGR_TO_RGB(unsigned char* bgr,
   reverse(bgr, width, height);
 }
 
+namespace {
+
+void swap(unsigned char* a, unsigned char* b, unsigned char* tmp) {
+  *tmp = *a;
+  *a = *b;
+  *b = *tmp;
+}
+
+}  // namespace
+
+void FLIP_UP_DOWN_C3(unsigned char* rgb, unsigned int width, unsigned int height) {
+  if (height <= 1) return;
+  width = width * 3;  // channel 3
+  unsigned char* up;
+  unsigned char* down;
+  // h = 4, h/2 = 2: 0 1 2 3
+  // h = 5, h/2 = 2: 0 1 2 3 4
+  unsigned char tmp;
+  for (unsigned int m = 0; m < height / 2; m++) {
+    up = rgb + m * width;
+    down = rgb + (height - 1 - m) * width;
+    for (unsigned int n = 0; n < width; n++) {
+      swap(up + n, down + n, &tmp);
+    }
+  }
+}
+
 MYNTEYE_END_NAMESPACE

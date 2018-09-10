@@ -84,9 +84,17 @@ set_outdir(
   RUNTIME ${OUTPUT_DIR}/bin
 )
 
+if(WITH_OPENCV)
+  include_directories(
+    ${OpenCV_INCLUDE_DIRS}
+  )
+endif()
+if(WITH_JPEG)
+  include_directories(
+    ${JPEG_INCLUDE_DIR}
+  )
+endif()
 include_directories(
-  ${OpenCV_INCLUDE_DIRS}
-  ${JPEG_INCLUDE_DIR}
   ${eSPDI_INCLUDE_DIRS}
   ${MYNTEYE_ROOT}/include
   ${CMAKE_CURRENT_BINARY_DIR}/include
@@ -100,9 +108,17 @@ set(MYNTEYE_CORE ${MYNTEYE_NAME}_core)
 
 file(GLOB_RECURSE MYNTEYE_CORE_SRCS "src/mynteye/*.cc")
 
+set(MYNTEYE_LINK_LIBS ${eSPDI_LIBS})
+if(WITH_OPENCV)
+  list(APPEND MYNTEYE_LINK_LIBS ${OpenCV_LIBS})
+endif()
+if(WITH_JPEG)
+  list(APPEND MYNTEYE_LINK_LIBS ${JPEG_LIBRARIES})
+endif()
+
 make_shared_library(${MYNTEYE_CORE}
   SRCS ${MYNTEYE_CORE_SRCS}
-  LINK_LIBS ${OpenCV_LIBS} ${JPEG_LIBRARIES} ${eSPDI_LIBS}
+  LINK_LIBS ${MYNTEYE_LINK_LIBS}
 )
 
 target_include_directories(${MYNTEYE_CORE} PUBLIC

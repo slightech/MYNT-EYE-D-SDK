@@ -80,7 +80,7 @@ class CameraPrivate {
   Image::pointer RetrieveImage(const ImageType& type, ErrorCode* code);
 
   /** Wait according to framerate. */
-  void Wait() const;
+  void Wait();
 
   void Close();
 
@@ -88,6 +88,8 @@ class CameraPrivate {
 
  private:
   void OnInit();
+  void OnPreWait();
+  void OnPostWait();
 
   Image::pointer RetrieveImageColor(ErrorCode* code);
   Image::pointer RetrieveImageDepth(ErrorCode* code);
@@ -124,10 +126,6 @@ class CameraPrivate {
 
 #ifdef MYNTEYE_OS_WIN
   std::mutex mtx_imgs_;
-  bool is_color_rgb24_;
-  bool is_color_mjpg_;
-
-  int depth_data_size_;
   RGBQUAD color_palette_z14_[16384];
 #else  // MYNTEYE_OS_LINUX
   DEPTH_TRANSFER_CTRL dtc_;
