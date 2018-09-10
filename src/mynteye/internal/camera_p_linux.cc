@@ -56,7 +56,7 @@ Image::pointer CameraPrivate::RetrieveImageColor(ErrorCode* code) {
       color_image_buf_->data(), &color_image_size_, &color_serial_number_, 0);
 
   if (ETronDI_OK != ret) {
-    DBG_LOGI("EtronDI_GetColorImage: %d", ret);
+    DBG_LOGI("RetrieveImageColor: %d", ret);
     *code = ErrorCode::ERROR_CAMERA_RETRIEVE_FAILED;
     return nullptr;
   }
@@ -105,7 +105,7 @@ Image::pointer CameraPrivate::RetrieveImageDepth(ErrorCode* code) {
       &depth_image_size_, &depth_serial_number_, depth_data_type_);
 
   if (ETronDI_OK != ret) {
-    DBG_LOGI("EtronDI_GetColorImage: %d", ret);
+    DBG_LOGI("RetrieveImageDepth: %d", ret);
     *code = ErrorCode::ERROR_CAMERA_RETRIEVE_FAILED;
     return nullptr;
   }

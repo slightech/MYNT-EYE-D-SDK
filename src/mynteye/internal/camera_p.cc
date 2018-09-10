@@ -114,7 +114,7 @@ void CameraPrivate::GetDevices(std::vector<DeviceInfo>* dev_infos) {
   dev_infos->clear();
 
   int count = EtronDI_GetDeviceNumber(etron_di_);
-  DBG_LOGD("EtronDI_GetDeviceNumber: %d", count);
+  DBG_LOGD("GetDevices: %d", count);
 
   DEVSELINFO dev_sel_info;
   DEVINFORMATION* p_dev_info =
