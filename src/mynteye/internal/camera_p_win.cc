@@ -243,11 +243,12 @@ Image::pointer CameraPrivate::RetrieveImageColor(ErrorCode* code) {
       // return clone as it will be changed in imgcallback
       return color_image_buf_->Clone();
     } else if (color_image_buf_->format() == ImageFormat::COLOR_RGB) {  // rgb24
-      FLIP_UP_DOWN_C3(color_image_buf_->data(),
-          color_img_width, color_img_height);
+      // clone as it will be changed in imgcallback
+      auto color = color_image_buf_->Clone();
+      // flip afer clone, because the buffer may not updated when retrieve again
+      FLIP_UP_DOWN_C3(color->data(), color_img_width, color_img_height);
       *code = ErrorCode::SUCCESS;
-      // return clone as it will be changed in imgcallback
-      return color_image_buf_->Clone();
+      return color;
     } else {
       LOGE("Unknown image color type.");
     }
