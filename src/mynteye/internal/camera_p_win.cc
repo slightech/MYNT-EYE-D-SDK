@@ -247,6 +247,7 @@ Image::pointer CameraPrivate::RetrieveImageColor(ErrorCode* code) {
       auto color = color_image_buf_->Clone();
       // flip afer clone, because the buffer may not updated when retrieve again
       FLIP_UP_DOWN_C3(color->data(), color_img_width, color_img_height);
+      RGB_TO_BGR(color->data(), color_img_width, color_img_height);
       *code = ErrorCode::SUCCESS;
       return color;
     } else {
