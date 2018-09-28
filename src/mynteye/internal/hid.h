@@ -26,7 +26,7 @@ class hid_device {
 public:
   using hid_t = struct hid_struct;
 
-  using usb_device_t = struct usb_device; 
+  using usb_device_t = struct usb_device;
   using usb_bus_t = struct usb_bus;
   using usb_interface_t = struct usb_interface;
   using usb_inter_desc_t = struct usb_interface_descriptor;
@@ -68,7 +68,7 @@ private:
   bool is_opened_;
 };
 
-}
+}  // namespace hid
 
 #endif //HID_H_
 
