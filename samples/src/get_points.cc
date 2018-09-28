@@ -95,7 +95,7 @@ int main(int argc, char const* argv[]) {
   // params.stream_mode = StreamMode::STREAM_1280x720;
   params.ir_intensity = 4;
 
-  cam.Open(params);
+  cam.Open(params, Source::VIDEO_STREAMING);
 
   cout << endl;
   if (!cam.IsOpened()) {

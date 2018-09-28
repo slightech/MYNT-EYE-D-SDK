@@ -19,6 +19,7 @@
 #include <ostream>
 
 #include "mynteye/stubs/global.h"
+#include "mynteye/image.h"
 
 MYNTEYE_BEGIN_NAMESPACE
 
@@ -42,8 +43,29 @@ enum class ErrorCode : std::int32_t {
   ERROR_CAMERA_NOT_OPENED,
   /** Camera retrieve the image failed. */
   ERROR_CAMERA_RETRIEVE_FAILED,
+  /** Imu cannot be opened for not plugged or any other reason. */
+  ERROR_IMU_OPEN_FAILED,
+  /** Imu receive data timeout */
+  ERROR_IMU_RECV_TIMEOUT,
+  /** Imu receive data error */
+  ERROR_IMU_DATA_ERROR,
   /** Last guard. */
   ERROR_CODE_LAST
+};
+
+/**
+ * @ingroup enumerations
+ * @brief Source allows the user to choose which data to be captured.
+ */
+enum class Source : std::uint8_t {
+  /** Video streaming of stereo, color, depth, etc. */
+  VIDEO_STREAMING,
+  /** Motion tracking of IMU (accelerometer, gyroscope) */
+  MOTION_TRACKING,
+  /** Enable everything together */
+  ALL,
+  /** Last guard */
+  LAST
 };
 
 /**
@@ -123,5 +145,78 @@ MYNTEYE_END_NAMESPACE
 
 MYNTEYE_API
 std::ostream& operator<<(std::ostream& os, const mynteye::StreamFormat& code);
+
+/**
+ * @ingroup datatypes
+ * @brief Image information
+ */
+struct MYNTEYE_API ImgInfo {
+  /** Image frame id */
+  std::uint16_t frame_id;
+
+  /** Image timestamp */
+  std::uint32_t timestamp;
+
+  /** Image exposure time */
+  std::uint16_t exposure_time;
+
+  void Reset() {
+    frame_id = 0;
+    timestamp = 0;
+    exposure_time = 0;
+  }
+
+  ImgInfo() {
+    Reset();
+  }
+  ImgInfo(const ImgInfo &other) {
+    frame_id = other.frame_id;
+    timestamp = other.timestamp;
+    exposure_time = other.exposure_time;
+  }
+  ImgInfo &operator=(const ImgInfo &other) {
+    frame_id = other.frame_id;
+    timestamp = other.timestamp;
+    exposure_time = other.exposure_time;
+    return *this;
+  }
+};
+
+/**
+ * @ingroup datatypes
+ * @brief Imu data
+ */
+struct MYNTEYE_API ImuData {
+  /**
+   * Data type
+   * 1: accelerometer
+   * 2: gyroscope
+   * */
+  std::int8_t flag;
+
+  /** Imu gyroscope or accelerometer or frame timestamp */
+  std::uint64_t timestamp;
+
+  /** temperature */
+  double temperature;
+
+  /** Imu accelerometer data for 3-axis: X, Y, X. */
+  double acc[3];
+
+  /** Imu gyroscope data for 3-axis: X, Y, Z. */
+  double gyr[3];
+
+  void Reset() {
+    flag = 0;
+    timestamp = 0;
+    temperature = 0;
+    std::fill(acc, acc + 3, 0);
+    std::fill(gyr, gyr + 3, 0);
+  }
+
+  ImuData() {
+    Reset();
+  }
+};
 
 #endif  // MYNTEYE_TYPES_H_

@@ -44,23 +44,36 @@ void Camera::GetResolutions(
   p_->GetResolutions(dev_index, color_infos, depth_infos);
 }
 
-ErrorCode Camera::Open() {
+ErrorCode Camera::Open(const Source& source) {
   std::vector<DeviceInfo> dev_infos = GetDevices();
   if (dev_infos.size() <= 0) {
     LOGE("Error: Device not found");
     return ErrorCode::ERROR_CAMERA_OPEN_FAILED;
   }
-  return Open(InitParams(0));
+  return Open(InitParams(0), source);
 }
 
-ErrorCode Camera::Open(const InitParams& params) {
-  return p_->Open(params);
+ErrorCode Camera::Open(const InitParams& params, const Source& source) {
+  if (source == Source::VIDEO_STREAMING) {
+    return p_->Open(params);
+  } else if (source == Source::MOTION_TRACKING) {
+    return p_->ImuOpen();
+  } else if (source == Source::ALL) {
+    if (ErrorCode::SUCCESS == p_->Open(params)) {
+      return p_->ImuOpen();
+    } else {
+      return ErrorCode::ERROR_CAMERA_OPEN_FAILED;
+    }
+  }
+
+  return ErrorCode::SUCCESS;
 }
 
 bool Camera::IsOpened() const {
   return p_->IsOpened();
 }
 
+/*
 Image::pointer Camera::RetrieveImage(const ImageType& type) {
   ErrorCode code = ErrorCode::SUCCESS;
   return RetrieveImage(type, &code);
@@ -69,6 +82,24 @@ Image::pointer Camera::RetrieveImage(const ImageType& type) {
 Image::pointer Camera::RetrieveImage(const ImageType& type, ErrorCode* code) {
   return p_->RetrieveImage(type, code);
 }
+*/
+stream_data Camera::RetrieveImage(const ImageType& type) {
+  ErrorCode code = ErrorCode::SUCCESS;
+  return RetrieveImage(type, &code);
+}
+
+stream_data Camera::RetrieveImage(const ImageType& type, ErrorCode* code) {
+  return p_->RetrieveImage(type, code);
+}
+
+std::vector<MotionData> Camera::GetMotionData() {                                              
+  std::vector<MotionData> datas;                                                               
+  for (auto &&data : p_->GetImuData()) {                                                    
+    datas.push_back({data.imu});                                                               
+  }                                                                                            
+                                                                                               
+  return datas;                                                                                
+} 
 
 void Camera::Wait() const {
   p_->Wait();

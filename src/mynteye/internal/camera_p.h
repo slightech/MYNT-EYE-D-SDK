@@ -24,20 +24,25 @@
 #include <memory>
 #include <mutex>
 #include <vector>
+#include <thread>
 
 #include "eSPDI.h"
 
 #include "mynteye/image.h"
+#include "mynteye/types.h"
+#include "types.h"
 
 MYNTEYE_BEGIN_NAMESPACE
 
 class Rate;
+class Channels;
 
 class CameraPrivate {
  public:
   using image_size_t = unsigned long int;  // NOLINT
+  using stream_datas_t = std::vector<device::StreamData>; 
 
-  explicit CameraPrivate(Camera* camera);
+  explicit CameraPrivate();
   ~CameraPrivate();
 
   void GetDevices(std::vector<DeviceInfo>* dev_infos);
@@ -77,14 +82,19 @@ class CameraPrivate {
   bool IsOpened() const;
   void CheckOpened() const;
 
-  Image::pointer RetrieveImage(const ImageType& type, ErrorCode* code);
+  stream_datas_t RetrieveImage(const ImageType& type, ErrorCode* code);
+
+  void StartHidTracking();
+  void StopHidTracking();
+  void SetHidCallback();
+  void CallbackImuData(const ImuPacket &packet);
+  void CallbackImgInfoData(const ImgPacket &packet);
+  /** Get imu data */
+  std::vector<device::MotionData> GetImuData();
 
   /** Wait according to framerate. */
   void Wait();
-
   void Close();
-
-  Camera* camera_;
 
  private:
   void OnInit();
@@ -93,6 +103,14 @@ class CameraPrivate {
 
   Image::pointer RetrieveImageColor(ErrorCode* code);
   Image::pointer RetrieveImageDepth(ErrorCode* code);
+
+  stream_datas_t Synchronization(const ImageType &type, ErrorCode *code);
+  std::mutex cap_color_mutex_;
+  std::mutex cap_depth_mutex_;
+  std::thread capture_thread_;
+  std::vector<Image> image_color_;
+  std::vector<Image> image_depth_;
+  bool is_capture_image_;
 
   void ReleaseBuf();
 
@@ -132,6 +150,14 @@ class CameraPrivate {
 #endif
 
   DepthMode depth_mode_;
+
+  std::shared_ptr<Channels> channels_;
+  std::mutex mtx_img_info_;
+  std::mutex mtx_imu_;
+
+  std::vector<device::MotionData> imu_data_;
+  std::vector<device::StreamData> stream_data_;
+  std::vector<device::ImgInfoData> img_info_;
 };
 
 MYNTEYE_END_NAMESPACE
