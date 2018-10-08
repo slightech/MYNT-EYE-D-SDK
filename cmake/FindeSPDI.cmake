@@ -21,7 +21,7 @@ if(MSVC)
   set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib")
 elseif(MINGW)
   set(eSPDI_LIB_DIR ${eSPDI_ROOT}/mingw/x64)
-  set(eSPDI_INCLUDE_DIR ${eSPDI_ROOT}/mingw/include) 
+  set(eSPDI_INCLUDE_DIR ${eSPDI_ROOT}/mingw/include)
   set(CMAKE_FIND_LIBRARY_SUFFIXES ".dll")
 elseif(APPLE)
   set(eSPDI_LIB_DIR ${eSPDI_ROOT}/mac/x64)
@@ -29,9 +29,15 @@ elseif(APPLE)
   set(CMAKE_FIND_LIBRARY_SUFFIXES ".dylib")
 elseif(UNIX)
   set(eSPDI_INCLUDE_DIR ${eSPDI_ROOT}/linux/include)
-  if(ARCH_AARCH64)
+
+  execute_process(COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE __arch)
+  #message(STATUS "__arch: ${__arch}")
+  #if(${__arch} STREQUAL "x86_64")
+  #if(${__arch} MATCHES "^(x86|i686|i386)$")
+
+  if(${__arch} STREQUAL "aarch64")
     set(eSPDI_LIB_DIR ${eSPDI_ROOT}/linux/aarch64)
-  elseif(ARCH_ARM)
+  elseif(${__arch} STREQUAL "arm")
     set(eSPDI_LIB_DIR ${eSPDI_ROOT}/linux/armhf64)
   else()
     set(eSPDI_LIB_DIR ${eSPDI_ROOT}/linux/x64)
@@ -41,11 +47,11 @@ else()
   message(FATAL_ERROR "This platform not support now.")
 endif()
 
-find_path(eSPDI_INCLUDE_DIRS 
-  NAMES eSPDI.h 
-  PATHS ${eSPDI_INCLUDE_DIR} ${CMAKE_EXTRA_INCLUDES} 
-  NO_SYSTEM_PATH 
-) 
+find_path(eSPDI_INCLUDE_DIRS
+  NAMES eSPDI.h
+  PATHS ${eSPDI_INCLUDE_DIR} ${CMAKE_EXTRA_INCLUDES}
+  NO_SYSTEM_PATH
+)
 
 find_library(eSPDI_LIBRARY
   NAMES ${eSPDI_LIBRARY_NAME}
