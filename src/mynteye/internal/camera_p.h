@@ -86,6 +86,12 @@ class CameraPrivate {
 
   Camera* camera_;
 
+  void GetHDCameraLogData();
+  void GetVGACameraLogData();
+
+  void GetCameraLogData(int index);
+  void SetCameraLogData(const std::string& file);
+
  private:
   void OnInit();
   void OnPreWait();

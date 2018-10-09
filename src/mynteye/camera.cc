@@ -77,3 +77,17 @@ void Camera::Wait() const {
 void Camera::Close() {
   p_->Close();
 }
+
+void Camera::SetLogData(const std::string& file_name)
+{
+  p_->SetCameraLogData(file_name);
+}
+
+void Camera::GetHDCameraLogData()
+{
+  p_->GetHDCameraLogData();
+}
+void Camera::GetVGACameraLogData()
+{
+  p_->GetVGACameraLogData();
+}

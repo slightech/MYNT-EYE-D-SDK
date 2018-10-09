@@ -14,6 +14,7 @@
 #include "mynteye/internal/camera_p.h"
 
 #include <string.h>
+#include <fstream>
 
 #include <stdexcept>
 #include <string>
@@ -524,3 +525,145 @@ void CameraPrivate::ReleaseBuf() {
     depth_buf_ = nullptr;
   }
 }
+
+void CameraPrivate::GetHDCameraLogData()
+{
+  GetCameraLogData(0);
+}
+
+void CameraPrivate::GetVGACameraLogData()
+{
+  GetCameraLogData(1);
+}
+
+// file [RectfyLog_PUMA_%d.tx] will be created after the func.
+
+void CameraPrivate::GetCameraLogData(int index)
+{
+  int nRet;
+
+  // for parse log test
+  eSPCtrl_RectLogData eSPRectLogData;
+  // EtronDI_GetRectifyLogData
+  // EtronDI_GetRectifyMatLogData
+  nRet = EtronDI_GetRectifyMatLogData( etron_di_, &dev_sel_info_, &eSPRectLogData, index);
+  printf("nRet = %d", nRet);
+
+  FILE *pfile;
+  char buf[128];
+  sprintf(buf, "RectfyLog_PUMA_%d.txt", index);
+  pfile = fopen(buf, "wt");
+  if (pfile != NULL) {
+    int i;
+    fprintf(pfile, "InImgWidth = %d\n",        eSPRectLogData.InImgWidth);
+    fprintf(pfile, "InImgHeight = %d\n",       eSPRectLogData.InImgHeight);
+    fprintf(pfile, "OutImgWidth = %d\n",       eSPRectLogData.OutImgWidth);
+    fprintf(pfile, "OutImgHeight = %d\n",      eSPRectLogData.OutImgHeight);
+    //
+    fprintf(pfile, "RECT_ScaleWidth = %d\n",   eSPRectLogData.RECT_ScaleWidth);
+    fprintf(pfile, "RECT_ScaleHeight = %d\n",  eSPRectLogData.RECT_ScaleHeight);
+    //
+    fprintf(pfile, "CamMat1 = ");
+    for (i=0; i<9; i++) {
+        fprintf(pfile, "%.8f, ",  eSPRectLogData.CamMat1[i]);
+    }
+    fprintf(pfile, "\n");
+    //
+    fprintf(pfile, "CamDist1 = ");
+    for (i=0; i<8; i++) {
+        fprintf(pfile, "%.8f, ",  eSPRectLogData.CamDist1[i]);
+    }
+    fprintf(pfile, "\n");
+    //
+    fprintf(pfile, "CamMat2 = ");
+    for (i=0; i<9; i++) {
+        fprintf(pfile, "%.8f, ",  eSPRectLogData.CamMat2[i]);
+    }
+    fprintf(pfile, "\n");
+    //
+    fprintf(pfile, "CamDist2 = ");
+    for (i=0; i<8; i++) {
+        fprintf(pfile, "%.8f, ",  eSPRectLogData.CamDist2[i]);
+    }
+    fprintf(pfile, "\n");
+    //
+    fprintf(pfile, "RotaMat = ");
+    for (i=0; i<9; i++) {
+        fprintf(pfile, "%.8f, ",  eSPRectLogData.RotaMat[i]);
+    }
+    fprintf(pfile, "\n");
+    //
+    fprintf(pfile, "TranMat = ");
+    for (i=0; i<3; i++) {
+        fprintf(pfile, "%.8f, ",  eSPRectLogData.TranMat[i]);
+    }
+    fprintf(pfile, "\n");
+    //
+    fprintf(pfile, "LRotaMat = ");
+    for (i=0; i<9; i++) {
+        fprintf(pfile, "%.8f, ",  eSPRectLogData.LRotaMat[i]);
+    }
+    fprintf(pfile, "\n");
+    //
+    fprintf(pfile, "RRotaMat = ");
+    for (i=0; i<9; i++) {
+        fprintf(pfile, "%.8f, ",  eSPRectLogData.RRotaMat[i]);
+    }
+    fprintf(pfile, "\n");
+    //
+    fprintf(pfile, "NewCamMat1 = ");
+    for (i=0; i<12; i++) {
+        fprintf(pfile, "%.8f, ",  eSPRectLogData.NewCamMat1[i]);
+    }
+    fprintf(pfile, "\n");
+    //
+    fprintf(pfile, "NewCamMat2 = ");
+    for (i=0; i<12; i++) {
+        fprintf(pfile, "%.8f, ",  eSPRectLogData.NewCamMat2[i]);
+    }
+    fprintf(pfile, "\n");
+    //
+    fprintf(pfile, "RECT_Crop_Row_BG = %d\n",   eSPRectLogData.RECT_Crop_Row_BG);
+    fprintf(pfile, "RECT_Crop_Row_ED = %d\n",   eSPRectLogData.RECT_Crop_Row_ED);
+    fprintf(pfile, "RECT_Crop_Col_BG_L = %d\n", eSPRectLogData.RECT_Crop_Col_BG_L);
+    fprintf(pfile, "RECT_Crop_Col_ED_L = %d\n", eSPRectLogData.RECT_Crop_Col_ED_L);
+    fprintf(pfile, "RECT_Scale_Col_M = %d\n",   eSPRectLogData.RECT_Scale_Col_M);
+    fprintf(pfile, "RECT_Scale_Col_N = %d\n",   eSPRectLogData.RECT_Scale_Col_N);
+    fprintf(pfile, "RECT_Scale_Row_M = %d\n",   eSPRectLogData.RECT_Scale_Row_M);
+    fprintf(pfile, "RECT_Scale_Row_N = %d\n",   eSPRectLogData.RECT_Scale_Row_N);
+    //
+    fprintf(pfile, "RECT_AvgErr = %.8f\n", eSPRectLogData.RECT_AvgErr);
+    //
+    fprintf(pfile, "nLineBuffers = %d\n",  eSPRectLogData.nLineBuffers);
+    //
+    printf("file ok\n");
+    fprintf(pfile, "ReProjectMat = ");
+    for (i = 0; i < 16; i++) {
+      fprintf(pfile, "%.8f, ", eSPRectLogData.ReProjectMat[i]);
+    }
+    fprintf(pfile, "\n");
+  }
+  fclose(pfile);
+}
+
+void CameraPrivate::SetCameraLogData(const std::string& file)
+{
+
+  std::ifstream t;  
+  int length;  
+  t.open(file.c_str());      // open input file  
+  t.seekg(0, std::ios::end);    // go to the end  
+  length = t.tellg();           // report location (this is the length)  
+  t.seekg(0, std::ios::beg);    // go back to the beginning  
+  char* buffer = new char[length];    // allocate memory for a buffer of appropriate dimension  
+  t.read(buffer, length);       // read the whole file into the buffer  
+  t.close();                    // close file handle
+  
+  // printf("%s", buffer); 
+  int nActualLength = 0;
+		
+  if( ETronDI_OK != EtronDI_SetLogData( etron_di_, &dev_sel_info_, (unsigned char*)buffer, length, &nActualLength, 0)) {
+    printf("error when setLogData\n");
+  }
+}
+
