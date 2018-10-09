@@ -39,13 +39,7 @@ typedef struct hid_struct {
 
 class hid_device {
 public:
-<<<<<<< HEAD
-  using usb_device_t = struct usb_device; 
-=======
-  using hid_t = struct hid_struct;
-
   using usb_device_t = struct usb_device;
->>>>>>> 8097d4db0fef5622c327bd92ae64dad3d189388f
   using usb_bus_t = struct usb_bus;
   using usb_interface_t = struct usb_interface;
   using usb_inter_desc_t = struct usb_interface_descriptor;

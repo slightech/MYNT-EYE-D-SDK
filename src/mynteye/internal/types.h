@@ -74,7 +74,7 @@ struct ImuSegment {
   }
 
   void from_data(std::uint8_t *data) {
-    flag = (*data | *(data + 1) << 8) + 1;
+    flag = *data + 1;
     timestamp = *(data + 2) | *(data + 3) << 8 |
       *(data + 4) << 16 | *(data + 5) << 24;
     accel_or_gyro[0] = *(data + 9) | *(data + 10) << 8;
