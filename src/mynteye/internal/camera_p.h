@@ -30,7 +30,7 @@
 
 #include "mynteye/image.h"
 #include "mynteye/types.h"
-#include "types.h"
+#include "mynteye/internal/types.h"
 
 MYNTEYE_BEGIN_NAMESPACE
 
@@ -41,6 +41,10 @@ class CameraPrivate {
  public:
   using image_size_t = unsigned long int;  // NOLINT
   using stream_datas_t = std::vector<device::StreamData>; 
+  using motion_data_t = device::MotionData;
+  using motion_datas_t = std::vector<motion_data_t>;
+  using imginfo_data_t = device::ImgInfoData;
+  using imginfo_datas_t = std::vector<imginfo_data_t>;
 
   explicit CameraPrivate();
   ~CameraPrivate();
@@ -90,7 +94,7 @@ class CameraPrivate {
   void CallbackImuData(const ImuPacket &packet);
   void CallbackImgInfoData(const ImgInfoPacket &packet);
   /** Get imu data */
-  std::vector<device::MotionData> GetImuData();
+  motion_datas_t GetImuData();
 
   /** Wait according to framerate. */
   void Wait();
@@ -147,8 +151,8 @@ class CameraPrivate {
   std::mutex mtx_img_info_;
   std::mutex mtx_imu_;
 
-  std::vector<device::MotionData> imu_data_;
-  std::vector<device::ImgInfoData> img_info_;
+  motion_datas_t imu_data_;
+  imginfo_datas_t img_info_;
 
   //void Synchronization(const ImageType &type, ErrorCode *code);
   //std::mutex cap_color_mtx_;

@@ -72,7 +72,7 @@ int Channels::ReadHidData(std::uint8_t *data, int length) {
 }
 
 bool Channels::ExtractHidData(ImuResPacket &imu, ImgInfoResPacket &img) {
-  static std::uint8_t data[PACKET_SIZE * 2]{};
+  std::uint8_t data[PACKET_SIZE * 2]{};
   std::fill(data, data + PACKET_SIZE * 2, 0);
 
   int size = ReadHidData(data, PACKET_SIZE * 2);
@@ -91,7 +91,7 @@ bool Channels::ExtractHidData(ImuResPacket &imu, ImgInfoResPacket &img) {
         img.from_data(packet + offset);
       } else if (*(packet + offset) == 0 || 
           *(packet + offset) == 1) {
-        std::cout << "packet + offset: " << packet + offset << std::endl;
+//        printf ("packet %u\n", *(packet + offset));
         imu.from_data(packet + offset);
       }
     }
@@ -110,6 +110,8 @@ bool Channels::StopHidTracking() {
     is_hid_tracking_ = false;
     hid_track_stop_ = false;
   }
+
+  return true;
 }
 
 MYNTEYE_END_NAMESPACE

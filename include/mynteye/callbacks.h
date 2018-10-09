@@ -3,7 +3,7 @@
 #pragma once
 
 #include <algorithm>
-#include "types.h"
+#include "mynteye/types.h"
 
 MYNTEYE_BEGIN_NAMESPACE
 

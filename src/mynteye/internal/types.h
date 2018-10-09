@@ -75,12 +75,11 @@ struct ImuSegment {
 
   void from_data(std::uint8_t *data) {
     flag = *data + 1;
-    timestamp = *(data + 2) | *(data + 3) << 8 |
-      *(data + 4) << 16 | *(data + 5) << 24;
-    accel_or_gyro[0] = *(data + 9) | *(data + 10) << 8;
-    accel_or_gyro[1] = *(data + 11) | *(data + 12) << 8;
-    accel_or_gyro[1] = *(data + 13) | *(data + 14) << 8;
-    temperature = *(data + 16) | *(data + 17) << 8;
+    timestamp = *(data + 2) | *(data + 3) << 8 | *(data + 4) << 16 | *(data + 5) << 24;
+    accel_or_gyro[0] = *(data + 6) | *(data + 7) << 8;
+    accel_or_gyro[1] = *(data + 8) | *(data + 9) << 8;
+    accel_or_gyro[2] = *(data + 10) | *(data + 11) << 8;
+    temperature = *(data + 12) | *(data + 13) << 8;
   }
 };
 #pragma pack(pop)
