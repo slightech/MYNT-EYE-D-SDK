@@ -24,6 +24,7 @@
 #include "mynteye/init_params.h"
 #include "mynteye/stream_info.h"
 #include "mynteye/types.h"
+#include "mynteye/callbacks.h"
 
 MYNTEYE_BEGIN_NAMESPACE
 
@@ -62,14 +63,14 @@ class MYNTEYE_API Camera {
   bool IsOpened() const;
 
   /** Return nullptr if failed. */
-  //Image::pointer RetrieveImage(const ImageType& type);
-  //Image::pointer RetrieveImage(const ImageType& type, ErrorCode* code);
+  Image::pointer RetrieveImage(const ImageType& type);
+  Image::pointer RetrieveImage(const ImageType& type, ErrorCode* code);
 
-  device::StreamData RetrieveImage(const ImageType& type);
-  device::StreamData RetrieveImage(const ImageType& type, ErrorCode* code);
+  //device::StreamData RetrieveImage(const ImageType& type);
+  //device::StreamData RetrieveImage(const ImageType& type, ErrorCode* code);
 
   /** Get Motion Data */
-  std::vector<mynteye::MotionData> GetMotionData();
+  std::vector<mynteye::MotionData> RetrieveMotion();
 
   /** Wait according to framerate. */
   void Wait() const;

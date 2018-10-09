@@ -34,7 +34,7 @@ class MYNTEYE_API Image {
   using pointer = std::shared_ptr<Image>;
 
  protected:
-  Image(ImageType type, ImageFormat format, int width, int height,
+  Image(ImageType type, ImageFormat format, int width, int height, 
       bool is_buffer);
 
  public:
@@ -57,6 +57,14 @@ class MYNTEYE_API Image {
 
   int height() const {
     return height_;
+  }
+
+  int frame_id() {
+    return frame_id_;
+  }
+
+  void set_frame_id(int count) {
+    frame_id_ = count;
   }
 
   bool is_buffer() const {
@@ -98,6 +106,7 @@ class MYNTEYE_API Image {
   ImageFormat format_;
   int width_;
   int height_;
+  int frame_id_;
   bool is_buffer_;
 
   std::vector<std::uint8_t> data_;

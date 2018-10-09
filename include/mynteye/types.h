@@ -19,7 +19,6 @@
 #include <ostream>
 
 #include "mynteye/stubs/global.h"
-#include "mynteye/image.h"
 
 MYNTEYE_BEGIN_NAMESPACE
 
@@ -192,7 +191,7 @@ struct MYNTEYE_API ImuData {
    * 1: accelerometer
    * 2: gyroscope
    * */
-  std::int8_t flag;
+  std::uint8_t flag;
 
   /** Imu gyroscope or accelerometer or frame timestamp */
   std::uint64_t timestamp;
@@ -201,17 +200,17 @@ struct MYNTEYE_API ImuData {
   double temperature;
 
   /** Imu accelerometer data for 3-axis: X, Y, X. */
-  double acc[3];
+  double accel[3];
 
   /** Imu gyroscope data for 3-axis: X, Y, Z. */
-  double gyr[3];
+  double gyro[3];
 
   void Reset() {
     flag = 0;
     timestamp = 0;
     temperature = 0;
-    std::fill(acc, acc + 3, 0);
-    std::fill(gyr, gyr + 3, 0);
+    std::fill(accel, accel + 3, 0);
+    std::fill(gyro, gyro + 3, 0);
   }
 
   ImuData() {

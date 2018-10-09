@@ -42,7 +42,8 @@ int main(int argc, char const* argv[]) {
   // params.stream_mode = StreamMode::STREAM_640x480;
   params.ir_intensity = 4;
 
-  cam.Open(params, Source::VIDEO_STREAMING);
+  //cam.Open(params, Source::VIDEO_STREAMING);
+  cam.Open(params, Source::ALL);
 
   cout << endl;
   if (!cam.IsOpened()) {
@@ -59,6 +60,25 @@ int main(int argc, char const* argv[]) {
   util::Counter counter;
   for (;;) {
     counter.Update();
+
+    auto &&motion_data = cam.RetrieveMotion();
+    ios::sync_with_stdio(false);
+    for (auto &&data : motion_data) {
+      std::cout << std::endl;
+      std::cout << "temperature: " << data.imu->temperature << std::endl;
+      std::cout << "timestamp: " << data.imu->timestamp << std::endl;
+      std::cout << "data.imu->flag: " << data.imu->flag << std::endl;
+      if (data.imu->flag == 1) {
+        std::cout << "acc_x: " << data.imu->accel[0]
+          << " acc_y: " << data.imu->accel[1]
+          << " acc_z: " << data.imu->accel[2] << std::endl;
+      } else if (data.imu->flag == 2){
+        std::cout << "gyr_x: " << data.imu->gyro[0]
+          << " gyr_y: " << data.imu->gyro[1]
+          << " gyr_z: " << data.imu->gyro[2] << std::endl;
+      }
+      std::cout << std::endl;
+    }
 
     auto image_color = cam.RetrieveImage(ImageType::IMAGE_COLOR);
     auto image_depth = cam.RetrieveImage(ImageType::IMAGE_DEPTH);

@@ -27,7 +27,7 @@ struct MYNTEYE_API MotionData {
 struct MYNTEYE_API ImgInfoData {
   /** Image information */
   std::shared_ptr<ImgInfo> img_info;
-}
+};
 
 /**
  * @ingroup datatypes

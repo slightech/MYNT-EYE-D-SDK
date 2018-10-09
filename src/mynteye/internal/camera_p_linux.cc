@@ -58,6 +58,7 @@ Image::pointer CameraPrivate::RetrieveImageColor(ErrorCode* code) {
   }
 
   color_image_buf_->set_valid_size(color_image_size_);
+  color_image_buf_->set_frame_id(color_serial_number_);
 
   *code = ErrorCode::SUCCESS;
   return color_image_buf_;

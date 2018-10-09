@@ -6,13 +6,12 @@
 #include <memory>
 #include <thread>
 
-#include "mynteye/mynteye.h"
-#include "mynteye/types.h"
-
-#include "internal/types.h"
-#include "hid.h"
+#include "mynteye/internal/types.h"
+#include "mynteye/internal/hid.h"
 
 MYNTEYE_BEGIN_NAMESPACE
+
+class hid_device;
 
 class MYNTEYE_API Channels {
 public:
@@ -24,13 +23,13 @@ public:
 
   void SetImuCallback(imu_callback_t callback);
   void SetImgInfoCallback(img_callback_t callback);
-  bool StartHidTracking();
+  void StartHidTracking();
   bool StopHidTracking();
+  void DoHidTrack();
 
 protected:
-  void DoHidTrack();
-  void ExtractHidData(ImuResPacket &res);
-  void ReadHidData(std::uint8_t *data, int length);
+  bool ExtractHidData(ImuResPacket &imu, ImgInfoResPacket &img);
+  int ReadHidData(std::uint8_t *data, int length);
 
 private:
   std::shared_ptr<hid::hid_device> device_;
@@ -42,3 +41,7 @@ private:
   imu_callback_t imu_callback_;
   img_callback_t img_callback_;
 };
+
+MYNTEYE_END_NAMESPACE
+
+#endif // MYNTEYE_INTERNAL_CHANNELS_H_

@@ -20,7 +20,7 @@
 
 #include "mynteye/util/log.h"
 #include "mynteye/util/rate.h"
-#include "hid.h"
+#include "channels.h"
 
 MYNTEYE_USE_NAMESPACE
 
@@ -77,18 +77,18 @@ inline std::uint8_t check_sum(std::uint8_t *buf, std::uint8_t length) {
 CameraPrivate::CameraPrivate()
   : etron_di_(nullptr),
     dev_sel_info_({-1}),
-    stream_info_dev_index_(-1),
     color_res_index_(0),
     depth_res_index_(0), 
     framerate_(10),
     rate_(nullptr),
+    stream_info_dev_index_(-1),
     color_serial_number_(0),
     depth_serial_number_(0),
     color_image_size_(0),
     depth_image_size_(0),
     color_image_buf_(nullptr),
     depth_image_buf_(nullptr),
-    depth_buf_(nullptr),
+    depth_buf_(nullptr) {
 
   DBG_LOGD(__func__);
 
@@ -493,7 +493,7 @@ void CameraPrivate::CheckOpened() const {
   if (!IsOpened()) throw std::runtime_error("Error: Camera not opened.");
 }
 
-CameraPrivate::RetrieveImage(const ImageType& type,
+Image::pointer CameraPrivate::RetrieveImage(const ImageType& type,
     ErrorCode* code) {
   if (!IsOpened()) {
     *code = ErrorCode::ERROR_CAMERA_NOT_OPENED;
@@ -509,30 +509,68 @@ CameraPrivate::RetrieveImage(const ImageType& type,
   }
 }
 
+/*
 void CameraPrivate::CaptureImage(const ImageType &type, 
     ErrorCode *code) {
-  capture_thread_ = std::thread([this]() {
-      while(is_capture_image_) {
-        std::lock_guard<std::mutex> _(capture_mutex_);
-        switch (type) {
-          case ImageType::IMAGE_COLOR: {
-            std::lock_guard<std::mutex> _(cap_color_mtx_);
-            auto color = RetrieveImageColor(code);
-            image_color_.push_back(color);
-          }
-          case ImageType::IMAGE_DEPTH: {
-            std::lock_guard<std::mutex> _(cap_depth_mtx_);
-            auto depth = RetrieveImageDepth(type);
-            image_depth_.push_back(depth);
-          }
-        }
-      }
-      });
+  while(is_capture_image_) {
+    switch (type) {
+      case ImageType::IMAGE_COLOR: {
+        std::lock_guard<std::mutex> _(cap_color_mtx_);
+        auto p = RetrieveImageColor(code);
+        Image color(type, p->format(), p->width(), p->height());
+        std::copy(p->data().begin(), p->data().end(), color.data().begin());
+        image_color_.push_back(color);
+      } break;
+      case ImageType::IMAGE_DEPTH: {
+        std::lock_guard<std::mutex> _(cap_depth_mtx_);
+        auto p = RetrieveImageDepth(code);
+        Image depth(type, p->format(), p->width(), p->height());
+        std::copy(p->data().begin(), p->data().end(), depth.data().begin());
+        image_depth_.push_back(color);
+      } break;
+      case ImageType::ALL: {
+        CaptureImage(ImageType::IMAGE_COLOR, code);
+        CaptureImage(ImageType::IMAGE_DEPTH, code);
+      } break;
+      default:
+        throw new std::runtime_error("CaptureImage: ImageType is unknown");
+    }
+  }
 }
 
-stream_datas_t CameraPrivate::Synchronization(const ImageType &type, 
+void CameraPrivate::Synchronization(const ImageType &type, 
     ErrorCode *code) {
+  {
+    switch (type) {
+      case ImageType::IMAGE_COLOR: {
+        std::lock_guard<std::mutex> _(cap_color_mtx_);
+        for (auto color : image_color_) {
+          for (auto info : img_info_) {
+            if (color.frame_id() == info.img_info->frame_id) {
+              device::StreamData data;
+              data.img_info = info.img_info;
+              data.img = color.Clone();
+              color_data_.push_back(data);
+              img_info_.erase(info);
+            }
+          }
+        }
+      } break;
+      case ImageType::IMAGE_DEPTH: {
+        std::lock_guard<std::mutex> _(cap_depth_mtx_);
+        for (auto depth : image_depth_) {
+          device::StreamData data;
+          data.img_info = nullptr;
+          data.img = color.Clone();
+          depth_data_.push_back(data);
+        }
+      } break;
+      default:
+        throw new std::runtime_error("Synchronization: ImageType is unknown"); 
+    }
+  }
 }
+*/
 
 void CameraPrivate::Wait() {
   if (rate_) {
@@ -548,7 +586,6 @@ void CameraPrivate::Close() {
     dev_sel_info_.index = -1;
   }
   ReleaseBuf();
-  CloseImu();
 }
 
 void CameraPrivate::ReleaseBuf() {
@@ -560,12 +597,15 @@ void CameraPrivate::ReleaseBuf() {
   }
 }
 
-void CameraPrivate::StartHidTracking() {
+ErrorCode CameraPrivate::StartHidTracking() {
   channels_->SetImuCallback(std::bind(&CameraPrivate::CallbackImuData, 
         this, std::placeholders::_1));
   channels_->SetImgInfoCallback(std::bind(&CameraPrivate::CallbackImgInfoData,
         this, std::placeholders::_1));
-  channels_->StartHidTrancking();
+  is_imu_open_ = true;
+  channels_->StartHidTracking();
+
+  return ErrorCode::SUCCESS;
 }
 
 void CameraPrivate::CallbackImuData(const ImuPacket &packet) {
@@ -591,7 +631,7 @@ void CameraPrivate::CallbackImuData(const ImuPacket &packet) {
       imu->gyro[2] = seg.accel_or_gyro[2] * 2000.f / 0x10000;
     }
     else {
-      imu->reset();
+      imu->Reset();
     }
 
     std::lock_guard<std::mutex> _(mtx_imu_);
@@ -600,7 +640,7 @@ void CameraPrivate::CallbackImuData(const ImuPacket &packet) {
   }
 } 
 
-void CallbackImgInfoData(const ImgInfoPacket &packet) {
+void CameraPrivate::CallbackImgInfoData(const ImgInfoPacket &packet) {
   auto &&img_info = std::make_shared<ImgInfo>();
 
   img_info->frame_id = packet.frame_id;
@@ -609,14 +649,14 @@ void CallbackImgInfoData(const ImgInfoPacket &packet) {
 
   std::lock_guard<std::mutex> _(mtx_img_info_);
   device::ImgInfoData tmp = {img_info};
-  imu_data_.push_back(tmp);
+  img_info_.push_back(tmp);
 }
 
 std::vector<device::MotionData> CameraPrivate::GetImuData() {
   if (!is_imu_open_)
     LOGE("Imu is not opened !");
 
-  std::lock_guard<std::mutex> _(imu_mutex_);
+  std::lock_guard<std::mutex> _(mtx_imu_);
   std::vector<device::MotionData> tmp = imu_data_;
   imu_data_.clear();
   return tmp;

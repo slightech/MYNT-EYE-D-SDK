@@ -82,13 +82,13 @@ class CameraPrivate {
   bool IsOpened() const;
   void CheckOpened() const;
 
-  stream_datas_t RetrieveImage(const ImageType& type, ErrorCode* code);
+  Image::pointer RetrieveImage(const ImageType& type, ErrorCode* code);
 
-  void StartHidTracking();
-  void StopHidTracking();
+  ErrorCode StartHidTracking();
+  //void StopHidTracking();
   void SetHidCallback();
   void CallbackImuData(const ImuPacket &packet);
-  void CallbackImgInfoData(const ImgPacket &packet);
+  void CallbackImgInfoData(const ImgInfoPacket &packet);
   /** Get imu data */
   std::vector<device::MotionData> GetImuData();
 
@@ -103,14 +103,6 @@ class CameraPrivate {
 
   Image::pointer RetrieveImageColor(ErrorCode* code);
   Image::pointer RetrieveImageDepth(ErrorCode* code);
-
-  stream_datas_t Synchronization(const ImageType &type, ErrorCode *code);
-  std::mutex cap_color_mutex_;
-  std::mutex cap_depth_mutex_;
-  std::thread capture_thread_;
-  std::vector<Image> image_color_;
-  std::vector<Image> image_depth_;
-  bool is_capture_image_;
 
   void ReleaseBuf();
 
@@ -156,8 +148,20 @@ class CameraPrivate {
   std::mutex mtx_imu_;
 
   std::vector<device::MotionData> imu_data_;
-  std::vector<device::StreamData> stream_data_;
   std::vector<device::ImgInfoData> img_info_;
+
+  //void Synchronization(const ImageType &type, ErrorCode *code);
+  //std::mutex cap_color_mtx_;
+  //std::mutex cap_depth_mtx_;
+  //std::thread capture_thread_;
+  std::vector<Image> image_color_;
+  std::vector<Image> image_depth_;
+  //stream_datas_t color_data_;
+  //stream_datas_t depth_data_;
+  //bool is_capture_image_;
+  //
+  bool is_imu_open_;
+
 };
 
 MYNTEYE_END_NAMESPACE

@@ -1,5 +1,7 @@
-#include "hid.h"
-#include "log.h"
+#include "mynteye/internal/hid.h"
+#include "mynteye/util/log.h"
+
+MYNTEYE_BEGIN_NAMESPACE
 
 namespace hid {
 
@@ -38,7 +40,7 @@ int hid_device::receive(int num, void *buf, int len, int timeout) {
   if (!hid || !hid->open) {
     return -1;
   };
-  return usb_bulk_read(hid->usb, 1, buf, len, timeout);
+  return usb_bulk_read(hid->usb, 1, (char *)buf, len, timeout);
 }
 
 /**
@@ -60,9 +62,9 @@ int hid_device::send(int num, void *buf, int len, int timeout) {
     return -1;
   };
   if (hid->ep_out) {
-    return usb_bulk_write(hid->usb, hid->ep_out, buf, len, timeout);
+    return usb_bulk_write(hid->usb, hid->ep_out, (char *)buf, len, timeout);
   } else {
-    return usb_control_msg(hid->usb, 0x21, 9, 0, hid->iface, buf, len, timeout);
+    return usb_control_msg(hid->usb, 0x21, 9, 0, hid->iface, (char *)buf, len, timeout);
   }
 }
 
@@ -80,7 +82,7 @@ int hid_device::send(int num, void *buf, int len, int timeout) {
  * actual number of devices opened
  */
 int hid_device::open(int max, int vid, int pid, int usage_page, int usage) {
-  LOGI("---------------hid_open----------------");
+  //LOGI("---------------hid_open----------------");
 
   if (first_hid_) {
     free_all_hid();
@@ -113,8 +115,7 @@ int hid_device::open(int max, int vid, int pid, int usage_page, int usage) {
       usb_interface_t *iface = dev->config->interface;
       usb_dev_handle *handle = nullptr;
       int claimed = 0;
-      process_usb_dev(dev, iface, handle, count, 
-          claimed, usage, usage_page);
+      process_usb_dev(max, dev, iface, handle, count, claimed, usage, usage_page);
       if (handle && !claimed) {
         usb_close(handle);
       }
@@ -198,7 +199,7 @@ void hid_device::add_hid(hid_t *hid)
   last_hid_ = hid;
 }
 
-hid_t *hid_device:: get_hid(int num)
+hid::hid_t *hid_device:: get_hid(int num)
 {
   hid_t *p;
   for (p = first_hid_; p && num > 0; p = p->next, num--) ;
@@ -219,7 +220,6 @@ void hid_device::free_all_hid(void)
     free(q);
   }
   first_hid_ = last_hid_ = nullptr;
-  LOGI("Free all hid");
 }
 
 void hid_device::hid_close(hid_t *hid)
@@ -236,10 +236,11 @@ void hid_device::hid_close(hid_t *hid)
   first_dev_ = nullptr;
 }
 
-void hid_device::process_usb_dev(usb_device_t *dev, 
+void hid_device::process_usb_dev(int max, 
+                          usb_device_t *dev, 
                           usb_interface_t *iface, 
                           usb_dev_handle *handle,
-                          int &count
+                          int &count,
                           int &claimed,
                           int usage,
                           int usage_page) {
@@ -264,7 +265,7 @@ void hid_device::process_usb_dev(usb_device_t *dev,
         in = endp->bEndpointAddress & 0x7F;
         LOGI("      IN endpoint %d", in);
       }else {
-        out = endp->dEndpointAddress;
+        out = endp->bEndpointAddress;
         LOGI("      OUT endpoint %d\n", out);
       }
     }
@@ -296,11 +297,12 @@ void hid_device::process_usb_dev(usb_device_t *dev,
       usb_release_interface(handle, i);
       continue;
     }
-    uint8_t *p = buf;
-    uint32_t parsed_usage_page = 0; 
-    uint32_t parsed_usage = 0;
-    uint32_t val = 0;
-    while ((int tag = hid_parse_item(&val, &p, buf + len)) >= 0) {
+    std::uint8_t *p = buf;
+    int parsed_usage_page = 0; 
+    int parsed_usage = 0;
+    std::uint32_t val = 0;
+    int tag;
+    while ((tag = hid_parse_item(&val, &p, buf + len)) >= 0) {
       if (tag == 4) {
         parsed_usage_page = val;
       }
@@ -320,13 +322,13 @@ void hid_device::process_usb_dev(usb_device_t *dev,
 
     hid_t *hid = (hid_t *)malloc(sizeof(hid_t));
     if (!hid) {
-      usb_release_interface(handle. i);
+      usb_release_interface(handle, i);
       continue;
     }
-    hid->usb = u;
+    hid->usb = handle;
     hid->iface = i;
-    hid->ep_in = ep_in;
-    hid->ep_out = ep_out;
+    hid->ep_in = in;
+    hid->ep_out = out;
     hid->open = 1;
     first_dev_ = dev;
     add_hid(hid);
@@ -339,6 +341,8 @@ void hid_device::process_usb_dev(usb_device_t *dev,
 }
 
 }
+
+MYNTEYE_END_NAMESPACE
 
 
 

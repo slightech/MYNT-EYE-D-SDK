@@ -18,7 +18,7 @@
 
 MYNTEYE_USE_NAMESPACE
 
-Camera::Camera() : p_(new CameraPrivate(this)) {
+Camera::Camera() : p_(new CameraPrivate()) {
   DBG_LOGD(__func__);
 }
 
@@ -57,10 +57,10 @@ ErrorCode Camera::Open(const InitParams& params, const Source& source) {
   if (source == Source::VIDEO_STREAMING) {
     return p_->Open(params);
   } else if (source == Source::MOTION_TRACKING) {
-    return p_->ImuOpen();
+    return p_->StartHidTracking();
   } else if (source == Source::ALL) {
     if (ErrorCode::SUCCESS == p_->Open(params)) {
-      return p_->ImuOpen();
+      return p_->StartHidTracking();
     } else {
       return ErrorCode::ERROR_CAMERA_OPEN_FAILED;
     }
@@ -73,7 +73,6 @@ bool Camera::IsOpened() const {
   return p_->IsOpened();
 }
 
-/*
 Image::pointer Camera::RetrieveImage(const ImageType& type) {
   ErrorCode code = ErrorCode::SUCCESS;
   return RetrieveImage(type, &code);
@@ -82,7 +81,8 @@ Image::pointer Camera::RetrieveImage(const ImageType& type) {
 Image::pointer Camera::RetrieveImage(const ImageType& type, ErrorCode* code) {
   return p_->RetrieveImage(type, code);
 }
-*/
+
+/*
 stream_data Camera::RetrieveImage(const ImageType& type) {
   ErrorCode code = ErrorCode::SUCCESS;
   return RetrieveImage(type, &code);
@@ -91,8 +91,9 @@ stream_data Camera::RetrieveImage(const ImageType& type) {
 stream_data Camera::RetrieveImage(const ImageType& type, ErrorCode* code) {
   return p_->RetrieveImage(type, code);
 }
+*/
 
-std::vector<MotionData> Camera::GetMotionData() {                                              
+std::vector<MotionData> Camera::RetrieveMotion() {                                              
   std::vector<MotionData> datas;                                                               
   for (auto &&data : p_->GetImuData()) {                                                    
     datas.push_back({data.imu});                                                               

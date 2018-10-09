@@ -106,13 +106,7 @@ add_definitions(-DMYNTEYE_EXPORTS)
 
 set(MYNTEYE_CORE ${MYNTEYE_NAME}_core)
 
-if(OS_WIN)
-  file(GLOB_RECURSE MYNTEYE_CORE_SRCS "src/mynteye/*.cc", "src/mynteye/hid_windows.c")
-elseif(OS_MAC)
-  file(GLOB_RECURSE MYNTEYE_CORE_SRCS "src/mynteye/*.cc", "src/mynteye/hid_macosx.c")
-else()
-  file(GLOB_RECURSE MYNTEYE_CORE_SRCS "src/mynteye/*.cc", "src/mynteye/hid_linux.c")
-endif()
+file(GLOB_RECURSE MYNTEYE_CORE_SRCS "src/mynteye/*.cc")
 
 set(MYNTEYE_LINK_LIBS ${eSPDI_LIBS} "usb")
 if(WITH_OPENCV)

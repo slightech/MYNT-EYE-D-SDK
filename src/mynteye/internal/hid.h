@@ -3,7 +3,10 @@
 
 #include <usb.h>
 #include <memory>
+#include "mynteye/stubs/global.h"
+#include "mynteye/types.h"
 
+/*
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -18,29 +21,29 @@ void rawhid_droped();
 #ifdef __cplusplus
 }
 #endif
+*/
 
+MYNTEYE_BEGIN_NAMESPACE
 
 namespace hid {
 
+typedef struct hid_struct {
+  usb_dev_handle *usb;
+  int open;
+  int iface;
+  int ep_in;
+  int ep_out;
+  struct hid_struct *prev;
+  struct hid_struct *next;
+}hid_t;
+
 class hid_device {
 public:
-  using hid_t = struct hid_struct;
-
   using usb_device_t = struct usb_device; 
   using usb_bus_t = struct usb_bus;
   using usb_interface_t = struct usb_interface;
   using usb_inter_desc_t = struct usb_interface_descriptor;
   using usb_end_desc_t = struct usb_endpoint_descriptor;
-
-  struct hid_struct {
-    usb_dev_handle *usb;
-    int open;
-    int iface;
-    int ep_in;
-    int ep_out;
-    hid_t *prev;
-    hid_t *next;
-  };
 
   hid_device();
   virtual ~hid_device();
@@ -58,7 +61,14 @@ protected:
   void free_all_hid(void);
   void hid_close(hid_t *hid);
   int hid_parse_item(uint32_t *val, uint8_t **data, const uint8_t *end);
-  void process_usb_dev(usb_device_t *dev);
+  void process_usb_dev(int max, 
+      usb_device_t *dev, 
+      usb_interface_t *iface, 
+      usb_dev_handle *handle, 
+      int &count, 
+      int &claimed, 
+      int usage, 
+      int usage_page);
 
 private:
   hid_t *first_hid_;
@@ -69,6 +79,8 @@ private:
 };
 
 }
+
+MYNTEYE_END_NAMESPACE
 
 #endif //HID_H_
 

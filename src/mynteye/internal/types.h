@@ -45,15 +45,16 @@ struct ImgInfoPacket {
 struct ImgInfoResPacket {
   std::vector<ImgInfoPacket> packets;
 
+  ImgInfoResPacket() = default;
   explicit ImgInfoResPacket(std::uint8_t *data) {
-    frome_data(data);
+    from_data(data);
   }
 
-  void frome_data(std::uint8_t *data) {
+  void from_data(std::uint8_t *data) {
     ImgInfoPacket packet(data);
     packets.push_back(packet);
   }
-}
+};
 #pragma pack(pop)
 
 /**
@@ -73,7 +74,7 @@ struct ImuSegment {
   }
 
   void from_data(std::uint8_t *data) {
-    flag = *data + 1;
+    flag = (*data | *(data + 1) << 8) + 1;
     timestamp = *(data + 2) | *(data + 3) << 8 |
       *(data + 4) << 16 | *(data + 5) << 24;
     accel_or_gyro[0] = *(data + 9) | *(data + 10) << 8;
@@ -93,7 +94,7 @@ struct ImuPacket {
   std::vector<ImuSegment> segments;
 
   ImuPacket() = default;
-  explicit ImuPacket(std::uint8_t seg_count, std::uint8_t *data) {
+  explicit ImuPacket(std::uint8_t *data) {
     from_data(data);
   }
   void from_data(std::uint8_t *data) {
