@@ -5,13 +5,13 @@ MYNTEYE_BEGIN_NAMESPACE
 
 namespace hid {
 
-hid_device::hid_device() : first_hid_(nullptr), 
+hid_device::hid_device() : first_hid_(nullptr),
   last_hid_(nullptr),
   first_dev_(nullptr),
-  is_opened_(false){
+  is_opened_(false) {
 }
 
-hid_device::~hid_device(){
+hid_device::~hid_device() {
   free_all_hid();
 }
 
@@ -22,7 +22,7 @@ int hid_device::get_device_class() {
   return first_dev_->descriptor.bDeviceClass;
 }
 
-/**  
+/**
  * receive - receive a packet
  *
  * Inputs:
@@ -39,8 +39,13 @@ int hid_device::receive(int num, void *buf, int len, int timeout) {
 
   if (!hid || !hid->open) {
     return -1;
+<<<<<<< HEAD
   };
   return usb_bulk_read(hid->usb, 1, (char *)buf, len, timeout);
+=======
+  }
+  return usb_bulk_read(hid->usb, 1, buf, len, timeout);
+>>>>>>> 8097d4db0fef5622c327bd92ae64dad3d189388f
 }
 
 /**
@@ -60,7 +65,7 @@ int hid_device::send(int num, void *buf, int len, int timeout) {
 
   if (!hid || !hid->open) {
     return -1;
-  };
+  }
   if (hid->ep_out) {
     return usb_bulk_write(hid->usb, hid->ep_out, (char *)buf, len, timeout);
   } else {
@@ -108,14 +113,19 @@ int hid_device::open(int max, int vid, int pid, int usage_page, int usage) {
       if (!dev->config || dev->config->bNumInterfaces < 1) {
         continue;
       }
-      LOGI("device: vid = %04X, pic = %04X, with %d iface, bdeviceclass %d\n", 
-          dev->descriptor.idVendor, dev->descriptor.idProduct, 
+      LOGI("device: vid = %04X, pic = %04X, with %d iface, bdeviceclass %d\n",
+          dev->descriptor.idVendor, dev->descriptor.idProduct,
           dev->config->bNumInterfaces, dev->descriptor.bDeviceClass);
 
       usb_interface_t *iface = dev->config->interface;
       usb_dev_handle *handle = nullptr;
       int claimed = 0;
+<<<<<<< HEAD
       process_usb_dev(max, dev, iface, handle, count, claimed, usage, usage_page);
+=======
+      process_usb_dev(dev, iface, handle, count,
+          claimed, usage, usage_page);
+>>>>>>> 8097d4db0fef5622c327bd92ae64dad3d189388f
       if (handle && !claimed) {
         usb_close(handle);
       }
@@ -186,8 +196,7 @@ int hid_device::hid_parse_item(uint32_t *val, uint8_t **data, const uint8_t *end
   return tag;
 }
 
-void hid_device::add_hid(hid_t *hid)
-{
+void hid_device::add_hid(hid_t *hid) {
   if (!first_hid_ || !last_hid_) {
     first_hid_ = last_hid_ = hid;
     hid->next = hid->prev = nullptr;
@@ -199,15 +208,18 @@ void hid_device::add_hid(hid_t *hid)
   last_hid_ = hid;
 }
 
+<<<<<<< HEAD
 hid::hid_t *hid_device:: get_hid(int num)
 {
+=======
+hid_t *hid_device:: get_hid(int num) {
+>>>>>>> 8097d4db0fef5622c327bd92ae64dad3d189388f
   hid_t *p;
   for (p = first_hid_; p && num > 0; p = p->next, num--) ;
   return p;
 }
 
-void hid_device::free_all_hid(void)
-{
+void hid_device::free_all_hid(void) {
   hid_t *p, *q;
 
   for (p = first_hid_; p; p = p->next) {
@@ -222,10 +234,9 @@ void hid_device::free_all_hid(void)
   first_hid_ = last_hid_ = nullptr;
 }
 
-void hid_device::hid_close(hid_t *hid)
-{
+void hid_device::hid_close(hid_t *hid) {
   hid_t *p;
-  int others=0;
+  int others = 0;
 
   usb_release_interface(hid->usb, hid->iface);
   for (p = first_hid_; p; p = p->next) {
@@ -236,9 +247,14 @@ void hid_device::hid_close(hid_t *hid)
   first_dev_ = nullptr;
 }
 
+<<<<<<< HEAD
 void hid_device::process_usb_dev(int max, 
                           usb_device_t *dev, 
                           usb_interface_t *iface, 
+=======
+void hid_device::process_usb_dev(usb_device_t *dev,
+                          usb_interface_t *iface,
+>>>>>>> 8097d4db0fef5622c327bd92ae64dad3d189388f
                           usb_dev_handle *handle,
                           int &count,
                           int &claimed,
@@ -264,8 +280,13 @@ void hid_device::process_usb_dev(int max,
       if (endp->bEndpointAddress & 0x80) {
         in = endp->bEndpointAddress & 0x7F;
         LOGI("      IN endpoint %d", in);
+<<<<<<< HEAD
       }else {
         out = endp->bEndpointAddress;
+=======
+      } else {
+        out = endp->dEndpointAddress;
+>>>>>>> 8097d4db0fef5622c327bd92ae64dad3d189388f
         LOGI("      OUT endpoint %d\n", out);
       }
     }
@@ -297,12 +318,20 @@ void hid_device::process_usb_dev(int max,
       usb_release_interface(handle, i);
       continue;
     }
+<<<<<<< HEAD
     std::uint8_t *p = buf;
     int parsed_usage_page = 0; 
     int parsed_usage = 0;
     std::uint32_t val = 0;
     int tag;
     while ((tag = hid_parse_item(&val, &p, buf + len)) >= 0) {
+=======
+    uint8_t *p = buf;
+    uint32_t parsed_usage_page = 0;
+    uint32_t parsed_usage = 0;
+    uint32_t val = 0;
+    while ((int tag = hid_parse_item(&val, &p, buf + len)) >= 0) {
+>>>>>>> 8097d4db0fef5622c327bd92ae64dad3d189388f
       if (tag == 4) {
         parsed_usage_page = val;
       }
@@ -340,7 +369,7 @@ void hid_device::process_usb_dev(int max,
   }
 }
 
-}
+}  // namespace hid
 
 MYNTEYE_END_NAMESPACE
 
