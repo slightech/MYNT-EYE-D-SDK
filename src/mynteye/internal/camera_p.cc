@@ -665,5 +665,6 @@ void CameraPrivate::SetCameraLogData(const std::string& file)
   if( ETronDI_OK != EtronDI_SetLogData( etron_di_, &dev_sel_info_, (unsigned char*)buffer, length, &nActualLength, 0)) {
     printf("error when setLogData\n");
   }
+  delete[] buffer;
 }
 
