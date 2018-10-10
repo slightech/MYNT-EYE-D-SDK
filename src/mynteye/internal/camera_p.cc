@@ -538,6 +538,65 @@ void CameraPrivate::GetVGACameraLogData()
 
 // file [RectfyLog_PUMA_%d.tx] will be created after the func.
 
+struct CameraCtrlRectLogData  CameraPrivate::GetCameraCtrlData(int index)
+{
+  struct CameraCtrlRectLogData res;
+  eSPCtrl_RectLogData eSPRectLogData;
+  EtronDI_GetRectifyMatLogData( etron_di_, &dev_sel_info_, &eSPRectLogData, index);
+  int i;
+  res.InImgWidth = eSPRectLogData.InImgWidth;
+  res.InImgHeight = eSPRectLogData.InImgHeight;
+  res.OutImgWidth = eSPRectLogData.OutImgWidth;
+  res.OutImgHeight = eSPRectLogData.OutImgHeight;
+  res.RECT_ScaleWidth = eSPRectLogData.RECT_ScaleWidth;
+  res.RECT_ScaleHeight = eSPRectLogData.RECT_ScaleHeight;
+  for (i=0; i < 9; i++) {
+    res.CamMat1[i] = eSPRectLogData.CamMat1[i];
+  }
+  for (i=0; i < 8; i++) {
+      res.CamDist1[i] = eSPRectLogData.CamDist1[i];
+  }
+  for (i=0; i < 9; i++) {
+      res.CamMat2[i] = eSPRectLogData.CamMat2[i];
+  }
+  for (i=0; i < 8; i++) {
+      res.CamDist2[i] = eSPRectLogData.CamDist2[i];
+  }
+  for (i=0; i < 9; i++) {
+      res.RotaMat[i] = eSPRectLogData.RotaMat[i];
+  }
+  for (i=0; i < 3; i++) {
+      res.TranMat[i] = eSPRectLogData.TranMat[i];
+  }
+  for (i=0; i < 9; i++) {
+      res.LRotaMat[i] = eSPRectLogData.LRotaMat[i];
+  }
+  for (i=0; i < 9; i++) {
+      res.RRotaMat[i] = eSPRectLogData.RRotaMat[i];
+  }
+  for (i=0; i < 12; i++) {
+      res.NewCamMat1[i] = eSPRectLogData.NewCamMat1[i];
+  }
+  for (i=0; i < 12; i++) {
+      res.NewCamMat2[i] = eSPRectLogData.NewCamMat2[i];
+  }
+  res.RECT_Crop_Row_BG = eSPRectLogData.RECT_Crop_Row_BG;
+  res.RECT_Crop_Row_ED = eSPRectLogData.RECT_Crop_Row_ED;
+  res.RECT_Crop_Col_BG_L = eSPRectLogData.RECT_Crop_Col_BG_L;
+  res.RECT_Crop_Col_ED_L = eSPRectLogData.RECT_Crop_Col_ED_L;
+  res.RECT_Scale_Col_M = eSPRectLogData.RECT_Scale_Col_M;
+  res.RECT_Scale_Col_N = eSPRectLogData.RECT_Scale_Col_N;
+  res.RECT_Scale_Row_M = eSPRectLogData.RECT_Scale_Row_M;
+  res.RECT_Scale_Row_N = eSPRectLogData.RECT_Scale_Row_N;
+  res.RECT_AvgErr = eSPRectLogData.RECT_AvgErr;
+  res.nLineBuffers = eSPRectLogData.nLineBuffers;
+  for (i = 0; i < 16; i++) {
+    res.ReProjectMat[i] = eSPRectLogData.ReProjectMat[i];
+  }
+
+  return res;
+}
+
 void CameraPrivate::GetCameraLogData(int index)
 {
   int nRet;
@@ -666,5 +725,15 @@ void CameraPrivate::SetCameraLogData(const std::string& file)
     printf("error when setLogData\n");
   }
   delete[] buffer;
+}
+
+
+struct CameraCtrlRectLogData CameraPrivate::GetHDCameraCtrlData()
+{
+  return GetCameraCtrlData(0);
+}
+struct CameraCtrlRectLogData CameraPrivate::GetVGACameraCtrlData()
+{
+  return GetCameraCtrlData(1);
 }
 

@@ -89,7 +89,11 @@ class CameraPrivate {
   void GetHDCameraLogData();
   void GetVGACameraLogData();
 
+  struct CameraCtrlRectLogData GetHDCameraCtrlData();
+  struct CameraCtrlRectLogData GetVGACameraCtrlData();
+
   void GetCameraLogData(int index);
+  struct CameraCtrlRectLogData GetCameraCtrlData(int index);
   void SetCameraLogData(const std::string& file);
 
  private:
