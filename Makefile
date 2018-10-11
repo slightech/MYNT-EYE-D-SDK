@@ -25,6 +25,7 @@ help:
 	@echo "  make build     build project"
 	@echo "  make install   build and install"
 	@echo "  make samples   build samples"
+	@echo "  make tools     build tools"
 	@echo "  make ros       build ros wrapper"
 	@echo "  make pkg       package sdk"
 	@echo "  make clean     clean"
@@ -55,6 +56,14 @@ samples: install
 all: samples
 
 .PHONY: all samples
+
+# tools
+
+tools: install
+	@$(call echo,Make $@)
+	@$(call cmake_build,./tools/_build)
+
+.PHONY: tools
 
 # ros
 
@@ -122,6 +131,8 @@ clean:
 	@$(call rm,./_install/)
 	@$(call rm,./samples/_build/)
 	@$(call rm,./samples/_output/)
+	@$(call rm,./tools/_build/)
+	@$(call rm,./tools/_output/)
 	@$(call rm,./pkginfo.sh)
 	@$(FIND) . -type f -name ".DS_Store" -print0 | xargs -0 rm -f
 
