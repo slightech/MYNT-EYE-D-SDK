@@ -13,7 +13,6 @@
 
 //#include "mynteye/files.h"
 //#include "mynteye/encapsulation.h"
-#include "camera.h"
 
 #define FULL_PRECISION \
   std::fixed << std::setprecision(std::numeric_limits<double>::max_digits10)
@@ -36,9 +35,9 @@ void Dataset::SaveMotionData(const mynteye::MotionData &data) {
   auto seq = motion_count_;
 
   writer->ofs << seq << ", " << static_cast<int>(data.imu->flag) << ", "
-    << data.imu->timestamp << ", "<< data.imu->acc[0] << ", " 
-    << data.imu->acc[1] << ", " << data.imu->acc[2] << ", " 
-    << data.imu->gyr[0] << ", " << data.imu->gyr[1] << ", " 
+    << data.imu->timestamp << ", "<< data.imu->acc[0] << ", "
+    << data.imu->acc[1] << ", " << data.imu->acc[2] << ", "
+    << data.imu->gyr[0] << ", " << data.imu->gyr[1] << ", "
     << data.imu->gyr[2] << ", " << data.imu->temperature << std::endl;
   ++motion_count_;
 }
@@ -48,7 +47,7 @@ void Dataset::SaveStreamData(const mynteye::MotionData &data) {
   auto seq = stream_count_;
 
   writer->ofs << seq << ", " << data.imu->frame_id << ", "
-    << data.imu->timestamp << ", " 
+    << data.imu->timestamp << ", "
     << data.imu->expose_time << std::endl;
   ++stream_count_;
 }

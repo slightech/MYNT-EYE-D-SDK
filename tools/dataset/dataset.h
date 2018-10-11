@@ -5,9 +5,8 @@
 #include <memory>
 #include <string>
 
-#include "public.h"
-#include "mynteye.h"
-#include "camera.h"
+#include "mynteye/callbacks.h"
+#include "mynteye/camera.h"
 
 namespace d1000_tools {
 

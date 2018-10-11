@@ -16,9 +16,9 @@
 
 #include <opencv2/highgui/highgui.hpp>
 
-#include "camera.h"
-#include "dataset.h"
-#include "times.h"
+#include "mynteye/camera.h"
+#include "dataset/dataset.h"
+#include "mynteye/util/times.h"
 
 using namespace std;
 using namespace mynteye;

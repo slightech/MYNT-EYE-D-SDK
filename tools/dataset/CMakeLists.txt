@@ -14,15 +14,27 @@
 
 get_filename_component(DIR_NAME ${CMAKE_CURRENT_LIST_DIR} NAME)
 
+set(OUTPUT_DIR "${CMAKE_CURRENT_LIST_DIR}/_output")
+
 set_outdir(
-  "${OUTPUT_DIR}/lib/${DIR_NAME}"
-  "${OUTPUT_DIR}/lib/${DIR_NAME}"
-  "${OUTPUT_DIR}/bin/${DIR_NAME}"
+  ARCHIVE ${OUTPUT_DIR}/lib
+  LIBRARY ${OUTPUT_DIR}/lib
+  RUNTIME ${OUTPUT_DIR}/bin
 )
 
+include_directories(
+  ${CMAKE_CURRENT_LIST_DIR}/src
+  ${PRO_DIR}/include
+)
+set(MYNTEYE_DLL_SEARCH_PATHS
+  ${PRO_DIR}/_install/bin
+  ${PRO_DIR}/_install/bin/3rdparty
+  ${OpenCV_LIB_SEARCH_PATH}
+)
 ## record
 
 make_executable(record
   SRCS record.cc dataset.cc
-  LINKLIBS ${OpenCV_LIBS} ${SDK_LIB_CORE}
+  LINK_LIBS  mynteye_core ${OpenCV_LIBS}
+  DLL_SEARCH_PATHS ${PRO_DIR}/_install/bin ${MYNTEYE_DLL_SEARCH_PATHS}
 )
