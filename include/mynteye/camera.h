@@ -93,6 +93,14 @@ class MYNTEYE_API Camera {
 
   void Close();
 
+  void SetLogData(const std::string& file_name);
+
+  void GetHDCameraLogDataFile();
+  void GetVGACameraLogDataFile();
+
+  struct CameraCtrlRectLogData GetHDCameraCtrlData();
+  struct CameraCtrlRectLogData GetVGACameraCtrlData();
+
  private:
   std::unique_ptr<CameraPrivate> p_;
 };

@@ -21,6 +21,7 @@
 #include <Windows.h>
 #endif
 
+#include <string>
 #include <memory>
 #include <mutex>
 #include <vector>
@@ -107,6 +108,18 @@ class CameraPrivate {
   void Wait();
   void Close();
 
+  void GetHDCameraLogData();
+  void GetVGACameraLogData();
+
+  struct CameraCtrlRectLogData GetHDCameraCtrlData();
+  struct CameraCtrlRectLogData GetVGACameraCtrlData();
+
+  void GetCameraLogData(int index);
+  struct CameraCtrlRectLogData GetCameraCtrlData(int index);
+  void SetCameraLogData(const std::string& file);
+
+  void SyncCameraLogData();
+
  private:
   void OnInit();
   void OnPreWait();
@@ -122,6 +135,7 @@ class CameraPrivate {
       unsigned char* imgBuf, int imgSize, int width, int height,
       int serialNumber, void *pParam);
 #endif
+  std::vector <struct CameraCtrlRectLogData> camera_log_datas_;
 
   void* etron_di_;
 

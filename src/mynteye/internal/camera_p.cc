@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #include <string.h>
+#include <fstream>
 
 #include <stdexcept>
 #include <string>
@@ -130,7 +131,7 @@ void CameraPrivate::GetDevices(std::vector<DeviceInfo>* dev_infos) {
   dev_infos->clear();
 
   int count = EtronDI_GetDeviceNumber(etron_di_);
-  DBG_LOGD("EtronDI_GetDeviceNumber: %d", count);
+  DBG_LOGD("GetDevices: %d", count);
 
   DEVSELINFO dev_sel_info;
   DEVINFORMATION* p_dev_info =
@@ -486,6 +487,7 @@ ErrorCode CameraPrivate::Open(const InitParams& params) {
 
   if (ETronDI_OK == ret) {
     StartCaptureImage();
+    SyncCameraLogData();
     return ErrorCode::SUCCESS;
   } else {
     dev_sel_info_.index = -1;  // reset flag
@@ -768,4 +770,221 @@ std::vector<device::MotionData> CameraPrivate::GetImuData() {
   motion_datas_t tmp = imu_data_;
   imu_data_.clear();
   return tmp;
+}
+
+void CameraPrivate::GetHDCameraLogData() {
+  GetCameraLogData(0);
+}
+
+void CameraPrivate::GetVGACameraLogData() {
+  GetCameraLogData(1);
+}
+
+void CameraPrivate::SyncCameraLogData() {
+  camera_log_datas_.clear();
+  for (int index = 0; index < 2 ; index++) {
+    struct CameraCtrlRectLogData camera_log_data;
+    eSPCtrl_RectLogData eSPRectLogData;
+    EtronDI_GetRectifyMatLogData(etron_di_,
+      &dev_sel_info_, &eSPRectLogData, index);
+    int i;
+    camera_log_data.InImgWidth = eSPRectLogData.InImgWidth;
+    camera_log_data.InImgHeight = eSPRectLogData.InImgHeight;
+    camera_log_data.OutImgWidth = eSPRectLogData.OutImgWidth;
+    camera_log_data.OutImgHeight = eSPRectLogData.OutImgHeight;
+    camera_log_data.RECT_ScaleWidth = eSPRectLogData.RECT_ScaleWidth;
+    camera_log_data.RECT_ScaleHeight = eSPRectLogData.RECT_ScaleHeight;
+    for (i=0; i < 9; i++) {
+      camera_log_data.CamMat1[i] = eSPRectLogData.CamMat1[i];
+    }
+    for (i=0; i < 8; i++) {
+        camera_log_data.CamDist1[i] = eSPRectLogData.CamDist1[i];
+    }
+    for (i=0; i < 9; i++) {
+        camera_log_data.CamMat2[i] = eSPRectLogData.CamMat2[i];
+    }
+    for (i=0; i < 8; i++) {
+        camera_log_data.CamDist2[i] = eSPRectLogData.CamDist2[i];
+    }
+    for (i=0; i < 9; i++) {
+        camera_log_data.RotaMat[i] = eSPRectLogData.RotaMat[i];
+    }
+    for (i=0; i < 3; i++) {
+        camera_log_data.TranMat[i] = eSPRectLogData.TranMat[i];
+    }
+    for (i=0; i < 9; i++) {
+        camera_log_data.LRotaMat[i] = eSPRectLogData.LRotaMat[i];
+    }
+    for (i=0; i < 9; i++) {
+        camera_log_data.RRotaMat[i] = eSPRectLogData.RRotaMat[i];
+    }
+    for (i=0; i < 12; i++) {
+        camera_log_data.NewCamMat1[i] = eSPRectLogData.NewCamMat1[i];
+    }
+    for (i=0; i < 12; i++) {
+        camera_log_data.NewCamMat2[i] = eSPRectLogData.NewCamMat2[i];
+    }
+    camera_log_data.RECT_Crop_Row_BG = eSPRectLogData.RECT_Crop_Row_BG;
+    camera_log_data.RECT_Crop_Row_ED = eSPRectLogData.RECT_Crop_Row_ED;
+    camera_log_data.RECT_Crop_Col_BG_L = eSPRectLogData.RECT_Crop_Col_BG_L;
+    camera_log_data.RECT_Crop_Col_ED_L = eSPRectLogData.RECT_Crop_Col_ED_L;
+    camera_log_data.RECT_Scale_Col_M = eSPRectLogData.RECT_Scale_Col_M;
+    camera_log_data.RECT_Scale_Col_N = eSPRectLogData.RECT_Scale_Col_N;
+    camera_log_data.RECT_Scale_Row_M = eSPRectLogData.RECT_Scale_Row_M;
+    camera_log_data.RECT_Scale_Row_N = eSPRectLogData.RECT_Scale_Row_N;
+    camera_log_data.RECT_AvgErr = eSPRectLogData.RECT_AvgErr;
+    camera_log_data.nLineBuffers = eSPRectLogData.nLineBuffers;
+    for (i = 0; i < 16; i++) {
+      camera_log_data.ReProjectMat[i] = eSPRectLogData.ReProjectMat[i];
+    }
+    camera_log_datas_.push_back(camera_log_data);
+  }
+}
+
+struct CameraCtrlRectLogData  CameraPrivate::GetCameraCtrlData(int index) {
+  return camera_log_datas_[index];
+}
+
+void CameraPrivate::GetCameraLogData(int index) {
+  int nRet;
+
+  // for parse log test
+  eSPCtrl_RectLogData eSPRectLogData;
+  // EtronDI_GetRectifyLogData in puma
+  // EtronDI_GetRectifyMatLogData
+  nRet = EtronDI_GetRectifyMatLogData(etron_di_,
+    &dev_sel_info_, &eSPRectLogData, index);
+  printf("nRet = %d", nRet);
+
+  FILE *pfile;
+  char buf[128];
+  sprintf(buf, "RectfyLog_PUMA_%d.txt", index); // NOLINT
+  pfile = fopen(buf, "wt");
+  if (pfile != NULL) {
+    int i;
+    fprintf(pfile, "InImgWidth = %d\n",        eSPRectLogData.InImgWidth);
+    fprintf(pfile, "InImgHeight = %d\n",       eSPRectLogData.InImgHeight);
+    fprintf(pfile, "OutImgWidth = %d\n",       eSPRectLogData.OutImgWidth);
+    fprintf(pfile, "OutImgHeight = %d\n",      eSPRectLogData.OutImgHeight);
+    //
+    fprintf(pfile, "RECT_ScaleWidth = %d\n",   eSPRectLogData.RECT_ScaleWidth);
+    fprintf(pfile, "RECT_ScaleHeight = %d\n",  eSPRectLogData.RECT_ScaleHeight);
+    //
+    fprintf(pfile, "CamMat1 = ");
+    for (i=0; i < 9; i++) {
+        fprintf(pfile, "%.8f, ",  eSPRectLogData.CamMat1[i]);
+    }
+    fprintf(pfile, "\n");
+    //
+    fprintf(pfile, "CamDist1 = ");
+    for (i=0; i < 8; i++) {
+        fprintf(pfile, "%.8f, ",  eSPRectLogData.CamDist1[i]);
+    }
+    fprintf(pfile, "\n");
+    //
+    fprintf(pfile, "CamMat2 = ");
+    for (i=0; i < 9; i++) {
+        fprintf(pfile, "%.8f, ",  eSPRectLogData.CamMat2[i]);
+    }
+    fprintf(pfile, "\n");
+    //
+    fprintf(pfile, "CamDist2 = ");
+    for (i=0; i < 8; i++) {
+        fprintf(pfile, "%.8f, ",  eSPRectLogData.CamDist2[i]);
+    }
+    fprintf(pfile, "\n");
+    //
+    fprintf(pfile, "RotaMat = ");
+    for (i=0; i < 9; i++) {
+        fprintf(pfile, "%.8f, ",  eSPRectLogData.RotaMat[i]);
+    }
+    fprintf(pfile, "\n");
+    //
+    fprintf(pfile, "TranMat = ");
+    for (i=0; i < 3; i++) {
+        fprintf(pfile, "%.8f, ",  eSPRectLogData.TranMat[i]);
+    }
+    fprintf(pfile, "\n");
+    //
+    fprintf(pfile, "LRotaMat = ");
+    for (i=0; i < 9; i++) {
+        fprintf(pfile, "%.8f, ",  eSPRectLogData.LRotaMat[i]);
+    }
+    fprintf(pfile, "\n");
+    //
+    fprintf(pfile, "RRotaMat = ");
+    for (i=0; i < 9; i++) {
+        fprintf(pfile, "%.8f, ",  eSPRectLogData.RRotaMat[i]);
+    }
+    fprintf(pfile, "\n");
+    //
+    fprintf(pfile, "NewCamMat1 = ");
+    for (i=0; i < 12; i++) {
+        fprintf(pfile, "%.8f, ",  eSPRectLogData.NewCamMat1[i]);
+    }
+    fprintf(pfile, "\n");
+    //
+    fprintf(pfile, "NewCamMat2 = ");
+    for (i=0; i < 12; i++) {
+        fprintf(pfile, "%.8f, ",  eSPRectLogData.NewCamMat2[i]);
+    }
+    fprintf(pfile, "\n");
+    //
+    fprintf(pfile, "RECT_Crop_Row_BG = %d\n",
+      eSPRectLogData.RECT_Crop_Row_BG);
+    fprintf(pfile, "RECT_Crop_Row_ED = %d\n",
+      eSPRectLogData.RECT_Crop_Row_ED);
+    fprintf(pfile, "RECT_Crop_Col_BG_L = %d\n",
+      eSPRectLogData.RECT_Crop_Col_BG_L);
+    fprintf(pfile, "RECT_Crop_Col_ED_L = %d\n",
+      eSPRectLogData.RECT_Crop_Col_ED_L);
+    fprintf(pfile, "RECT_Scale_Col_M = %d\n",
+      eSPRectLogData.RECT_Scale_Col_M);
+    fprintf(pfile, "RECT_Scale_Col_N = %d\n",
+      eSPRectLogData.RECT_Scale_Col_N);
+    fprintf(pfile, "RECT_Scale_Row_M = %d\n",
+      eSPRectLogData.RECT_Scale_Row_M);
+    fprintf(pfile, "RECT_Scale_Row_N = %d\n",
+      eSPRectLogData.RECT_Scale_Row_N);
+    //
+    fprintf(pfile, "RECT_AvgErr = %.8f\n", eSPRectLogData.RECT_AvgErr);
+    //
+    fprintf(pfile, "nLineBuffers = %d\n",  eSPRectLogData.nLineBuffers);
+    //
+    printf("file ok\n");
+    fprintf(pfile, "ReProjectMat = ");
+    for (i = 0; i < 16; i++) {
+      fprintf(pfile, "%.8f, ", eSPRectLogData.ReProjectMat[i]);
+    }
+    fprintf(pfile, "\n");
+  }
+  fclose(pfile);
+}
+
+void CameraPrivate::SetCameraLogData(const std::string& file) {
+  std::ifstream t;
+  int length;
+  t.open(file.c_str());
+  t.seekg(0, std::ios::end);
+  length = t.tellg();
+  t.seekg(0, std::ios::beg);
+  char* buffer = new char[length];
+  t.read(buffer, length);
+  t.close();
+
+  int nActualLength = 0;
+
+  if ( ETronDI_OK != EtronDI_SetLogData( etron_di_, &dev_sel_info_,
+    (unsigned char*)buffer, length, &nActualLength, 0)) {
+    printf("error when setLogData\n");
+  }
+  delete[] buffer;
+  SyncCameraLogData();
+}
+
+struct CameraCtrlRectLogData CameraPrivate::GetHDCameraCtrlData() {
+  return GetCameraCtrlData(0);
+}
+struct CameraCtrlRectLogData CameraPrivate::GetVGACameraCtrlData() {
+  return GetCameraCtrlData(1);
 }

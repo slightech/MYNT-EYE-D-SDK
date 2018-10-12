@@ -15,6 +15,8 @@
 
 #ifdef MYNTEYE_OS_LINUX
 
+#include <algorithm>
+
 #include "mynteye/util/convertor.h"
 #include "mynteye/util/log.h"
 
@@ -46,13 +48,15 @@ Image::pointer CameraPrivate::RetrieveImageColor(ErrorCode* code) {
     color_image_buf_ = ImageColor::Create(
       is_mjpeg ? ImageFormat::COLOR_MJPG : ImageFormat::COLOR_YUYV,
       color_img_width, color_img_height, true);
+  } else {
+    color_image_buf_->ResetBuffer();
   }
 
   int ret = EtronDI_GetColorImage(etron_di_, &dev_sel_info_,
       color_image_buf_->data(), &color_image_size_, &color_serial_number_, 0);
 
   if (ETronDI_OK != ret) {
-    DBG_LOGI("EtronDI_GetColorImage: %d", ret);
+    DBG_LOGI("RetrieveImageColor: %d", ret);
     *code = ErrorCode::ERROR_CAMERA_RETRIEVE_FAILED;
     return nullptr;
   }
@@ -84,12 +88,16 @@ Image::pointer CameraPrivate::RetrieveImageDepth(ErrorCode* code) {
         depth_image_buf_ = ImageDepth::Create(ImageFormat::DEPTH_GRAY_24,
             depth_img_width, depth_img_height, true);
       }
+    } else {
+      depth_image_buf_->ResetBuffer();
     }
   } else {  // DEPTH_IMG_NON_TRANSFER
     depth_raw = true;
     if (!depth_image_buf_) {
       depth_image_buf_ = ImageDepth::Create(ImageFormat::DEPTH_RAW,
           depth_img_width, depth_img_height, true);
+    } else {
+      depth_image_buf_->ResetBuffer();
     }
   }
 
@@ -98,7 +106,7 @@ Image::pointer CameraPrivate::RetrieveImageDepth(ErrorCode* code) {
       &depth_image_size_, &depth_serial_number_, depth_data_type_);
 
   if (ETronDI_OK != ret) {
-    DBG_LOGI("EtronDI_GetColorImage: %d", ret);
+    DBG_LOGI("RetrieveImageDepth: %d", ret);
     *code = ErrorCode::ERROR_CAMERA_RETRIEVE_FAILED;
     return nullptr;
   }
@@ -109,11 +117,13 @@ Image::pointer CameraPrivate::RetrieveImageDepth(ErrorCode* code) {
   if (depth_raw) {
     return depth_image_buf_;
   } else {
-    EtronDI_Convert_Depth_Y_To_Buffer(etron_di_, &dev_sel_info_,
-      depth_buf_, depth_image_buf_->data(),
-      depth_img_width, depth_img_height,
-      dtc_ == DEPTH_IMG_COLORFUL_TRANSFER ? true : false,
-      depth_data_type_);
+    std::copy(depth_buf_, depth_buf_ + depth_image_size_,
+        depth_image_buf_->data());
+    // EtronDI_Convert_Depth_Y_To_Buffer(etron_di_, &dev_sel_info_,
+    //   depth_buf_, depth_image_buf_->data(),
+    //   depth_img_width, depth_img_height,
+    //   dtc_ == DEPTH_IMG_COLORFUL_TRANSFER ? true : false,
+    //   depth_data_type_);
     return depth_image_buf_;
   }
 }

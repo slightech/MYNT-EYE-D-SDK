@@ -61,7 +61,8 @@ Image::Image(ImageType type, ImageFormat format, int width, int height,
     format_(format),
     width_(width),
     height_(height),
-    is_buffer_(is_buffer) {
+    is_buffer_(is_buffer),
+    raw_format_(format) {
   auto n = get_image_size(format, width, height);
   data_.assign(n, 0);
   set_valid_size(n);
@@ -106,6 +107,15 @@ Image::pointer Image::GetCache(const ImageFormat& format) {
   return image;
 }
 
+bool Image::ResetBuffer() {
+  if (is_buffer_) {
+    format_ = raw_format_;
+    return true;
+  }
+  LOGW("Reset buffer, but it's not a buffer.");
+  return false;
+}
+
 // ImageColor
 
 ImageColor::ImageColor(ImageFormat format, int width, int height,
@@ -117,6 +127,7 @@ ImageColor::~ImageColor() {
 }
 
 Image::pointer ImageColor::To(ImageFormat format) {
+  // LOGI(strings::format_string("color src: %d, dst: %d", format_, format));
   if (format == format_) {
     return shared_from_this();
   }
@@ -172,6 +183,7 @@ ImageDepth::~ImageDepth() {
 }
 
 Image::pointer ImageDepth::To(ImageFormat format) {
+  // LOGI(strings::format_string("depth src: %d, dst: %d", format_, format));
   if (format == format_) {
     return shared_from_this();
   }
