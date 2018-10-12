@@ -1,0 +1,4 @@
+*.pyc
+
+cpplint.py
+pylint.rc
