@@ -31,7 +31,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   boost::shared_ptr<boost::thread> device_poll_thread;
 
   image_transport::CameraPublisher pub_color;
-  image_transport::Publisher pub_depth;
+  image_transport::CameraPublisher pub_depth;
   ros::Publisher pub_points;
 // tf2_ros::StaticTransformBroadcaster static_tf_broadcaster;
 
@@ -148,18 +148,20 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     // header.seq = 0;
     header.stamp = stamp;
     header.frame_id = depth_frame_id;
+
+    auto &&info = getCameraInfo();
     if (depth_mode == 0) {  // DEPTH_RAW
       *mat = img->To(mynteye::ImageFormat::DEPTH_RAW)->ToMat();
       pub_depth.publish(
-          cv_bridge::CvImage(header, enc::MONO16, *mat).toImageMsg());
+          cv_bridge::CvImage(header, enc::MONO16, *mat).toImageMsg(),info);
     } else if (depth_mode == 1) {  // DEPTH_GRAY
       *mat = img->To(mynteye::ImageFormat::DEPTH_GRAY_24)->ToMat();
       pub_depth.publish(
-          cv_bridge::CvImage(header, enc::RGB8, *mat).toImageMsg());
+          cv_bridge::CvImage(header, enc::RGB8, *mat).toImageMsg(),info);
     } else if (depth_mode == 2) {  // DEPTH_COLORFUL
       *mat = img->To(mynteye::ImageFormat::DEPTH_RGB)->ToMat();
       pub_depth.publish(
-          cv_bridge::CvImage(header, enc::RGB8, *mat).toImageMsg());
+          cv_bridge::CvImage(header, enc::RGB8, *mat).toImageMsg(),info);
     } else {
       NODELET_ERROR_STREAM("Depth mode unsupported");
       return;
@@ -323,7 +325,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     image_transport::ImageTransport it_mynteye(nh);
     pub_color = it_mynteye.advertiseCamera(color_topic, 1);  // color
     NODELET_INFO_STREAM("Advertized on topic " << color_topic);
-    pub_depth = it_mynteye.advertise(depth_topic, 1);  // depth
+    pub_depth = it_mynteye.advertiseCamera(depth_topic, 1);  // depth
     NODELET_INFO_STREAM("Advertized on topic " << depth_topic);
     pub_points = nh.advertise<sensor_msgs::PointCloud2>(points_topic, 1);
     NODELET_INFO_STREAM("Advertized on topic " << points_topic);
