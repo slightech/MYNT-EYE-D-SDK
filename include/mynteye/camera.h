@@ -42,6 +42,24 @@ struct MYNTEYE_API MotionData {
   }
 };
 
+struct MYNTEYE_API StreamData {
+  /** Image information */
+  std::shared_ptr<ImgInfo> img_info;
+
+  /** Image data */
+  std::shared_ptr<Image> img;
+
+  bool operator==(const StreamData& other) const {
+    if (img_info && other.img_info) {
+      return img_info->frame_id == other.img_info->frame_id &&
+             img_info->timestamp == other.img_info->timestamp &&
+             img_info->exposure_time == other.img_info->exposure_time;
+    }
+
+    return false;
+  }
+};
+
 class CameraPrivate;
 
 class MYNTEYE_API Camera {
@@ -57,17 +75,15 @@ class MYNTEYE_API Camera {
       std::vector<StreamInfo>* color_infos,
       std::vector<StreamInfo>* depth_infos) const;
 
-  ErrorCode Open(const Source& source);
-  ErrorCode Open(const InitParams& params, const Source& source);
+  ErrorCode Open();
+  ErrorCode Open(const InitParams& params);
 
   bool IsOpened() const;
 
-  /** Return nullptr if failed. */
-  Image::pointer RetrieveImage(const ImageType& type);
-  Image::pointer RetrieveImage(const ImageType& type, ErrorCode* code);
-
-  //device::StreamData RetrieveImage(const ImageType& type);
-  //device::StreamData RetrieveImage(const ImageType& type, ErrorCode* code);
+  std::vector<mynteye::StreamData> RetrieveImages(const ImageType& type);
+  std::vector<mynteye::StreamData> RetrieveImages(const ImageType& type, ErrorCode* code);
+  mynteye::StreamData RetrieveImage(const ImageType& type);
+  mynteye::StreamData RetrieveImage(const ImageType& type, ErrorCode* code);
 
   /** Get Motion Data */
   std::vector<mynteye::MotionData> RetrieveMotion();

@@ -165,7 +165,7 @@ int main(int argc, char const* argv[]) {
   // params.stream_mode = StreamMode::STREAM_1280x720;
   params.ir_intensity = 4;
 
-  cam.Open(params, Source::VIDEO_STREAMING);
+  cam.Open(params);
 
   cout << endl;
   if (!cam.IsOpened()) {
@@ -204,8 +204,29 @@ int main(int argc, char const* argv[]) {
   for (;;) {
     counter.Update();
 
-    auto image_color = cam.RetrieveImage(ImageType::IMAGE_COLOR);
-    auto image_depth = cam.RetrieveImage(ImageType::IMAGE_DEPTH);
+    auto image_color = cam.RetrieveImages(ImageType::IMAGE_COLOR);
+    auto image_depth = cam.RetrieveImages(ImageType::IMAGE_DEPTH);
+    for (auto data : image_color) {
+      cv::Mat color = data.img->To(ImageFormat::COLOR_BGR)->ToMat();
+      util::draw(color, util::to_string(counter.fps(), 5, 1), util::TOP_RIGHT);
+
+      cv::setMouseCallback("color", OnDepthMouseCallback, &depth_region);
+      depth_region.DrawRect(color);
+      cv::imshow("color", color);
+    }
+    for (auto data : image_depth) {
+      cv::Mat depth = data.img->To(ImageFormat::DEPTH_RAW)->ToMat();
+
+      cv::setMouseCallback("depth", OnDepthMouseCallback, &depth_region);
+      // Note: DrawRect will change some depth values to show the rect.
+      depth_region.DrawRect(depth);
+      cv::imshow("depth", depth);
+
+      depth_region.ShowElems<ushort>(depth, [](const ushort& elem) {
+        return std::to_string(elem);
+      }, 80, depth_info);
+    }
+    /*
     if (image_color && image_depth) {
       cv::Mat color = image_color->To(ImageFormat::COLOR_BGR)->ToMat();
       cv::Mat depth = image_depth->To(ImageFormat::DEPTH_RAW)->ToMat();
@@ -224,6 +245,7 @@ int main(int argc, char const* argv[]) {
         return std::to_string(elem);
       }, 80, depth_info);
     }
+    */
 
     char key = static_cast<char>(cv::waitKey(1));
     if (key == 27 || key == 'q' || key == 'Q') {  // ESC/Q

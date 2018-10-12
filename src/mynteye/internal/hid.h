@@ -1,5 +1,5 @@
-#ifndef HID_H_
-#define HID_H_
+#ifndef MYNTEYE_INTERNAL_HID_H_ // NOLINT
+#define MYNTEYE_INTERNAL_HID_H_
 
 #include <usb.h>
 #include <memory>
@@ -38,7 +38,7 @@ typedef struct hid_struct {
 }hid_t;
 
 class hid_device {
-public:
+ public:
   using usb_device_t = struct usb_device;
   using usb_bus_t = struct usb_bus;
   using usb_interface_t = struct usb_interface;
@@ -55,22 +55,22 @@ public:
   void droped();
   int get_device_class();
 
-protected:
+ protected:
   void add_hid(hid_t *hid);
   hid_t *get_hid(int num);
   void free_all_hid(void);
   void hid_close(hid_t *hid);
   int hid_parse_item(uint32_t *val, uint8_t **data, const uint8_t *end);
-  void process_usb_dev(int max, 
-      usb_device_t *dev, 
-      usb_interface_t *iface, 
-      usb_dev_handle *handle, 
-      int &count, 
-      int &claimed, 
-      int usage, 
+  void process_usb_dev(int max,
+      usb_device_t *dev,
+      usb_interface_t *iface,
+      usb_dev_handle *handle,
+      int &count,
+      int &claimed,
+      int usage,
       int usage_page);
 
-private:
+ private:
   hid_t *first_hid_;
   hid_t *last_hid_;
   usb_device_t *first_dev_;
@@ -82,5 +82,5 @@ private:
 
 MYNTEYE_END_NAMESPACE
 
-#endif //HID_H_
+#endif //MYNTEYE_INTERNAL_HID_H_ // NOLINT
 

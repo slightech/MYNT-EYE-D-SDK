@@ -25,12 +25,14 @@
 #include <mutex>
 #include <vector>
 #include <thread>
+#include <condition_variable>
 
 #include "eSPDI.h"
 
 #include "mynteye/image.h"
 #include "mynteye/types.h"
 #include "mynteye/internal/types.h"
+#include "mynteye/callbacks.h"
 
 MYNTEYE_BEGIN_NAMESPACE
 
@@ -40,13 +42,14 @@ class Channels;
 class CameraPrivate {
  public:
   using image_size_t = unsigned long int;  // NOLINT
-  using stream_datas_t = std::vector<device::StreamData>; 
+  using stream_data_t = device::StreamData;
+  using stream_datas_t = std::vector<stream_data_t>;
   using motion_data_t = device::MotionData;
   using motion_datas_t = std::vector<motion_data_t>;
-  using imginfo_data_t = device::ImgInfoData;
-  using imginfo_datas_t = std::vector<imginfo_data_t>;
+  using img_info_data_t = device::ImgInfoData;
+  using img_info_datas_t = std::vector<img_info_data_t>;
 
-  explicit CameraPrivate();
+  CameraPrivate();
   ~CameraPrivate();
 
   void GetDevices(std::vector<DeviceInfo>* dev_infos);
@@ -86,13 +89,17 @@ class CameraPrivate {
   bool IsOpened() const;
   void CheckOpened() const;
 
-  Image::pointer RetrieveImage(const ImageType& type, ErrorCode* code);
+  // Image::pointer RetrieveImage(const ImageType& type, ErrorCode* code);
+  stream_datas_t RetrieveImage(const ImageType& type, ErrorCode* code);
+  stream_data_t RetrieveLatestImage(const ImageType& type, ErrorCode* code);
 
   ErrorCode StartHidTracking();
-  //void StopHidTracking();
+  // void StopHidTracking();
   void SetHidCallback();
-  void CallbackImuData(const ImuPacket &packet);
-  void CallbackImgInfoData(const ImgInfoPacket &packet);
+  void ImuDataCallback(const ImuPacket &packet);
+  void ImageInfoCallback(const ImgInfoPacket &packet);
+  void StartCaptureImage();
+  void StopCaptureImage();
   /** Get imu data */
   motion_datas_t GetImuData();
 
@@ -152,20 +159,29 @@ class CameraPrivate {
   std::mutex mtx_imu_;
 
   motion_datas_t imu_data_;
-  imginfo_datas_t img_info_;
+  img_info_datas_t img_info_;
 
-  //void Synchronization(const ImageType &type, ErrorCode *code);
-  //std::mutex cap_color_mtx_;
-  //std::mutex cap_depth_mtx_;
-  //std::thread capture_thread_;
-  std::vector<Image> image_color_;
-  std::vector<Image> image_depth_;
-  //stream_datas_t color_data_;
-  //stream_datas_t depth_data_;
-  //bool is_capture_image_;
-  //
+  void Synthetic(const ImageType &type);
+  void CaptureImage(const ImageType &type, ErrorCode *code);
+
+  std::mutex cap_color_mtx_;
+  std::mutex cap_depth_mtx_;
+
+  std::thread cap_image_thread_;
+  std::thread sync_thread_;
+
+  std::condition_variable image_color_wait_;
+  std::condition_variable image_depth_wait_;
+
+  std::vector<Image::pointer> image_color_;
+  std::vector<Image::pointer> image_depth_;
+  stream_datas_t color_data_;
+  stream_datas_t depth_data_;
+  bool is_capture_image_;
   bool is_imu_open_;
 
+  bool is_start_;
+  static std::uint16_t counter;
 };
 
 MYNTEYE_END_NAMESPACE

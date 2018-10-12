@@ -54,21 +54,6 @@ enum class ErrorCode : std::int32_t {
 
 /**
  * @ingroup enumerations
- * @brief Source allows the user to choose which data to be captured.
- */
-enum class Source : std::uint8_t {
-  /** Video streaming of stereo, color, depth, etc. */
-  VIDEO_STREAMING,
-  /** Motion tracking of IMU (accelerometer, gyroscope) */
-  MOTION_TRACKING,
-  /** Enable everything together */
-  ALL,
-  /** Last guard */
-  LAST
-};
-
-/**
- * @ingroup enumerations
  * @brief List image types.
  */
 enum class ImageType : std::int32_t {
@@ -76,6 +61,8 @@ enum class ImageType : std::int32_t {
   IMAGE_COLOR,
   /** Depth. */
   IMAGE_DEPTH,
+  /** All. */
+  ALL,
   /** Last guard. */
   IMAGE_TYPE_LAST
 };

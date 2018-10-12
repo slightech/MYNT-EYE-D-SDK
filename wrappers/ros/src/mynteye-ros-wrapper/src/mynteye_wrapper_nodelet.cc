@@ -128,9 +128,9 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
         if (color_SubNumber > 0 || points_subscribed) {
           auto image_color = mynteye->RetrieveImage(
               mynteye::ImageType::IMAGE_COLOR);
-          if (image_color) {
+          if (image_color.img) {
             color_ok = true;
-            publishColor(image_color, t, &color);
+            publishColor(image_color.img, t, &color);
           }
         }
 
@@ -138,9 +138,9 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
         if (depth_SubNumber > 0 || points_subscribed) {
           auto image_depth = mynteye->RetrieveImage(
               mynteye::ImageType::IMAGE_DEPTH);
-          if (image_depth) {
+          if (image_depth.img) {
             depth_ok = true;
-            publishDepth(image_depth, t, &depth);
+            publishDepth(image_depth.img, t, &depth);
           }
         }
 

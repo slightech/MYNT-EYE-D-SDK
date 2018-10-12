@@ -35,20 +35,20 @@ void Dataset::SaveMotionData(const mynteye::MotionData &data) {
   auto seq = motion_count_;
 
   writer->ofs << seq << ", " << static_cast<int>(data.imu->flag) << ", "
-    << data.imu->timestamp << ", "<< data.imu->acc[0] << ", "
-    << data.imu->acc[1] << ", " << data.imu->acc[2] << ", "
-    << data.imu->gyr[0] << ", " << data.imu->gyr[1] << ", "
-    << data.imu->gyr[2] << ", " << data.imu->temperature << std::endl;
+    << data.imu->timestamp << ", "<< data.imu->accel[0] << ", "
+    << data.imu->accel[1] << ", " << data.imu->accel[2] << ", "
+    << data.imu->gyro[0] << ", " << data.imu->gyro[1] << ", "
+    << data.imu->gyro[2] << ", " << data.imu->temperature << std::endl;
   ++motion_count_;
 }
 
-void Dataset::SaveStreamData(const mynteye::MotionData &data) {
+void Dataset::SaveStreamData(const mynteye::StreamData &data) {
   auto &&writer = GetStreamWriter();
   auto seq = stream_count_;
 
-  writer->ofs << seq << ", " << data.imu->frame_id << ", "
-    << data.imu->timestamp << ", "
-    << data.imu->expose_time << std::endl;
+  writer->ofs << seq << ", " << data.img_info->frame_id << ", "
+    << data.img_info->timestamp << ", "
+    << data.img_info->exposure_time << std::endl;
   ++stream_count_;
 }
 

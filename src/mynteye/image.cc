@@ -92,6 +92,7 @@ Image::pointer Image::Clone() const {
   auto image = Create(type_, format_, width_, height_, false);
   std::copy(data_.begin(), data_.end(), image->data_.begin());
   image->set_valid_size(valid_size_);
+  image->set_frame_id(frame_id_);
   return image;
 }
 

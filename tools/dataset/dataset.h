@@ -24,7 +24,7 @@ namespace d1000_tools {
       virtual ~Dataset();
 
       void SaveMotionData(const mynteye::MotionData &data);
-      void SaveStreamData(const mynteye::MotionData &data);
+      void SaveStreamData(const mynteye::StreamData &data);
 
     private:
       writer_t GetMotionWriter();

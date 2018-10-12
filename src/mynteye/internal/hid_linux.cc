@@ -39,8 +39,8 @@ int hid_device::receive(int num, void *buf, int len, int timeout) {
 
   if (!hid || !hid->open) {
     return -1;
-  };
-  return usb_bulk_read(hid->usb, 1, (char *)buf, len, timeout);
+  }
+  return usb_bulk_read(hid->usb, 1, static_cast<char *>(buf), len, timeout);
 }
 
 /**
@@ -62,9 +62,10 @@ int hid_device::send(int num, void *buf, int len, int timeout) {
     return -1;
   }
   if (hid->ep_out) {
-    return usb_bulk_write(hid->usb, hid->ep_out, (char *)buf, len, timeout);
+    return usb_bulk_write(hid->usb, hid->ep_out, static_cast<char *>(buf), len, timeout);
   } else {
-    return usb_control_msg(hid->usb, 0x21, 9, 0, hid->iface, (char *)buf, len, timeout);
+    return usb_control_msg(hid->usb, 0x21, 9, 0, hid->iface,
+        static_cast<char *>(buf), len, timeout);
   }
 }
 
@@ -82,8 +83,6 @@ int hid_device::send(int num, void *buf, int len, int timeout) {
  * actual number of devices opened
  */
 int hid_device::open(int max, int vid, int pid, int usage_page, int usage) {
-  //LOGI("---------------hid_open----------------");
-
   if (first_hid_) {
     free_all_hid();
   }
@@ -115,7 +114,7 @@ int hid_device::open(int max, int vid, int pid, int usage_page, int usage) {
       usb_interface_t *iface = dev->config->interface;
       usb_dev_handle *handle = nullptr;
       int claimed = 0;
-      process_usb_dev(max, dev, iface, handle, count, 
+      process_usb_dev(max, dev, iface, handle, count,
           claimed, usage, usage_page);
       if (handle && !claimed) {
         usb_close(handle);
@@ -199,8 +198,7 @@ void hid_device::add_hid(hid_t *hid) {
   last_hid_ = hid;
 }
 
-hid::hid_t *hid_device:: get_hid(int num)
-{
+hid::hid_t *hid_device:: get_hid(int num) {
   hid_t *p;
   for (p = first_hid_; p && num > 0; p = p->next, num--) ;
   return p;
@@ -234,9 +232,9 @@ void hid_device::hid_close(hid_t *hid) {
   first_dev_ = nullptr;
 }
 
-void hid_device::process_usb_dev(int max, 
-                          usb_device_t *dev, 
-                          usb_interface_t *iface, 
+void hid_device::process_usb_dev(int max,
+                          usb_device_t *dev,
+                          usb_interface_t *iface,
                           usb_dev_handle *handle,
                           int &count,
                           int &claimed,
@@ -262,7 +260,7 @@ void hid_device::process_usb_dev(int max,
       if (endp->bEndpointAddress & 0x80) {
         in = endp->bEndpointAddress & 0x7F;
         LOGI("      IN endpoint %d", in);
-      }else {
+      } else {
         out = endp->bEndpointAddress;
         LOGI("      OUT endpoint %d\n", out);
       }
@@ -279,7 +277,8 @@ void hid_device::process_usb_dev(int max,
     }
     LOGI("   Hid interface (generic)");
     uint8_t buf[1024];
-    if (usb_get_driver_np(handle, i, (char *)buf, sizeof(buf)) >= 0) {
+    if (usb_get_driver_np(handle, i,
+          (char *)buf, sizeof(buf)) >= 0) {  // NOLINT
       LOGI("  In use by driver \"%s\"", buf);
       if (usb_detach_kernel_driver_np(handle, i) < 0) {
         LOGI("  Unable to detach from kernel\n");
@@ -289,14 +288,15 @@ void hid_device::process_usb_dev(int max,
       LOGI("  Unable claim interface %d", i);
       continue;
     }
-    int len = usb_control_msg(handle, 0x81, 6, 0x2200, i, (char *)buf, sizeof(buf), 250);
+    int len = usb_control_msg(handle, 0x81, 6, 0x2200, i,
+      (char *)buf, sizeof(buf), 250); // NOLINT
     LOGI("  descriptor, len=%d", len);
     if (len < 2) {
       usb_release_interface(handle, i);
       continue;
     }
     std::uint8_t *p = buf;
-    int parsed_usage_page = 0; 
+    int parsed_usage_page = 0;
     int parsed_usage = 0;
     std::uint32_t val = 0;
     int tag;
@@ -318,7 +318,7 @@ void hid_device::process_usb_dev(int max,
       continue;
     }
 
-    hid_t *hid = (hid_t *)malloc(sizeof(hid_t));
+    hid_t *hid = static_cast<hid_t *>(malloc(sizeof(hid_t)));
     if (!hid) {
       usb_release_interface(handle, i);
       continue;

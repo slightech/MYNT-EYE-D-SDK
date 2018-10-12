@@ -14,7 +14,7 @@ MYNTEYE_BEGIN_NAMESPACE
 class hid_device;
 
 class MYNTEYE_API Channels {
-public:
+ public:
   Channels();
   virtual ~Channels();
 
@@ -27,11 +27,11 @@ public:
   bool StopHidTracking();
   void DoHidTrack();
 
-protected:
+ protected:
   bool ExtractHidData(ImuResPacket &imu, ImgInfoResPacket &img);
   int ReadHidData(std::uint8_t *data, int length);
 
-private:
+ private:
   std::shared_ptr<hid::hid_device> device_;
 
   bool is_hid_tracking_;

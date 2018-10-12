@@ -4,12 +4,11 @@
 
 #include <algorithm>
 #include "mynteye/types.h"
+#include "mynteye/image.h"
 
 MYNTEYE_BEGIN_NAMESPACE
 
 namespace device {
-
-class Image;
 
 /**
  * @ingroup datatypes
@@ -41,7 +40,7 @@ struct MYNTEYE_API StreamData {
   std::shared_ptr<Image> img;
 };
 
-}
+} // namespace device
 
 MYNTEYE_END_NAMESPACE
 

@@ -11,23 +11,17 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#include <iostream>
-
-#include <opencv2/highgui/highgui.hpp>
-
-// PCL headers
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
 #include <pcl/visualization/cloud_viewer.h>
 
-#include "mynteye/camera.h"
+#include <iostream>
+#include <opencv2/highgui/highgui.hpp>
 
+#include "mynteye/camera.h"
 #include "util/cam_utils.h"
 #include "util/counter.h"
 #include "util/cv_painter.h"
-
-using namespace std;
-using namespace mynteye;
 
 typedef pcl::PointXYZRGBA PointT;
 typedef pcl::PointCloud<PointT> PointCloud;
@@ -49,7 +43,7 @@ void show_points(cv::Mat rgb, cv::Mat depth) {
   for (int m = 0; m < depth.rows; m++) {
     for (int n = 0; n < depth.cols; n++) {
       // get depth value at (m, n)
-      unsigned short d = depth.ptr<unsigned short>(m)[n];
+      std::uint16_t d = depth.ptr<std::uint16_t>(m)[n];
       // when d is equal 0 or 4096 means no depth
       if (d == 0 || d == 4096)
         continue;
@@ -57,7 +51,7 @@ void show_points(cv::Mat rgb, cv::Mat depth) {
       PointT p;
 
       // get point x y z
-      p.z = float(d) / camera_factor;
+      p.z = static_cast<float>(d) / camera_factor;
       p.x = (n - camera_cx) * p.z / camera_fx;
       p.y = (m - camera_cy) * p.z / camera_fy;
 
@@ -67,11 +61,11 @@ void show_points(cv::Mat rgb, cv::Mat depth) {
       p.r = rgb.ptr<uchar>(m)[n * 3 + 2];
 
       // add point to cloud
-      cloud->points.push_back( p );
+      cloud->points.push_back(p);
     }
   }
 
-  pcl::visualization::PointCloudColorHandlerRGBField<PointT> color (cloud);
+  pcl::visualization::PointCloudColorHandlerRGBField<PointT>color(cloud);
   viewer.updatePointCloud<PointT>(cloud, color, "sample cloud");
   viewer.spinOnce();
   // clear points
@@ -79,55 +73,56 @@ void show_points(cv::Mat rgb, cv::Mat depth) {
 }
 
 int main(int argc, char const* argv[]) {
-  Camera cam;
-  DeviceInfo dev_info;
-  if (!util::select(cam, &dev_info)) {
+  mynteye::Camera cam;
+  mynteye::DeviceInfo dev_info;
+  if (!mynteye::util::select(cam, &dev_info)) {
     return 1;
   }
-  util::print_stream_infos(cam, dev_info.index);
+  mynteye::util::print_stream_infos(cam, dev_info.index);
 
-  cout << "Open device: " << dev_info.index << ", "
-      << dev_info.name << endl << endl;
+  std::cout << "Open device: " << dev_info.index << ", "
+      << dev_info.name << std::endl << std::endl;
 
   // Warning: Color stream format MJPG doesn't work.
-  InitParams params(dev_info.index);
-  params.depth_mode = DepthMode::DEPTH_RAW;
+  mynteye::InitParams params(dev_info.index);
+  params.depth_mode = mynteye::DepthMode::DEPTH_RAW;
   // params.stream_mode = StreamMode::STREAM_1280x720;
   params.ir_intensity = 4;
 
-  cam.Open(params, Source::VIDEO_STREAMING);
+  cam.Open(params);
 
-  cout << endl;
+  std::cout << std::endl;
   if (!cam.IsOpened()) {
-    cerr << "Error: Open camera failed" << endl;
+    std::cerr << "Error: Open camera failed" << std::endl;
     return 1;
   }
-  cout << "Open device success" << endl << endl;
+  std::cout << "Open device success" << std::endl << std::endl;
 
-  cout << "Press ESC/Q on Windows to terminate" << endl;
+  std::cout << "Press ESC/Q on Windows to terminate" << std::endl;
 
   {
     viewer.setBackgroundColor(0, 0, 0);
     viewer.addCoordinateSystem(1.0);
     viewer.initCameraParameters();
     viewer.addPointCloud<PointT>(cloud, "sample cloud");
-    viewer.setCameraPosition(0,0,-2,0,-1,0,0);
+    viewer.setCameraPosition(0, 0, -2, 0, -1, 0, 0);
     viewer.setSize(1280, 720);
   }
 
   cv::namedWindow("color");
   cv::namedWindow("depth");
 
-  util::Counter counter;
+  mynteye::util::Counter counter;
   for (;;) {
     counter.Update();
 
-    auto image_color = cam.RetrieveImage(ImageType::IMAGE_COLOR);
-    auto image_depth = cam.RetrieveImage(ImageType::IMAGE_DEPTH);
-    if (image_color && image_depth) {
-      cv::Mat color = image_color->To(ImageFormat::COLOR_BGR)->ToMat();
-      cv::Mat depth = image_depth->To(ImageFormat::DEPTH_RAW)->ToMat();
-      util::draw(color, util::to_string(counter.fps(), 5, 1), util::TOP_RIGHT);
+    auto image_color = cam.RetrieveImage(mynteye::ImageType::IMAGE_COLOR);
+    auto image_depth = cam.RetrieveImage(mynteye::ImageType::IMAGE_DEPTH);
+    if (image_color.img && image_depth.img) {
+      cv::Mat color = image_color.img->To(mynteye::ImageFormat::COLOR_BGR)->ToMat();
+      cv::Mat depth = image_depth.img->To(mynteye::ImageFormat::DEPTH_RAW)->ToMat();
+      mynteye::util::draw(color, mynteye::util::to_string(counter.fps(), 5, 1),
+          mynteye::util::TOP_RIGHT);
       cv::imshow("color", color);
       cv::imshow("depth", depth);
       show_points(color, depth);

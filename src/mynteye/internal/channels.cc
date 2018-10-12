@@ -7,9 +7,9 @@
 
 MYNTEYE_BEGIN_NAMESPACE
 
-Channels::Channels() : is_hid_tracking_(false), 
-  hid_track_stop_(false), 
-  imu_callback_(nullptr), 
+Channels::Channels() : is_hid_tracking_(false),
+  hid_track_stop_(false),
+  imu_callback_(nullptr),
   img_callback_(nullptr) {
     device_ = std::make_shared<hid::hid_device>();
 }
@@ -52,7 +52,7 @@ void Channels::StartHidTracking() {
   }
 
   is_hid_tracking_ = true;
-  //open device
+  // open device
   if (device_->open(1, 0x0483, 0x5720, -1, -1) < 0) {
     if (device_->open(1, 0x0483, 0x5720, -1, -1) < 0) {
       LOGE("Error:: open imu device is failure.");
@@ -85,11 +85,11 @@ bool Channels::ExtractHidData(ImuResPacket &imu, ImgInfoResPacket &img) {
     std::uint8_t *packet = data + i * PACKET_SIZE;
 
     imu.from_header_data(packet);
-    for (int offset = 3; offset <= PACKET_SIZE - DATA_SIZE; 
+    for (int offset = 3; offset <= PACKET_SIZE - DATA_SIZE;
         offset += DATA_SIZE) {
       if (*(packet + offset) == 2) {
         img.from_data(packet + offset);
-      } else if (*(packet + offset) == 0 || 
+      } else if (*(packet + offset) == 0 ||
           *(packet + offset) == 1) {
 //        printf ("packet %u\n", *(packet + offset));
         imu.from_data(packet + offset);
