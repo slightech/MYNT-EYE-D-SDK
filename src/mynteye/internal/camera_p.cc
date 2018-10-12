@@ -622,6 +622,12 @@ void CameraPrivate::Synthetic(const ImageType &type) {
             *data.img_info = *info.img_info;
             data.img = color->Clone();
             color_data_.push_back(data);
+          } else if (color->frame_id() < info.img_info->frame_id) {
+            image_color_.clear();
+            return;
+          } else {
+            img_info_.clear();
+            return;
           }
         }
       }
