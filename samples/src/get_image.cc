@@ -60,7 +60,7 @@ int main(int argc, char const* argv[]) {
 
     auto image_color = cam.RetrieveImage(mynteye::ImageType::IMAGE_COLOR);
     auto image_depth = cam.RetrieveImage(mynteye::ImageType::IMAGE_DEPTH);
-    if (image_color.img && image_depth.img) {
+    if (image_color.img) {
       cv::Mat color = image_color.img->To(mynteye::ImageFormat::COLOR_BGR)->ToMat();
       mynteye::util::draw(color, mynteye::util::to_string(counter.fps(), 5, 1),
           mynteye::util::TOP_RIGHT);
