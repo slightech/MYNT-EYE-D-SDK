@@ -30,12 +30,13 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   ros::NodeHandle nh_ns;
   boost::shared_ptr<boost::thread> device_poll_thread;
 
-  image_transport::Publisher pub_color;
+  image_transport::CameraPublisher pub_color;
   image_transport::Publisher pub_depth;
   ros::Publisher pub_points;
-  // tf2_ros::StaticTransformBroadcaster static_tf_broadcaster;
+// tf2_ros::StaticTransformBroadcaster static_tf_broadcaster;
 
-  // Launch params
+  sensor_msgs::CameraInfoPtr camera_info_ptr_;
+// Launch params
   int dev_index;
   int framerate;
   int depth_mode;
@@ -64,14 +65,81 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   }
 
   void publishColor(mynteye::Image::pointer img, ros::Time stamp,
-      cv::Mat* mat) {
+      cv::Mat* mat, std::uint32_t seq) {
+    if (pub_color.getNumSubscribers() == 0)
+      return;
     std_msgs::Header header;
     // header.seq = 0;
     header.stamp = stamp;
     header.frame_id = color_frame_id;
     *mat = img->To(mynteye::ImageFormat::COLOR_RGB)->ToMat();
-    pub_color.publish(cv_bridge::CvImage(header, enc::RGB8, *mat).toImageMsg());
-    // NODELET_INFO_STREAM("Publish color");
+
+    auto &&msg =
+        cv_bridge::CvImage(header, enc::RGB8, *mat).toImageMsg();
+    auto &&info = getCameraInfo();
+    info->header.stamp = msg->header.stamp;
+    pub_color.publish(msg, info);
+  }
+
+  sensor_msgs::CameraInfoPtr getCameraInfo() {
+// http://docs.ros.org/kinetic/api/sensor_msgs/html/msg/CameraInfo.html
+    sensor_msgs::CameraInfo *camera_info = new sensor_msgs::CameraInfo();
+    camera_info_ptr_ = sensor_msgs::CameraInfoPtr(camera_info);
+
+    struct MYNTEYE_NAMESPACE::CameraCtrlRectLogData camera_ctrl_data;
+
+    // <arg name="stream_1280x720"   default="0" />
+    // <arg name="stream_2560x720"   default="1" />
+    // GetHDCameraCtrlData();
+    // <arg name="stream_1280x480"   default="2" />
+    // <arg name="stream_640x480"    default="3" />
+    // GetVGACameraCtrlData();
+
+    if (stream_mode == 0 || stream_mode == 1) {
+      camera_ctrl_data = mynteye->GetHDCameraCtrlData();
+    } else if (stream_mode == 2 || stream_mode == 3) {
+      camera_ctrl_data = mynteye->GetVGACameraCtrlData();
+    }
+
+    camera_info->header.frame_id = color_frame_id;
+    camera_info->width = camera_ctrl_data.OutImgWidth;
+    camera_info->height = camera_ctrl_data.OutImgHeight;
+
+    //     [fx  0 cx]
+    // K = [ 0 fy cy]
+    //     [ 0  0  1]
+    camera_info->K.at(0) = camera_ctrl_data.CamMat1[0];
+    camera_info->K.at(2) = camera_ctrl_data.CamMat1[2];
+    camera_info->K.at(4) = camera_ctrl_data.CamMat1[4];
+    camera_info->K.at(5) = camera_ctrl_data.CamMat1[5];
+    camera_info->K.at(8) = 1;
+
+    //     [fx'  0  cx' Tx]
+    // P = [ 0  fy' cy' Ty]
+    //     [ 0   0   1   0]
+    for (int i = 0; i < 12; i++) {
+        camera_info->P.at(i) = camera_ctrl_data.NewCamMat1[i];
+    }
+
+    camera_info->distortion_model = "plumb_bob";
+
+    // D of plumb_bob: (k1, k2, t1, t2, k3)
+    for (int i = 0; i < 5; i++) {
+      camera_info->D.push_back(camera_ctrl_data.CamDist1[i]);
+    }
+
+    // R to identity matrix
+    camera_info->R.at(0) = 1.0;
+    camera_info->R.at(1) = 0.0;
+    camera_info->R.at(2) = 0.0;
+    camera_info->R.at(3) = 0.0;
+    camera_info->R.at(4) = 1.0;
+    camera_info->R.at(5) = 0.0;
+    camera_info->R.at(6) = 0.0;
+    camera_info->R.at(7) = 0.0;
+    camera_info->R.at(8) = 1.0;
+
+    return camera_info_ptr_;
   }
 
   void publishDepth(mynteye::Image::pointer img, ros::Time stamp,
@@ -130,7 +198,9 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
               mynteye::ImageType::IMAGE_COLOR);
           if (image_color) {
             color_ok = true;
-            publishColor(image_color, t, &color);
+            static std::size_t count = 0;
+            ++count;
+            publishColor(image_color, t, &color, count);
           }
         }
 
@@ -251,7 +321,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
     // Image publishers
     image_transport::ImageTransport it_mynteye(nh);
-    pub_color = it_mynteye.advertise(color_topic, 1);  // color
+    pub_color = it_mynteye.advertiseCamera(color_topic, 1);  // color
     NODELET_INFO_STREAM("Advertized on topic " << color_topic);
     pub_depth = it_mynteye.advertise(depth_topic, 1);  // depth
     NODELET_INFO_STREAM("Advertized on topic " << depth_topic);
