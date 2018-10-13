@@ -109,26 +109,17 @@ void Camera::Close() {
   p_->Close();
 }
 
-void Camera::SetLogData(const std::string& file_name)
-{
+void Camera::SetLogData(const std::string &file_name) {
   p_->SetCameraLogData(file_name);
 }
 
-void Camera::GetHDCameraLogDataFile()
-{
-  p_->GetHDCameraLogData();
-}
-void Camera::GetVGACameraLogDataFile()
-{
-  p_->GetVGACameraLogData();
-}
+void Camera::GetHDCameraLogDataFile() { p_->GetHDCameraLogData(); }
+void Camera::GetVGACameraLogDataFile() { p_->GetVGACameraLogData(); }
 
-struct CameraCtrlRectLogData Camera::GetHDCameraCtrlData()
-{
+struct CameraCtrlRectLogData Camera::GetHDCameraCtrlData() {
   return p_->GetHDCameraCtrlData();
 }
 
-struct CameraCtrlRectLogData Camera::GetVGACameraCtrlData()
-{
+struct CameraCtrlRectLogData Camera::GetVGACameraCtrlData() {
   return p_->GetVGACameraCtrlData();
 }
