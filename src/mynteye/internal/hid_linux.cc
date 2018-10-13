@@ -1,3 +1,16 @@
+// Copyright 2018 Slightech Co., Ltd. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 #include "mynteye/internal/hid.h"
 #include "mynteye/util/log.h"
 
@@ -62,7 +75,8 @@ int hid_device::send(int num, void *buf, int len, int timeout) {
     return -1;
   }
   if (hid->ep_out) {
-    return usb_bulk_write(hid->usb, hid->ep_out, static_cast<char *>(buf), len, timeout);
+    return usb_bulk_write(hid->usb, hid->ep_out, static_cast<char *>(buf), len,
+                          timeout);
   } else {
     return usb_control_msg(hid->usb, 0x21, 9, 0, hid->iface,
         static_cast<char *>(buf), len, timeout);
@@ -157,7 +171,8 @@ void hid_device::droped() {
  * and usage, and even then is may not be truly correct, but it does
  * work with the Teensy Raw HID example.
  */
-int hid_device::hid_parse_item(uint32_t *val, uint8_t **data, const uint8_t *end) {
+int hid_device::hid_parse_item(uint32_t *val, uint8_t **data,
+                               const uint8_t *end) {
   const uint8_t *p = *data;
   uint8_t tag;
   int table[4] = {0, 1, 2, 4};
