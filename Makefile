@@ -22,6 +22,7 @@ include CommonDefs.mk
 help:
 	@echo "Usage:"
 	@echo "  make help      show help message"
+	@echo "  make init      init project"
 	@echo "  make build     build project"
 	@echo "  make install   build and install"
 	@echo "  make samples   build samples"
@@ -30,6 +31,19 @@ help:
 	@echo "  make pkg       package sdk"
 	@echo "  make clean     clean"
 	@echo "  make cleanall  cleanall"
+
+# deps
+
+submodules:
+	@git submodule update --init
+
+# init
+
+init: submodules
+	@$(call echo,Make $@)
+	@$(SH) ./scripts/init.sh
+
+.PHONY: init
 
 # build
 
