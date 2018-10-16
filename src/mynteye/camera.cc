@@ -93,9 +93,9 @@ mynteye::StreamData Camera::RetrieveImage(const ImageType& type,
   return {data.img_info, data.img};
 }
 
-std::vector<mynteye::MotionData> Camera::RetrieveMotion() {
+std::vector<mynteye::MotionData> Camera::RetrieveMotions() {
   std::vector<mynteye::MotionData> datas;
-  for (auto &&data : p_->GetImuData()) {
+  for (auto &&data : p_->GetImuDatas()) {
     datas.push_back({data.imu});
   }
   return datas;

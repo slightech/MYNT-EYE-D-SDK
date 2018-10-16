@@ -762,7 +762,7 @@ void CameraPrivate::ImageInfoCallback(const ImgInfoPacket &packet) {
   img_info_.push_back(tmp);
 }
 
-std::vector<device::MotionData> CameraPrivate::GetImuData() {
+std::vector<device::MotionData> CameraPrivate::GetImuDatas() {
   if (!is_imu_open_)
     LOGE("Imu is not opened !");
 

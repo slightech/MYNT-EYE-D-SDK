@@ -86,7 +86,7 @@ class MYNTEYE_API Camera {
   mynteye::StreamData RetrieveImage(const ImageType& type, ErrorCode* code);
 
   /** Get Motion Data */
-  std::vector<mynteye::MotionData> RetrieveMotion();
+  std::vector<mynteye::MotionData> RetrieveMotions();
 
   /** Wait according to framerate. */
   void Wait() const;
