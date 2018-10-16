@@ -44,15 +44,19 @@
 
   <!-- Node params -->
 
-  <arg name="mynteye"            default="mynteye" />
-  <arg name="base_frame"         default="$(arg mynteye)_link_frame" />
-  <arg name="color_frame"        default="$(arg mynteye)_color_frame" />
-  <arg name="depth_frame"        default="$(arg mynteye)_depth_frame" />
-  <arg name="points_frame"       default="$(arg mynteye)_points_frame" />
+  <arg name="mynteye"       default="mynteye" />
+  <arg name="base_frame"    default="$(arg mynteye)_link_frame" />
+  <arg name="color_frame"   default="$(arg mynteye)_color_frame" />
+  <arg name="depth_frame"   default="$(arg mynteye)_depth_frame" />
+  <arg name="points_frame"  default="$(arg mynteye)_points_frame" />
+  <arg name="imu_frame"     default="$(arg mynteye)_imu_frame" />
+  <arg name="temp_frame"    default="$(arg mynteye)_temp_frame" />
 
-  <arg name="color_topic"        default="$(arg mynteye)/color" />
-  <arg name="depth_topic"        default="$(arg mynteye)/depth" />
-  <arg name="points_topic"       default="$(arg mynteye)/points" />
+  <arg name="color_topic"   default="$(arg mynteye)/color" />
+  <arg name="depth_topic"   default="$(arg mynteye)/depth" />
+  <arg name="points_topic"  default="$(arg mynteye)/points" />
+  <arg name="imu_topic"     default="$(arg mynteye)/imu" />
+  <arg name="temp_topic"    default="$(arg mynteye)/temp" />
 
   <node name="mynteye_wrapper_node" pkg="mynteye_wrapper" type="mynteye_wrapper_node" output="screen">
 
@@ -79,11 +83,15 @@
     <param name="color_frame"  value="$(arg color_frame)" />
     <param name="depth_frame"  value="$(arg depth_frame)" />
     <param name="points_frame" value="$(arg points_frame)" />
+    <param name="imu_frame"    value="$(arg imu_frame)" />
+    <param name="temp_frame"   value="$(arg temp_frame)" />
 
     <!-- Topic names -->
     <param name="color_topic"  value="$(arg color_topic)" />
     <param name="depth_topic"  value="$(arg depth_topic)" />
     <param name="points_topic" value="$(arg points_topic)" />
+    <param name="imu_topic"    value="$(arg imu_topic)" />
+    <param name="temp_topic"   value="$(arg temp_topic)" />
   </node>
 
   <arg name="pi/2" value="1.5707963267948966" />
@@ -95,5 +103,10 @@
       args="$(arg optical_rotate) $(arg base_frame) $(arg depth_frame) 100" />
   <node pkg="tf" type="static_transform_publisher" name="link3_broadcaster"
       args="$(arg optical_rotate) $(arg base_frame) $(arg points_frame) 100" />
+
+  <node pkg="tf" type="static_transform_publisher" name="link4_broadcaster"
+      args="0 0 0 0 0 0 $(arg color_frame) $(arg imu_frame) 100" />
+  <node pkg="tf" type="static_transform_publisher" name="link5_broadcaster"
+      args="0 0 0 0 0 0 $(arg color_frame) $(arg temp_frame) 100" />
 
 </launch>

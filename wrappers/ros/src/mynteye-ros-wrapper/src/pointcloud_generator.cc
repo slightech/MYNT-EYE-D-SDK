@@ -2,7 +2,7 @@
 
 #include <utility>
 
-using namespace mynteye_wrapper;
+MYNTEYE_USE_NAMESPACE
 
 PointCloudGenerator::PointCloudGenerator(CameraIntrinsics in, Callback callback,
     std::int32_t frequency)

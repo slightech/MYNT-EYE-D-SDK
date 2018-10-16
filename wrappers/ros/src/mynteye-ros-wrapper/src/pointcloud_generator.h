@@ -15,7 +15,7 @@
 
 #include "mynteye/util/rate.h"
 
-namespace mynteye_wrapper {
+MYNTEYE_BEGIN_NAMESPACE
 
 struct CameraIntrinsics {
   double factor;
@@ -59,6 +59,6 @@ class PointCloudGenerator {
   bool generating_;
 };
 
-}  // namespace mynteye_wrapper
+MYNTEYE_END_NAMESPACE
 
 #endif  // MYNTEYE_WRAPPER_POINTCLOUD_GENERATOR_H_

@@ -1,9 +1,10 @@
-
 #include <ros/ros.h>
 #include <nodelet/nodelet.h>
-#include <image_transport/image_transport.h>
+
 #include <cv_bridge/cv_bridge.h>
+#include <image_transport/image_transport.h>
 #include <sensor_msgs/image_encodings.h>
+#include <sensor_msgs/Imu.h>
 #include <tf/tf.h>
 #include <tf2_ros/static_transform_broadcaster.h>
 
@@ -17,10 +18,12 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
+#include "mynteye_wrapper/Temp.h"
+
 #include "mynteye/camera.h"
 #include "pointcloud_generator.h" // NOLINT
 
-namespace mynteye_wrapper {
+MYNTEYE_BEGIN_NAMESPACE
 
 namespace enc = sensor_msgs::image_encodings;
 
@@ -32,10 +35,14 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   image_transport::CameraPublisher pub_color;
   image_transport::CameraPublisher pub_depth;
   ros::Publisher pub_points;
-// tf2_ros::StaticTransformBroadcaster static_tf_broadcaster;
+  ros::Publisher pub_imu_;
+  ros::Publisher pub_temp_;
+
+  // tf2_ros::StaticTransformBroadcaster static_tf_broadcaster;
 
   sensor_msgs::CameraInfoPtr camera_info_ptr_;
-// Launch params
+
+  // Launch params
   int dev_index;
   int framerate;
   int depth_mode;
@@ -50,6 +57,8 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   std::string color_frame_id;
   std::string depth_frame_id;
   std::string points_frame_id;
+  std::string imu_frame_id;
+  std::string temp_frame_id;
 
   // MYNTEYE objects
   mynteye::InitParams params;
@@ -254,21 +263,31 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     color_frame_id = "mynteye_color_frame";
     depth_frame_id = "mynteye_depth_frame";
     points_frame_id = "mynteye_points_frame";
+    imu_frame_id = "mynteye_imu_frame";
+    temp_frame_id = "mynteye_temp_frame";
     nh_ns.getParam("base_frame_id", base_frame_id);
     nh_ns.getParam("color_frame", color_frame_id);
     nh_ns.getParam("depth_frame", depth_frame_id);
     nh_ns.getParam("points_frame", points_frame_id);
+    nh_ns.getParam("imu_frame", imu_frame_id);
+    nh_ns.getParam("temp_frame", temp_frame_id);
     NODELET_INFO_STREAM("base_frame: " << base_frame_id);
     NODELET_INFO_STREAM("color_frame: " << color_frame_id);
     NODELET_INFO_STREAM("depth_frame: " << depth_frame_id);
     NODELET_INFO_STREAM("points_frame: " << points_frame_id);
+    NODELET_INFO_STREAM("imu_frame: " << imu_frame_id);
+    NODELET_INFO_STREAM("temp_frame: " << temp_frame_id);
 
     std::string color_topic = "mynteye/color";
     std::string depth_topic = "mynteye/depth";
     std::string points_topic = "mynteye/points";
+    std::string imu_topic = "mynteye/imu";
+    std::string temp_topic = "mynteye/temp";
     nh_ns.getParam("color_topic", color_topic);
     nh_ns.getParam("depth_topic", depth_topic);
     nh_ns.getParam("points_topic", points_topic);
+    nh_ns.getParam("imu_topic", imu_topic);
+    nh_ns.getParam("temp_topic", temp_topic);
 
     // MYNTEYE objects
     mynteye.reset(new mynteye::Camera);
@@ -329,6 +348,11 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     pub_points = nh.advertise<sensor_msgs::PointCloud2>(points_topic, 1);
     NODELET_INFO_STREAM("Advertized on topic " << points_topic);
 
+    pub_imu_ = nh.advertise<sensor_msgs::Imu>(imu_topic, 1);
+    NODELET_INFO_STREAM("Advertized on topic " << imu_topic);
+    // pub_temp_ = nh.advertise<mynteye_wrapper::Temp>(temp_topic, 1);
+    // NODELET_INFO_STREAM("Advertized on topic " << temp_topic);
+
     double cx, cy, fx, fy;
     std::int32_t points_frequency;
     nh_ns.getParam("cx", cx);
@@ -358,7 +382,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   }
 };
 
-}  // namespace mynteye_wrapper
+MYNTEYE_END_NAMESPACE
 
 #include <pluginlib/class_list_macros.h> // NOLINT
-PLUGINLIB_EXPORT_CLASS(mynteye_wrapper::MYNTEYEWrapperNodelet, nodelet::Nodelet);
+PLUGINLIB_EXPORT_CLASS(MYNTEYE_NAMESPACE::MYNTEYEWrapperNodelet, nodelet::Nodelet);
