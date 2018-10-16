@@ -31,6 +31,14 @@ help:
 	@echo "  make clean     clean"
 	@echo "  make cleanall  cleanall"
 
+# init
+
+init:
+	@$(call echo,Make $@)
+	@$(SH) ./scripts/init.sh
+
+.PHONY: init
+
 # build
 
 build:
