@@ -102,7 +102,7 @@ class CameraPrivate {
   void StartCaptureImage();
   void StopCaptureImage();
   /** Get imu data */
-  motion_datas_t GetImuData();
+  motion_datas_t GetImuDatas();
 
   /** Wait according to framerate. */
   void Wait();
