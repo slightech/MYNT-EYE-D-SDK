@@ -39,8 +39,10 @@
   <arg name="fx" default="0" />
   <arg name="fy" default="0" />
 
-  <!-- Generating points frequency, make slower then framerate -->
+  <!-- Generating points frequency, make slower than framerate -->
   <arg name="points_frequency" default="2" />
+
+  <arg name="gravity" default="9.8" />
 
   <!-- Node params -->
 
@@ -77,6 +79,8 @@
     <param name="fy" value="$(arg fy)" />
 
     <param name="points_frequency" value="$(arg points_frequency)" />
+
+    <param name="gravity" value="$(arg gravity)" />
 
     <!-- Frame ids -->
     <param name="base_frame"   value="$(arg base_frame)" />
