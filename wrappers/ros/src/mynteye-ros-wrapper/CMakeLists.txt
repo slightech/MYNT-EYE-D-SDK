@@ -20,6 +20,7 @@ endfunction(checkPackage)
 find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   image_transport
+  message_runtime
   nodelet
   roscpp
   sensor_msgs
@@ -33,6 +34,16 @@ checkPackage("nodelet" "")
 checkPackage("roscpp" "")
 checkPackage("sensor_msgs" "")
 checkPackage("std_msgs" "")
+
+add_message_files(
+  FILES
+  Temp.msg
+)
+
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+)
 
 catkin_package()
 

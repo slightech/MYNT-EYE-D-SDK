@@ -136,7 +136,7 @@ enum class ImageMode : std::int32_t {
   IMAGE_RECTIFIED
 };
 
-struct CameraCtrlRectLogData {
+struct MYNTEYE_API CameraCtrlRectLogData {
 	union {
 		unsigned char uByteArray[1024];/**< union data defined as below struct { }*/
 		struct {
@@ -149,26 +149,26 @@ struct CameraCtrlRectLogData {
 			unsigned short	RECT_ScaleWidth;/**< Input image width(Single image) *RECT_Scale_Col_N /RECT_Scale_Col_M */
 			unsigned short	RECT_ScaleHeight;/**< Input image height(Single image) *RECT_Scale_Row_N /RECT_Scale_Row_M */
 			float	        CamMat1[9];/**< Left Camera Matrix
-								fx, 0, cx, 0, fy, cy, 0, 0, 1 
+								fx, 0, cx, 0, fy, cy, 0, 0, 1
 								fx,fy : focus  ; cx,cy : principle point */
 			float	        CamDist1[8];/**< Left Camera Distortion Matrix
-								k1, k2, p1, p2, k3, k4, k5, k6 
+								k1, k2, p1, p2, k3, k4, k5, k6
 								k1~k6 : radial distort ; p1,p2 : tangential distort */
 			float			CamMat2[9];/**< Right Camera Matrix
-								fx, 0, cx, 0, fy, cy, 0, 0, 1  
+								fx, 0, cx, 0, fy, cy, 0, 0, 1
 								fx,fy : focus  ; cx,cy : principle point */
 			float			CamDist2[8];/**< Right Camera Distortion Matrix
-								k1, k2, p1, p2, k3, k4, k5, k6 
+								k1, k2, p1, p2, k3, k4, k5, k6
 								k1~k6 : radial distort ; p1,p2 : tangential distort */
-			float			RotaMat[9];/**< Rotation matrix between the left and right camera coordinate systems. 
+			float			RotaMat[9];/**< Rotation matrix between the left and right camera coordinate systems.
 								| [0] [1] [2] |       |Xcr|
 								| [3] [4] [5] |   *   |Ycr|            => cr = right camera coordinate
 								| [6] [7] [8] |       |Zcr| */
-			float			TranMat[3];/**< Translation vector between the coordinate systems of the cameras. 
+			float			TranMat[3];/**< Translation vector between the coordinate systems of the cameras.
 								|[0]|      |Xcr|
 								|[1]|   +  |Ycr|	             => cr = right camera coordinate
 								|[2]|      |Zcr| */
-			float			LRotaMat[9];/**< 3x3 rectification transform (rotation matrix) for the left camera. 
+			float			LRotaMat[9];/**< 3x3 rectification transform (rotation matrix) for the left camera.
 								| [0] [1] [2] |       |Xcl|
 								| [3] [4] [5] |   *   |Ycl|            => cl = left camera coordinate
 								| [6] [7] [8] |       |Zcl| */
@@ -176,11 +176,11 @@ struct CameraCtrlRectLogData {
 								| [0] [1] [2] |       |Xcr|
 								| [3] [4] [5] |   *   |Ycr|            => cr = right camera coordinate
 								| [6] [7] [8] |       |Zcr| */
-			float			NewCamMat1[12];/**< 3x4 projection matrix in the (rectified) coordinate systems for the left camera. 
-								fx' 0 cx' 0 0 fy' cy' 0 0 0 1 0 
+			float			NewCamMat1[12];/**< 3x4 projection matrix in the (rectified) coordinate systems for the left camera.
+								fx' 0 cx' 0 0 fy' cy' 0 0 0 1 0
 								fx',fy' : rectified focus ; cx', cy; : rectified principle point */
-			float			NewCamMat2[12];/**< 3x4 projection matrix in the (rectified) coordinate systems for the rightt camera. 
-								fx' 0 cx' TranMat[0]* 0 fy' cy' 0 0 0 1 0 
+			float			NewCamMat2[12];/**< 3x4 projection matrix in the (rectified) coordinate systems for the rightt camera.
+								fx' 0 cx' TranMat[0]* 0 fy' cy' 0 0 0 1 0
 								fx',fy' : rectified focus ; cx', cy; : rectified principle point */
 			unsigned short	RECT_Crop_Row_BG;/**< Rectidied image crop row begin */
 			unsigned short	RECT_Crop_Row_ED;/**< Rectidied image crop row end */
@@ -275,5 +275,10 @@ struct MYNTEYE_API ImuData {
     Reset();
   }
 };
+
+MYNTEYE_END_NAMESPACE
+
+MYNTEYE_API
+std::ostream& operator<<(std::ostream& os, const mynteye::StreamFormat& code);
 
 #endif  // MYNTEYE_TYPES_H_
