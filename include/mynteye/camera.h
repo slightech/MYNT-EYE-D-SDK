@@ -18,6 +18,7 @@
 #include <cstdint>
 #include <memory>
 #include <vector>
+#include <string>
 
 #include "mynteye/device_info.h"
 #include "mynteye/image.h"
@@ -67,21 +68,29 @@ class MYNTEYE_API Camera {
   Camera();
   ~Camera();
 
+  /** Get Deveces info */
   std::vector<DeviceInfo> GetDevices() const;
+  /** Get Deveces info with parameter.*/
   void GetDevices(std::vector<DeviceInfo>* dev_infos) const;
 
+  /** Get data stream information on chosed device.*/
   void GetResolutions(
       const std::int32_t& dev_index,
       std::vector<StreamInfo>* color_infos,
       std::vector<StreamInfo>* depth_infos) const;
 
+  /** Open camera */
   ErrorCode Open();
+  /** Open camera with params */
   ErrorCode Open(const InitParams& params);
 
+  /** Get the work status of the camera true(working)/false(stopped) */
   bool IsOpened() const;
 
+  /** Get the work status of the camera true(working)/false(stopped) */
   std::vector<mynteye::StreamData> RetrieveImages(const ImageType& type);
-  std::vector<mynteye::StreamData> RetrieveImages(const ImageType& type, ErrorCode* code);
+  std::vector<mynteye::StreamData> RetrieveImages(
+    const ImageType& type, ErrorCode* code);
   mynteye::StreamData RetrieveImage(const ImageType& type);
   mynteye::StreamData RetrieveImage(const ImageType& type, ErrorCode* code);
 
@@ -91,14 +100,20 @@ class MYNTEYE_API Camera {
   /** Wait according to framerate. */
   void Wait() const;
 
+  /** Close the camera. */
   void Close();
-
+  /** Use the XXX.bin file to calibration the camera.*/
   void SetLogData(const std::string& file_name);
-
+  /** Get camera HD stream config information output to RectfyLog_PUMA_1.txt. */
   void GetHDCameraLogDataFile();
+  /** Get camera VGA stream config information output to RectfyLog_PUMA_2.txt. */
   void GetVGACameraLogDataFile();
 
+  /** Get camera HD stream config information 
+    return struct CameraCtrlRectLogData.*/
   struct CameraCtrlRectLogData GetHDCameraCtrlData();
+  /** Get camera VGA stream config information 
+    return struct CameraCtrlRectLogData.*/
   struct CameraCtrlRectLogData GetVGACameraCtrlData();
 
  private:
