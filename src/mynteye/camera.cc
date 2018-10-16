@@ -54,13 +54,7 @@ ErrorCode Camera::Open() {
 }
 
 ErrorCode Camera::Open(const InitParams& params) {
-  if (ErrorCode::SUCCESS == p_->Open(params)) {
-    return p_->StartHidTracking();
-  } else {
-    return ErrorCode::ERROR_CAMERA_OPEN_FAILED;
-  }
-
-  return ErrorCode::SUCCESS;
+  return p_->Open(params);
 }
 
 bool Camera::IsOpened() const {
@@ -122,4 +116,8 @@ struct CameraCtrlRectLogData Camera::GetHDCameraCtrlData() {
 
 struct CameraCtrlRectLogData Camera::GetVGACameraCtrlData() {
   return p_->GetVGACameraCtrlData();
+}
+
+void Camera::SetImageMode(const ImageMode& mode) {
+  p_->SetImageMode(mode);
 }

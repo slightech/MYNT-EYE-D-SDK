@@ -120,10 +120,17 @@ class CameraPrivate {
 
   void SyncCameraLogData();
 
+  void SetImageMode(const ImageMode &mode);
+
  private:
   void OnInit();
   void OnPreWait();
   void OnPostWait();
+
+  void SyntheticImageColor();
+  void SyntheticImageDepth();
+  void CaptureImageColor(ErrorCode *code);
+  void CaptureImageDepth(ErrorCode *code);
 
   Image::pointer RetrieveImageColor(ErrorCode* code);
   Image::pointer RetrieveImageDepth(ErrorCode* code);
@@ -174,9 +181,6 @@ class CameraPrivate {
 
   motion_datas_t imu_data_;
   img_info_datas_t img_info_;
-
-  void Synthetic(const ImageType &type);
-  void CaptureImage(const ImageType &type, ErrorCode *code);
 
   std::mutex cap_color_mtx_;
   std::mutex cap_depth_mtx_;

@@ -127,6 +127,15 @@ enum class StreamFormat : std::int32_t {
   STREAM_FORMAT_LAST
 };
 
+/**
+ * @ingroup enumerations
+ * @brief List image mode.
+ */
+enum class ImageMode : std::int32_t {
+  IMAGE_RAW,
+  IMAGE_RECTIFIED
+};
+
 struct CameraCtrlRectLogData {
 	union {
 		unsigned char uByteArray[1024];/**< union data defined as below struct { }*/
@@ -187,7 +196,7 @@ struct CameraCtrlRectLogData {
             float ReProjectMat[16];
 		};
 	};
-} ;
+};
 
 MYNTEYE_END_NAMESPACE
 

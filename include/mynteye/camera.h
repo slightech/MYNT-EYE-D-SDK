@@ -18,6 +18,7 @@
 #include <cstdint>
 #include <memory>
 #include <vector>
+#include <string>
 
 #include "mynteye/device_info.h"
 #include "mynteye/image.h"
@@ -100,6 +101,8 @@ class MYNTEYE_API Camera {
 
   struct CameraCtrlRectLogData GetHDCameraCtrlData();
   struct CameraCtrlRectLogData GetVGACameraCtrlData();
+
+  void SetImageMode(const ImageMode& mode);
 
  private:
   std::unique_ptr<CameraPrivate> p_;

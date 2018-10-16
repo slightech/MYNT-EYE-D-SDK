@@ -66,6 +66,7 @@ Image::Image(ImageType type, ImageFormat format, int width, int height,
   auto n = get_image_size(format, width, height);
   data_.assign(n, 0);
   set_valid_size(n);
+  set_frame_id(0);
 }
 
 Image::~Image() {
@@ -91,9 +92,10 @@ cv::Mat Image::ToMat() {
 
 Image::pointer Image::Clone() const {
   auto image = Create(type_, format_, width_, height_, false);
-  std::copy(data_.begin(), data_.end(), image->data_.begin());
   image->set_valid_size(valid_size_);
   image->set_frame_id(frame_id_);
+  image->resize();
+  std::copy(data_.begin(), data_.end(), image->data_.begin());
   return image;
 }
 

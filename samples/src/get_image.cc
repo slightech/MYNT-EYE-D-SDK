@@ -38,8 +38,9 @@ int main(int argc, char const* argv[]) {
   params.depth_mode = mynteye::DepthMode::DEPTH_COLORFUL;
   // params.stream_mode = StreamMode::STREAM_640x480;
   params.ir_intensity = 4;
-  params.framerate = 10;
+  params.framerate = 60;
 
+  cam.SetImageMode(mynteye::ImageMode::IMAGE_RECTIFIED);
   cam.Open(params);
 
   std::cout << std::endl;

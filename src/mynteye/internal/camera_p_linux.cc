@@ -80,7 +80,7 @@ Image::pointer CameraPrivate::RetrieveImageDepth(ErrorCode* code) {
     depth_raw = false;
     if (!depth_image_buf_) {
       depth_buf_ = (unsigned char*)calloc(
-          depth_img_width*2*depth_img_height*3, sizeof(unsigned char));
+          depth_img_width * 2 * depth_img_height * 3, sizeof(unsigned char));
       if (dtc_ == DEPTH_IMG_COLORFUL_TRANSFER) {
         depth_image_buf_ = ImageDepth::Create(ImageFormat::DEPTH_RGB,
             depth_img_width, depth_img_height, true);
@@ -112,11 +112,13 @@ Image::pointer CameraPrivate::RetrieveImageDepth(ErrorCode* code) {
   }
 
   depth_image_buf_->set_valid_size(depth_image_size_);
+  depth_image_buf_->set_frame_id(depth_serial_number_);
 
   *code = ErrorCode::SUCCESS;
   if (depth_raw) {
     return depth_image_buf_;
   } else {
+    depth_image_buf_->resize();
     std::copy(depth_buf_, depth_buf_ + depth_image_size_,
         depth_image_buf_->data());
     // EtronDI_Convert_Depth_Y_To_Buffer(etron_di_, &dev_sel_info_,

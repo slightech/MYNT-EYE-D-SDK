@@ -19,6 +19,7 @@
 #include <map>
 #include <memory>
 #include <vector>
+#include <iostream>
 
 #ifdef WITH_OPENCV
 #include <opencv2/core/core.hpp>
@@ -34,7 +35,7 @@ class MYNTEYE_API Image {
   using pointer = std::shared_ptr<Image>;
 
  protected:
-  Image(ImageType type, ImageFormat format, int width, int height, 
+  Image(ImageType type, ImageFormat format, int width, int height,
       bool is_buffer);
 
  public:
@@ -63,8 +64,8 @@ class MYNTEYE_API Image {
     return frame_id_;
   }
 
-  void set_frame_id(int count) {
-    frame_id_ = count;
+  void set_frame_id(int frame_id) {
+    frame_id_ = frame_id;
   }
 
   bool is_buffer() const {
@@ -89,6 +90,10 @@ class MYNTEYE_API Image {
 
   void set_valid_size(std::size_t valid_size) {
     valid_size_ = valid_size;
+  }
+
+  void resize() {
+    data_.assign(valid_size_, 0);
   }
 
   virtual pointer To(ImageFormat format) = 0;

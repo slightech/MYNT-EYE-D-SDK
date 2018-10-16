@@ -77,6 +77,7 @@ bool Channels::ExtractHidData(ImuResPacket &imu, ImgInfoResPacket &img) {
 
   int size = ReadHidData(data, PACKET_SIZE * 2);
   if (size < 0) {
+    hid_track_stop_ = true;
     LOGE("Error:: Reading, device went offline !");
     return false;
   }

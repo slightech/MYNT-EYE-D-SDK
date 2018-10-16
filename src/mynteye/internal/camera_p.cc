@@ -76,8 +76,6 @@ inline std::uint8_t check_sum(std::uint8_t *buf, std::uint8_t length) {
   return crc8;
 }
 
-std::uint16_t CameraPrivate::counter = 1;
-
 CameraPrivate::CameraPrivate()
   : etron_di_(nullptr),
     dev_sel_info_({-1}),
@@ -107,6 +105,7 @@ CameraPrivate::CameraPrivate()
       (PETRONDI_STREAM_INFO)malloc(sizeof(ETRONDI_STREAM_INFO)*64);
   stream_depth_info_ptr_ =
       (PETRONDI_STREAM_INFO)malloc(sizeof(ETRONDI_STREAM_INFO)*64);
+  depth_data_type_ = 2;
   OnInit();
 
   channels_ = std::make_shared<Channels>();
@@ -120,7 +119,6 @@ CameraPrivate::~CameraPrivate() {
   channels_->StopHidTracking();
   StopCaptureImage();
   Close();
-  EtronDI_Release(&etron_di_);
 }
 
 void CameraPrivate::GetDevices(std::vector<DeviceInfo>* dev_infos) {
@@ -382,11 +380,8 @@ bool CameraPrivate::SetFWRegister(std::uint16_t address, std::uint16_t value,
 ErrorCode CameraPrivate::Open(const InitParams& params) {
   dev_sel_info_.index = params.dev_index;
 
-  // if (params.dev_info.type == PUMA) {
-    depth_data_type_ = 2;  // ETronDI_DEPTH_DATA_14_BITS
-    EtronDI_SetDepthDataType(etron_di_, &dev_sel_info_, depth_data_type_);
-    DBG_LOGI("SetDepthDataType: %d", depth_data_type_);
-  // }
+  EtronDI_SetDepthDataType(etron_di_, &dev_sel_info_, depth_data_type_);
+  DBG_LOGI("SetDepthDataType: %d", depth_data_type_);
 
   SetAutoExposureEnabled(params.state_ae);
   SetAutoWhiteBalanceEnabled(params.state_awb);
@@ -431,11 +426,6 @@ ErrorCode CameraPrivate::Open(const InitParams& params) {
       stream_depth_info_ptr_[depth_res_index_].nWidth,
       stream_depth_info_ptr_[depth_res_index_].nHeight,
       stream_depth_info_ptr_[depth_res_index_].bFormatMJPG ? "MJPG" : "YUYV");
-
-  if (depth_data_type_ != 1 && depth_data_type_ != 2) {
-    throw std::runtime_error(strings::format_string(
-        "Error: Depth data type (%d) not supported.", depth_data_type_));
-  }
 
   if (params.ir_intensity >= 0) {
     if (SetFWRegister(0xE0, params.ir_intensity)) {
@@ -486,6 +476,7 @@ ErrorCode CameraPrivate::Open(const InitParams& params) {
 #endif
 
   if (ETronDI_OK == ret) {
+    StartHidTracking();
     StartCaptureImage();
     SyncCameraLogData();
     return ErrorCode::SUCCESS;
@@ -556,18 +547,14 @@ CameraPrivate::stream_data_t CameraPrivate::RetrieveLatestImage(const ImageType&
   switch (type) {
     case ImageType::IMAGE_COLOR: {
       std::lock_guard<std::mutex> _(cap_color_mtx_);
-      if (color_data_.empty()) {
-        return {};
-      }
+      if (color_data_.empty()) { return {}; }
       auto data = color_data_.back();
       color_data_.clear();
       return data;
     } break;
     case ImageType::IMAGE_DEPTH: {
       std::lock_guard<std::mutex> _(cap_depth_mtx_);
-      if (depth_data_.empty()) {
-        return {};
-      }
+      if (depth_data_.empty()) { return {}; }
       auto data = depth_data_.back();
       depth_data_.clear();
       return data;
@@ -577,83 +564,72 @@ CameraPrivate::stream_data_t CameraPrivate::RetrieveLatestImage(const ImageType&
   }
 }
 
-void CameraPrivate::CaptureImage(const ImageType& type,
-    ErrorCode* code) {
-  switch (type) {
-    case ImageType::IMAGE_COLOR: {
-      std::unique_lock<std::mutex> _(cap_color_mtx_);
-      auto p = RetrieveImageColor(code);
-      if (p) {
-        auto color = p->Clone();
-        image_color_.push_back(color);
-      }
-      if (!image_color_.empty()) {
-        image_color_wait_.notify_one();
-      }
-    } break;
-    case ImageType::IMAGE_DEPTH: {
-      std::unique_lock<std::mutex> _(cap_depth_mtx_);
-      auto p = RetrieveImageDepth(code);
-      if (p) {
-        auto depth = p->Clone();
-        image_depth_.push_back(depth);
-      }
-      if (!image_depth_.empty()) {
-        image_depth_wait_.notify_one();
-      }
-    } break;
-    case ImageType::ALL: {
-      CaptureImage(ImageType::IMAGE_COLOR, code);
-      CaptureImage(ImageType::IMAGE_DEPTH, code);
-    } break;
-    default:
-      throw new std::runtime_error("CaptureImage: ImageType is unknown");
+void CameraPrivate::CaptureImageColor(ErrorCode* code) {
+  std::unique_lock<std::mutex> _(cap_color_mtx_);
+  auto p = RetrieveImageColor(code);
+  if (p) {
+    auto color = p->Clone();
+    image_color_.push_back(color);
+  }
+  if (!image_color_.empty()) {
+    image_color_wait_.notify_one();
   }
 }
 
-void CameraPrivate::Synthetic(const ImageType &type) {
-  switch (type) {
-    case ImageType::IMAGE_COLOR: {
-      std::unique_lock<std::mutex> _(cap_color_mtx_);
-      image_color_wait_.wait_for(_, std::chrono::seconds(1));
-      for (auto color : image_color_) {
-        for (auto info : img_info_) {
-          if (color->frame_id() == info.img_info->frame_id) {
-            stream_data_t data;
-            data.img_info = std::make_shared<ImgInfo>();
-            *data.img_info = *info.img_info;
-            data.img = color->Clone();
-            color_data_.push_back(data);
-          } else if (color->frame_id() < info.img_info->frame_id) {
-            image_color_.clear();
-            return;
-          } else {
-            img_info_.clear();
-            return;
-          }
-        }
-      }
-      image_color_.clear();
-      img_info_.clear();
-    } break;
-    case ImageType::IMAGE_DEPTH: {
-      std::unique_lock<std::mutex> _(cap_depth_mtx_);
-      image_depth_wait_.wait_for(_, std::chrono::seconds(1));
-      for (auto depth : image_depth_) {
-        stream_data_t data;
-        data.img_info = nullptr;
-        data.img = depth->Clone();
-        depth_data_.push_back(data);
-      }
-      image_depth_.clear();
-    } break;
-    case ImageType::ALL: {
-      Synthetic(ImageType::IMAGE_COLOR);
-      Synthetic(ImageType::IMAGE_DEPTH);
-    } break;
-    default:
-      throw new std::runtime_error("Synthetic: ImageType is unknown");
+void CameraPrivate::CaptureImageDepth(ErrorCode* code) {
+  std::unique_lock<std::mutex> _(cap_depth_mtx_);
+  auto p = RetrieveImageDepth(code);
+  if (p) {
+    auto depth = p->Clone();
+    image_depth_.push_back(depth);
   }
+  if (!image_depth_.empty()) {
+    image_depth_wait_.notify_one();
+  }
+}
+
+void CameraPrivate::SyntheticImageColor() {
+  std::unique_lock<std::mutex> _(cap_color_mtx_);
+  image_color_wait_.wait_for(_, std::chrono::seconds(1));
+
+  if (image_color_.empty() || img_info_.empty()) { return; }
+  if (image_color_.front()->frame_id() >
+      img_info_.back().img_info->frame_id) {
+    if (image_color_.size() > 5) { image_color_.clear(); }
+    img_info_.clear();
+    return;
+  } else if (image_color_.back()->frame_id() <
+      img_info_.front().img_info->frame_id) {
+    if (img_info_.size() > 5) { img_info_.clear(); }
+    image_color_.clear();
+    return;
+  }
+
+  for (auto color : image_color_) {
+    for (auto info : img_info_) {
+      if (color->frame_id() == info.img_info->frame_id) {
+        stream_data_t data;
+        data.img_info = std::make_shared<ImgInfo>();
+        *data.img_info = *info.img_info;
+        data.img = color->Clone();
+        color_data_.push_back(data);
+      }
+    }
+  }
+  image_color_.clear();
+  img_info_.clear();
+}
+
+void CameraPrivate::SyntheticImageDepth() {
+  std::unique_lock<std::mutex> _(cap_depth_mtx_);
+  image_depth_wait_.wait_for(_, std::chrono::seconds(1));
+  for (auto depth : image_depth_) {
+    stream_data_t data;
+    data.img_info = nullptr;
+    data.img = depth->Clone();
+    depth_data_.push_back(data);
+  }
+  image_depth_.clear();
 }
 
 void CameraPrivate::StartCaptureImage() {
@@ -661,24 +637,24 @@ void CameraPrivate::StartCaptureImage() {
   cap_image_thread_ = std::thread([this]() {
     ErrorCode code = ErrorCode::SUCCESS;
     while (is_capture_image_) {
-      CaptureImage(ImageType::ALL, &code);
+      CaptureImageColor(&code);
+      CaptureImageDepth(&code);
     }
   });
   sync_thread_ = std::thread([this]() {
     while (is_capture_image_) {
-      Synthetic(ImageType::ALL);
+      SyntheticImageColor();
+      SyntheticImageDepth();
     }
   });
 }
 
 void CameraPrivate::StopCaptureImage() {
   is_capture_image_ = false;
-  if (cap_image_thread_.joinable()) {
-    cap_image_thread_.join();
-  }
-  if (sync_thread_.joinable()) {
-    sync_thread_.join();
-  }
+  cap_image_thread_.join();
+  image_color_wait_.notify_all();
+  image_depth_wait_.notify_all();
+  sync_thread_.join();
 }
 
 void CameraPrivate::Wait() {
@@ -697,6 +673,7 @@ void CameraPrivate::Close() {
     dev_sel_info_.index = -1;
   }
   ReleaseBuf();
+  EtronDI_Release(&etron_di_);
 }
 
 void CameraPrivate::ReleaseBuf() {
@@ -987,4 +964,17 @@ struct CameraCtrlRectLogData CameraPrivate::GetHDCameraCtrlData() {
 }
 struct CameraCtrlRectLogData CameraPrivate::GetVGACameraCtrlData() {
   return GetCameraCtrlData(1);
+}
+
+void CameraPrivate::SetImageMode(const ImageMode& mode) {
+  switch (mode) {
+    case ImageMode::IMAGE_RAW:
+      depth_data_type_ = 9; // ETronDI_DEPTH_DATA_11_BITS_RAW
+      break;
+    case ImageMode::IMAGE_RECTIFIED:
+      depth_data_type_ = 4; // ETronDI_DEPTH_DATA_11_BITS
+      break;
+    default:
+      throw new std::runtime_error("ImageMode is unknown");
+  }
 }
