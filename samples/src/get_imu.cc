@@ -67,27 +67,29 @@ int main(int argc, char const* argv[]) {
 
     auto motion_datas = cam.RetrieveMotions();
     std::cout << "Imu count: " << motion_datas.size() << std::endl;
-    for (auto data : motion_datas) {
-      if (data.imu) {
-        if (data.imu->flag == 1) {  // accelerometer
-          std::cout << "accel timestamp: " << data.imu->timestamp
-            << ", accel_x: " << data.imu->accel[0]
-            << ", accel_y: " << data.imu->accel[1]
-            << ", accel_z: " << data.imu->accel[2]
-            << ", temperature: " << data.imu->temperature
-            << std::endl;
-        } else if (data.imu->flag == 2) {  // gyroscope
-          std::cout << "gyro timestamp: " << data.imu->timestamp
-            << ", gyro_x: " << data.imu->gyro[0]
-            << ", gyro_y: " << data.imu->gyro[1]
-            << ", gyro_z: " << data.imu->gyro[2]
-            << ", temperature: " << data.imu->temperature
-            << std::endl;
+    if (motion_datas.size() > 0) {
+      for (auto data : motion_datas) {
+        if (data.imu) {
+          if (data.imu->flag == 1) {  // accelerometer
+            std::cout << "accel timestamp: " << data.imu->timestamp
+              << ", accel_x: " << data.imu->accel[0]
+              << ", accel_y: " << data.imu->accel[1]
+              << ", accel_z: " << data.imu->accel[2]
+              << ", temperature: " << data.imu->temperature
+              << std::endl;
+          } else if (data.imu->flag == 2) {  // gyroscope
+            std::cout << "gyro timestamp: " << data.imu->timestamp
+              << ", gyro_x: " << data.imu->gyro[0]
+              << ", gyro_y: " << data.imu->gyro[1]
+              << ", gyro_z: " << data.imu->gyro[2]
+              << ", temperature: " << data.imu->temperature
+              << std::endl;
+          } else {
+            std::cerr << "Imu type is unknown" << std::endl;
+          }
         } else {
-          std::cerr << "Imu type is unknown" << std::endl;
+          std::cerr << "Motion data is empty" << std::endl;
         }
-      } else {
-        std::cerr << "Motion data is empty" << std::endl;
       }
       std::cout << std::endl;
     }
