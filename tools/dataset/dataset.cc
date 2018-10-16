@@ -1,4 +1,17 @@
-#include "dataset.h"
+// Copyright 2018 Slightech Co., Ltd. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+#include "dataset/dataset.h"
 
 #ifdef USE_OPENCV2
 #include <opencv2/highgui/highgui.hpp>
@@ -10,9 +23,6 @@
 #include <limits>
 #include <stdexcept>
 #include <utility>
-
-//#include "mynteye/files.h"
-//#include "mynteye/encapsulation.h"
 
 #define FULL_PRECISION \
   std::fixed << std::setprecision(std::numeric_limits<double>::max_digits10)
@@ -58,7 +68,6 @@ Dataset::writer_t Dataset::GetMotionWriter() {
     writer->outdir = outdir_;
     writer->outfile = writer->outdir + OS_SEP "motion.txt";
 
-    //files::mkdir(writer->outdir);
     writer->ofs.open(writer->outfile, std::ofstream::out);
     writer->ofs << "seq, flag, timestamp, "
                    "accel_x, accel_y, accel_z, "
@@ -77,7 +86,6 @@ Dataset::writer_t Dataset::GetStreamWriter() {
     writer->outdir = outdir_;
     writer->outfile = writer->outdir + OS_SEP "left" + OS_SEP "stream.txt";
 
-    //files::mkdir(writer->outdir);
     writer->ofs.open(writer->outfile, std::ofstream::out);
     writer->ofs << "seq, frame_id, timestamp, exposure_time" << std::endl;
     writer->ofs << FULL_PRECISION;
@@ -89,4 +97,4 @@ Dataset::writer_t Dataset::GetStreamWriter() {
   return stream_writer_;
 }
 
-} //namespace d1000-tools
+}  // namespace d1000_tools

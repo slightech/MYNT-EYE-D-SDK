@@ -1,7 +1,20 @@
+/*! \file eSPDI.h
+  	\brief Etron SDK API export functions, data structure and variable definition
+  	Copyright:
+	This file copyright (C) 2017 by
+
+	eYs3D an Etron company
+
+	An unpublished work.  All rights reserved.
+
+	This file is proprietary information, and may not be disclosed or
+	copied without the prior permission of eYs3D an Etron company.
+ */
 #ifndef LIB_ESPDI_H
 #define LIB_ESPDI_H
 
 #include "eSPDI_def.h"
+#include "eSPDI_version.h"
 int  EtronDI_Init(void **ppHandleEtronDI, bool bIsLogEnabled);
 int  EtronDI_FindDevice(void *pHandleEtronDI);
 void EtronDI_Release(void **ppHandleEtronDI);

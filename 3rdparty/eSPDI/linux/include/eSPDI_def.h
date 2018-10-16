@@ -1,3 +1,15 @@
+/*! \file eSPDI_def.h
+  	\brief main data structure, variable and macro definition and error definition
+  	Copyright:
+	This file copyright (C) 2017 by
+
+	eYs3D an Etron company
+
+	An unpublished work.  All rights reserved.
+
+	This file is proprietary information, and may not be disclosed or
+	copied without the prior permission of eYs3D an Etron company.
+ */
 #ifndef LIB_ETRONDI_DEF_H
 #define LIB_ETRONDI_DEF_H
 
@@ -127,6 +139,7 @@ typedef enum
 #define ETronDI_DEPTH_DATA_14_BITS_RAW		7 /* raw */
 #define ETronDI_DEPTH_DATA_8_BITS_x80_RAW	8 /* raw */
 #define ETronDI_DEPTH_DATA_11_BITS_RAW		9 /* raw */
+#define ETronDI_DEPTH_DATA_11_BITS_COMBINED_RECTIFY     13// multi-baseline
 
 // for Flash Read/Write +
 // Firmware (size in KBytes)
@@ -506,5 +519,53 @@ typedef enum
 // for LED and Laser -
 
 // for 3D Motor Control -
+
+// for Point Cloud
+struct EtronDIImageType
+{
+    enum Value
+    {
+        IMAGE_UNKNOWN = -1,
+        COLOR_YUY2 = 0,
+        COLOR_RGB24,
+        COLOR_MJPG,
+        DEPTH_8BITS = 100,
+        DEPTH_8BITS_0x80,
+        DEPTH_11BITS,
+        DEPTH_14BITS
+    };
+
+    static bool IsImageColor(EtronDIImageType::Value type)
+    {
+        return (type == COLOR_YUY2 || type == COLOR_RGB24 || type == COLOR_MJPG);
+    }
+
+    static bool IsImageDepth(EtronDIImageType::Value type)
+    {
+        return (type != IMAGE_UNKNOWN && !IsImageColor(type));
+    }
+
+    static EtronDIImageType::Value DepthDataTypeToDepthImageType(WORD dataType)
+    {
+        switch (dataType)
+        {
+        case ETronDI_DEPTH_DATA_8_BITS:
+        case ETronDI_DEPTH_DATA_8_BITS_RAW:
+            return EtronDIImageType::DEPTH_8BITS;
+        case ETronDI_DEPTH_DATA_8_BITS_x80:
+        case ETronDI_DEPTH_DATA_8_BITS_x80_RAW:
+            return EtronDIImageType::DEPTH_8BITS_0x80;
+        case ETronDI_DEPTH_DATA_11_BITS:
+        case ETronDI_DEPTH_DATA_11_BITS_RAW:
+        case ETronDI_DEPTH_DATA_11_BITS_COMBINED_RECTIFY:
+            return EtronDIImageType::DEPTH_11BITS;
+        case ETronDI_DEPTH_DATA_14_BITS:
+        case ETronDI_DEPTH_DATA_14_BITS_RAW:
+            return EtronDIImageType::DEPTH_14BITS;
+        default: return EtronDIImageType::IMAGE_UNKNOWN;
+        }
+    }
+};
+
 
 #endif // LIB_ETRONDI_DEF_H

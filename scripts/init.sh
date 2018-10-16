@@ -109,6 +109,7 @@ elif [ "$HOST_OS" = "Mac" ]; then
   [ -f "/usr/local/bin/clang-format-diff" ] || \
     ln -s /usr/local/share/clang/clang-format-diff.py /usr/local/bin/clang-format-diff
   # _install_deps "brew install" libuvc
+  _install_deps "brew install" libuvc
 elif [ "$HOST_OS" = "Win" ]; then
   # detect pacman on MSYS
   _detect pacman
