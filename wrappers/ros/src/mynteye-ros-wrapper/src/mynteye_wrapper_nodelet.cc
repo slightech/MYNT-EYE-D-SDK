@@ -85,6 +85,12 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
   std::string dashes;
 
+  ros::Time timeBeginPointOnRos;
+
+  std::uint32_t timeBeginPointOnDevice;
+
+  bool isImuTimeInited;
+
  public:
   MYNTEYEWrapperNodelet() : dashes(std::string(30, '-')) {
   }
@@ -246,6 +252,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
     imu_accel = nullptr;
     imu_gyro = nullptr;
+    // ros::Duration(0.001).sleep();
   }
 
   void publishTemp(float temperature, ros::Time stamp) {
@@ -315,13 +322,22 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
           auto motion_datas = mynteye->RetrieveMotions();
           if (motion_datas.size() > 0) {
             for (auto data : motion_datas) {
+              ros::Time tImg = timeBeginPointOnRos;
+              if (isImuTimeInited) {
+                tImg += ros::Duration(
+                  (data.imu->timestamp - timeBeginPointOnDevice)%100000,
+                  (data.imu->timestamp - timeBeginPointOnDevice)*10000);
+              } else {
+                isImuTimeInited = true;
+                timeBeginPointOnDevice = data.imu->timestamp;
+              }
               if (data.imu) {
                 if (data.imu->flag == 1) {  // accelerometer
                   imu_accel = data.imu;
-                  publishImu(t, temp_SubNumber > 0);
+                  publishImu(tImg, temp_SubNumber > 0);
                 } else if (data.imu->flag == 2) {  // gyroscope
                   imu_gyro = data.imu;
-                  publishImu(t, temp_SubNumber > 0);
+                  publishImu(tImg, temp_SubNumber > 0);
                 } else {
                   NODELET_WARN_STREAM("Imu type is unknown");
                 }
@@ -353,6 +369,9 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     state_awb = true;
     ir_intensity = 0;
     gravity = 9.8;
+    timeBeginPointOnRos = ros::Time::now();
+    isImuTimeInited = false;
+    std::uint32_t timeBeginPointOnDevice = 0;
 
     nh_ns.getParam("dev_index", dev_index);
     nh_ns.getParam("framerate", framerate);

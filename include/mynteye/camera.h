@@ -103,7 +103,7 @@ class MYNTEYE_API Camera {
   /** Close the camera. */
   void Close();
   /** Use the XXX.bin file to calibration the camera.*/
-  void SetLogData(const std::string& file_name);
+  void SetCalibrationWithFile(const std::string& file_name);
   /** Get camera HD stream config information output to RectfyLog_PUMA_1.txt. */
   void GetHDCameraLogDataFile();
   /** Get camera VGA stream config information output to RectfyLog_PUMA_2.txt. */
