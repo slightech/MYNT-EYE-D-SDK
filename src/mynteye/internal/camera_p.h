@@ -90,16 +90,23 @@ class CameraPrivate {
   bool IsOpened() const;
   void CheckOpened() const;
 
-  // Image::pointer RetrieveImage(const ImageType& type, ErrorCode* code);
+  /** Get datas of stream and status */
   stream_datas_t RetrieveImage(const ImageType& type, ErrorCode* code);
+  /** Get the latest data of stream and status */
   stream_data_t RetrieveLatestImage(const ImageType& type, ErrorCode* code);
 
+  /** Start hid device */
   ErrorCode StartHidTracking();
   // void StopHidTracking();
+  /** Set callback of hid */
   void SetHidCallback();
+  /** Callback of imu data */
   void ImuDataCallback(const ImuPacket &packet);
+  /** Callback of image information */
   void ImageInfoCallback(const ImgInfoPacket &packet);
+  /** Start capture image */
   void StartCaptureImage();
+  /** Stop capture image */
   void StopCaptureImage();
   /** Get imu data */
   motion_datas_t GetImuDatas();
@@ -120,6 +127,7 @@ class CameraPrivate {
 
   void SyncCameraLogData();
 
+  /** Set image mode (raw image or rectified image) */
   void SetImageMode(const ImageMode &mode);
 
  private:

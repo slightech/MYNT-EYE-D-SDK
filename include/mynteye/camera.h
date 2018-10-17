@@ -29,6 +29,10 @@
 
 MYNTEYE_BEGIN_NAMESPACE
 
+/**
+ * @ingroup datatypes
+ * Camera motion data.
+ */
 struct MYNTEYE_API MotionData {
   /** ImuData */
   std::shared_ptr<ImuData> imu;
@@ -43,6 +47,10 @@ struct MYNTEYE_API MotionData {
   }
 };
 
+/**
+ * @ingroup datatypes
+ * Camera stream data.
+ */
 struct MYNTEYE_API StreamData {
   /** Image information */
   std::shared_ptr<ImgInfo> img_info;
@@ -87,11 +95,14 @@ class MYNTEYE_API Camera {
   /** Get the work status of the camera true(working)/false(stopped) */
   bool IsOpened() const;
 
-  /** Get the work status of the camera true(working)/false(stopped) */
+  /** Get datas of stream */
   std::vector<mynteye::StreamData> RetrieveImages(const ImageType& type);
+  /** Get datas of stream and status */
   std::vector<mynteye::StreamData> RetrieveImages(
     const ImageType& type, ErrorCode* code);
+  /** Get the latest data of stream. */
   mynteye::StreamData RetrieveImage(const ImageType& type);
+  /** Get the latest data of stream and status */
   mynteye::StreamData RetrieveImage(const ImageType& type, ErrorCode* code);
 
   /** Get Motion Data */
@@ -116,6 +127,7 @@ class MYNTEYE_API Camera {
     return struct CameraCtrlRectLogData.*/
   struct CameraCtrlRectLogData GetVGACameraCtrlData();
 
+  /** Set Image mode ( raw image and rectified image )*/
   void SetImageMode(const ImageMode& mode);
 
  private:
