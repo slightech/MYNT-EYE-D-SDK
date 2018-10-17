@@ -325,8 +325,8 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
               ros::Time tImg = timeBeginPointOnRos;
               if (isImuTimeInited) {
                 tImg += ros::Duration(
-                  (data.imu->timestamp - timeBeginPointOnDevice)%100000,
-                  (data.imu->timestamp - timeBeginPointOnDevice)*10000);
+                  (data.imu->timestamp - timeBeginPointOnDevice)/100000,
+                  (data.imu->timestamp - timeBeginPointOnDevice)%100000*10000);
               } else {
                 isImuTimeInited = true;
                 timeBeginPointOnDevice = data.imu->timestamp;
