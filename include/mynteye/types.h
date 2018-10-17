@@ -126,9 +126,6 @@ enum class StreamFormat : std::int32_t {
   STREAM_YUYV = 1,
   STREAM_FORMAT_LAST
 };
-    
-MYNTEYE_API
-std::ostream& operator<<(std::ostream& os, const mynteye::StreamFormat& code);
 
 /**
  * @ingroup enumerations
@@ -277,5 +274,8 @@ struct MYNTEYE_API ImuData {
 };
 
 MYNTEYE_END_NAMESPACE
+    
+MYNTEYE_API
+std::ostream& operator<<(std::ostream& os, const mynteye::StreamFormat& code);
 
 #endif  // MYNTEYE_TYPES_H_
