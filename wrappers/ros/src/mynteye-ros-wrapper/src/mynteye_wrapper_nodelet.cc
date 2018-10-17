@@ -330,6 +330,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
               } else {
                 isImuTimeInited = true;
                 timeBeginPointOnDevice = data.imu->timestamp;
+                timeBeginPointOnRos = ros::Time::now();
               }
               if (data.imu) {
                 if (data.imu->flag == 1) {  // accelerometer
@@ -369,7 +370,6 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     state_awb = true;
     ir_intensity = 0;
     gravity = 9.8;
-    timeBeginPointOnRos = ros::Time::now();
     isImuTimeInited = false;
     std::uint32_t timeBeginPointOnDevice = 0;
 
