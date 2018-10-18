@@ -28,6 +28,7 @@ help:
 	@echo "  make samples   build samples"
 	@echo "  make tools     build tools"
 	@echo "  make ros       build ros wrapper"
+	@echo "  make apidoc    build api doc"
 	@echo "  make pkg       package sdk"
 	@echo "  make clean     clean"
 	@echo "  make cleanall  cleanall"
@@ -95,6 +96,25 @@ cleanros:
 	@$(call rm,./wrappers/ros/.catkin_workspace)
 	@$(call rm,./wrappers/ros/src/CMakeLists.txt)
 
+# doc
+
+apidoc:
+	@$(call echo,Make $@)
+	@$(SH) ./docs/build.sh
+
+opendoc: apidoc
+	@$(call echo,Make $@)
+	@$(shell $(SH) ./docs/langs.sh 1); \
+	for lang in "$${LANGS[@]}"; do \
+		html=./docs/_output/$$lang/html/index.html; \
+		[ -f "$$html" ] && $(SH) ./scripts/open.sh $$html; \
+	done
+
+cleandoc:
+	@$(call rm,./docs/_output/)
+
+.PHONY: apidoc opendoc cleandoc
+
 # pkg
 
 .PHONY: pkg
@@ -151,7 +171,7 @@ clean:
 	@$(FIND) . -type f -name ".DS_Store" -print0 | xargs -0 rm -f
 
 .PHONY: cleanall
-cleanall: clean cleanros cleanpkg
+cleanall: clean cleanros cleandoc cleanpkg
 	@$(call echo,Make $@)
 	@$(call rm_f,build-*,./apps/)
 

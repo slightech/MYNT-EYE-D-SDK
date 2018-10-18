@@ -29,20 +29,25 @@ _texcjk() {
 }
 
 DOXYFILE="api.doxyfile"
-OUTPUT="_output"
+OUTPUT="$BASE_DIR/_output"
 
 _generate() {
+  lang="$1"; shift;
+  echo "Build doc $lang"
+  cd "$BASE_DIR/$lang"
   if [ -f "$DOXYFILE" ]; then
+    outdir="$OUTPUT/$lang"
+    [ -e "$outdir" ] || mkdir -p "$outdir"
     echo "doxygen $DOXYFILE"
     doxygen $DOXYFILE
-    if type "pdflatex" &> /dev/null && [ -f "$OUTPUT/latex/Makefile" ]; then
+    if type "pdflatex" &> /dev/null && [ -f "$outdir/latex/Makefile" ]; then
       echo "doxygen make latex"
       version=`cat $DOXYFILE | grep -m1 "^PROJECT_NUMBER\s*=" | \
         sed -E "s/^.*=[[:space:]]*(.*)[[:space:]]*$/\1/g"`
       filename="mynt-eye-d-sdk-apidoc"; \
         [ -n "$version" ] && filename="$filename-$version"; \
-        filename="$filename.pdf"
-      cd "$OUTPUT/latex" && _texcjk refman.tex && make
+        filename="$filename-$lang.pdf"
+      cd "$outdir/latex" && _texcjk refman.tex && make
       [ -f "refman.pdf" ] && mv "refman.pdf" "../$filename"
     fi
     echo "doxygen completed"
@@ -51,6 +56,11 @@ _generate() {
   fi
 }
 
-cd "$BASE_DIR"
-_generate
+source "$BASE_DIR/langs.sh"
+
+for lang in "${LANGS[@]}"; do
+  [ -d "$BASE_DIR/$lang" ] || continue
+  _generate "$lang"
+done
+
 cd "$BASE_DIR"
