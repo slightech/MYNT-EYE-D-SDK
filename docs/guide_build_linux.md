@@ -2,25 +2,24 @@
 
 ## 1. Install SDK dependencies
 
+Note: Because of the problem of device permissions, you must reinsert the camera device after the command is executed.
+```
+make init
+```
+
 ### 1.1 Install OpenCV
 
 *If you have installed opencv already or you want use it in ROS, you can skip this part.*
 
-#### 1.1.1 Install OpenCV dependencies (OpenCV need GTK or VTK for GUI)
+#### 1.1.1 Install OpenCV with apt or compile (Choose one)
 
-```
-sudo apt-get install libjpeg-dev libgtk-3-dev
-```
-
-#### 1.1.2 Install OpenCV with apt or compile (Choose one)
-
-##### 1.1.2.1 Install OpenCV with apt (Recommond)
+##### 1.1.1.1 Install OpenCV with apt (Recommond)
 
 ```
 sudo apt-get install libopencv-dev
 ```
 
-##### 1.1.2.2 Install OpenCV by Compile
+##### 1.1.1.2 Install OpenCV by Compile
 
 ```
 git clone https://github.com/opencv/opencv.git
@@ -37,13 +36,7 @@ make -j4
 sudo make install
 ```
 
-### 1.2 Install libusb
-
-```
-sudo apt-get install libusb-dev
-```
-
-### 1.3 Install PCL for Point Cloud sample (Optional)
+### 1.2 Install PCL for Point Cloud sample (Optional)
 
 ```
 sudo add-apt-repository ppa:v-launchpad-jochen-sprickerhof-de/pcl
@@ -51,7 +44,7 @@ sudo apt-get update
 sudo apt-get install libpcl-all
 ```
 
-### 1.4 Link libGL.so for TX1/TX2 compile bug (Optional)
+### 1.3 Link libGL.so for TX1/TX2 compile bug (Optional)
 
 ```
 sudo ln -sf /usr/lib/aarch64-linux-gnu/tegra/libGL.so /usr/lib/aarch64-linux-gnu/libGL.so

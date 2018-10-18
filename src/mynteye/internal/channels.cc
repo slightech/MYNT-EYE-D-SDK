@@ -7,6 +7,18 @@
 
 MYNTEYE_BEGIN_NAMESPACE
 
+namespace {
+
+inline std::uint8_t check_sum(std::uint8_t *buf, std::uint8_t length) {
+  std::uint8_t crc8 = 0;
+  while (length--) {
+    crc8 = crc8 ^ (*buf++);
+  }
+  return crc8;
+}
+
+} // namespace
+
 Channels::Channels() : is_hid_tracking_(false),
   hid_track_stop_(false),
   imu_callback_(nullptr),
@@ -82,9 +94,15 @@ bool Channels::ExtractHidData(ImuResPacket &imu, ImgInfoResPacket &img) {
     return false;
   }
 
+
   for (int i = 0; i < size / PACKET_SIZE; i++) {
     std::uint8_t *packet = data + i * PACKET_SIZE;
 
+    if (packet[PACKET_SIZE - 1] !=
+        check_sum(&packet[3], packet[2])) {
+      LOGW("check droped.");
+      continue;
+    }
     imu.from_header_data(packet);
     for (int offset = 3; offset <= PACKET_SIZE - DATA_SIZE;
         offset += DATA_SIZE) {
@@ -92,7 +110,6 @@ bool Channels::ExtractHidData(ImuResPacket &imu, ImgInfoResPacket &img) {
         img.from_data(packet + offset);
       } else if (*(packet + offset) == 0 ||
           *(packet + offset) == 1) {
-//        printf ("packet %u\n", *(packet + offset));
         imu.from_data(packet + offset);
       }
     }

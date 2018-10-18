@@ -133,7 +133,7 @@ int main(int argc, char const *argv[]) {
     }
 
     t = static_cast<double>(cv::getTickCount());
-    auto &&motion_data = cam.RetrieveMotion();
+    auto &&motion_data = cam.RetrieveMotions();
     imu_count += motion_data.size();
     for (auto &&motion : motion_data) {
       dataset.SaveMotionData(motion);

@@ -793,6 +793,10 @@ WARN_LOGFILE           =
 
 INPUT                  = guide_build_linux.md \
                          guide_build_win.md \
+                         guide_ros.md \
+                         recording_data.md \
+                         analyzing_imu.md \
+                         analyze_time_stamps.md \
                          ../include
 
 # This tag can be used to specify the character encoding of the source files
