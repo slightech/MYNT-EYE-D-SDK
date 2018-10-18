@@ -1,10 +1,6 @@
-# ROS installation
+# ROS 安装
 
-## 1 Install With OpenCV ROS
-
-If you won't use ROS(The Robot Operating System), you can skip this part.
-
-### 1.1 Install ROS Kinetic
+### 4.1 安装 ROS Kinectic 版本
 
 ```
 cd ~
@@ -12,9 +8,9 @@ wget https://raw.githubusercontent.com/oroca/oroca-ros-pkg/master/ros_install.sh
 chmod 755 ./ros_install.sh && bash ./ros_install.sh catkin_ws kinetic
 ```
 
-> ROS Kinetic will install OpenCV, JPEG.
+> ROS Kinetic 会自动安装 OpenCV, JPEG.
 
-### 1.2 Build ROS Wrapper
+### 4.2 编译 ROS Wrapper
 
 ```
 make ros
