@@ -32,11 +32,11 @@ imu analytics done
 
 The analysis result graph will be saved in the data set directory. as follows:
 
-![imu analytics](static/images/imu_analytics.png)                      
+![imu analytics](imu_analytics.png)                      
 
 \latexonly
 \includegraphics[width=0.3
-\textwidth,keepaspectratio]{static/images/imu_analytics.png}
+\textwidth,keepaspectratio]{../static/images/imu_analytics.png}
 \endlatexonly
 
 In addition, the script specific options can be executed -h:

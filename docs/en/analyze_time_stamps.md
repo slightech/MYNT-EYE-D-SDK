@@ -44,11 +44,11 @@ stamp analytics done
 
 The analysis result graph will be saved in the dataset directory. as follow:
 
-![stamp analytics](static/images/stamp_analytics.png)
+![stamp analytics](stamp_analytics.png)
 
 \latexonly
 \includegraphics[width=0.3
-\textwidth,keepaspectratio]{static/images/stamp_analytics.png}
+\textwidth,keepaspectratio]{../static/images/stamp_analytics.png}
 \endlatexonly
 
 In addition, the script specific options can be executed -h to understand:
