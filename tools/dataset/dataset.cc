@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #include "dataset/dataset.h"
+#include "mynteye/util/files.h"
 
 #ifdef USE_OPENCV2
 #include <opencv2/highgui/highgui.hpp>
@@ -26,11 +27,19 @@
 
 #define FULL_PRECISION \
   std::fixed << std::setprecision(std::numeric_limits<double>::max_digits10)
+/*
 #define OS_SEP "/"
+*/
+
+MYNTEYE_BEGIN_NAMESPACE
 
 namespace d1000_tools {
 
 Dataset::Dataset(std::string outdir) : outdir_(std::move(outdir)) {
+  std::cout << __func__ << std::endl;
+  if (!files::mkdir(outdir_)) {
+    std::cout << "Create directory failed: " << outdir_ << std::endl;
+  }
 }
 
 Dataset::~Dataset() {
@@ -66,7 +75,7 @@ Dataset::writer_t Dataset::GetMotionWriter() {
   if (motion_writer_ == nullptr) {
     writer_t writer = std::make_shared<Writer>();
     writer->outdir = outdir_;
-    writer->outfile = writer->outdir + OS_SEP "motion.txt";
+    writer->outfile = writer->outdir + MYNTEYE_OS_SEP "motion.txt";
 
     writer->ofs.open(writer->outfile, std::ofstream::out);
     writer->ofs << "seq, flag, timestamp, "
@@ -84,8 +93,9 @@ Dataset::writer_t Dataset::GetStreamWriter() {
   if (stream_writer_ == nullptr) {
     writer_t writer = std::make_shared<Writer>();
     writer->outdir = outdir_;
-    writer->outfile = writer->outdir + OS_SEP "left" + OS_SEP "stream.txt";
+    writer->outfile = writer->outdir + MYNTEYE_OS_SEP "left" + MYNTEYE_OS_SEP "stream.txt";
 
+    files::mkdir(writer->outdir);
     writer->ofs.open(writer->outfile, std::ofstream::out);
     writer->ofs << "seq, frame_id, timestamp, exposure_time" << std::endl;
     writer->ofs << FULL_PRECISION;
@@ -98,3 +108,5 @@ Dataset::writer_t Dataset::GetStreamWriter() {
 }
 
 }  // namespace d1000_tools
+
+MYNTEYE_END_NAMESPACE

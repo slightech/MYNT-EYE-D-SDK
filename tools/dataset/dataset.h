@@ -21,6 +21,8 @@
 #include "mynteye/callbacks.h"
 #include "mynteye/camera.h"
 
+MYNTEYE_BEGIN_NAMESPACE
+
 namespace d1000_tools {
 
 class Dataset {
@@ -52,5 +54,7 @@ class Dataset {
 };
 
 }  // namespace d1000_tools
+
+MYNTEYE_END_NAMESPACE
 
 #endif  // TOOLS_DATASET_DATASET_H_
