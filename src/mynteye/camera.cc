@@ -103,7 +103,7 @@ void Camera::Close() {
   p_->Close();
 }
 
-void Camera::SetLogData(const std::string &file_name) {
+void Camera::SetCalibrationWithFile(const std::string &file_name) {
   p_->SetCameraLogData(file_name);
 }
 
