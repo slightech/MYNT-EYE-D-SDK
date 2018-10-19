@@ -1,4 +1,7 @@
 # IMU coordinata system
 IMU coordinate system is right-handed,the axis directions are as follows:
 
-<img src="../static/images/mynteye_d_imu_coord.jpg" width="50%" height="50%" />
+![](mynteye_d_imu_coord.jpg)
+\latexonly
+\includegraphics[width=0.6\textwidth,keepaspectration]{mynteye_d_imu_coord.jpg}
+\endlatexonly

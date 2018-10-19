@@ -20,6 +20,8 @@
 #include "dataset/dataset.h"
 #include "mynteye/util/times.h"
 
+MYNTEYE_USE_NAMESPACE
+
 int main(int argc, char const *argv[]) {
   std::string dashes(80, '-');
 

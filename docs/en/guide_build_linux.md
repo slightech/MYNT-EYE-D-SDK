@@ -13,7 +13,7 @@ make init
 
 #### 1.1.1 Install OpenCV with apt or compile (Choose one)
 
-##### 1.1.1.1 Install OpenCV with apt (Recommond)
+##### 1.1.1.1 Install OpenCV with apt (Recommend)
 
 ```
 sudo apt-get install libopencv-dev

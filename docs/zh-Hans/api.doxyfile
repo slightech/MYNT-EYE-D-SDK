@@ -796,9 +796,9 @@ INPUT                  = guide_product_description.md \
                          guide_build_linux.md \
                          guide_build_win.md \
                          guide_ros.md \
-                         recording_data.md \
-                         analyzing_imu.md \
-                         analyze_time_stamps.md \
+                         guide_recording_data.md \
+                         guide_analyzing_imu.md \
+                         guide_analyze_time_stamps.md \
                          ../include
 
 # This tag can be used to specify the character encoding of the source files
@@ -1766,7 +1766,9 @@ LATEX_EXTRA_STYLESHEET =
 # This tag requires that the tag GENERATE_LATEX is set to YES.
 
 LATEX_EXTRA_FILES      = ../static/images/mynteye_d_imu_coord.jpg \
-                         ../static/images/mynteye_surface_zh-Hans.jpg
+                         ../static/images/mynteye_surface_zh-Hans.jpg \
+                         ../static/images/imu_analytics.png \
+                         ../static/images/stamp_analytics.png
 
 # If the PDF_HYPERLINKS tag is set to YES, the LaTeX that is generated is
 # prepared for conversion to PDF (using ps2pdf or pdflatex). The PDF file will

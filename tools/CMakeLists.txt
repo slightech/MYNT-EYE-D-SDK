@@ -83,6 +83,7 @@ set(MYNTEYE_ROOT "${PROJECT_SOURCE_DIR}")
 # tools
 
 include_directories(
+  ${PRO_DIR}/src
   ${CMAKE_CURRENT_LIST_DIR}
   ${OpenCV_INCLUDE_DIRS}
 )
