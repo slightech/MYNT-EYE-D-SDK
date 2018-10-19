@@ -59,6 +59,7 @@
   <arg name="points_topic"  default="$(arg mynteye)/points" />
   <arg name="imu_topic"     default="$(arg mynteye)/imu" />
   <arg name="temp_topic"    default="$(arg mynteye)/temp" />
+  <arg name="gray_topic"    default="$(arg mynteye)/gray" />
 
   <node name="mynteye_wrapper_node" pkg="mynteye_wrapper" type="mynteye_wrapper_node" output="screen">
 
@@ -96,6 +97,7 @@
     <param name="points_topic" value="$(arg points_topic)" />
     <param name="imu_topic"    value="$(arg imu_topic)" />
     <param name="temp_topic"   value="$(arg temp_topic)" />
+    <param name="gray_topic"   value="$(arg gray_topic)" />
   </node>
 
   <arg name="pi/2" value="1.5707963267948966" />
