@@ -2,7 +2,7 @@
 
 ## 1. Install SDK dependencies
 
-Note: Because of the problem of device permissions, you must reinsert the camera device after the command is executed.
+Note: Because of the problem of device permissions, you must reinsert the camera device after the command is executed and on the same computer, this operation only needs to be done once..
 ```
 make init
 ```
