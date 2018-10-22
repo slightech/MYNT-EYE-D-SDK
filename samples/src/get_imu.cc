@@ -57,7 +57,7 @@ int main(int argc, char const* argv[]) {
   for (;;) {
     counter.Update();
 
-    auto image_color = cam.RetrieveImage(mynteye::ImageType::IMAGE_COLOR);
+    auto image_color = cam.RetrieveImage(mynteye::ImageType::IMAGE_LEFT_COLOR);
     if (image_color.img) {
       cv::Mat color = image_color.img->To(mynteye::ImageFormat::COLOR_BGR)->ToMat();
       mynteye::util::draw(color, mynteye::util::to_string(counter.fps(), 5, 1),

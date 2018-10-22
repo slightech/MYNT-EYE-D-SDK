@@ -204,7 +204,7 @@ int main(int argc, char const* argv[]) {
   for (;;) {
     counter.Update();
 
-    auto image_color = cam.RetrieveImages(ImageType::IMAGE_COLOR);
+    auto image_color = cam.RetrieveImages(ImageType::IMAGE_LEFT_COLOR);
     auto image_depth = cam.RetrieveImages(ImageType::IMAGE_DEPTH);
     for (auto data : image_color) {
       cv::Mat color = data.img->To(ImageFormat::COLOR_BGR)->ToMat();

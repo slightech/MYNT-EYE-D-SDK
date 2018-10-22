@@ -57,8 +57,10 @@ enum class ErrorCode : std::int32_t {
  * @brief List image types.
  */
 enum class ImageType : std::int32_t {
-  /** Color. */
-  IMAGE_COLOR,
+  /** LEFT Color. */
+  IMAGE_LEFT_COLOR,
+  /** RIGHT Color. */
+  IMAGE_RIGHT_COLOR,
   /** Depth. */
   IMAGE_DEPTH,
   /** All. */

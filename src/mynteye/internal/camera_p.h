@@ -140,6 +140,9 @@ class CameraPrivate {
   void CaptureImageColor(ErrorCode *code);
   void CaptureImageDepth(ErrorCode *code);
 
+  void TransferColor(Image::pointer color, img_info_data_t info);
+  void CutPart(ImageType type, Image::pointer color, img_info_data_t info);
+
   Image::pointer RetrieveImageColor(ErrorCode* code);
   Image::pointer RetrieveImageDepth(ErrorCode* code);
 
@@ -202,12 +205,15 @@ class CameraPrivate {
   std::vector<Image::pointer> image_color_;
   std::vector<Image::pointer> image_depth_;
   stream_datas_t color_data_;
+  stream_datas_t left_color_data_;
+  stream_datas_t right_color_data_;
   stream_datas_t depth_data_;
   bool is_capture_image_;
   bool is_imu_open_;
 
   bool is_start_;
-  static std::uint16_t counter;
+
+  bool is_right_color_;
 };
 
 MYNTEYE_END_NAMESPACE

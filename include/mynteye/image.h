@@ -103,6 +103,7 @@ class MYNTEYE_API Image {
 #endif
 
   pointer Clone() const;
+  pointer CutPart(ImageType type) const;
 
   bool ResetBuffer();
 

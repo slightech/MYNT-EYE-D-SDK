@@ -37,8 +37,9 @@ int main(int argc, char const* argv[]) {
   // params.depth_mode = DepthMode::DEPTH_GRAY;
   params.depth_mode = mynteye::DepthMode::DEPTH_COLORFUL;
   // params.stream_mode = StreamMode::STREAM_640x480;
+  params.stream_mode = mynteye::StreamMode::STREAM_2560x720;
   params.ir_intensity = 4;
-  params.framerate = 60;
+  params.framerate = 30;
 
   cam.SetImageMode(mynteye::ImageMode::IMAGE_RECTIFIED);
   cam.Open(params);
@@ -59,13 +60,17 @@ int main(int argc, char const* argv[]) {
   for (;;) {
     counter.Update();
 
-    auto image_color = cam.RetrieveImage(mynteye::ImageType::IMAGE_COLOR);
+    auto left_color = cam.RetrieveImage(mynteye::ImageType::IMAGE_LEFT_COLOR);
+    auto right_color = cam.RetrieveImage(mynteye::ImageType::IMAGE_RIGHT_COLOR);
     auto image_depth = cam.RetrieveImage(mynteye::ImageType::IMAGE_DEPTH);
-    if (image_color.img) {
-      cv::Mat color = image_color.img->To(mynteye::ImageFormat::COLOR_BGR)->ToMat();
-      mynteye::util::draw(color, mynteye::util::to_string(counter.fps(), 5, 1),
+    if (left_color.img && right_color.img) {
+      cv::Mat left = left_color.img->To(mynteye::ImageFormat::COLOR_BGR)->ToMat();
+      cv::Mat right = right_color.img->To(mynteye::ImageFormat::COLOR_BGR)->ToMat();
+      mynteye::util::draw(left, mynteye::util::to_string(counter.fps(), 5, 1),
           mynteye::util::TOP_RIGHT);
-      cv::imshow("color", color);
+      cv::Mat img;
+      cv::hconcat(left, right, img);
+      cv::imshow("color", img);
     }
     if (image_depth.img) {
       cv::Mat depth = image_depth.img->To(mynteye::ImageFormat::DEPTH_BGR)->ToMat();

@@ -53,6 +53,22 @@ int get_mat_type(const ImageFormat& format) {
 }
 #endif
 
+inline void copyLeft(const std::uint8_t *in, std::uint8_t *out,
+    int width, int height) {
+  for (int i = 0; i < height; i++) {
+    std::copy(in + i * width * 2,
+        in + (width - 1) + i * width * 2, out + i * width);
+  }
+}
+
+inline void copyRight(const std::uint8_t *in, std::uint8_t *out,
+    int width, int height) {
+  for (int i = 0; i < height; i++) {
+    std::copy(in + i * width * 2 + width,
+        in + (i + 1) * width * 2 - 1, out + i * width);
+  }
+}
+
 }  // namespace
 
 Image::Image(ImageType type, ImageFormat format, int width, int height,
@@ -75,7 +91,8 @@ Image::~Image() {
 Image::pointer Image::Create(ImageType type, ImageFormat format, int width,
     int height, bool is_buffer) {
   switch (type) {
-    case ImageType::IMAGE_COLOR:
+    case ImageType::IMAGE_LEFT_COLOR:
+    case ImageType::IMAGE_RIGHT_COLOR:
       return ImageColor::Create(format, width, height, is_buffer);
     case ImageType::IMAGE_DEPTH:
       return ImageDepth::Create(format, width, height, is_buffer);
@@ -96,6 +113,27 @@ Image::pointer Image::Clone() const {
   image->set_frame_id(frame_id_);
   image->resize();
   std::copy(data_.begin(), data_.end(), image->data_.begin());
+  return image;
+}
+
+Image::pointer Image::CutPart(ImageType type) const {
+  auto image = Create(type_, format_, width_ / 2, height_, false);
+  image->set_valid_size(valid_size_ / 2);
+  image->set_frame_id(frame_id_);
+  image->resize();
+  switch (type) {
+    case ImageType::IMAGE_LEFT_COLOR:
+      // std::copy(data_.begin(), data_.begin() + (valid_size_ / 2 - 1), image->data_.begin());
+      copyLeft(data_.data(), image->data(), width_, height_);
+      break;
+    case ImageType::IMAGE_RIGHT_COLOR:
+      // std::copy(data_.begin() + (valid_size_ / 2), data_.end(), image->data_.begin());
+      copyRight(data_.data(), image->data(), width_, height_);
+      break;
+    default:
+      throw new std::runtime_error("Image:: ImageType is unknow.");
+  }
+
   return image;
 }
 
@@ -122,7 +160,7 @@ bool Image::ResetBuffer() {
 
 ImageColor::ImageColor(ImageFormat format, int width, int height,
     bool is_buffer)
-  : Image(ImageType::IMAGE_COLOR, format, width, height, is_buffer) {
+  : Image(ImageType::IMAGE_LEFT_COLOR, format, width, height, is_buffer) {
 }
 
 ImageColor::~ImageColor() {

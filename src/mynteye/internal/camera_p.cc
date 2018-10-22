@@ -93,7 +93,8 @@ CameraPrivate::CameraPrivate()
     depth_buf_(nullptr),
     is_capture_image_(false),
     is_imu_open_(false),
-    is_start_(false) {
+    is_start_(false),
+    is_right_color_(false) {
 
   DBG_LOGD(__func__);
 
@@ -378,6 +379,15 @@ bool CameraPrivate::SetFWRegister(std::uint16_t address, std::uint16_t value,
 }
 
 ErrorCode CameraPrivate::Open(const InitParams& params) {
+  if (params.stream_mode == StreamMode::STREAM_2560x720) {
+    is_right_color_ = true;
+  }
+  if (params.stream_mode == StreamMode::STREAM_2560x720 &&
+      params.framerate == 60) {
+    LOGI("The frame rate chosen is too large, please use a smaller frame rate.");
+    return ErrorCode::ERROR_FAILURE;
+  }
+
   dev_sel_info_.index = params.dev_index;
 
   EtronDI_SetDepthDataType(etron_di_, &dev_sel_info_, depth_data_type_);
@@ -520,10 +530,19 @@ std::vector<device::StreamData> CameraPrivate::RetrieveImage(const ImageType& ty
   }
 
   switch (type) {
-    case ImageType::IMAGE_COLOR: {
+    case ImageType::IMAGE_LEFT_COLOR: {
       std::lock_guard<std::mutex> _(cap_color_mtx_);
-      stream_datas_t data = color_data_;
-      color_data_.clear();
+      stream_datas_t data = left_color_data_;
+      left_color_data_.clear();
+      return data;
+    } break;
+    case ImageType::IMAGE_RIGHT_COLOR: {
+      if (!is_right_color_) {
+        throw new std::runtime_error("RetrieveImage: Right color is disable.");
+      }
+      std::lock_guard<std::mutex> _(cap_color_mtx_);
+      stream_datas_t data = right_color_data_;
+      right_color_data_.clear();
       return data;
     } break;
     case ImageType::IMAGE_DEPTH: {
@@ -545,11 +564,18 @@ CameraPrivate::stream_data_t CameraPrivate::RetrieveLatestImage(const ImageType&
   }
 
   switch (type) {
-    case ImageType::IMAGE_COLOR: {
+    case ImageType::IMAGE_LEFT_COLOR: {
       std::lock_guard<std::mutex> _(cap_color_mtx_);
-      if (color_data_.empty()) { return {}; }
-      auto data = color_data_.back();
-      color_data_.clear();
+      if (left_color_data_.empty()) { return {}; }
+      auto data = left_color_data_.back();
+      left_color_data_.clear();
+      return data;
+    } break;
+    case ImageType::IMAGE_RIGHT_COLOR: {
+      std::lock_guard<std::mutex> _(cap_color_mtx_);
+      if (right_color_data_.empty()) { return {}; }
+      auto data = right_color_data_.back();
+      right_color_data_.clear();
       return data;
     } break;
     case ImageType::IMAGE_DEPTH: {
@@ -593,6 +619,7 @@ void CameraPrivate::SyntheticImageColor() {
   image_color_wait_.wait_for(_, std::chrono::seconds(1));
 
   if (image_color_.empty() || img_info_.empty()) { return; }
+
   if (image_color_.front()->frame_id() >
       img_info_.back().img_info->frame_id) {
     if (image_color_.size() > 5) { image_color_.clear(); }
@@ -608,16 +635,39 @@ void CameraPrivate::SyntheticImageColor() {
   for (auto color : image_color_) {
     for (auto info : img_info_) {
       if (color->frame_id() == info.img_info->frame_id) {
-        stream_data_t data;
-        data.img_info = std::make_shared<ImgInfo>();
-        *data.img_info = *info.img_info;
-        data.img = color->Clone();
-        color_data_.push_back(data);
+        TransferColor(color, info);
       }
     }
   }
   image_color_.clear();
   img_info_.clear();
+}
+
+void CameraPrivate::TransferColor(Image::pointer color, img_info_data_t info) {
+  if (!is_right_color_) {
+    stream_data_t data;
+    data.img_info = std::make_shared<ImgInfo>();
+    *data.img_info = *info.img_info;
+    data.img = color->Clone();
+    left_color_data_.push_back(data);
+  } else if (is_right_color_) {
+    CutPart(ImageType::IMAGE_LEFT_COLOR, color, info);
+    CutPart(ImageType::IMAGE_RIGHT_COLOR, color, info);
+  }
+}
+
+void CameraPrivate::CutPart(ImageType type,
+    Image::pointer color, img_info_data_t info) {
+  stream_data_t data;
+  data.img_info = std::make_shared<ImgInfo>();
+  *data.img_info = *info.img_info;
+  if (type == ImageType::IMAGE_LEFT_COLOR) {
+    data.img = color->CutPart(ImageType::IMAGE_LEFT_COLOR);
+    left_color_data_.push_back(data);
+  } else if (type == ImageType::IMAGE_RIGHT_COLOR) {
+    data.img = color->CutPart(ImageType::IMAGE_RIGHT_COLOR);
+    right_color_data_.push_back(data);
+  }
 }
 
 void CameraPrivate::SyntheticImageDepth() {

@@ -116,7 +116,7 @@ int main(int argc, char const* argv[]) {
   for (;;) {
     counter.Update();
 
-    auto image_color = cam.RetrieveImage(mynteye::ImageType::IMAGE_COLOR);
+    auto image_color = cam.RetrieveImage(mynteye::ImageType::IMAGE_LEFT_COLOR);
     auto image_depth = cam.RetrieveImage(mynteye::ImageType::IMAGE_DEPTH);
     if (image_color.img && image_depth.img) {
       cv::Mat color = image_color.img->To(mynteye::ImageFormat::COLOR_BGR)->ToMat();
