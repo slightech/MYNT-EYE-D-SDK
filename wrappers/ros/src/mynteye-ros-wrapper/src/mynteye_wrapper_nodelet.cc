@@ -28,6 +28,7 @@
 #include <boost/make_shared.hpp>
 #include <boost/thread/thread.hpp>
 
+#include <opencv2/opencv.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
@@ -45,9 +46,11 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   ros::NodeHandle nh_ns;
   boost::shared_ptr<boost::thread> device_poll_thread;
 
-  image_transport::CameraPublisher pub_color;
+  image_transport::CameraPublisher pub_color_left;
+  image_transport::CameraPublisher pub_color_right;
   image_transport::CameraPublisher pub_depth;
-  image_transport::CameraPublisher pub_gray;
+  image_transport::CameraPublisher pub_gray_left;
+  image_transport::CameraPublisher pub_gray_right;
   ros::Publisher pub_points;
   ros::Publisher pub_imu;
   ros::Publisher pub_temp;
@@ -69,12 +72,14 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   int gravity;
 
   std::string base_frame_id;
-  std::string color_frame_id;
+  std::string color_frame_left_id;
+  std::string color_frame_right_id;
   std::string depth_frame_id;
   std::string points_frame_id;
   std::string imu_frame_id;
   std::string temp_frame_id;
-  std::string gray_frame_id;
+  std::string gray_frame_left_id;
+  std::string gray_frame_right_id;
 
   // MYNTEYE objects
   mynteye::InitParams params;
@@ -97,38 +102,42 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   MYNTEYEWrapperNodelet() : dashes(std::string(30, '-')) {
   }
 
-  void publishColor(mynteye::Image::pointer img, ros::Time stamp,
+  void publishColor(const std::string& frame_id, image_transport::CameraPublisher& pub,  // NOLINT
+    mynteye::Image::pointer img, ros::Time stamp,
       cv::Mat* mat, std::uint32_t seq) {
-    if (pub_color.getNumSubscribers() == 0)
+    if (pub.getNumSubscribers() == 0)
       return;
     std_msgs::Header header;
     // header.seq = 0;
     header.stamp = stamp;
-    header.frame_id = color_frame_id;
+    header.frame_id = frame_id;
     *mat = img->To(mynteye::ImageFormat::COLOR_RGB)->ToMat();
 
     auto &&msg =
         cv_bridge::CvImage(header, enc::RGB8, *mat).toImageMsg();
     auto &&info = getCameraInfo();
     info->header.stamp = msg->header.stamp;
-    pub_color.publish(msg, info);
+    pub.publish(msg, info);
   }
 
-  void publishGray(mynteye::Image::pointer img, ros::Time stamp,
+  void publishGray(const std::string& frame_id, image_transport::CameraPublisher& pub, // NOLINT
+    mynteye::Image::pointer img, ros::Time stamp,
       cv::Mat* mat, std::uint32_t seq) {
-    if (pub_gray.getNumSubscribers() == 0)
+    if (pub.getNumSubscribers() == 0)
       return;
     std_msgs::Header header;
     // header.seq = 0;
     header.stamp = stamp;
-    header.frame_id = color_frame_id;
-    *mat = img->To(mynteye::ImageFormat::IMAGE_GRAY_8)->ToMat();
-
+    header.frame_id = frame_id;
+    *mat = img->To(mynteye::ImageFormat::COLOR_RGB)->ToMat();
+    cv::Mat dst;
+    cv::cvtColor(*mat, dst, CV_RGB2GRAY);
     auto &&msg =
-        cv_bridge::CvImage(header, enc::MONO8, *mat).toImageMsg();
+        cv_bridge::CvImage(header, enc::MONO8, dst).toImageMsg();
     auto &&info = getCameraInfo();
     info->header.stamp = msg->header.stamp;
-    pub_color.publish(msg, info);
+
+    pub.publish(msg, info);
   }
 
   sensor_msgs::CameraInfoPtr getCameraInfo() {
@@ -151,7 +160,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       camera_ctrl_data = mynteye->GetVGACameraCtrlData();
     }
 
-    camera_info->header.frame_id = color_frame_id;
+    // camera_info->header.frame_id = color_frame_id;
     camera_info->width = camera_ctrl_data.OutImgWidth;
     camera_info->height = camera_ctrl_data.OutImgHeight;
 
@@ -293,17 +302,21 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     ros::Rate loop_rate(params.framerate);
 
     // Main loop
-    cv::Mat color, gray, depth;
+    cv::Mat color_left, gray_left, color_right, gray_right, depth;
     while (nh_ns.ok()) {
       // Check for subscribers
-      int color_SubNumber = pub_color.getNumSubscribers();
+      int color_Right_SubNumber = pub_color_right.getNumSubscribers();
+      int gray_Right_SubNumber = pub_gray_right.getNumSubscribers();
+      int color_Left_SubNumber = pub_color_left.getNumSubscribers();
+      int gray_Left_SubNumber = pub_gray_left.getNumSubscribers();
       int depth_SubNumber = pub_depth.getNumSubscribers();
       int points_SubNumber = pub_points.getNumSubscribers();
       int imu_SubNumber = pub_imu.getNumSubscribers();
       int temp_SubNumber = pub_temp.getNumSubscribers();
-      int gray_SubNumber = pub_gray.getNumSubscribers();
 
-      bool img_Sub = (color_SubNumber + depth_SubNumber + points_SubNumber) > 0;
+      bool img_Sub = (gray_Right_SubNumber + gray_Left_SubNumber +
+        color_Left_SubNumber + color_Right_SubNumber +
+        depth_SubNumber + points_SubNumber) > 0;
       bool imu_Sub = (imu_SubNumber + temp_SubNumber) > 0;
       if (img_Sub || imu_Sub) {
         // publish points, the depth mode must be DEPTH_RAW.
@@ -311,27 +324,49 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
         ros::Time t = ros::Time::now();
 
-        bool color_ok = false;
-        if (color_SubNumber > 0 || points_subscribed) {
+        bool color_right_ok = false;
+        bool gray_right_ok = false;
+        if (color_Right_SubNumber > 0
+            || points_subscribed
+            || gray_Right_SubNumber > 0) {
           auto image_color = mynteye->RetrieveImage(
-              mynteye::ImageType::IMAGE_COLOR);
+              mynteye::ImageType::IMAGE_RIGHT_COLOR);
           if (image_color.img) {
-            color_ok = true;
             static std::size_t count = 0;
             ++count;
-            publishColor(image_color.img, t, &color, count);
+            if (color_Right_SubNumber > 0) {
+              color_right_ok = true;
+              publishColor(color_frame_right_id, pub_color_right,
+                image_color.img, t, &color_right, count);
+            }
+            if (gray_Right_SubNumber > 0) {
+              gray_right_ok = true;
+              publishGray(gray_frame_right_id, pub_gray_right,
+                image_color.img, t, &gray_right, count);
+            }
           }
         }
 
-        bool gray_ok = false;
-        if (gray_SubNumber > 0 || points_subscribed) {
-          auto image_gray = mynteye->RetrieveImage(
-              mynteye::ImageType::IMAGE_COLOR);
-          if (image_gray.img) {
-            gray_ok = true;
+        bool color_left_ok = false;
+        bool gray_left_ok = false;
+        if (color_Left_SubNumber > 0
+            || points_subscribed
+            || gray_Left_SubNumber > 0) {
+          auto image_color = mynteye->RetrieveImage(
+              mynteye::ImageType::IMAGE_LEFT_COLOR);
+          if (image_color.img) {
             static std::size_t count = 0;
             ++count;
-            publishGray(image_gray.img, t, &gray, count);
+            if (color_Left_SubNumber > 0) {
+              color_left_ok = true;
+              publishColor(color_frame_left_id, pub_color_left,
+                image_color.img, t, &color_left, count);
+            }
+            if (gray_Left_SubNumber > 0) {
+              gray_left_ok = true;
+              publishGray(gray_frame_left_id, pub_gray_left,
+                image_color.img, t, &gray_left, count);
+            }
           }
         }
 
@@ -344,10 +379,11 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
             publishDepth(image_depth.img, t, &depth);
           }
         }
-
-        if (points_subscribed && color_ok && depth_ok) {
-          pointcloud_generator->Push(color, depth, t);
-        }
+        // there is a bug when use point cloud Push function ,
+        // can't fix it with try catch.Skip this temporaryly.
+        // if (points_subscribed && color_ok && depth_ok) {
+        //   // pointcloud_generator->Push(color, depth, t);
+        // }
 
         if (imu_Sub) {
           // NODELET_INFO_STREAM("Retrieve motions");
@@ -417,34 +453,46 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     nh_ns.getParam("gravity", gravity);
 
     base_frame_id = "mynteye_link";
-    color_frame_id = "mynteye_color_frame";
+    color_frame_left_id = "mynteye_color_frame_left";
+    color_frame_right_id = "mynteye_color_frame_right";
     depth_frame_id = "mynteye_depth_frame";
     points_frame_id = "mynteye_points_frame";
-    gray_frame_id = "mynteye_gray_frame";
+    gray_frame_right_id = "mynteye_gray_frame_right";
+    gray_frame_left_id = "mynteye_gray_frame_left";
     imu_frame_id = "mynteye_imu_frame";
     temp_frame_id = "mynteye_temp_frame";
     nh_ns.getParam("base_frame_id", base_frame_id);
-    nh_ns.getParam("color_frame", color_frame_id);
-    nh_ns.getParam("gray_frame", gray_frame_id);
+    nh_ns.getParam("color_frame", color_frame_right_id);
+    nh_ns.getParam("color_frame", color_frame_left_id);
+    nh_ns.getParam("gray_frame", gray_frame_left_id);
+    nh_ns.getParam("gray_frame", gray_frame_right_id);
     nh_ns.getParam("depth_frame", depth_frame_id);
     nh_ns.getParam("points_frame", points_frame_id);
     nh_ns.getParam("imu_frame", imu_frame_id);
     nh_ns.getParam("temp_frame", temp_frame_id);
     NODELET_INFO_STREAM("base_frame: " << base_frame_id);
-    NODELET_INFO_STREAM("color_frame: " << color_frame_id);
-    NODELET_INFO_STREAM("gray_frame: " << gray_frame_id);
+    NODELET_INFO_STREAM("color_frame_right: " << color_frame_right_id);
+    NODELET_INFO_STREAM("color_frame_left: " << color_frame_left_id);
+    NODELET_INFO_STREAM("gray_frame_left: " << gray_frame_left_id);
+    NODELET_INFO_STREAM("gray_frame_right: " << gray_frame_right_id);
     NODELET_INFO_STREAM("depth_frame: " << depth_frame_id);
     NODELET_INFO_STREAM("points_frame: " << points_frame_id);
     NODELET_INFO_STREAM("imu_frame: " << imu_frame_id);
     NODELET_INFO_STREAM("temp_frame: " << temp_frame_id);
 
-    std::string color_topic = "mynteye/color";
+    std::string color_left_topic = "mynteye/color_left";
+    std::string color_right_topic = "mynteye/color_right";
+    std::string gray_left_topic = "mynteye/gray_left";
+    std::string gray_right_topic = "mynteye/gray_right";
     std::string depth_topic = "mynteye/depth";
     std::string points_topic = "mynteye/points";
     std::string imu_topic = "mynteye/imu";
     std::string temp_topic = "mynteye/temp";
-    std::string gray_topic = "mynteye/gray";
-    nh_ns.getParam("color_topic", color_topic);
+
+    nh_ns.getParam("color_left_topic", color_left_topic);
+    nh_ns.getParam("color_right_topic", color_right_topic);
+    nh_ns.getParam("gray_left_topic", gray_left_topic);
+    nh_ns.getParam("gray_right_topic", gray_right_topic);
     nh_ns.getParam("depth_topic", depth_topic);
     nh_ns.getParam("points_topic", points_topic);
     nh_ns.getParam("imu_topic", imu_topic);
@@ -502,10 +550,15 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
     // Image publishers
     image_transport::ImageTransport it_mynteye(nh);
-    pub_color = it_mynteye.advertiseCamera(color_topic, 1);  // color
-    NODELET_INFO_STREAM("Advertized on topic " << color_topic);
-    pub_gray = it_mynteye.advertiseCamera(gray_topic, 1);  // gray
-    NODELET_INFO_STREAM("Advertized on topic " << gray_topic);
+    pub_color_left = it_mynteye.advertiseCamera(color_left_topic, 1);  // color
+    NODELET_INFO_STREAM("Advertized on topic " << color_left_topic);
+    pub_color_right = it_mynteye.advertiseCamera(color_right_topic, 1);
+    NODELET_INFO_STREAM("Advertized on topic " << color_right_topic);
+    pub_gray_left = it_mynteye.advertiseCamera(gray_left_topic, 1);  // gray
+    NODELET_INFO_STREAM("Advertized on topic " << gray_left_topic);
+    pub_gray_right = it_mynteye.advertiseCamera(gray_right_topic, 1);
+    NODELET_INFO_STREAM("Advertized on topic " << gray_right_topic);
+
     pub_depth = it_mynteye.advertiseCamera(depth_topic, 1);  // depth
     NODELET_INFO_STREAM("Advertized on topic " << depth_topic);
     pub_points = nh.advertise<sensor_msgs::PointCloud2>(points_topic, 1);
