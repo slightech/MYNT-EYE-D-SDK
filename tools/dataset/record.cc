@@ -119,7 +119,7 @@ int main(int argc, char const *argv[]) {
   std::size_t imu_count = 0;
   auto &&time_beg = mynteye::times::now();
   for (;;) {
-    auto image_color = cam.RetrieveImage(mynteye::ImageType::IMAGE_COLOR);
+    auto image_color = cam.RetrieveImage(mynteye::ImageType::IMAGE_LEFT_COLOR);
     auto image_depth = cam.RetrieveImage(mynteye::ImageType::IMAGE_DEPTH);
     if (image_color.img) {
       cv::Mat color =
