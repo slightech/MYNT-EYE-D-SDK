@@ -16,6 +16,7 @@
 
 # pylint: disable=missing-docstring
 
+from data import ROSBag, MYNTEYE, What
 from __future__ import print_function
 
 import os
@@ -25,7 +26,6 @@ TOOLBOX_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(os.path.join(TOOLBOX_DIR, 'internal'))
 
 # pylint: disable=import-error,wrong-import-position
-from data import ROSBag, MYNTEYE, What
 
 
 ANGLE_DEGREES = 'd'
@@ -353,8 +353,8 @@ def _main():
         sys.exit('Error: dataset model not supported {}'.format(model))
     else:
       dataset = ROSBag(path,
-                       topic_img_left='/mynteye/left/image_raw',
-                       topic_imu='/mynteye/imu/data_raw')
+                       topic_img_left='/mynteye/gray_left',
+                       topic_imu='/mynteye/imu')
     return dataset
 
   dataset = BinDataset(dataset_path, dataset_creator)
