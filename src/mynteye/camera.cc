@@ -61,6 +61,10 @@ bool Camera::IsOpened() const {
   return p_->IsOpened();
 }
 
+void Camera::EnableImageType(const ImageType& type) {
+  p_->EnableImageType(type);
+}
+
 std::vector<mynteye::StreamData> Camera::RetrieveImages(const ImageType& type) {
   ErrorCode code = ErrorCode::SUCCESS;
   return RetrieveImages(type, &code);

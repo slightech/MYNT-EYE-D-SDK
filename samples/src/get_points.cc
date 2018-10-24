@@ -89,6 +89,8 @@ int main(int argc, char const* argv[]) {
   // params.stream_mode = StreamMode::STREAM_1280x720;
   params.ir_intensity = 4;
 
+  cam.EnableImageType(mynteye::ImageType::IMAGE_LEFT_COLOR);
+  cam.EnableImageType(mynteye::ImageType::IMAGE_DEPTH);
   cam.Open(params);
 
   std::cout << std::endl;

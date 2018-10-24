@@ -128,10 +128,10 @@ public:
 #endif
       cv::Point(point_.x-n, point_.y-n),
       cv::Point(point_.x+n, point_.y+n),
-      selected_ ? cv::Scalar(0,255,0) : cv::Scalar(0,0,255), 1);
+      selected_ ? cv::Scalar(0, 255, 0) : cv::Scalar(0, 0, 255), 1);
   }
 
-private:
+ private:
   std::uint32_t n_;
   bool show_;
   bool selected_;
@@ -164,6 +164,9 @@ int main(int argc, char const* argv[]) {
   params.depth_mode = DepthMode::DEPTH_RAW;
   // params.stream_mode = StreamMode::STREAM_1280x720;
   params.ir_intensity = 4;
+
+  cam.EnableImageType(mynteye::ImageType::IMAGE_LEFT_COLOR);
+  cam.EnableImageType(mynteye::ImageType::IMAGE_DEPTH);
 
   cam.Open(params);
 
@@ -226,26 +229,6 @@ int main(int argc, char const* argv[]) {
         return std::to_string(elem);
       }, 80, depth_info);
     }
-    /*
-    if (image_color && image_depth) {
-      cv::Mat color = image_color->To(ImageFormat::COLOR_BGR)->ToMat();
-      cv::Mat depth = image_depth->To(ImageFormat::DEPTH_RAW)->ToMat();
-      util::draw(color, util::to_string(counter.fps(), 5, 1), util::TOP_RIGHT);
-
-      cv::setMouseCallback("color", OnDepthMouseCallback, &depth_region);
-      depth_region.DrawRect(color);
-      cv::imshow("color", color);
-
-      cv::setMouseCallback("depth", OnDepthMouseCallback, &depth_region);
-      // Note: DrawRect will change some depth values to show the rect.
-      depth_region.DrawRect(depth);
-      cv::imshow("depth", depth);
-
-      depth_region.ShowElems<ushort>(depth, [](const ushort& elem) {
-        return std::to_string(elem);
-      }, 80, depth_info);
-    }
-    */
 
     char key = static_cast<char>(cv::waitKey(1));
     if (key == 27 || key == 'q' || key == 'Q') {  // ESC/Q

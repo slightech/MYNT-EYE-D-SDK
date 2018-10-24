@@ -40,6 +40,7 @@ int main(int argc, char const* argv[]) {
   params.ir_intensity = 4;
   params.framerate = 10;
 
+  cam.EnableImageType(mynteye::ImageType::IMAGE_LEFT_COLOR);
   cam.Open(params);
 
   std::cout << std::endl;

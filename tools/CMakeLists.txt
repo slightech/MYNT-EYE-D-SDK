@@ -66,25 +66,13 @@ include(${PRO_DIR}/cmake/DetectOpenCV.cmake)
 
 # targets
 
-set(OUTPUT_DIR "${CMAKE_CURRENT_LIST_DIR}/_output")
-
-set_outdir(
-  ARCHIVE ${OUTPUT_DIR}/lib
-  LIBRARY ${OUTPUT_DIR}/lib
-  RUNTIME ${OUTPUT_DIR}/bin
-)
-set(MYNTEYE_NAME "${PROJECT_NAME}")
-set(MYNTEYE_ROOT "${PROJECT_SOURCE_DIR}")
-
-#include_directories(
-#  ${CMAKE_CURRENT_SOURCE_DIR}
-#)
+set(OUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/_output")
 
 # tools
 
 include_directories(
   ${PRO_DIR}/src
-  ${CMAKE_CURRENT_LIST_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}
   ${OpenCV_INCLUDE_DIRS}
 )
 

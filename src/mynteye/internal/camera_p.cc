@@ -93,8 +93,7 @@ CameraPrivate::CameraPrivate()
     depth_buf_(nullptr),
     is_capture_image_(false),
     is_imu_open_(false),
-    is_start_(false),
-    is_right_color_(false) {
+    is_start_(false) {
 
   DBG_LOGD(__func__);
 
@@ -108,6 +107,9 @@ CameraPrivate::CameraPrivate()
       (PETRONDI_STREAM_INFO)malloc(sizeof(ETRONDI_STREAM_INFO)*64);
   depth_data_type_ = 2;
   OnInit();
+  is_enable_image_[ImageType::IMAGE_LEFT_COLOR] = false;
+  is_enable_image_[ImageType::IMAGE_RIGHT_COLOR] = false;
+  is_enable_image_[ImageType::IMAGE_DEPTH] = false;
 
   channels_ = std::make_shared<Channels>();
 }
@@ -245,7 +247,11 @@ void CameraPrivate::GetResolutionIndex(const std::int32_t& dev_index,
   *depth_res_index = -1;
 
   int width = 0, height = 0;
-  get_stream_size(stream_mode, &width, &height);
+  if (is_enable_image_[ImageType::IMAGE_RIGHT_COLOR]) {
+    get_stream_size(stream_mode_, &width, &height);
+  } else {
+    get_stream_size(stream_mode, &width, &height);
+  }
 
   memset(stream_color_info_ptr_, 0, sizeof(ETRONDI_STREAM_INFO)*64);
   memset(stream_depth_info_ptr_, 0, sizeof(ETRONDI_STREAM_INFO)*64);
@@ -379,10 +385,7 @@ bool CameraPrivate::SetFWRegister(std::uint16_t address, std::uint16_t value,
 }
 
 ErrorCode CameraPrivate::Open(const InitParams& params) {
-  if (params.stream_mode == StreamMode::STREAM_2560x720) {
-    is_right_color_ = true;
-  }
-  if (params.stream_mode == StreamMode::STREAM_2560x720 &&
+  if (stream_mode_ == StreamMode::STREAM_2560x720 &&
       params.framerate == 60) {
     LOGI("The frame rate chosen is too large, please use a smaller frame rate.");
     return ErrorCode::ERROR_FAILURE;
@@ -537,8 +540,8 @@ std::vector<device::StreamData> CameraPrivate::RetrieveImage(const ImageType& ty
       return data;
     } break;
     case ImageType::IMAGE_RIGHT_COLOR: {
-      if (!is_right_color_) {
-        throw new std::runtime_error("RetrieveImage: Right color is disable.");
+      if (!is_enable_image_[ImageType::IMAGE_RIGHT_COLOR]) {
+        LOGE("RetrieveImage: Right color is disable.");
       }
       std::lock_guard<std::mutex> _(cap_color_mtx_);
       stream_datas_t data = right_color_data_;
@@ -636,6 +639,8 @@ void CameraPrivate::SyntheticImageColor() {
     for (auto info : img_info_) {
       if (color->frame_id() == info.img_info->frame_id) {
         TransferColor(color, info);
+        if (image_color_.size() > 30) { image_color_.clear(); }
+        if (img_info_.size() > 30) { img_info_.clear(); }
       }
     }
   }
@@ -644,13 +649,13 @@ void CameraPrivate::SyntheticImageColor() {
 }
 
 void CameraPrivate::TransferColor(Image::pointer color, img_info_data_t info) {
-  if (!is_right_color_) {
+  if (!is_enable_image_[ImageType::IMAGE_RIGHT_COLOR]) {
     stream_data_t data;
     data.img_info = std::make_shared<ImgInfo>();
     *data.img_info = *info.img_info;
     data.img = color->Clone();
     left_color_data_.push_back(data);
-  } else if (is_right_color_) {
+  } else {
     CutPart(ImageType::IMAGE_LEFT_COLOR, color, info);
     CutPart(ImageType::IMAGE_RIGHT_COLOR, color, info);
   }
@@ -678,6 +683,7 @@ void CameraPrivate::SyntheticImageDepth() {
     data.img_info = nullptr;
     data.img = depth->Clone();
     depth_data_.push_back(data);
+    if (depth_data_.size() > 30) { depth_data_.clear(); }
   }
   image_depth_.clear();
 }
@@ -687,14 +693,24 @@ void CameraPrivate::StartCaptureImage() {
   cap_image_thread_ = std::thread([this]() {
     ErrorCode code = ErrorCode::SUCCESS;
     while (is_capture_image_) {
-      CaptureImageColor(&code);
-      CaptureImageDepth(&code);
+      if (is_enable_image_[ImageType::IMAGE_LEFT_COLOR] ||
+          is_enable_image_[ImageType::IMAGE_RIGHT_COLOR]) {
+        CaptureImageColor(&code);
+      }
+      if (is_enable_image_[ImageType::IMAGE_DEPTH]) {
+        CaptureImageDepth(&code);
+      }
     }
   });
   sync_thread_ = std::thread([this]() {
     while (is_capture_image_) {
-      SyntheticImageColor();
-      SyntheticImageDepth();
+      if (is_enable_image_[ImageType::IMAGE_LEFT_COLOR] ||
+          is_enable_image_[ImageType::IMAGE_RIGHT_COLOR]) {
+        SyntheticImageColor();
+      }
+      if (is_enable_image_[ImageType::IMAGE_DEPTH]) {
+        SyntheticImageDepth();
+      }
     }
   });
 }
@@ -1026,5 +1042,27 @@ void CameraPrivate::SetImageMode(const ImageMode& mode) {
       break;
     default:
       throw new std::runtime_error("ImageMode is unknown");
+  }
+}
+
+void CameraPrivate::EnableImageType(const ImageType& type) {
+  switch (type) {
+    case ImageType::IMAGE_LEFT_COLOR:
+      is_enable_image_[type] = true;
+      break;
+    case ImageType::IMAGE_RIGHT_COLOR:
+      is_enable_image_[type] = true;
+      stream_mode_ = StreamMode::STREAM_2560x720;
+      break;
+    case ImageType::IMAGE_DEPTH:
+      is_enable_image_[type] = true;
+      break;
+    case ImageType::ALL:
+      EnableImageType(ImageType::IMAGE_LEFT_COLOR);
+      EnableImageType(ImageType::IMAGE_RIGHT_COLOR);
+      EnableImageType(ImageType::IMAGE_DEPTH);
+      break;
+    default:
+      LOGE("EnableImageType:: ImageType is unknown.");
   }
 }

@@ -27,6 +27,7 @@
 #include <vector>
 #include <thread>
 #include <condition_variable>
+#include <map>
 
 #include "eSPDI.h"
 
@@ -110,6 +111,8 @@ class CameraPrivate {
   void StopCaptureImage();
   /** Get imu data */
   motion_datas_t GetImuDatas();
+
+  void EnableImageType(const ImageType& type);
 
   /** Wait according to framerate. */
   void Wait();
@@ -213,7 +216,8 @@ class CameraPrivate {
 
   bool is_start_;
 
-  bool is_right_color_;
+  std::map<ImageType, bool> is_enable_image_;
+  StreamMode stream_mode_;
 };
 
 MYNTEYE_END_NAMESPACE

@@ -65,8 +65,6 @@ enum class ImageType : std::int32_t {
   IMAGE_DEPTH,
   /** All. */
   ALL,
-  /** Last guard. */
-  IMAGE_TYPE_LAST
 };
 
 /**

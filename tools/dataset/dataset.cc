@@ -43,6 +43,12 @@ Dataset::Dataset(std::string outdir) : outdir_(std::move(outdir)) {
 }
 
 Dataset::~Dataset() {
+  for (auto &&it = stream_writers_.begin(); it != stream_writers_.end(); it++) {
+    if (it->second) {
+      it->second->ofs.flush();
+      it->second->ofs.close();
+    }
+  }
   if (motion_writer_) {
     motion_writer_->ofs.flush();
     motion_writer_->ofs.close();
@@ -61,14 +67,15 @@ void Dataset::SaveMotionData(const mynteye::MotionData &data) {
   ++motion_count_;
 }
 
-void Dataset::SaveStreamData(const mynteye::StreamData &data) {
-  auto &&writer = GetStreamWriter();
-  auto seq = stream_count_;
+void Dataset::SaveStreamData(const ImageType &type,
+    const mynteye::StreamData &data) {
+  auto &&writer = GetStreamWriter(type);
+  auto seq = stream_count_[type];
 
   writer->ofs << seq << ", " << data.img_info->frame_id << ", "
     << data.img_info->timestamp << ", "
     << data.img_info->exposure_time << std::endl;
-  ++stream_count_;
+  ++stream_count_[type];
 }
 
 Dataset::writer_t Dataset::GetMotionWriter() {
@@ -89,22 +96,32 @@ Dataset::writer_t Dataset::GetMotionWriter() {
   return motion_writer_;
 }
 
-Dataset::writer_t Dataset::GetStreamWriter() {
-  if (stream_writer_ == nullptr) {
+Dataset::writer_t Dataset::GetStreamWriter(const ImageType &type) {
+  try {
+    return stream_writers_.at(type);
+  } catch (const std::out_of_range &e) {
     writer_t writer = std::make_shared<Writer>();
-    writer->outdir = outdir_;
-    writer->outfile = writer->outdir + MYNTEYE_OS_SEP "left" + MYNTEYE_OS_SEP "stream.txt";
+    switch (type) {
+      case ImageType::IMAGE_LEFT_COLOR: {
+        writer->outdir = outdir_ + MYNTEYE_OS_SEP "left";
+      } break;
+      case ImageType::IMAGE_RIGHT_COLOR: {
+        writer->outdir = outdir_ + MYNTEYE_OS_SEP "right";
+      } break;
+      default:
+        std::cout << "Unsupported ImageType." << std::endl;
+    }
+    writer->outfile = writer->outdir + MYNTEYE_OS_SEP "stream.txt";
 
     files::mkdir(writer->outdir);
     writer->ofs.open(writer->outfile, std::ofstream::out);
     writer->ofs << "seq, frame_id, timestamp, exposure_time" << std::endl;
     writer->ofs << FULL_PRECISION;
 
-    stream_writer_ = writer;
-    stream_count_ = 0;
+    stream_writers_[type] = writer;
+    stream_count_[type] = 0;
+    return writer;
   }
-
-  return stream_writer_;
 }
 
 }  // namespace d1000_tools

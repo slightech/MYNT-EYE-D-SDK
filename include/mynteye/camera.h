@@ -95,6 +95,8 @@ class MYNTEYE_API Camera {
   /** Get the work status of the camera true(working)/false(stopped) */
   bool IsOpened() const;
 
+  /** Enable image of type */
+  void EnableImageType(const ImageType& type);
   /** Get datas of stream */
   std::vector<mynteye::StreamData> RetrieveImages(const ImageType& type);
   /** Get datas of stream and status */

@@ -80,7 +80,7 @@ int main(int argc, char const *argv[]) {
       std::cout << std::setw(5) << info.index << " | " << info << std::endl;
     }
     std::cout << dashes << std::endl << std::endl;
-}
+  }
 
   std::cout << "Open device: " << dev_info.index << ", "
     << dev_info.name << std::endl << std::endl;
@@ -88,11 +88,12 @@ int main(int argc, char const *argv[]) {
   // Warning: Color stream format MJPG doesn't work.
   mynteye::InitParams params(dev_info.index);
   params.depth_mode = mynteye::DepthMode::DEPTH_COLORFUL;
-  // params.stream_mode = StreamMode::STREAM_1280x720;
+  params.stream_mode = StreamMode::STREAM_2560x720;
   params.ir_intensity = 4;
+  params.framerate = 30;
 
   // output file path
-  const char *outdir;
+  const char *outdir = nullptr;
   if (argc >= 2) {
     outdir = argv[1];
   } else {
@@ -100,6 +101,7 @@ int main(int argc, char const *argv[]) {
   }
   d1000_tools::Dataset dataset(outdir);
 
+  cam.EnableImageType(mynteye::ImageType::ALL);
   cam.Open(params);
 
   std::cout << std::endl;
@@ -112,36 +114,50 @@ int main(int argc, char const *argv[]) {
   std::cout << "Press ESC/Q on Windows to terminate" << std::endl;
 
   cv::namedWindow("color", cv::WINDOW_AUTOSIZE);
-  cv::namedWindow("depth", cv::WINDOW_AUTOSIZE);
 
   double t, fps = 0;
-  cv::Mat color, depth;
   std::size_t imu_count = 0;
+  std::size_t img_count = 0;
   auto &&time_beg = mynteye::times::now();
   for (;;) {
-    auto image_color = cam.RetrieveImage(mynteye::ImageType::IMAGE_COLOR);
-    auto image_depth = cam.RetrieveImage(mynteye::ImageType::IMAGE_DEPTH);
-    if (image_color.img) {
-      cv::Mat color =
-          image_color.img->To(mynteye::ImageFormat::COLOR_BGR)->ToMat();
-      cv::imshow("color", color);
+    auto &&left_color = cam.RetrieveImages(mynteye::ImageType::IMAGE_LEFT_COLOR);
+    auto &&right_color = cam.RetrieveImages(mynteye::ImageType::IMAGE_RIGHT_COLOR);
+    img_count += left_color.size();
+    if (!left_color.empty() && !right_color.empty()) {
+      auto &&left = left_color.back();
+      auto &&right = right_color.back();
+      cv::Mat image_left =
+        left.img->To(mynteye::ImageFormat::COLOR_BGR)->ToMat();
+      cv::Mat image_right =
+        right.img->To(mynteye::ImageFormat::COLOR_BGR)->ToMat();
 
-      dataset.SaveStreamData(image_color);
-    }
-    if (image_depth.img) {
-      cv::Mat depth =
-          image_depth.img->To(mynteye::ImageFormat::DEPTH_BGR)->ToMat();
-      cv::imshow("depth", depth);
+      cv::Mat color;
+      cv::hconcat(image_left, image_right, color);
+      cv::imshow("color", color);
     }
 
     t = static_cast<double>(cv::getTickCount());
     auto &&motion_data = cam.RetrieveMotions();
     imu_count += motion_data.size();
-    for (auto &&motion : motion_data) {
-      dataset.SaveMotionData(motion);
-    }
-    std::cout << "\rSaved " << ", " << imu_count << " imus" << std::flush;
 
+    {
+      for (auto &&left : left_color) {
+        dataset.SaveStreamData(
+            mynteye::ImageType::IMAGE_LEFT_COLOR, left);
+      }
+
+      for (auto &&right : right_color) {
+        dataset.SaveStreamData(
+            mynteye::ImageType::IMAGE_RIGHT_COLOR, right);
+      }
+
+      for (auto &&motion : motion_data) {
+        dataset.SaveMotionData(motion);
+      }
+
+      std::cout << "\rSaved " << img_count << " imgs" <<
+        ", " << imu_count << " imus" << std::flush;
+    }
 
     char key = static_cast<char>(cv::waitKey(10));
     if (key == 27 || key == 'q' || key == 'Q') {  // ESC/Q
@@ -163,8 +179,8 @@ int main(int argc, char const *argv[]) {
   std::cout << "Time beg: " << mynteye::times::to_local_string(time_beg)
     << ", end: " << mynteye::times::to_local_string(time_end)
     << ", cost: " << elapsed_ms << "ms" << std::endl;
-  //  LOG(INFO) << "Img count: " << img_count
-  //   << ", fps: " << (1000.f * img_count / elapsed_ms);
+  std::cout << "Img count: " << img_count
+    << ", fps: " << (1000.f * img_count / elapsed_ms) << std::endl;
   std::cout << "Imu count: " << imu_count
     << ", hz: " << (1000.f * imu_count / elapsed_ms) << std::endl;
 

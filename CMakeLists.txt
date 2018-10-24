@@ -106,6 +106,30 @@ add_definitions(-DMYNTEYE_EXPORTS)
 
 set(MYNTEYE_CORE ${MYNTEYE_NAME}_core)
 
+#if(OS_WIN)
+#  set(DEVICE_SRC "src/mynteye/internal/hid_windows.cc")
+#elseif(OS_MAC)
+#  set(DEVICE_SRC "src/mynteye/internal/hid_macos.cc")
+#else()
+#  set(DEVICE_SRC "src/mynteye/internal/hid_linux.cc")
+#endif()
+
+#set(MYNTEYE_CORE_SRCS
+#  src/mynteye/camera.cc
+#  src/mynteye/image.cc
+#  src/mynteye/device_info.cc
+#  src/mynteye/init_params.cc
+#  src/mynteye/stream_info.cc
+#  src/mynteye/types.cc
+#  src/mynteye/internal/camera_p.cc
+#  src/mynteye/internal/camera_p_linux.cc
+#  src/mynteye/internal/camera_p_win.cc
+#  src/mynteye/internal/channels.cc
+#  src/mynteye/util/convertor.cc
+#  src/mynteye/util/rate.cc
+#  src/mynteye/util/strings.cc
+#  ${DEVICE_SRC}
+#)
 file(GLOB_RECURSE MYNTEYE_CORE_SRCS "src/mynteye/*.cc")
 
 set(MYNTEYE_LINK_LIBS ${eSPDI_LIBS} "usb")

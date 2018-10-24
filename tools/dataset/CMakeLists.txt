@@ -14,23 +14,12 @@
 
 get_filename_component(DIR_NAME ${CMAKE_CURRENT_LIST_DIR} NAME)
 
-set(OUTPUT_DIR "${CMAKE_CURRENT_LIST_DIR}/_output")
-
 set_outdir(
-  ARCHIVE ${OUTPUT_DIR}/lib
-  LIBRARY ${OUTPUT_DIR}/lib
-  RUNTIME ${OUTPUT_DIR}/bin
+  ARCHIVE ${OUT_DIR}/lib/${DIR_NAME}
+  LIBRARY ${OUT_DIR}/lib/${DIR_NAME}
+  RUNTIME ${OUT_DIR}/bin/${DIR_NAME}
 )
 
-include_directories(
-  ${CMAKE_CURRENT_LIST_DIR}/src
-  ${PRO_DIR}/include
-)
-set(MYNTEYE_DLL_SEARCH_PATHS
-  ${PRO_DIR}/_install/bin
-  ${PRO_DIR}/_install/bin/3rdparty
-  ${OpenCV_LIB_SEARCH_PATH}
-)
 ## record
 
 make_executable(record
