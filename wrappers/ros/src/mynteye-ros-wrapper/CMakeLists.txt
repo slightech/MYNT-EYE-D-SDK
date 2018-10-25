@@ -46,7 +46,7 @@ generate_messages(
   std_msgs
 )
 
-catkin_package()
+catkin_package(CATKIN_DEPENDS cv_bridge image_transport nodelet roscpp sensor_msgs std_msgs tf)
 
 get_filename_component(SDK_DIR "${PROJECT_SOURCE_DIR}/../../../.." ABSOLUTE)
 

@@ -32,7 +32,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
-#include "mynteye_wrapper/Temp.h"
+#include <mynteye_wrapper/Temp.h>
 
 #include "mynteye/camera.h"
 #include "pointcloud_generator.h" // NOLINT
