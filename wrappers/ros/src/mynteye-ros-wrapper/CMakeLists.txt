@@ -34,6 +34,7 @@ checkPackage("nodelet" "")
 checkPackage("roscpp" "")
 checkPackage("sensor_msgs" "")
 checkPackage("std_msgs" "")
+checkPackage("tf" "")
 
 add_message_files(
   FILES
