@@ -192,8 +192,13 @@ void CameraPrivate::ImgCallback(EtronDIImageType::Value imgType, int imgId,
       unsigned int color_img_height =(unsigned int)(
           p->stream_color_info_ptr_[p->color_res_index_].nHeight);
 
+      /*
       if (imgType == EtronDIImageType::COLOR_RGB24) {
         p->color_image_buf_ = ImageColor::Create(ImageFormat::COLOR_RGB,
+            color_img_width, color_img_height, true);
+            */
+      if (imgType == EtronDIImageType::COLOR_YUY2) {
+        p->color_image_buf_ = ImageColor::Create(ImageFormat::COLOR_YUYV,
             color_img_width, color_img_height, true);
       } else if (imgType == EtronDIImageType::COLOR_MJPG) {
         p->color_image_buf_ = ImageColor::Create(ImageFormat::COLOR_MJPG,
@@ -203,6 +208,7 @@ void CameraPrivate::ImgCallback(EtronDIImageType::Value imgType, int imgId,
       p->color_image_buf_->ResetBuffer();
     }
     p->color_image_buf_->set_valid_size(imgSize);
+    p->color_image_buf_->set_frame_id(serialNumber);
     std::copy(imgBuf, imgBuf + imgSize, p->color_image_buf_->data());
   } else if (EtronDIImageType::IsImageDepth(imgType)) {
     // LOGI("Image callback depth");
@@ -218,6 +224,7 @@ void CameraPrivate::ImgCallback(EtronDIImageType::Value imgType, int imgId,
       p->depth_image_buf_->ResetBuffer();
     }
     p->depth_image_buf_->set_valid_size(imgSize);
+    p->depth_image_buf_->set_frame_id(serialNumber);
     std::copy(imgBuf, imgBuf + imgSize, p->depth_image_buf_->data());
   } else {
     LOGE("Image callback failed. Unknown image type.");
@@ -242,14 +249,16 @@ Image::pointer CameraPrivate::RetrieveImageColor(ErrorCode* code) {
       *code = ErrorCode::SUCCESS;
       // return clone as it will be changed in imgcallback
       return color_image_buf_->Clone();
-    } else if (color_image_buf_->format() == ImageFormat::COLOR_RGB) {  // rgb24
+    } else if (color_image_buf_->format() == ImageFormat::COLOR_YUYV) {  // YUYV
+      /*
       // clone as it will be changed in imgcallback
       auto color = color_image_buf_->Clone();
       // flip afer clone, because the buffer may not updated when retrieve again
       FLIP_UP_DOWN_C3(color->data(), color_img_width, color_img_height);
       RGB_TO_BGR(color->data(), color_img_width, color_img_height);
+      */
       *code = ErrorCode::SUCCESS;
-      return color;
+      return color_image_buf_->Clone();
     } else {
       LOGE("Unknown image color type.");
     }

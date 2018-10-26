@@ -273,8 +273,58 @@ struct MYNTEYE_API ImuData {
   }
 };
 
+/**
+ * @ingroup calibration
+ * IMU intrinsics: scale, drift and variances.
+ */
+struct MYNTEYE_API ImuIntrinsics {
+  /**
+   * Scale matrix.
+   * \code
+   *   Scale X     cross axis  cross axis
+   *   cross axis  Scale Y     cross axis
+   *   cross axis  cross axis  Scale Z
+   * \endcode
+   */
+  double scale[3][3];
+  /* Zero-drift: X, Y, Z */
+  double drift[3];
+
+  /** Noise density variances */
+  double noise[3];
+  /** Random walk variances */
+  double bias[3];
+
+  std::uint8_t reserve[100];
+
+  /** Warm drift 
+   *  \code
+   *    0 - Slope
+   *    1 - Constant value
+   *  \endcode
+   */
+  double x[2];
+  double y[2];
+  double z[2];
+};
+
+MYNTEYE_API
+std::ostream &operator<<(std::ostream &os, const ImuIntrinsics &in);
+
+/**
+ * @ingroup calibration
+ * Motion intrinsics, including accelerometer and gyroscope.
+ */
+struct MYNTEYE_API MotionIntrinsics {
+  ImuIntrinsics accel; /**< Accelerometer intrinsics */
+  ImuIntrinsics gyro;  /**< Gyroscope intrinsics */
+};
+
+MYNTEYE_API
+std::ostream &operator<<(std::ostream &os, const MotionIntrinsics &in);
+
 MYNTEYE_END_NAMESPACE
-    
+
 MYNTEYE_API
 std::ostream& operator<<(std::ostream& os, const mynteye::StreamFormat& code);
 

@@ -463,7 +463,7 @@ ErrorCode CameraPrivate::Open(const InitParams& params) {
   //     int* pFps,
   //     BYTE ctrlMode)
 
-  bool toRgb = true;
+  bool toRgb = false;
   // Depth0: none
   // Depth1: unshort
   // Depth2: ?
@@ -492,6 +492,12 @@ ErrorCode CameraPrivate::Open(const InitParams& params) {
     StartHidTracking();
     StartCaptureImage();
     SyncCameraLogData();
+    /*
+    unsigned char pdata[100] = {};
+    int plen, nbufferSize = 9;
+    EtronDI_GetSerialNumber(etron_di_, &dev_sel_info_, pdata, nbufferSize, &plen);
+    printf ("pdata = %s, nbufferSize = %d, plen = %d\n", pdata, nbufferSize, plen);
+    */
     return ErrorCode::SUCCESS;
   } else {
     dev_sel_info_.index = -1;  // reset flag
@@ -499,6 +505,7 @@ ErrorCode CameraPrivate::Open(const InitParams& params) {
   }
 }
 
+    EtronDI_SetSerialNumber(etron_di_, &dev_sel_info_, pdata, nbufferSize);
 bool CameraPrivate::IsOpened() const {
   return dev_sel_info_.index != -1;
 }
@@ -542,6 +549,7 @@ std::vector<device::StreamData> CameraPrivate::RetrieveImage(const ImageType& ty
     case ImageType::IMAGE_RIGHT_COLOR: {
       if (!is_enable_image_[ImageType::IMAGE_RIGHT_COLOR]) {
         LOGE("RetrieveImage: Right color is disable.");
+        throw new std::runtime_error("RetrieveImage: Right color is disable.");
       }
       std::lock_guard<std::mutex> _(cap_color_mtx_);
       stream_datas_t data = right_color_data_;
@@ -599,10 +607,13 @@ void CameraPrivate::CaptureImageColor(ErrorCode* code) {
   if (p) {
     auto color = p->Clone();
     image_color_.push_back(color);
+    image_color_wait_.notify_one();
   }
+  /*
   if (!image_color_.empty()) {
     image_color_wait_.notify_one();
   }
+  */
 }
 
 void CameraPrivate::CaptureImageDepth(ErrorCode* code) {
@@ -611,10 +622,13 @@ void CameraPrivate::CaptureImageDepth(ErrorCode* code) {
   if (p) {
     auto depth = p->Clone();
     image_depth_.push_back(depth);
+    image_depth_wait_.notify_one();
   }
+  /*
   if (!image_depth_.empty()) {
     image_depth_wait_.notify_one();
   }
+  */
 }
 
 void CameraPrivate::SyntheticImageColor() {

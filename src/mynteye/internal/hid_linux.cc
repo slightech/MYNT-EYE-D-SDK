@@ -20,8 +20,7 @@ namespace hid {
 
 hid_device::hid_device() : first_hid_(nullptr),
   last_hid_(nullptr),
-  first_dev_(nullptr),
-  is_opened_(false) {
+  first_dev_(nullptr) {
 }
 
 hid_device::~hid_device() {
@@ -88,15 +87,13 @@ int hid_device::send(int num, void *buf, int len, int timeout) {
  *
  * Inputs:
  * max = maximum number of devices to open
- * vid = Vendor ID, or -1 if any
- * pid = Product ID, or -1 if any
  * usage_page = top level usage page, or -1 if any
  * usage = top level usage number, or -1 if any
  *
  * Outputs:
  * actual number of devices opened
  */
-int hid_device::open(int max, int vid, int pid, int usage_page, int usage) {
+int hid_device::open(int max, int usage_page, int usage) {
   if (first_hid_) {
     free_all_hid();
   }
@@ -112,10 +109,10 @@ int hid_device::open(int max, int vid, int pid, int usage_page, int usage) {
   int count = 0;
   for (usb_bus_t *bus = usb_get_busses(); bus; bus = bus->next) {
     for (usb_device_t *dev = bus->devices; dev; dev = dev->next) {
-      if (vid > 0 && dev->descriptor.idVendor != vid) {
+      if (VID > 0 && dev->descriptor.idVendor != VID) {
         continue;
       }
-      if (pid > 0 && dev->descriptor.idProduct != pid) {
+      if (PID > 0 && dev->descriptor.idProduct != PID) {
         continue;
       }
       if (!dev->config || dev->config->bNumInterfaces < 1) {
@@ -135,7 +132,6 @@ int hid_device::open(int max, int vid, int pid, int usage_page, int usage) {
       }
     }
   }
-  is_opened_ = true;
   return count;
 }
 

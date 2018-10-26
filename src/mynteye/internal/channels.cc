@@ -65,8 +65,8 @@ void Channels::StartHidTracking() {
 
   is_hid_tracking_ = true;
   // open device
-  if (device_->open(1, 0x0483, 0x5720, -1, -1) < 0) {
-    if (device_->open(1, 0x0483, 0x5720, -1, -1) < 0) {
+  if (device_->open(1, -1, -1) < 0) {
+    if (device_->open(1, -1, -1) < 0) {
       LOGE("Error:: open imu device is failure.");
       return;
     }
