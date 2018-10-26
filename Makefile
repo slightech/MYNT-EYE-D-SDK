@@ -42,7 +42,7 @@ submodules:
 
 init: submodules
 	@$(call echo,Make $@)
-	@$(SH) ./scripts/init.sh
+	@$(SH) ./scripts/init.sh $(INIT_OPTIONS)
 
 .PHONY: init
 

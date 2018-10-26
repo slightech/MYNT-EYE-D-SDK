@@ -4,6 +4,7 @@
 | 165x31.5x29.6 | 149x24 |
 
 ![](mynteye_surface_zh-Hans.jpg)
+
 \latexonly
 \includegraphics[width=0.6\textwidth,keepaspectration]{mynteye_surface_zh-Hans.jpg}
 \endlatexonly

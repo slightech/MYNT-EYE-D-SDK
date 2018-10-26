@@ -95,7 +95,7 @@ make all
 .\samples\_output\bin\get_points.bat
 ```
 
-## 4. Clean
+## 4. 清理
 
 ```
 cd <sdk>

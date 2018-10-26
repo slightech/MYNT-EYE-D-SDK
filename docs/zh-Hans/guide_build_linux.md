@@ -144,7 +144,7 @@ cd <sdk>
 make pkg
 ```
 
-## 6. Clean
+## 6. 清理
 
 ```
 cd <sdk>
