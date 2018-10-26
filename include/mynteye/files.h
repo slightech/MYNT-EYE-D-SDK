@@ -26,15 +26,17 @@ bool _mkdir(const std::string &path) {
 #endif
 
   if (status != 0 && errno != EEXIST) {
-    std::cout << "Create directory failed (status " << status
-      << "), path: " << path << std::endl;
+    // std::cout << "Create directory failed (status " << status
+    //   << "), path: " << path << std::endl;
     return false;
   }
   if (errno == EEXIST) {
-    std::cout << "Create directory needless (already exist), path: " << std::endl;
+    // std::cout << "Create directory needless"  <<
+    // "(already exist), path " << path << std::endl;
     return true;
   } else {
-    std::cout << "Create directory success, path: " << std::endl;
+    // std::cout << "Create directory success, path: " <<
+    // path << std::endl;
     return true;
   }
 }
@@ -55,7 +57,7 @@ bool mkdir(const std::string &path) {
   return true;
 }
 
-} // namespace files
+}  // namespace files
 
 MYNTEYE_END_NAMESPACE
 
