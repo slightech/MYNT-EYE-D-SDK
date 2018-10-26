@@ -27,7 +27,6 @@ sys.path.append(os.path.join(TOOLBOX_DIR, 'internal'))
 
 # pylint: disable=import-error,wrong-import-position
 
-
 ANGLE_DEGREES = 'd'
 ANGLE_RADIANS = 'r'
 ANGLE_UNITS = (ANGLE_DEGREES, ANGLE_RADIANS)
