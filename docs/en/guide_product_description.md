@@ -1,4 +1,4 @@
-# Product description
+# Product description {#mainpage}
 
 The MYNT Depth utilizes the camera and the motion sensor to provide visually accurate SLAM results with higher precision, lower cost, simpler layout, along with the ability to achieve face and object recognition. The concept of combining binocular and IMU is the leading-edge technology in the current SLAM industry.The depth version of the product has a built-in depth calculation chip that can output depth images without the host computer. At the same time, the product is equipped with leading hardware solutions such as IR active light, IMU six-axis, hardware-level frame synchronization, global shutter, etc., up to 720p/60fps (120°FOV version) of synchronous image information, the recognition distance can reach 15m (50 °FOV version), accuracy up to millimeters (50° FOV version).
 
