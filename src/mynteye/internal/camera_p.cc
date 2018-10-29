@@ -505,7 +505,6 @@ ErrorCode CameraPrivate::Open(const InitParams& params) {
   }
 }
 
-    EtronDI_SetSerialNumber(etron_di_, &dev_sel_info_, pdata, nbufferSize);
 bool CameraPrivate::IsOpened() const {
   return dev_sel_info_.index != -1;
 }

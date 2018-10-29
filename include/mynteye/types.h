@@ -273,6 +273,7 @@ struct MYNTEYE_API ImuData {
   }
 };
 
+#if 0
 /**
  * @ingroup calibration
  * IMU intrinsics: scale, drift and variances.
@@ -295,7 +296,7 @@ struct MYNTEYE_API ImuIntrinsics {
   /** Random walk variances */
   double bias[3];
 
-  std::uint8_t reserve[100];
+  // std::uint8_t reserve[100];
 
   /** Warm drift 
    *  \code
@@ -322,6 +323,7 @@ struct MYNTEYE_API MotionIntrinsics {
 
 MYNTEYE_API
 std::ostream &operator<<(std::ostream &os, const MotionIntrinsics &in);
+#endif
 
 MYNTEYE_END_NAMESPACE
 
