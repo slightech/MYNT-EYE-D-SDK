@@ -1,7 +1,7 @@
 pipeline {
   agent {
-    // docker { image 'ros:kinetic-ros-core-xenial' }
-    docker { image 'ros:kinetic-ros-base-xenial' }
+    // docker { image 'ros:kinetic-ros-base-xenial' }
+    docker { image 'joinaero/kinetic-ros-opencv-xenial' }
   }
 
   stages {
@@ -9,10 +9,7 @@ pipeline {
       steps {
         echo "WORKSPACE: ${env.WORKSPACE}"
         echo 'apt-get ..'
-        sh '''
-        apt-get update
-        apt-get install -y ros-kinetic-opencv3
-        '''
+        sh 'apt-get update'
       }
     }
     stage('Init') {
@@ -87,7 +84,7 @@ pipeline {
     }
     failure {
       echo 'This will run only if failed'
-      mail to: 'mynteye@slightech.com',
+      mail to: 'mynteye-ci@slightech.com',
       subject: "Failed Pipeline: ${currentBuild.fullDisplayName}",
       body: "Something is wrong with ${env.BUILD_URL}"
     }
