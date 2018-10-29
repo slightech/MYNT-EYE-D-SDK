@@ -198,8 +198,6 @@ struct MYNTEYE_API CameraCtrlRectLogData {
 	};
 };
 
-
-
 /**
  * @ingroup datatypes
  * @brief Image information
@@ -298,7 +296,7 @@ struct MYNTEYE_API ImuIntrinsics {
 
   // std::uint8_t reserve[100];
 
-  /** Warm drift 
+  /** Warm drift
    *  \code
    *    0 - Slope
    *    1 - Constant value
@@ -308,9 +306,6 @@ struct MYNTEYE_API ImuIntrinsics {
   double y[2];
   double z[2];
 };
-
-MYNTEYE_API
-std::ostream &operator<<(std::ostream &os, const ImuIntrinsics &in);
 
 /**
  * @ingroup calibration
