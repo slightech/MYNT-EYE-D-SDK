@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(mynteye_wrapper)
+project(mynteye_wrapper_d)
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
@@ -20,7 +20,7 @@ endfunction(checkPackage)
 find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   image_transport
-  message_runtime
+  message_generation
   nodelet
   roscpp
   sensor_msgs
@@ -30,23 +30,20 @@ find_package(catkin REQUIRED COMPONENTS
 
 checkPackage("cv_bridge" "")
 checkPackage("image_transport" "")
+checkPackage("message_generation" "")
 checkPackage("nodelet" "")
 checkPackage("roscpp" "")
 checkPackage("sensor_msgs" "")
 checkPackage("std_msgs" "")
 checkPackage("tf" "")
 
-add_message_files(
-  FILES
-  Temp.msg
-)
+add_message_files(FILES Temp.msg)
 
-generate_messages(
-  DEPENDENCIES
-  std_msgs
-)
+generate_messages(DEPENDENCIES std_msgs)
 
-catkin_package(CATKIN_DEPENDS cv_bridge image_transport nodelet roscpp sensor_msgs std_msgs tf)
+catkin_package(
+  CATKIN_DEPENDS cv_bridge image_transport message_runtime nodelet roscpp sensor_msgs std_msgs tf
+)
 
 get_filename_component(SDK_DIR "${PROJECT_SOURCE_DIR}/../../../.." ABSOLUTE)
 
@@ -78,18 +75,18 @@ set(LINK_LIBRARIES
 add_executable(mynteye_listener src/mynteye_listener.cc)
 target_link_libraries(mynteye_listener ${LINK_LIBRARIES})
 
-add_library(mynteye_wrapper
+add_library(mynteye_wrapper_d
   src/mynteye_wrapper_nodelet.cc
   src/pointcloud_generator.cc
 )
-target_link_libraries(mynteye_wrapper ${LINK_LIBRARIES})
+target_link_libraries(mynteye_wrapper_d ${LINK_LIBRARIES})
 
-add_executable(mynteye_wrapper_node src/mynteye_wrapper_node.cc)
-target_link_libraries(mynteye_wrapper_node mynteye_wrapper ${LINK_LIBRARIES})
+add_executable(mynteye_wrapper_d_node src/mynteye_wrapper_node.cc)
+target_link_libraries(mynteye_wrapper_d_node mynteye_wrapper_d ${LINK_LIBRARIES})
 
 # install
 
-install(TARGETS mynteye_wrapper mynteye_wrapper_node
+install(TARGETS mynteye_wrapper_d mynteye_wrapper_d_node
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

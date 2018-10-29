@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<launch>
+
+  <include file="$(find mynteye_wrapper_d)/launch/mynteye.launch"/>
+
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find mynteye_wrapper_d)/rviz/mynteye.rviz" output="screen"/>
+
+</launch>

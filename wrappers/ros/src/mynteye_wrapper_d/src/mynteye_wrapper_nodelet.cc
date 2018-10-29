@@ -32,7 +32,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
-#include <mynteye_wrapper/Temp.h>
+#include <mynteye_wrapper_d/Temp.h>
 
 #include "mynteye/camera.h"
 #include "pointcloud_generator.h" // NOLINT
@@ -284,7 +284,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   }
 
   void publishTemp(float temperature, ros::Time stamp) {
-    mynteye_wrapper::Temp msg;
+    mynteye_wrapper_d::Temp msg;
     msg.header.stamp = stamp;
     msg.header.frame_id = temp_frame_id;
     msg.data = temperature;
@@ -566,7 +566,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
     pub_imu = nh.advertise<sensor_msgs::Imu>(imu_topic, 1);
     NODELET_INFO_STREAM("Advertized on topic " << imu_topic);
-    pub_temp = nh.advertise<mynteye_wrapper::Temp>(temp_topic, 1);
+    pub_temp = nh.advertise<mynteye_wrapper_d::Temp>(temp_topic, 1);
     NODELET_INFO_STREAM("Advertized on topic " << temp_topic);
 
     double cx, cy, fx, fy;

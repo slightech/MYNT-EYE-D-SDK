@@ -105,21 +105,21 @@ roscore
 
 ```
 source ./wrappers/ros/devel/setup.bash
-roslaunch mynteye_wrapper display.launch
+roslaunch mynteye_wrapper_d display.launch
 ```
 
 **Publish:**
 
 ```
 source ./wrappers/ros/devel/setup.bash
-roslaunch mynteye_wrapper mynteye.launch
+roslaunch mynteye_wrapper_d mynteye.launch
 ```
 
 **Subscribe:**
 
 ```
 source ./wrappers/ros/devel/setup.bash
-rosrun mynteye_wrapper mynteye_listener
+rosrun mynteye_wrapper_d mynteye_listener
 ```
 
 ## 5. Package

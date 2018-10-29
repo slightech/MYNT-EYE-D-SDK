@@ -64,7 +64,7 @@
   <arg name="color_left_topic"   default="$(arg mynteye)/color_left" />
   <arg name="color_right_topic"   default="$(arg mynteye)/color_right" />
 
-  <node name="mynteye_wrapper_node" pkg="mynteye_wrapper" type="mynteye_wrapper_node" output="screen">
+  <node name="mynteye_wrapper_d_node" pkg="mynteye_wrapper_d" type="mynteye_wrapper_d_node" output="screen">
 
     <!-- Camera params -->
     <param name="dev_index"     value="$(arg dev_index)" />
@@ -96,7 +96,7 @@
     <param name="temp_frame"   value="$(arg temp_frame)" />
 
     <!-- Topic names -->
-    
+
     <param name="depth_topic"       value="$(arg depth_topic)" />
     <param name="points_topic"      value="$(arg points_topic)" />
     <param name="imu_topic"         value="$(arg imu_topic)" />
