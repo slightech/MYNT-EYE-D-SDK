@@ -3,7 +3,7 @@ dataset: "mynteye"
 
 # rosbag config
 rosbag:
-  topic_img_left: "/mynteye/gray_left"
-  topic_img_right: "/mynteye/gray_right"
-  topic_imu: "/mynteye/imu"
-  topic_temp: "/mynteye/temp"
+  topic_img_left: "/mynteye/left/color"
+  topic_img_right: "/mynteye/right/color"
+  topic_imu: "/mynteye/imu/data_raw"
+  topic_temp: "/mynteye/temp/data_raw"

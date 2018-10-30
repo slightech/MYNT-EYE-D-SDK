@@ -29,3 +29,5 @@ _install/
 
 /dataset/
 /*.bag
+
+*.pyc

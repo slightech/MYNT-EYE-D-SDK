@@ -55,14 +55,14 @@
   <arg name="imu_frame"     default="$(arg mynteye)_imu_frame" />
   <arg name="temp_frame"    default="$(arg mynteye)_temp_frame" />
 
-  <arg name="depth_topic"   default="$(arg mynteye)/depth" />
-  <arg name="points_topic"  default="$(arg mynteye)/points" />
-  <arg name="imu_topic"     default="$(arg mynteye)/imu" />
-  <arg name="temp_topic"    default="$(arg mynteye)/temp" />
-  <arg name="gray_left_topic"    default="$(arg mynteye)/gray_left" />
-  <arg name="gray_right_topic"    default="$(arg mynteye)/gray_right" />
-  <arg name="color_left_topic"   default="$(arg mynteye)/color_left" />
-  <arg name="color_right_topic"   default="$(arg mynteye)/color_right" />
+  <arg name="depth_topic"   default="$(arg mynteye)/depth/image_raw" />
+  <arg name="points_topic"  default="$(arg mynteye)/points/data_raw" />
+  <arg name="imu_topic"     default="$(arg mynteye)/imu/data_raw" />
+  <arg name="temp_topic"    default="$(arg mynteye)/temp/data_raw" />
+  <arg name="gray_left_topic"    default="$(arg mynteye)/left/gray" />
+  <arg name="gray_right_topic"    default="$(arg mynteye)/right/gray" />
+  <arg name="color_left_topic"   default="$(arg mynteye)/left/color" />
+  <arg name="color_right_topic"   default="$(arg mynteye)/right/color" />
 
   <node name="mynteye_wrapper_d_node" pkg="mynteye_wrapper_d" type="mynteye_wrapper_d_node" output="screen">
 
