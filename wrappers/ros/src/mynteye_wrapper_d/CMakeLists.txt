@@ -72,9 +72,6 @@ set(LINK_LIBRARIES
   mynteye_core
 )
 
-add_executable(mynteye_listener src/mynteye_listener.cc)
-target_link_libraries(mynteye_listener ${LINK_LIBRARIES})
-
 add_library(mynteye_wrapper_d
   src/mynteye_wrapper_nodelet.cc
   src/pointcloud_generator.cc
@@ -84,6 +81,9 @@ target_link_libraries(mynteye_wrapper_d ${LINK_LIBRARIES})
 add_executable(mynteye_wrapper_d_node src/mynteye_wrapper_node.cc)
 target_link_libraries(mynteye_wrapper_d_node mynteye_wrapper_d ${LINK_LIBRARIES})
 
+add_executable(mynteye_listener src/mynteye_listener.cc)
+target_link_libraries(mynteye_listener ${LINK_LIBRARIES})
+
 # install
 
 install(TARGETS mynteye_wrapper_d mynteye_wrapper_d_node
@@ -92,7 +92,11 @@ install(TARGETS mynteye_wrapper_d mynteye_wrapper_d_node
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-install(DIRECTORY launch/
+install(DIRECTORY launch
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+)
+
+install(DIRECTORY rviz
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
 )
 
