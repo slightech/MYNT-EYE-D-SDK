@@ -351,7 +351,7 @@ def _main():
         sys.exit('Error: dataset model not supported {}'.format(model))
     else:
       dataset = ROSBag(path,
-                       topic_img_left='/mynteye/left/color',
+                       topic_img_left='/mynteye/left/image_color',
                        topic_imu='/mynteye/imu/data_raw')
     return dataset
 
