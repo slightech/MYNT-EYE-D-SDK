@@ -49,8 +49,8 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   image_transport::CameraPublisher pub_color_left;
   image_transport::CameraPublisher pub_color_right;
   image_transport::CameraPublisher pub_depth;
-  image_transport::CameraPublisher pub_gray_left;
-  image_transport::CameraPublisher pub_gray_right;
+  image_transport::CameraPublisher pub_mono_left;
+  image_transport::CameraPublisher pub_mono_right;
   ros::Publisher pub_points;
   ros::Publisher pub_imu;
   ros::Publisher pub_temp;
@@ -78,8 +78,8 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   std::string points_frame_id;
   std::string imu_frame_id;
   std::string temp_frame_id;
-  std::string gray_frame_left_id;
-  std::string gray_frame_right_id;
+  std::string mono_frame_left_id;
+  std::string mono_frame_right_id;
 
   // MYNTEYE objects
   mynteye::InitParams params;
@@ -120,7 +120,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     pub.publish(msg, info);
   }
 
-  void publishGray(const std::string& frame_id, image_transport::CameraPublisher& pub, // NOLINT
+  void publishMono(const std::string& frame_id, image_transport::CameraPublisher& pub, // NOLINT
     mynteye::Image::pointer img, ros::Time stamp,
       cv::Mat* mat, std::uint32_t seq) {
     if (pub.getNumSubscribers() == 0)
@@ -292,6 +292,8 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   }
 
   void device_poll() {
+    mynteye->SetImageMode(mynteye::ImageMode::IMAGE_RAW);
+    mynteye->EnableImageType(mynteye::ImageType::ALL);
     mynteye->Open(params);
     if (!mynteye->IsOpened()) {
       NODELET_ERROR_STREAM("Open camera failed");
@@ -302,19 +304,19 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     ros::Rate loop_rate(params.framerate);
 
     // Main loop
-    cv::Mat color_left, gray_left, color_right, gray_right, depth;
+    cv::Mat color_left, mono_left, color_right, mono_right, depth;
     while (nh_ns.ok()) {
       // Check for subscribers
       int color_Right_SubNumber = pub_color_right.getNumSubscribers();
-      int gray_Right_SubNumber = pub_gray_right.getNumSubscribers();
+      int mono_Right_SubNumber = pub_mono_right.getNumSubscribers();
       int color_Left_SubNumber = pub_color_left.getNumSubscribers();
-      int gray_Left_SubNumber = pub_gray_left.getNumSubscribers();
+      int mono_Left_SubNumber = pub_mono_left.getNumSubscribers();
       int depth_SubNumber = pub_depth.getNumSubscribers();
       int points_SubNumber = pub_points.getNumSubscribers();
       int imu_SubNumber = pub_imu.getNumSubscribers();
       int temp_SubNumber = pub_temp.getNumSubscribers();
 
-      bool img_Sub = (gray_Right_SubNumber + gray_Left_SubNumber +
+      bool img_Sub = (mono_Right_SubNumber + mono_Left_SubNumber +
         color_Left_SubNumber + color_Right_SubNumber +
         depth_SubNumber + points_SubNumber) > 0;
       bool imu_Sub = (imu_SubNumber + temp_SubNumber) > 0;
@@ -325,10 +327,10 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
         ros::Time t = ros::Time::now();
 
         bool color_right_ok = false;
-        bool gray_right_ok = false;
+        bool mono_right_ok = false;
         if (color_Right_SubNumber > 0
             || points_subscribed
-            || gray_Right_SubNumber > 0) {
+            || mono_Right_SubNumber > 0) {
           auto image_color = mynteye->RetrieveImage(
               mynteye::ImageType::IMAGE_RIGHT_COLOR);
           if (image_color.img) {
@@ -339,19 +341,19 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
               publishColor(color_frame_right_id, pub_color_right,
                 image_color.img, t, &color_right, count);
             }
-            if (gray_Right_SubNumber > 0) {
-              gray_right_ok = true;
-              publishGray(gray_frame_right_id, pub_gray_right,
-                image_color.img, t, &gray_right, count);
+            if (mono_Right_SubNumber > 0) {
+              mono_right_ok = true;
+              publishMono(mono_frame_right_id, pub_mono_right,
+                image_color.img, t, &mono_right, count);
             }
           }
         }
 
         bool color_left_ok = false;
-        bool gray_left_ok = false;
+        bool mono_left_ok = false;
         if (color_Left_SubNumber > 0
             || points_subscribed
-            || gray_Left_SubNumber > 0) {
+            || mono_Left_SubNumber > 0) {
           auto image_color = mynteye->RetrieveImage(
               mynteye::ImageType::IMAGE_LEFT_COLOR);
           if (image_color.img) {
@@ -362,10 +364,10 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
               publishColor(color_frame_left_id, pub_color_left,
                 image_color.img, t, &color_left, count);
             }
-            if (gray_Left_SubNumber > 0) {
-              gray_left_ok = true;
-              publishGray(gray_frame_left_id, pub_gray_left,
-                image_color.img, t, &gray_left, count);
+            if (mono_Left_SubNumber > 0) {
+              mono_left_ok = true;
+              publishMono(mono_frame_left_id, pub_mono_left,
+                image_color.img, t, &mono_left, count);
             }
           }
         }
@@ -457,15 +459,15 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     color_frame_right_id = "mynteye_color_frame_right";
     depth_frame_id = "mynteye_depth_frame";
     points_frame_id = "mynteye_points_frame";
-    gray_frame_right_id = "mynteye_gray_frame_right";
-    gray_frame_left_id = "mynteye_gray_frame_left";
+    mono_frame_right_id = "mynteye_mono_frame_right";
+    mono_frame_left_id = "mynteye_mono_frame_left";
     imu_frame_id = "mynteye_imu_frame";
     temp_frame_id = "mynteye_temp_frame";
     nh_ns.getParam("base_frame_id", base_frame_id);
     nh_ns.getParam("color_frame", color_frame_right_id);
     nh_ns.getParam("color_frame", color_frame_left_id);
-    nh_ns.getParam("gray_frame", gray_frame_left_id);
-    nh_ns.getParam("gray_frame", gray_frame_right_id);
+    nh_ns.getParam("mono_frame", mono_frame_left_id);
+    nh_ns.getParam("mono_frame", mono_frame_right_id);
     nh_ns.getParam("depth_frame", depth_frame_id);
     nh_ns.getParam("points_frame", points_frame_id);
     nh_ns.getParam("imu_frame", imu_frame_id);
@@ -473,17 +475,17 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     NODELET_INFO_STREAM("base_frame: " << base_frame_id);
     NODELET_INFO_STREAM("color_frame_right: " << color_frame_right_id);
     NODELET_INFO_STREAM("color_frame_left: " << color_frame_left_id);
-    NODELET_INFO_STREAM("gray_frame_left: " << gray_frame_left_id);
-    NODELET_INFO_STREAM("gray_frame_right: " << gray_frame_right_id);
+    NODELET_INFO_STREAM("mono_frame_left: " << mono_frame_left_id);
+    NODELET_INFO_STREAM("mono_frame_right: " << mono_frame_right_id);
     NODELET_INFO_STREAM("depth_frame: " << depth_frame_id);
     NODELET_INFO_STREAM("points_frame: " << points_frame_id);
     NODELET_INFO_STREAM("imu_frame: " << imu_frame_id);
     NODELET_INFO_STREAM("temp_frame: " << temp_frame_id);
 
-    std::string color_left_topic = "mynteye/color_left";
-    std::string color_right_topic = "mynteye/color_right";
-    std::string gray_left_topic = "mynteye/gray_left";
-    std::string gray_right_topic = "mynteye/gray_right";
+    std::string color_left_topic = "mynteye/left/image_color";
+    std::string color_right_topic = "mynteye/right/image_color";
+    std::string mono_left_topic = "mynteye/left/image_mono";
+    std::string mono_right_topic = "mynteye/right/image_mono";
     std::string depth_topic = "mynteye/depth";
     std::string points_topic = "mynteye/points";
     std::string imu_topic = "mynteye/imu";
@@ -491,8 +493,8 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
     nh_ns.getParam("color_left_topic", color_left_topic);
     nh_ns.getParam("color_right_topic", color_right_topic);
-    nh_ns.getParam("gray_left_topic", gray_left_topic);
-    nh_ns.getParam("gray_right_topic", gray_right_topic);
+    nh_ns.getParam("mono_left_topic", mono_left_topic);
+    nh_ns.getParam("mono_right_topic", mono_right_topic);
     nh_ns.getParam("depth_topic", depth_topic);
     nh_ns.getParam("points_topic", points_topic);
     nh_ns.getParam("imu_topic", imu_topic);
@@ -554,10 +556,10 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     NODELET_INFO_STREAM("Advertized on topic " << color_left_topic);
     pub_color_right = it_mynteye.advertiseCamera(color_right_topic, 1);
     NODELET_INFO_STREAM("Advertized on topic " << color_right_topic);
-    pub_gray_left = it_mynteye.advertiseCamera(gray_left_topic, 1);  // gray
-    NODELET_INFO_STREAM("Advertized on topic " << gray_left_topic);
-    pub_gray_right = it_mynteye.advertiseCamera(gray_right_topic, 1);
-    NODELET_INFO_STREAM("Advertized on topic " << gray_right_topic);
+    pub_mono_left = it_mynteye.advertiseCamera(mono_left_topic, 1);  // mono
+    NODELET_INFO_STREAM("Advertized on topic " << mono_left_topic);
+    pub_mono_right = it_mynteye.advertiseCamera(mono_right_topic, 1);
+    NODELET_INFO_STREAM("Advertized on topic " << mono_right_topic);
 
     pub_depth = it_mynteye.advertiseCamera(depth_topic, 1);  // depth
     NODELET_INFO_STREAM("Advertized on topic " << depth_topic);
