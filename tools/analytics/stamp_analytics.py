@@ -145,9 +145,9 @@ class BinDataset(object):
     imgs_t_diff = np.diff(imgs['t'])
     # imus_t_diff = np.diff(imus['t'])
 
-    accel = imus[imus['flag'] == 1]
+    accel = imus[(imus['flag'] == 0) & (imus['flag'] == 1)]
     accel_t_diff = np.diff(accel['t'])
-    gyro = imus[imus['flag'] == 2]
+    gyro = imus[(imus['flag'] == 0) & (imus['flag'] == 2)]
     gyro_t_diff = np.diff(gyro['t'])
 
     print('\ncount')

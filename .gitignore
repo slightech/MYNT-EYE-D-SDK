@@ -26,3 +26,6 @@ _install/
 /platforms/linux/sdk.cfg
 
 /.vscode/
+
+/dataset/
+/*.bag
