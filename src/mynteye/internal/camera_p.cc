@@ -652,7 +652,8 @@ void CameraPrivate::SyntheticImageColor() {
     for (auto info : img_info_) {
       if (color->frame_id() == info.img_info->frame_id) {
         TransferColor(color, info);
-        if (image_color_.size() > 30) { image_color_.clear(); }
+        if (left_color_data_.size() > 30) { left_color_data_.clear(); }
+        if (right_color_data_.size() > 30) { right_color_data_.clear(); }
         if (img_info_.size() > 30) { img_info_.clear(); }
       }
     }
