@@ -359,7 +359,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
           if (image_color.img) {
             static std::size_t count = 0;
             ++count;
-            if (color_Left_SubNumber > 0) {
+            if (color_Left_SubNumber > 0 || points_subscribed) {
               color_left_ok = true;
               publishColor(color_frame_left_id, pub_color_left,
                 image_color.img, t, &color_left, count);
@@ -381,11 +381,12 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
             publishDepth(image_depth.img, t, &depth);
           }
         }
-        // there is a bug when use point cloud Push function ,
-        // can't fix it with try catch.Skip this temporaryly.
-        // if (points_subscribed && color_ok && depth_ok) {
-        //   // pointcloud_generator->Push(color, depth, t);
-        // }
+
+        // after update (89ced6e) and get the new hardware camera ,
+        // depth data back to normal , so focus this problem later on.
+        if (points_subscribed && color_left_ok && depth_ok) {
+          pointcloud_generator->Push(color_left, depth, t);
+        }
 
         if (imu_Sub) {
           // NODELET_INFO_STREAM("Retrieve motions");
