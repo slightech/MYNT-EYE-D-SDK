@@ -133,6 +133,8 @@ class CameraPrivate {
   /** Set image mode (raw image or rectified image) */
   void SetImageMode(const ImageMode &mode);
 
+  inline StreamMode GetStreamMode() { return stream_mode_; }
+
  private:
   void OnInit();
   void OnPreWait();

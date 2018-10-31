@@ -125,3 +125,7 @@ struct CameraCtrlRectLogData Camera::GetVGACameraCtrlData() {
 void Camera::SetImageMode(const ImageMode& mode) {
   p_->SetImageMode(mode);
 }
+
+StreamMode Camera::GetStreamMode() {
+  return p_->GetStreamMode();
+}
