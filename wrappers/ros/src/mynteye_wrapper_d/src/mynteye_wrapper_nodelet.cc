@@ -280,7 +280,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
     imu_accel = nullptr;
     imu_gyro = nullptr;
-    // ros::Duration(0.001).sleep();
+    ros::Duration(0.001).sleep();
   }
 
   void publishTemp(float temperature, ros::Time stamp) {
@@ -293,8 +293,16 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
   void device_poll() {
     // Main loop
+    mynteye->SetImageMode(mynteye::ImageMode::IMAGE_RAW);
+    mynteye->EnableImageType(mynteye::ImageType::ALL);
+    mynteye->Open(params);
+    if (!mynteye->IsOpened()) {
+      NODELET_ERROR_STREAM("Open camera failed");
+      return;
+    }
+    NODELET_INFO_STREAM("Open camera success");
+
     cv::Mat color_left, mono_left, color_right, mono_right, depth;
-    bool camera_online_tag = false;
     ros::Rate loop_rate(params.framerate);
     while (nh_ns.ok()) {
       // printf("1\n");
@@ -313,18 +321,6 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
         depth_SubNumber + points_SubNumber) > 0;
       bool imu_Sub = (imu_SubNumber + temp_SubNumber) > 0;
       if (img_Sub || imu_Sub) {
-        if (!camera_online_tag) {
-          camera_online_tag = true;
-          mynteye->SetImageMode(mynteye::ImageMode::IMAGE_RAW);
-          mynteye->EnableImageType(mynteye::ImageType::ALL);
-          mynteye->Open(params);
-          if (!mynteye->IsOpened()) {
-            NODELET_ERROR_STREAM("Open camera failed");
-            return;
-          }
-          NODELET_INFO_STREAM("Open camera success");
-        }
-
         // printf("2\n");
         // publish points, the depth mode must be DEPTH_RAW.
         bool points_subscribed = (points_SubNumber > 0) && (depth_mode == 0);
@@ -423,11 +419,6 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
               }
             }
           }
-        }
-      } else {
-        if (camera_online_tag) {
-          camera_online_tag = false;
-          mynteye->Close();
         }
       }
       if (img_Sub) loop_rate.sleep();
