@@ -105,7 +105,7 @@ CameraPrivate::CameraPrivate()
       (PETRONDI_STREAM_INFO)malloc(sizeof(ETRONDI_STREAM_INFO)*64);
   stream_depth_info_ptr_ =
       (PETRONDI_STREAM_INFO)malloc(sizeof(ETRONDI_STREAM_INFO)*64);
-  depth_data_type_ = 2;
+  depth_data_type_ = 9;
   OnInit();
   is_enable_image_[ImageType::IMAGE_LEFT_COLOR] = false;
   is_enable_image_[ImageType::IMAGE_RIGHT_COLOR] = false;

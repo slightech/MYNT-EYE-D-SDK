@@ -92,21 +92,24 @@ int main(int argc, char const* argv[]) {
   cam.EnableImageType(mynteye::ImageType::IMAGE_LEFT_COLOR);
   cam.EnableImageType(mynteye::ImageType::IMAGE_DEPTH);
 
-  StreamMode streamMode = cam.GetStreamMode();
+  mynteye::StreamMode streamMode = cam.GetStreamMode();
 
-  if (streamMode == STREAM_1280x720 || STREAM_2560x720) {
+  if (streamMode == mynteye::StreamMode::STREAM_1280x720
+      || streamMode == mynteye::StreamMode::STREAM_2560x720) {
     camera_cy = 254.9 * 2;
-  } else if (streamMode == STREAM_1280x480 || STREAM_640x480) {
+  } else if (streamMode == mynteye::StreamMode::STREAM_1280x480
+      || streamMode == mynteye::StreamMode::STREAM_640x480) {
     camera_cy = 254.9;
   } else {
     camera_cy = 0;
   }
 
-  if (streamMode == STREAM_1280x720 || STREAM_1280x480) {
+  if (streamMode == mynteye::StreamMode::STREAM_1280x720
+      || streamMode == mynteye::StreamMode::STREAM_1280x480) {
     camera_cx = 682.3;
-  } else if (streamMode == STREAM_2560x720) {
+  } else if (streamMode == mynteye::StreamMode::STREAM_2560x720) {
     camera_cx = 682.3 * 2;
-  } else if (streamMode == STREAM_640x480) {
+  } else if (streamMode == mynteye::StreamMode::STREAM_640x480) {
     camera_cx = 682.3 / 2;
   } else {
     camera_cx = 0;

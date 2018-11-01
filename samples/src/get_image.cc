@@ -41,7 +41,7 @@ int main(int argc, char const* argv[]) {
   params.ir_intensity = 4;
   params.framerate = 30;
 
-  cam.SetImageMode(mynteye::ImageMode::IMAGE_RECTIFIED);
+  // cam.SetImageMode(mynteye::ImageMode::IMAGE_RECTIFIED);
   cam.EnableImageType(mynteye::ImageType::ALL);
   cam.Open(params);
 
