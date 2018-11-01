@@ -197,6 +197,7 @@ class CameraPrivate {
 
   motion_datas_t imu_data_;
   img_info_datas_t img_info_;
+  img_info_datas_t cache_image_info_;
 
   std::mutex cap_color_mtx_;
   std::mutex cap_depth_mtx_;
