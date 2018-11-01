@@ -40,6 +40,8 @@ class MYNTEYE_API Channels {
 
   imu_callback_t imu_callback_;
   img_callback_t img_callback_;
+
+  std::uint16_t package_sn_ = 0;
 };
 
 MYNTEYE_END_NAMESPACE

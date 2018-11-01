@@ -122,7 +122,6 @@ struct ImuPacket {
  */
 #pragma pack(push, 1)
 struct ImuResPacket {
-  std::uint8_t header;
   std::vector<ImuPacket> packets;
 
   ImuResPacket() = default;
@@ -133,9 +132,6 @@ struct ImuResPacket {
   void from_data(std::uint8_t *data) {
     ImuPacket packet(data);
     packets.push_back(packet);
-  }
-  void from_header_data(std::uint8_t *data) {
-    header = *data | *(data + 1) << 8;
   }
 };
 #pragma pack(pop)
