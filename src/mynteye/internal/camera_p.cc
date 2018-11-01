@@ -791,9 +791,12 @@ void CameraPrivate::ImuDataCallback(const ImuPacket &packet) {
       imu->Reset();
     }
 
-    std::lock_guard<std::mutex> _(mtx_imu_);
     motion_data_t tmp = {imu};
-    imu_data_.push_back(tmp);
+    cache_imu_data_.push_back(tmp);
+
+    std::lock_guard<std::mutex> _(mtx_imu_);
+    imu_data_.assign(cache_imu_data_.begin(), cache_imu_data_.end());
+    cache_imu_data_.clear();
   }
 }
 
@@ -809,6 +812,7 @@ void CameraPrivate::ImageInfoCallback(const ImgInfoPacket &packet) {
 
   std::lock_guard<std::mutex> _(mtx_img_info_);
   img_info_.assign(cache_image_info_.begin(), cache_image_info_.end());
+  cache_image_info_.clear();
 }
 
 std::vector<device::MotionData> CameraPrivate::GetImuDatas() {
