@@ -105,7 +105,7 @@ CameraPrivate::CameraPrivate()
       (PETRONDI_STREAM_INFO)malloc(sizeof(ETRONDI_STREAM_INFO)*64);
   stream_depth_info_ptr_ =
       (PETRONDI_STREAM_INFO)malloc(sizeof(ETRONDI_STREAM_INFO)*64);
-  depth_data_type_ = 2;
+  depth_data_type_ = 9;
   OnInit();
   is_enable_image_[ImageType::IMAGE_LEFT_COLOR] = false;
   is_enable_image_[ImageType::IMAGE_RIGHT_COLOR] = false;
@@ -608,11 +608,6 @@ void CameraPrivate::CaptureImageColor(ErrorCode* code) {
     image_color_.push_back(color);
     image_color_wait_.notify_one();
   }
-  /*
-  if (!image_color_.empty()) {
-    image_color_wait_.notify_one();
-  }
-  */
 }
 
 void CameraPrivate::CaptureImageDepth(ErrorCode* code) {
@@ -623,11 +618,6 @@ void CameraPrivate::CaptureImageDepth(ErrorCode* code) {
     image_depth_.push_back(depth);
     image_depth_wait_.notify_one();
   }
-  /*
-  if (!image_depth_.empty()) {
-    image_depth_wait_.notify_one();
-  }
-  */
 }
 
 void CameraPrivate::SyntheticImageColor() {
@@ -802,9 +792,11 @@ void CameraPrivate::ImuDataCallback(const ImuPacket &packet) {
     }
     ++motion_count_;
     if (motion_count_ > 20) {
-    std::lock_guard<std::mutex> _(mtx_imu_);
-    motion_data_t tmp = {imu};
-    imu_data_.push_back(tmp);
+      motion_data_t tmp = {imu};
+      cache_imu_data_.push_back(tmp);
+      std::lock_guard<std::mutex> _(mtx_imu_);
+      imu_data_.assign(cache_imu_data_.begin(), cache_imu_data_.end());
+      cache_imu_data_.clear();
     }
   }
 }
@@ -816,9 +808,12 @@ void CameraPrivate::ImageInfoCallback(const ImgInfoPacket &packet) {
   img_info->timestamp = packet.timestamp;
   img_info->exposure_time = packet.exposure_time;
 
-  std::lock_guard<std::mutex> _(mtx_img_info_);
   img_info_data_t tmp = {img_info};
-  img_info_.push_back(tmp);
+  cache_image_info_.push_back(tmp);
+
+  std::lock_guard<std::mutex> _(mtx_img_info_);
+  img_info_.assign(cache_image_info_.begin(), cache_image_info_.end());
+  cache_image_info_.clear();
 }
 
 std::vector<device::MotionData> CameraPrivate::GetImuDatas() {

@@ -133,6 +133,8 @@ class CameraPrivate {
   /** Set image mode (raw image or rectified image) */
   void SetImageMode(const ImageMode &mode);
 
+  inline StreamMode GetStreamMode() { return stream_mode_; }
+
  private:
   void OnInit();
   void OnPreWait();
@@ -194,7 +196,9 @@ class CameraPrivate {
   std::mutex mtx_imu_;
 
   motion_datas_t imu_data_;
+  motion_datas_t cache_imu_data_;
   img_info_datas_t img_info_;
+  img_info_datas_t cache_image_info_;
 
   std::mutex cap_color_mtx_;
   std::mutex cap_depth_mtx_;

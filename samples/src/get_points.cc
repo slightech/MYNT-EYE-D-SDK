@@ -32,10 +32,10 @@ pcl::visualization::PCLVisualizer viewer("point cloud viewer");
 // TODO replace the real camera param
 const float camera_factor = 1000.0;
 
-const double camera_cx = 682.3;
-const double camera_cy = 254.9;
-const double camera_fx = 979.8;
-const double camera_fy = 942.8;
+double camera_cx = 682.3;
+double camera_cy = 254.9;
+double camera_fx = 979.8;
+double camera_fy = 942.8;
 
 // show point cloud
 void show_points(cv::Mat rgb, cv::Mat depth) {
@@ -91,6 +91,33 @@ int main(int argc, char const* argv[]) {
 
   cam.EnableImageType(mynteye::ImageType::IMAGE_LEFT_COLOR);
   cam.EnableImageType(mynteye::ImageType::IMAGE_DEPTH);
+
+  mynteye::StreamMode streamMode = cam.GetStreamMode();
+
+  if (streamMode == mynteye::StreamMode::STREAM_1280x720
+      || streamMode == mynteye::StreamMode::STREAM_2560x720) {
+    camera_cy = 254.9 * 2;
+  } else if (streamMode == mynteye::StreamMode::STREAM_1280x480
+      || streamMode == mynteye::StreamMode::STREAM_640x480) {
+    camera_cy = 254.9;
+  } else {
+    camera_cy = 0;
+  }
+
+  if (streamMode == mynteye::StreamMode::STREAM_1280x720
+      || streamMode == mynteye::StreamMode::STREAM_1280x480) {
+    camera_cx = 682.3;
+  } else if (streamMode == mynteye::StreamMode::STREAM_2560x720) {
+    camera_cx = 682.3 * 2;
+  } else if (streamMode == mynteye::StreamMode::STREAM_640x480) {
+    camera_cx = 682.3 / 2;
+  } else {
+    camera_cx = 0;
+  }
+
+  camera_fx = 979.8;
+  camera_fy = 942.8;
+
   cam.Open(params);
 
   std::cout << std::endl;
