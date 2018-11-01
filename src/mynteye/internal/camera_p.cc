@@ -800,10 +800,12 @@ void CameraPrivate::ImuDataCallback(const ImuPacket &packet) {
     } else {
       imu->Reset();
     }
-
+    ++motion_count_;
+    if (motion_count_ > 20) {
     std::lock_guard<std::mutex> _(mtx_imu_);
     motion_data_t tmp = {imu};
     imu_data_.push_back(tmp);
+    }
   }
 }
 

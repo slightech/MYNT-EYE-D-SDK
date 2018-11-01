@@ -373,7 +373,7 @@ class MYNTEYE(Dataset):
         for line in f:
           values = [_.strip() for _ in line.split(',')]
           img = Image()
-          img.timestamp = float(values[fields['timestamp']]) * 0.000001
+          img.timestamp = float(values[fields['timestamp']]) * 0.00001
           yield {What.img_left: img}
     if hit_img_right and self._info.has_img_right:
       with open(self._info.img_right_txt) as f:
@@ -381,7 +381,7 @@ class MYNTEYE(Dataset):
         for line in f:
           values = [_.strip() for _ in line.split(',')]
           img = Image()
-          img.timestamp = float(values[fields['timestamp']]) * 0.000001
+          img.timestamp = float(values[fields['timestamp']]) * 0.00001
           yield {What.img_right: img}
     if (hit_imu or hit_temp) and self._info.has_imu:
       with open(self._info.imu_txt) as f:
@@ -389,7 +389,7 @@ class MYNTEYE(Dataset):
         for line in f:
           values = [_.strip() for _ in line.split(',')]
           imu = IMU()
-          imu.timestamp = float(values[fields['timestamp']]) * 0.000001
+          imu.timestamp = float(values[fields['timestamp']]) * 0.00001
           imu.flag = values[fields['flag']]
           imu.accel_x = float(values[fields['accel_x']])
           imu.accel_y = float(values[fields['accel_y']])

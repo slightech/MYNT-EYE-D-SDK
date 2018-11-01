@@ -305,7 +305,7 @@ def _parse_args():
       '--rate-img',
       dest='rate_img',
       metavar='RATE',
-      default=60,
+      default=30,
       type=int,
       help='the img rate (default: %(default)s)')
   parser.add_argument(
