@@ -18,6 +18,11 @@
 #include <string>
 
 #include <opencv2/core/core.hpp>
+#include <opencv2/core/version.hpp>
+
+#if CV_VERSION_EPOCH == 2
+#define USE_OPENCV2
+#endif
 
 namespace mynteye {
 namespace util {

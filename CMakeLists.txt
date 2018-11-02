@@ -13,7 +13,7 @@
 # limitations under the License.
 cmake_minimum_required(VERSION 3.0)
 
-project(mynteye VERSION 1.3.6 LANGUAGES C CXX)
+project(mynteye VERSION 1.4.1 LANGUAGES C CXX)
 
 include(cmake/Common.cmake)
 
