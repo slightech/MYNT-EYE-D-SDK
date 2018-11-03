@@ -132,6 +132,15 @@ class MYNTEYE_API Camera {
   /** Set Image mode ( raw image and rectified image )*/
   void SetImageMode(const ImageMode& mode);
 
+  /** Get device information of Info*/
+  std::string GetInfo(const Info &info) const;
+
+  /** Get the intrinsics of motion. */
+  MotionIntrinsics GetMotionIntrinsics() const;
+
+  /** Get the extrinsics from left to motion. */
+  Extrinsics GetMotionExtrinsics() const;
+
  private:
   std::unique_ptr<CameraPrivate> p_;
 };

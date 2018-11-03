@@ -13,7 +13,7 @@
 // limitations under the License.
 #include "mynteye/stream_info.h"
 
-MYNTEYE_USE_NAMESPACE
+MYNTEYE_BEGIN_NAMESPACE
 
 std::ostream& operator<<(std::ostream& os, const StreamInfo& info) {
   os << "index: " << info.index
@@ -22,3 +22,5 @@ std::ostream& operator<<(std::ostream& os, const StreamInfo& info) {
     << ", format: " << info.format;
   return os;
 }
+
+MYNTEYE_END_NAMESPACE

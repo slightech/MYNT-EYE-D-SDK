@@ -61,9 +61,9 @@ struct MYNTEYE_API DeviceInfo {
   std::string fw_version;
 };
 
-MYNTEYE_END_NAMESPACE
-
 MYNTEYE_API
-std::ostream& operator<<(std::ostream& os, const mynteye::DeviceInfo& info);
+std::ostream& operator<<(std::ostream& os, const DeviceInfo& info);
+
+MYNTEYE_END_NAMESPACE
 
 #endif  // MYNTEYE_DEVICE_INFO_H_

@@ -17,12 +17,12 @@
 #include <stdexcept>
 #include <string>
 #include <chrono>
+#include <sys/time.h>
 
 #include "mynteye/internal/camera_p.h"
 #include "mynteye/internal/channels.h"
 #include "mynteye/util/log.h"
 #include "mynteye/util/rate.h"
-
 
 MYNTEYE_USE_NAMESPACE
 
@@ -66,8 +66,6 @@ std::string get_stream_format_string(const StreamFormat& stream_format) {
   }
 }
 
-}  // namespace
-
 inline std::uint8_t check_sum(std::uint8_t *buf, std::uint8_t length) {
   std::uint8_t crc8 = 0;
   while (length--) {
@@ -75,6 +73,8 @@ inline std::uint8_t check_sum(std::uint8_t *buf, std::uint8_t length) {
   }
   return crc8;
 }
+
+}  // namespace
 
 CameraPrivate::CameraPrivate()
   : etron_di_(nullptr),
@@ -489,6 +489,9 @@ ErrorCode CameraPrivate::Open(const InitParams& params) {
 #endif
 
   if (ETronDI_OK == ret) {
+    channels_->Start();
+    ReadAllInfos();
+    // sleep(10);
     StartHidTracking();
     StartCaptureImage();
     SyncCameraLogData();
@@ -1078,4 +1081,102 @@ void CameraPrivate::EnableImageType(const ImageType& type) {
     default:
       LOGE("EnableImageType:: ImageType is unknown.");
   }
+}
+
+void CameraPrivate::ReadAllInfos() {
+  device_params_ = std::make_shared<DeviceParams>();
+
+  Channels::imu_params_t imu_params;
+  if (!channels_->GetFiles(device_params_.get(), &imu_params)) {
+    LOGE("%s %d:: Read device infos failed. Please upgrade"
+        "your firmware to the latest version.", __FILE__, __LINE__);
+    return;
+  }
+
+  LOGI("Device info: name: %s", device_params_->name.c_str());
+  LOGI("             serial_number: %s", device_params_->serial_number.c_str());
+  LOGI("             firmware_version: %s",
+      device_params_->firmware_version.to_string().c_str());
+  LOGI("             hardware_version: %s",
+      device_params_->hardware_version.to_string().c_str());
+  LOGI("             spec_version: %s",
+      device_params_->spec_version.to_string().c_str());
+  LOGI("             lens_type: %s",
+      device_params_->lens_type.to_string().c_str());
+  LOGI("             imu_type: %s",
+      device_params_->imu_type.to_string().c_str());
+  LOGI("             nominal_baseline: %u", device_params_->nominal_baseline);
+
+  if (imu_params.ok) {
+    SetMotionIntrinsics({imu_params.in_accel, imu_params.in_gyro});
+    SetMotionExtrinsics(imu_params.ex_left_to_imu);
+    std::cout << GetMotionIntrinsics() << std::endl;
+    std::cout << GetMotionExtrinsics() << std::endl;
+  } else {
+    LOGE("%s %d:: Motion intrinsics & extrinsics not exist",
+        __FILE__, __LINE__);
+  }
+}
+
+std::shared_ptr<DeviceParams> CameraPrivate::GetInfo() const {
+  return device_params_;
+}
+
+std::string CameraPrivate::GetInfo(const Info &info) const {
+  if (!device_params_) {
+    LOGE("%s %d:: Device information not found", __FILE__, __LINE__);
+  }
+  switch (info) {
+    case Info::DEVICE_NAME:
+      return device_params_->name;
+    case Info::SERIAL_NUMBER:
+      return device_params_->serial_number;
+    case Info::FIRMWARE_VERSION:
+      return device_params_->firmware_version.to_string();
+    case Info::HARDWARE_VERSION:
+      return device_params_->hardware_version.to_string();
+    case Info::SPEC_VERSION:
+      return device_params_->spec_version.to_string();
+    case Info::LENS_TYPE:
+      return device_params_->lens_type.to_string();
+    case Info::IMU_TYPE:
+      return device_params_->imu_type.to_string();
+    case Info::NOMINAL_BASELINE:
+      return std::to_string(device_params_->nominal_baseline);
+    default:
+      LOGE("%s %d:: Unknown device info", __FILE__, __LINE__);
+      return "";
+  }
+}
+
+MotionIntrinsics CameraPrivate::GetMotionIntrinsics() const {
+  if (motion_intrinsics_) {
+    return *motion_intrinsics_;
+  } else {
+    LOGE("%s %d:: Motion intrinsics not found", __FILE__, __LINE__);
+    return {};
+  }
+}
+
+Extrinsics CameraPrivate::GetMotionExtrinsics() const {
+  if (motion_from_extrinsics_) {
+    return *motion_from_extrinsics_;
+  } else {
+    LOGE("%s %d:: Motion extrinsics not found", __FILE__, __LINE__);
+    return {};
+  }
+}
+
+void CameraPrivate::SetMotionIntrinsics(const MotionIntrinsics &in) {
+  if (!motion_intrinsics_) {
+    motion_intrinsics_ = std::make_shared<MotionIntrinsics>();
+  }
+  *motion_intrinsics_ = in;
+}
+
+void CameraPrivate::SetMotionExtrinsics(const Extrinsics &ex) {
+  if (!motion_from_extrinsics_) {
+    motion_from_extrinsics_ = std::make_shared<Extrinsics>();
+  }
+  *motion_from_extrinsics_ = ex;
 }

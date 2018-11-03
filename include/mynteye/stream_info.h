@@ -45,9 +45,9 @@ struct MYNTEYE_API StreamInfo {
   StreamFormat format;
 };
 
-MYNTEYE_END_NAMESPACE
-
 MYNTEYE_API
-std::ostream& operator<<(std::ostream& os, const mynteye::StreamInfo& info);
+std::ostream& operator<<(std::ostream& os, const StreamInfo& info);
+
+MYNTEYE_END_NAMESPACE
 
 #endif  // MYNTEYE_STREAM_INFO_H_

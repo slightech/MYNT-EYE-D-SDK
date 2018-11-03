@@ -125,6 +125,7 @@ set(MYNTEYE_CORE_SRCS
   src/mynteye/internal/camera_p_linux.cc
   src/mynteye/internal/camera_p_win.cc
   src/mynteye/internal/channels.cc
+  src/mynteye/internal/types.cc
   src/mynteye/util/convertor.cc
   src/mynteye/util/rate.cc
   src/mynteye/util/strings.cc

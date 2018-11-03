@@ -133,6 +133,19 @@ class CameraPrivate {
   /** Set image mode (raw image or rectified image) */
   void SetImageMode(const ImageMode &mode);
 
+  /** Get the device info. */
+  std::shared_ptr<DeviceParams> GetInfo() const;
+  /** Get the device info of a field. */
+  std::string GetInfo(const Info &info) const;
+  /** Get the intrinsics of motion. */
+  MotionIntrinsics GetMotionIntrinsics() const;
+  /** Get the extrinsics from left to motion. */
+  Extrinsics GetMotionExtrinsics() const;
+  /** Set the intrinsics of motion. */
+  void SetMotionIntrinsics(const MotionIntrinsics &in);
+  /** Set the extrinsics from left to motion. */
+  void SetMotionExtrinsics(const Extrinsics &ex);
+
  private:
   void OnInit();
   void OnPreWait();
@@ -218,6 +231,12 @@ class CameraPrivate {
 
   std::map<ImageType, bool> is_enable_image_;
   StreamMode stream_mode_;
+
+  void ReadAllInfos();
+  std::shared_ptr<DeviceParams> device_params_;
+
+  std::shared_ptr<MotionIntrinsics> motion_intrinsics_;
+  std::shared_ptr<Extrinsics> motion_from_extrinsics_;
 };
 
 MYNTEYE_END_NAMESPACE

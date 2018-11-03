@@ -18,9 +18,10 @@ MYNTEYE_BEGIN_NAMESPACE
 
 namespace hid {
 
-hid_device::hid_device() : first_hid_(nullptr),
-  last_hid_(nullptr),
-  first_dev_(nullptr) {
+hid_device::hid_device() :
+  first_dev_(nullptr),
+  first_hid_(nullptr),
+  last_hid_(nullptr) {
 }
 
 hid_device::~hid_device() {
@@ -101,7 +102,7 @@ int hid_device::open(int max, int usage_page, int usage) {
     return 0;
   }
 
-  LOGI("hid_open, max = %d", max);
+  // LOGI("hid_open, max = %d", max);
   usb_init();
   usb_find_busses();
   usb_find_devices();
@@ -118,9 +119,11 @@ int hid_device::open(int max, int usage_page, int usage) {
       if (!dev->config || dev->config->bNumInterfaces < 1) {
         continue;
       }
+      /*
       LOGI("device: vid = %04X, pic = %04X, with %d iface, bdeviceclass %d\n",
           dev->descriptor.idVendor, dev->descriptor.idProduct,
           dev->config->bNumInterfaces, dev->descriptor.bDeviceClass);
+          */
 
       usb_interface_t *iface = dev->config->interface;
       usb_dev_handle *handle = nullptr;
@@ -256,8 +259,8 @@ void hid_device::process_usb_dev(int max,
     if (!desc) {
       continue;
     }
-    LOGI("  Type %d, %d, %d", desc->bInterfaceClass,
-        desc->bInterfaceSubClass, desc->bInterfaceProtocol);
+    // LOGI("  Type %d, %d, %d", desc->bInterfaceClass,
+        // desc->bInterfaceSubClass, desc->bInterfaceProtocol);
     if (3 != desc->bInterfaceClass ||
         0 != desc->bInterfaceSubClass ||
         0 != desc->bInterfaceProtocol)
@@ -267,13 +270,13 @@ void hid_device::process_usb_dev(int max,
     int in = 0;
     int out = 0;
     for (int n = 0; n < desc->bNumEndpoints; n++, endp++) {
-      LOGI("%d \r", endp->bEndpointAddress);
+      // LOGI("%d \r", endp->bEndpointAddress);
       if (endp->bEndpointAddress & 0x80) {
         in = endp->bEndpointAddress & 0x7F;
-        LOGI("      IN endpoint %d", in);
+        // LOGI("      IN endpoint %d", in);
       } else {
         out = endp->bEndpointAddress;
-        LOGI("      OUT endpoint %d\n", out);
+        // LOGI("      OUT endpoint %d\n", out);
       }
     }
     if (!in) {
@@ -282,26 +285,26 @@ void hid_device::process_usb_dev(int max,
     if (!handle) {
       handle = usb_open(dev);
       if (!handle) {
-        LOGI("    Unable to open device");
+        // LOGI("    Unable to open device");
         break;
       }
     }
-    LOGI("   Hid interface (generic)");
+    // LOGI("   Hid interface (generic)");
     uint8_t buf[1024];
     if (usb_get_driver_np(handle, i,
           (char *)buf, sizeof(buf)) >= 0) {  // NOLINT
-      LOGI("  In use by driver \"%s\"", buf);
+      // LOGI("  In use by driver \"%s\"", buf);
       if (usb_detach_kernel_driver_np(handle, i) < 0) {
-        LOGI("  Unable to detach from kernel\n");
+        // LOGI("  Unable to detach from kernel\n");
       }
     }
     if (usb_claim_interface(handle, i) < 0) {
-      LOGI("  Unable claim interface %d", i);
+      // LOGI("  Unable claim interface %d", i);
       continue;
     }
     int len = usb_control_msg(handle, 0x81, 6, 0x2200, i,
       (char *)buf, sizeof(buf), 250); // NOLINT
-    LOGI("  descriptor, len=%d", len);
+    // LOGI("  descriptor, len=%d", len);
     if (len < 2) {
       usb_release_interface(handle, i);
       continue;

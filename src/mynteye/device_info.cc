@@ -16,7 +16,7 @@
 #include <iomanip>
 #include <iostream>
 
-MYNTEYE_USE_NAMESPACE
+MYNTEYE_BEGIN_NAMESPACE
 
 std::ostream& operator<<(std::ostream& os, const DeviceInfo& info) {
   std::ios fmt{nullptr};
@@ -31,3 +31,5 @@ std::ostream& operator<<(std::ostream& os, const DeviceInfo& info) {
   os.copyfmt(fmt);  // restore format
   return os;
 }
+
+MYNTEYE_END_NAMESPACE

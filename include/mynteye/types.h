@@ -127,6 +127,9 @@ enum class StreamFormat : std::int32_t {
   STREAM_FORMAT_LAST
 };
 
+MYNTEYE_API
+std::ostream& operator<<(std::ostream& os, const StreamFormat& code);
+
 /**
  * @ingroup enumerations
  * @brief List image mode.
@@ -134,6 +137,32 @@ enum class StreamFormat : std::int32_t {
 enum class ImageMode : std::int32_t {
   IMAGE_RAW,
   IMAGE_RECTIFIED
+};
+
+/**
+ * @ingroup enumerations
+ * @brief Camera info fields are read-only strings that can be queried from the
+ * device.
+ */
+enum class Info : std::uint8_t {
+  /** Device name */
+  DEVICE_NAME,
+  /** Serial number */
+  SERIAL_NUMBER,
+  /** Firmware version */
+  FIRMWARE_VERSION,
+  /** Hardware version */
+  HARDWARE_VERSION,
+  /** Spec version */
+  SPEC_VERSION,
+  /** Lens type */
+  LENS_TYPE,
+  /** IMU type */
+  IMU_TYPE,
+  /** Nominal baseline */
+  NOMINAL_BASELINE,
+  /** Last guard */
+  LAST
 };
 
 struct MYNTEYE_API CameraCtrlRectLogData {
@@ -271,7 +300,6 @@ struct MYNTEYE_API ImuData {
   }
 };
 
-#if 0
 /**
  * @ingroup calibration
  * IMU intrinsics: scale, drift and variances.
@@ -318,11 +346,30 @@ struct MYNTEYE_API MotionIntrinsics {
 
 MYNTEYE_API
 std::ostream &operator<<(std::ostream &os, const MotionIntrinsics &in);
-#endif
 
-MYNTEYE_END_NAMESPACE
+/**
+ * @ingroup calibration
+ * Extrinsics, represent how the different datas are connected.
+ */
+struct MYNTEYE_API Extrinsics {
+  double rotation[3][3]; /**< Rotation matrix */
+  double translation[3]; /**< Translation vector */
+
+  /**
+   * Inverse this extrinsics.
+   * @return the inversed extrinsics.
+   */
+  Extrinsics Inverse() const {
+    return {{{rotation[0][0], rotation[1][0], rotation[2][0]},
+             {rotation[0][1], rotation[1][1], rotation[2][1]},
+             {rotation[0][2], rotation[1][2], rotation[2][2]}},
+            {-translation[0], -translation[1], -translation[2]}};
+  }
+};
 
 MYNTEYE_API
-std::ostream& operator<<(std::ostream& os, const mynteye::StreamFormat& code);
+std::ostream &operator<<(std::ostream &os, const Extrinsics &ex);
+
+MYNTEYE_END_NAMESPACE
 
 #endif  // MYNTEYE_TYPES_H_

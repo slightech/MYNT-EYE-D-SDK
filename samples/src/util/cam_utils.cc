@@ -11,11 +11,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#include "util/cam_utils.h"
-
 #include <iomanip>
 #include <iostream>
 #include <vector>
+
+#include "util/cam_utils.h"
 
 namespace mynteye {
 namespace util {
