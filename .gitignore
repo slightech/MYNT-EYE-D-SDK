@@ -28,6 +28,7 @@ _install/
 /.vscode/
 
 /dataset/
+/mynteye/
 /*.bag
 
 *.pyc
