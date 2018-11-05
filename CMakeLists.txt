@@ -210,6 +210,13 @@ if(eSPDI_LIBRARY)
   endforeach()
 endif()
 
+# ocvinfo.sh
+
+configure_file(
+  "${MYNTEYE_ROOT}/cmake/templates/ocvinfo.sh.in"
+  "${MYNTEYE_ROOT}/ocvinfo.sh"
+)
+
 # pkginfo.sh
 
 configure_file(
