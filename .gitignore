@@ -27,6 +27,7 @@ _install/
 /3rdparty/opencv/
 /3rdparty/libjpeg-turbo64/
 /ocvinfo.sh
+/winpack.nsi
 
 /pkginfo.sh
 /platforms/linux/sdk.cfg

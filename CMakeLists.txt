@@ -237,6 +237,15 @@ configure_file(
   "${MYNTEYE_ROOT}/platforms/linux/sdk.cfg"
 )
 
+# winpack.nsi
+
+if(OS_WIN)
+  configure_file(
+    scripts/win/nsis/winpack.nsi.in
+    ${CMAKE_CURRENT_SOURCE_DIR}/winpack.nsi @ONLY
+  )
+endif()
+
 # install
 
 set(MYNTEYE_CMAKE_INCLUDE_DIR "${CMAKE_INSTALL_PREFIX}/include/${MYNTEYE_NAME}")
