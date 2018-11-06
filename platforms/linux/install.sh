@@ -37,7 +37,7 @@ source "$BASE_DIR/sdk.cfg"
 RPATH_OPENCV=/usr/local/lib
 [ -z "$SDK_OpenCV_LIB_DIR" ] || RPATH_OPENCV=$SDK_OpenCV_LIB_DIR
 
-patchelf --set-rpath $RPATH_OPENCV:$BASE_DIR/lib/3rdparty $BASE_DIR/lib/libmynteye_core.so
+patchelf --set-rpath $RPATH_OPENCV:$BASE_DIR/lib/3rdparty $BASE_DIR/lib/libmynteye_depth.so
 
 ecol "Change rpath done"
 

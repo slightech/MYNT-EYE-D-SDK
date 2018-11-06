@@ -121,6 +121,8 @@ class MYNTEYE_API Camera {
   void GetHDCameraLogDataFile();
   /** Get camera VGA stream config information output to RectfyLog_PUMA_2.txt. */
   void GetVGACameraLogDataFile();
+  /** Get camera stream mode*/
+  StreamMode GetStreamMode();
 
   /** Get camera HD stream config information 
     return struct CameraCtrlRectLogData.*/

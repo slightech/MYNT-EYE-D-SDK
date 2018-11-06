@@ -144,7 +144,11 @@ bool Channels::ExtractHidData(ImuResPacket &imu, ImgInfoResPacket &img) {
       LOGW("check droped.");
       continue;
     }
-    imu.from_header_data(packet);
+
+    auto sn = *packet | *(packet + 1) << 8;
+    if (package_sn_ == sn) { continue; }
+    package_sn_ = sn;
+
     for (int offset = 3; offset <= PACKET_SIZE - DATA_SIZE;
         offset += DATA_SIZE) {
       if (*(packet + offset) == 2) {

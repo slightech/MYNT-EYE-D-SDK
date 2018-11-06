@@ -69,7 +69,7 @@ include_directories(
 set(LINK_LIBRARIES
   ${catkin_LIBRARIES}
   ${OpenCV_LIBS}
-  mynteye_core
+  mynteye_depth
 )
 
 add_library(mynteye_wrapper_d

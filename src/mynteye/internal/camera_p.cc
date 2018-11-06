@@ -107,7 +107,7 @@ CameraPrivate::CameraPrivate()
       (PETRONDI_STREAM_INFO)malloc(sizeof(ETRONDI_STREAM_INFO)*64);
   stream_depth_info_ptr_ =
       (PETRONDI_STREAM_INFO)malloc(sizeof(ETRONDI_STREAM_INFO)*64);
-  depth_data_type_ = 2;
+  depth_data_type_ = 9;
   OnInit();
   is_enable_image_[ImageType::IMAGE_LEFT_COLOR] = false;
   is_enable_image_[ImageType::IMAGE_RIGHT_COLOR] = false;
@@ -614,11 +614,6 @@ void CameraPrivate::CaptureImageColor(ErrorCode* code) {
     image_color_.push_back(color);
     image_color_wait_.notify_one();
   }
-  /*
-  if (!image_color_.empty()) {
-    image_color_wait_.notify_one();
-  }
-  */
 }
 
 void CameraPrivate::CaptureImageDepth(ErrorCode* code) {
@@ -629,11 +624,6 @@ void CameraPrivate::CaptureImageDepth(ErrorCode* code) {
     image_depth_.push_back(depth);
     image_depth_wait_.notify_one();
   }
-  /*
-  if (!image_depth_.empty()) {
-    image_depth_wait_.notify_one();
-  }
-  */
 }
 
 void CameraPrivate::SyntheticImageColor() {
@@ -658,7 +648,8 @@ void CameraPrivate::SyntheticImageColor() {
     for (auto info : img_info_) {
       if (color->frame_id() == info.img_info->frame_id) {
         TransferColor(color, info);
-        if (image_color_.size() > 30) { image_color_.clear(); }
+        if (left_color_data_.size() > 30) { left_color_data_.clear(); }
+        if (right_color_data_.size() > 30) { right_color_data_.clear(); }
         if (img_info_.size() > 30) { img_info_.clear(); }
       }
     }
@@ -785,13 +776,13 @@ void CameraPrivate::ImuDataCallback(const ImuPacket &packet) {
   for (auto &&seg : packet.segments) {
     auto &&imu = std::make_shared<ImuData>();
     imu->flag = seg.flag;
-    imu->temperature = static_cast<double>((std::uint16_t)(seg.temperature * 0.125 + 23));
+    imu->temperature = static_cast<double>(seg.temperature * 0.125 + 23);
     imu->timestamp = seg.timestamp;
 
     if (imu->flag == 1) {
-      imu->accel[0] = (std::int16_t)seg.accel_or_gyro[0] * 12.f / 0x10000;
-      imu->accel[1] = (std::int16_t)seg.accel_or_gyro[1] * 12.f / 0x10000;
-      imu->accel[2] = (std::int16_t)seg.accel_or_gyro[2] * 12.f / 0x10000;
+      imu->accel[0] = seg.accel_or_gyro[0] * 12.f / 0x10000;
+      imu->accel[1] = seg.accel_or_gyro[1] * 12.f / 0x10000;
+      imu->accel[2] = seg.accel_or_gyro[2] * 12.f / 0x10000;
       imu->gyro[0] = 0;
       imu->gyro[1] = 0;
       imu->gyro[2] = 0;
@@ -799,16 +790,22 @@ void CameraPrivate::ImuDataCallback(const ImuPacket &packet) {
       imu->accel[0] = 0;
       imu->accel[1] = 0;
       imu->accel[2] = 0;
-      imu->gyro[0] = (std::int16_t)seg.accel_or_gyro[0] * 2000.f / 0x10000;
-      imu->gyro[1] = (std::int16_t)seg.accel_or_gyro[1] * 2000.f / 0x10000;
-      imu->gyro[2] = (std::int16_t)seg.accel_or_gyro[2] * 2000.f / 0x10000;
+      imu->gyro[0] = seg.accel_or_gyro[0] * 2000.f / 0x10000;
+      imu->gyro[1] = seg.accel_or_gyro[1] * 2000.f / 0x10000;
+      imu->gyro[2] = seg.accel_or_gyro[2] * 2000.f / 0x10000;
     } else {
       imu->Reset();
     }
 
-    std::lock_guard<std::mutex> _(mtx_imu_);
-    motion_data_t tmp = {imu};
-    imu_data_.push_back(tmp);
+    ++motion_count_;
+    if (motion_count_ > 20) {
+      motion_data_t tmp = {imu};
+      cache_imu_data_.push_back(tmp);
+      std::lock_guard<std::mutex> _(mtx_imu_);
+      imu_data_.insert(imu_data_.end(), cache_imu_data_.begin(),
+          cache_imu_data_.end());
+      cache_imu_data_.clear();
+    }
   }
 }
 
@@ -819,9 +816,12 @@ void CameraPrivate::ImageInfoCallback(const ImgInfoPacket &packet) {
   img_info->timestamp = packet.timestamp;
   img_info->exposure_time = packet.exposure_time;
 
-  std::lock_guard<std::mutex> _(mtx_img_info_);
   img_info_data_t tmp = {img_info};
-  img_info_.push_back(tmp);
+  cache_image_info_.push_back(tmp);
+
+  std::lock_guard<std::mutex> _(mtx_img_info_);
+  img_info_.insert(img_info_.end(), cache_image_info_.begin(), cache_image_info_.end());
+  cache_image_info_.clear();
 }
 
 std::vector<device::MotionData> CameraPrivate::GetImuDatas() {

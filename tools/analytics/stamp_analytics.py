@@ -145,9 +145,9 @@ class BinDataset(object):
     imgs_t_diff = np.diff(imgs['t'])
     # imus_t_diff = np.diff(imus['t'])
 
-    accel = imus[(imus['flag'] == 0) & (imus['flag'] == 1)]
+    accel = imus[(imus['flag'] == 0) | (imus['flag'] == 1)]
     accel_t_diff = np.diff(accel['t'])
-    gyro = imus[(imus['flag'] == 0) & (imus['flag'] == 2)]
+    gyro = imus[(imus['flag'] == 0) | (imus['flag'] == 2)]
     gyro_t_diff = np.diff(gyro['t'])
 
     print('\ncount')
@@ -305,7 +305,7 @@ def _parse_args():
       '--rate-img',
       dest='rate_img',
       metavar='RATE',
-      default=60,
+      default=30,
       type=int,
       help='the img rate (default: %(default)s)')
   parser.add_argument(
@@ -351,7 +351,7 @@ def _main():
         sys.exit('Error: dataset model not supported {}'.format(model))
     else:
       dataset = ROSBag(path,
-                       topic_img_left='/mynteye/left/color',
+                       topic_img_left='/mynteye/left/image_color',
                        topic_imu='/mynteye/imu/data_raw')
     return dataset
 

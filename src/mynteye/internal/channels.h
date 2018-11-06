@@ -73,6 +73,7 @@ class MYNTEYE_API Channels {
   img_callback_t img_callback_;
 
   std::uint8_t req_count_ = 0;
+  std::uint16_t package_sn_ = 0;
 };
 
 MYNTEYE_END_NAMESPACE

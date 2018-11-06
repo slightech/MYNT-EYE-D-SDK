@@ -121,7 +121,7 @@ public:
     if (!show_) return;
     std::uint32_t n = (n_ > 1) ? n_ : 1;
     n += 1;  // outside the region
-#ifdef USE_OPENCV2
+#ifdef WITH_OPENCV2
     cv::rectangle(const_cast<cv::Mat&>(im),
 #else
     cv::rectangle(im,

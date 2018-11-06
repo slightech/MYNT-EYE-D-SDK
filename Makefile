@@ -118,8 +118,13 @@ cleandoc:
 # pkg
 
 .PHONY: pkg
-pkg: install cleanros
+pkg:
 	@$(call echo,Make $@)
+ifeq ($(HOST_OS),Win)
+	@$(MAKE) clean
+	@$(SH) ./scripts/win/winpack.sh "$(PKGNAME)"
+else ifeq ($(HOST_OS),Linux)
+	@$(MAKE) install cleanros
 
 	@$(call echo,Copy ./cmake to ./_install/cmake ...,1;35)
 	@$(call cp,./cmake/Common.cmake,./_install/cmake/Common.cmake)
@@ -149,6 +154,9 @@ pkg: install cleanros
 	$(call echo,Compress $$dst.tar.gz ...,1;35); \
 	tar -zcf $$dst.tar.gz $$dst; \
 	$(call echo,Compress $$dst.tar.gz done,1;35)
+else
+	$(error "Can't make pkg on $(HOST_OS)")
+endif
 
 .PHONY: cleanpkg
 cleanpkg:

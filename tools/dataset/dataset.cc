@@ -14,7 +14,7 @@
 #include "dataset/dataset.h"
 #include "mynteye/util/files.h"
 
-#ifdef USE_OPENCV2
+#ifdef WITH_OPENCV2
 #include <opencv2/highgui/highgui.hpp>
 #else
 #include <opencv2/imgcodecs/imgcodecs.hpp>

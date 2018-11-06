@@ -133,6 +133,7 @@ class CameraPrivate {
   /** Set image mode (raw image or rectified image) */
   void SetImageMode(const ImageMode &mode);
 
+<<<<<<< HEAD
   /** Get the device info. */
   std::shared_ptr<DeviceParams> GetInfo() const;
   /** Get the device info of a field. */
@@ -150,6 +151,9 @@ class CameraPrivate {
   std::shared_ptr<Channels> channels() const {
     return channels_;
   }
+=======
+  inline StreamMode GetStreamMode() { return stream_mode_; }
+>>>>>>> c268b37cd0688750d80f88c4823dd2c4748aa547
 
  private:
   void OnInit();
@@ -212,7 +216,9 @@ class CameraPrivate {
   std::mutex mtx_imu_;
 
   motion_datas_t imu_data_;
+  motion_datas_t cache_imu_data_;
   img_info_datas_t img_info_;
+  img_info_datas_t cache_image_info_;
 
   std::mutex cap_color_mtx_;
   std::mutex cap_depth_mtx_;
@@ -242,6 +248,7 @@ class CameraPrivate {
 
   std::shared_ptr<MotionIntrinsics> motion_intrinsics_;
   std::shared_ptr<Extrinsics> motion_from_extrinsics_;
+  std::size_t motion_count_ = 0;
 };
 
 MYNTEYE_END_NAMESPACE

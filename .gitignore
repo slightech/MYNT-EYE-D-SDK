@@ -4,6 +4,9 @@ _build/
 _output/
 _install/
 
+.vs/
+.vscode/
+
 # qt
 
 /apps/build*/
@@ -19,15 +22,19 @@ _install/
 
 # others
 
-/mynteye-*
-!/mynteye-*cmake*
+*.pyc
+
+/3rdparty/opencv/
+/3rdparty/libjpeg-turbo64/
+/ocvinfo.sh
+/winpack.nsi
 
 /pkginfo.sh
 /platforms/linux/sdk.cfg
 
-/.vscode/
+/mynteye-*
+!/mynteye-*cmake*
 
 /dataset/
+/mynteye/
 /*.bag
-
-*.pyc
