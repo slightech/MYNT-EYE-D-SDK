@@ -133,7 +133,6 @@ class CameraPrivate {
   /** Set image mode (raw image or rectified image) */
   void SetImageMode(const ImageMode &mode);
 
-<<<<<<< HEAD
   /** Get the device info. */
   std::shared_ptr<DeviceParams> GetInfo() const;
   /** Get the device info of a field. */
@@ -151,9 +150,8 @@ class CameraPrivate {
   std::shared_ptr<Channels> channels() const {
     return channels_;
   }
-=======
+
   inline StreamMode GetStreamMode() { return stream_mode_; }
->>>>>>> c268b37cd0688750d80f88c4823dd2c4748aa547
 
  private:
   void OnInit();

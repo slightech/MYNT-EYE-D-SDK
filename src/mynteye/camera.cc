@@ -136,6 +136,7 @@ MotionIntrinsics Camera::GetMotionIntrinsics() const {
 
 Extrinsics Camera::GetMotionExtrinsics() const {
   return p_->GetMotionExtrinsics();
+}
 
 StreamMode Camera::GetStreamMode() {
   return p_->GetStreamMode();
