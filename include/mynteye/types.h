@@ -314,6 +314,8 @@ struct MYNTEYE_API ImuIntrinsics {
    * \endcode
    */
   double scale[3][3];
+  /** Assembly error [3][3] */
+  double assembly[3][3];
   /* Zero-drift: X, Y, Z */
   double drift[3];
 
@@ -322,18 +324,22 @@ struct MYNTEYE_API ImuIntrinsics {
   /** Random walk variances */
   double bias[3];
 
+
   // std::uint8_t reserve[100];
 
   /** Warm drift
    *  \code
-   *    0 - Slope
-   *    1 - Constant value
+   *    0 - Constant value
+   *    1 - Slope
    *  \endcode
    */
   double x[2];
   double y[2];
   double z[2];
 };
+
+MYNTEYE_API
+std::ostream &operator<<(std::ostream &os, const ImuIntrinsics &in);
 
 /**
  * @ingroup calibration

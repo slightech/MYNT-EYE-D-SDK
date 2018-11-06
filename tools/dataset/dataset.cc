@@ -33,7 +33,7 @@
 
 MYNTEYE_BEGIN_NAMESPACE
 
-namespace d1000_tools {
+namespace tools {
 
 Dataset::Dataset(std::string outdir) : outdir_(std::move(outdir)) {
   std::cout << __func__ << std::endl;
@@ -124,6 +124,6 @@ Dataset::writer_t Dataset::GetStreamWriter(const ImageType &type) {
   }
 }
 
-}  // namespace d1000_tools
+}  // namespace tools
 
 MYNTEYE_END_NAMESPACE

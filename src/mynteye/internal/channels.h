@@ -40,7 +40,7 @@ class MYNTEYE_API Channels {
 
   void SetImuCallback(imu_callback_t callback);
   void SetImgInfoCallback(img_callback_t callback);
-  void Start();
+  void Open();
   void StartHidTracking();
   bool StopHidTracking();
   void DoHidTrack();

@@ -146,6 +146,11 @@ class CameraPrivate {
   /** Set the extrinsics from left to motion. */
   void SetMotionExtrinsics(const Extrinsics &ex);
 
+  // protected:
+  std::shared_ptr<Channels> channels() const {
+    return channels_;
+  }
+
  private:
   void OnInit();
   void OnPreWait();

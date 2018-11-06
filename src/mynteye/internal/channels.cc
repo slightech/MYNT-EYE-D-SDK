@@ -29,7 +29,8 @@ inline std::uint8_t check_sum(std::uint8_t *buf, std::uint16_t length) {
 
 void CheckSpecVersion(const Version *spec_version) {
   if (spec_version == nullptr) {
-    LOGE("%s %d:: Spec version must be specified.");
+    LOGE("%s %d:: Spec version must be specified.", __FILE__, __LINE__);
+    return;
   }
 
   std::vector<std::string> spec_versions{"1.0"};
@@ -88,7 +89,7 @@ void Channels::DoHidTrack() {
   }
 }
 
-void Channels::Start() {
+void Channels::Open() {
   is_hid_tracking_ = true;
   // open device
   if (device_->open(1, -1, -1) < 0) {
@@ -196,13 +197,57 @@ std::string _from_data(const std::uint8_t *data, std::size_t count) {
   return s;
 }
 
-std::size_t from_data(ImuIntrinsics *in, const std::uint8_t *data) {
+std::size_t from_data(Channels::device_info_t *info, const std::uint8_t *data) {
+  std::size_t i = 4;  // skip vid, pid
+  // name, 20
+  info->name = _from_data(data + i, 20);
+  i += 20;
+  // serial_number, 24
+  info->serial_number = _from_data(data + i, 24);
+  i += 24;
+  // firmware_version, 2
+  info->firmware_version.set_minor(data[i]);
+  info->firmware_version.set_major(data[i + 1]);
+  i += 2;
+  // hardware_version, 3
+  info->hardware_version.set_minor(data[i]);
+  info->hardware_version.set_major(data[i + 1]);
+  info->hardware_version.set_flag(std::bitset<8>(data[i + 2]));
+  i += 3;
+  // spec_version, 2
+  info->spec_version.set_minor(data[i]);
+  info->spec_version.set_major(data[i + 1]);
+  i += 2;
+  // lens_type, 4
+  info->lens_type.set_vendor(_from_data<std::uint16_t>(data + i));
+  info->lens_type.set_product(_from_data<std::uint16_t>(data + i + 2));
+  i += 4;
+  // imu_type, 4
+  info->imu_type.set_vendor(_from_data<std::uint16_t>(data + i));
+  info->imu_type.set_product(_from_data<std::uint16_t>(data + i + 2));
+  i += 4;
+  // nominal_baseline, 2
+  info->nominal_baseline = _from_data<std::uint16_t>(data + i);
+  i += 2;
+
+  return i;
+}
+
+std::size_t from_data(ImuIntrinsics *in,
+    const std::uint8_t *data, const Version *spec_version) {
   std::size_t i = 0;
 
   // scale
   for (std::size_t j = 0; j < 3; j++) {
     for (std::size_t k = 0; k < 3; k++) {
       in->scale[j][k] = _from_data<double>(data + i + (j * 3 + k) * 8);
+    }
+  }
+  i += 72;
+  // assembly
+  for (std::size_t j = 0; j < 3; j++) {
+    for (std::size_t k = 0; k < 3; k++) {
+      in->assembly[j][k] = _from_data<double>(data + i + (j * 3 + k) * 8);
     }
   }
   i += 72;
@@ -239,10 +284,12 @@ std::size_t from_data(ImuIntrinsics *in, const std::uint8_t *data) {
   }
   i += 16;
 
+  UNUSED(spec_version);
   return i;
 }
 
-std::size_t from_data(Extrinsics *ex, const std::uint8_t *data) {
+std::size_t from_data(Extrinsics *ex,
+    const std::uint8_t *data, const Version *spec_version) {
   std::size_t i = 0;
 
   // rotation
@@ -258,51 +305,18 @@ std::size_t from_data(Extrinsics *ex, const std::uint8_t *data) {
   }
   i += 24;
 
-  return i;
-}
-
-std::size_t from_data(Channels::device_info_t *info, const std::uint8_t *data) {
-  std::size_t i = 4;  // skip vid, pid
-  // name, 22
-  info->name = _from_data(data + i, 22);
-  i += 22;
-  // serial_number, 24
-  info->serial_number = _from_data(data + i, 24);
-  i += 24;
-  // firmware_version, 2
-  info->firmware_version.set_major(data[i]);
-  info->firmware_version.set_minor(data[i + 1]);
-  i += 2;
-  // hardware_version, 3
-  info->hardware_version.set_major(data[i]);
-  info->hardware_version.set_minor(data[i + 1]);
-  info->hardware_version.set_flag(std::bitset<8>(data[i + 2]));
-  i += 3;
-  // spec_version, 2
-  info->spec_version.set_major(data[i]);
-  info->spec_version.set_minor(data[i + 1]);
-  i += 2;
-  // lens_type, 4
-  info->lens_type.set_vendor(_from_data<std::uint16_t>(data + i));
-  info->lens_type.set_product(_from_data<std::uint16_t>(data + i + 2));
-  i += 4;
-  // imu_type, 4
-  info->imu_type.set_vendor(_from_data<std::uint16_t>(data + i));
-  info->imu_type.set_product(_from_data<std::uint16_t>(data + i + 2));
-  i += 4;
-  // nominal_baseline, 2
-  info->nominal_baseline = _from_data<std::uint16_t>(data + i);
-  i += 2;
-
+  UNUSED(spec_version);
   return i;
 }
 
 std::size_t from_data(
-    Channels::imu_params_t *imu_params, const std::uint8_t *data) {
+    Channels::imu_params_t *imu_params,
+    const std::uint8_t *data,
+    const Version *spec_version) {
   std::size_t i = 0;
-  i += from_data(&imu_params->in_accel, data + i);
-  i += from_data(&imu_params->in_gyro, data + i);
-  i += from_data(&imu_params->ex_left_to_imu, data + i);
+  i += from_data(&imu_params->in_accel, data + i, spec_version);
+  i += from_data(&imu_params->in_gyro, data + i, spec_version);
+  i += from_data(&imu_params->ex_left_to_imu, data + i, spec_version);
   return i;
 }
 
@@ -353,16 +367,6 @@ bool Channels::RequireFileData(bool device_info,
           __FILE__, __LINE__);
       return false;
     }
-    /*
-    if (buffer[0] != 0x0B) {
-      if (++req_count_ > 5) {
-        LOGE("%s %d:: 3333333333Error reading, device went offline.",
-            __FILE__, __LINE__);
-        return false;
-      }
-      continue;
-    }
-    */
 
     if (buffer[0] == 0x0B && (packets_num == -1)) { continue; }
     if (packets_num == (buffer[0] | buffer[1] << 8)) { continue; }
@@ -415,10 +419,7 @@ bool Channels::GetFiles(device_info_t *info,
     return false;
   }
 
-    LOGE("%s %d:: GetFiles failed.", __FILE__, __LINE__);
   std::uint16_t size = _from_data<std::uint16_t>(data + 1);
-    printf("199999999999999999 %u, %u\n", size, file_len);
-  // std::uint16_t size = data[1] | data[2] << 8;
   std::uint8_t checksum = data[3 + size];
 
   std::uint8_t checksum_now = check_sum(data + 3, size);
@@ -434,16 +435,14 @@ bool Channels::GetFiles(device_info_t *info,
   while (i < end) {
     std::uint8_t file_id = *(data + i);
     std::uint16_t file_size = _from_data<std::uint16_t>(data + i + 1);
-    // std::uint16_t file_size = *(data + i + 1) | *(data + i + 2) << 8;
 
     i += 3;
     switch (file_id) {
       case FID_DEVICE_INFO: {
-          printf("from_data %u, %u, %lu\n", from_data(info, data + i), file_size, file_id);
         if (from_data(info, data + i) != file_size) {
           LOGI("%s %d:: The firmware not support getting device info,"
               "you could upgrade to latest.", __FILE__, __LINE__);
-          // return false;
+          return false;
         }
         spec_ver = &info->spec_version;
         CheckSpecVersion(spec_ver);
@@ -453,10 +452,8 @@ bool Channels::GetFiles(device_info_t *info,
         imu_params->ok = file_size > 0;
         if (imu_params->ok) {
           CheckSpecVersion(spec_ver);
-          printf("from_data %u, %u, %lu\n",
-              from_data(imu_params, data + i), file_size, file_id);
-          if (from_data(imu_params, data + i)
-              != file_size) { /* return false; */ }
+          if (from_data(imu_params, data + i, spec_version)
+              != file_size) { return false; }
         }
       } break;
       default:
@@ -466,7 +463,6 @@ bool Channels::GetFiles(device_info_t *info,
     i += file_size;
   }
 
-  LOGI("MYNTEYE-D:: GetFiles success");
   return true;
 }
 
@@ -476,7 +472,6 @@ template <typename T>
 std::size_t _to_data(T value, std::uint8_t *data) {
   std::size_t size = sizeof(T) / sizeof(std::uint8_t);
   for (std::size_t i = 0; i < size; i++) {
-    // data[i] = static_cast<std::uint8_t>((value >> (8 * (size - i - 1))) & 0xFF);
     data[i] = static_cast<std::uint8_t>((value >> (8 * i)) & 0xFF);
   }
   return size;
@@ -498,28 +493,28 @@ std::size_t _to_data(std::string value, std::uint8_t *data, std::size_t count) {
 }
 
 std::size_t to_data(
-    const Channels::device_info_t *info, std::uint8_t *data) {
-  std::size_t i = 3;  // skip id, size
-  i += 4;             // skip vid, pid
-  // name, 22
-  _to_data(info->name, data + i, 22);
-  i += 22;
+    const Channels::device_info_t *info, std::uint8_t *data,
+    const Version *spec_version) {
+  std::size_t i = 4;             // skip vid, pid
+  // name, 20
+  _to_data(info->name, data + i, 20);
+  i += 20;
   // serial_number, 24
   _to_data(info->serial_number, data + i, 24);
   i += 24;
   // firmware_version, 2
-  data[i] = info->firmware_version.major();
-  data[i + 1] = info->firmware_version.minor();
+  data[i] = info->firmware_version.minor();
+  data[i + 1] = info->firmware_version.major();
   i += 2;
   // hardware_version, 3
-  data[i] = info->hardware_version.major();
-  data[i + 1] = info->hardware_version.minor();
+  data[i] = info->hardware_version.minor();
+  data[i + 1] = info->hardware_version.major();
   data[i + 2] =
       static_cast<std::uint8_t>(info->hardware_version.flag().to_ulong());
   i += 3;
   // spec_version, 2
-  data[i] = info->spec_version.major();
-  data[i + 1] = info->spec_version.minor();
+  data[i] = info->spec_version.minor();
+  data[i + 1] = info->spec_version.major();
   i += 2;
   // lens_type, 4
   _to_data(info->lens_type.vendor(), data + i);
@@ -538,16 +533,26 @@ std::size_t to_data(
   data[0] = Channels::FID_DEVICE_INFO;
   data[1] = static_cast<std::uint8_t>(size & 0xFF);
   data[2] = static_cast<std::uint8_t>((size >> 8) & 0xFF);
+
+  UNUSED(spec_version);
   return size + 3;
 }
 
-std::size_t to_data(const ImuIntrinsics *in, std::uint8_t *data) {
+std::size_t to_data(const ImuIntrinsics *in,
+    std::uint8_t *data, const Version *spec_version) {
   std::size_t i = 0;
 
   // scale
   for (std::size_t j = 0; j < 3; j++) {
     for (std::size_t k = 0; k < 3; k++) {
       _to_data(in->scale[j][k], data + i + (j * 3 + k) * 8);
+    }
+  }
+  i += 72;
+  // assembly
+  for (std::size_t j = 0; j < 3; j++) {
+    for (std::size_t k = 0; k < 3; k++) {
+      _to_data(in->assembly[j][k], data + i + (j * 3 + k) * 8);
     }
   }
   i += 72;
@@ -584,10 +589,12 @@ std::size_t to_data(const ImuIntrinsics *in, std::uint8_t *data) {
   }
   i += 16;
 
+  UNUSED(spec_version);
   return i;
 }
 
-std::size_t to_data(const Extrinsics *ex, std::uint8_t *data) {
+std::size_t to_data(const Extrinsics *ex, std::uint8_t *data,
+    const Version *spec_version) {
   std::size_t i = 0;
 
   // rotation
@@ -603,15 +610,19 @@ std::size_t to_data(const Extrinsics *ex, std::uint8_t *data) {
   }
   i += 24;
 
+  UNUSED(spec_version);
   return i;
 }
 
 std::size_t to_data(
-    const Channels::imu_params_t *imu_params, std::uint8_t *data) {
-  std::size_t i = 3;  // skip id, size
-  i += to_data(&imu_params->in_accel, data + i);
-  i += to_data(&imu_params->in_gyro, data + i);
-  i += to_data(&imu_params->ex_left_to_imu, data + i);
+    const Channels::imu_params_t *imu_params,
+    std::uint8_t *data,
+    const Version *spec_version) {
+  std::size_t i = 0;
+  i += to_data(&imu_params->in_accel, data + i, spec_version);
+  i += to_data(&imu_params->in_gyro, data + i, spec_version);
+  i += to_data(&imu_params->ex_left_to_imu, data + i, spec_version);
+
   // others
   std::size_t size = i - 3;
   data[0] = Channels::FID_IMU_PARAMS;
@@ -632,8 +643,6 @@ bool Channels::UpdateFileData(
   cmd[3] = (size & 0xFF00) >> 8;
   cmd[4] = (size & 0xFF0000) >> 16;
   cmd[5] = (size & 0xFF000000) >> 24;
-
-  // std::uint32_t packets_sum = size / 60 + 1;
 
   if (device_->get_device_class() == 0xFF) {
     LOGE("%s %d:: Not support filechannel, please update firmware.",
@@ -717,24 +726,24 @@ bool Channels::SetFiles(device_info_t *info,
   std::uint16_t size = 3;
   if (info != nullptr) {
     data[0] |= 0x80 | 0x01 << 0;
-    std::uint16_t ret = to_data(info, data + size);
+    std::uint16_t data_size = to_data(info, data + size + 3, spec_ver);
     *(data + size) = 0x01 << 0;
-    *(data + size + 1) = ret & 0xFF;
-    *(data + size + 2) = (ret >> 8) & 0xFF;
+    *(data + size + 1) = data_size & 0xFF;
+    *(data + size + 2) = (data_size >> 8) & 0xFF;
     size += 3;
-    size += ret;
+    size += data_size;
   }
 
   data[0] |= 0x80 | 0x00 << 1;
 
   if (imu_params != nullptr) {
     data[0] |= 0x80 | 0x01 << 2;
-    std::uint16_t ret = to_data(imu_params, data + size);
+    std::uint16_t data_size = to_data(imu_params, data + size + 3, spec_ver);
     *(data + size) = 0x01 << 2;
-    *(data + size + 1) = ret & 0xFF;
-    *(data + size + 2) = (ret >> 8) & 0xFF;
+    *(data + size + 1) = data_size & 0xFF;
+    *(data + size + 2) = (data_size >> 8) & 0xFF;
     size += 3;
-    size += ret;
+    size += data_size;
   }
 
   size -= 3;

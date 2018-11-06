@@ -24,7 +24,7 @@
 
 MYNTEYE_BEGIN_NAMESPACE
 
-namespace d1000_tools {
+namespace tools {
 
 class Dataset {
  public:
@@ -55,7 +55,7 @@ class Dataset {
   std::map<ImageType, std::size_t> stream_count_;
 };
 
-}  // namespace d1000_tools
+}  // namespace tools
 
 MYNTEYE_END_NAMESPACE
 

@@ -99,7 +99,7 @@ int main(int argc, char const *argv[]) {
   } else {
     outdir = "./dataset";
   }
-  d1000_tools::Dataset dataset(outdir);
+  tools::Dataset dataset(outdir);
 
   cam.EnableImageType(mynteye::ImageType::ALL);
   cam.Open(params);

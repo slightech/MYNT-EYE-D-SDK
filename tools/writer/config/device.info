@@ -1,0 +1,10 @@
+%YAML:1.0
+---
+device_name: "MYNT-EYE-D1000"
+serial_number: "0000000000000000"
+firmware_version: "2.0"
+hardware_version: "2.0"
+spec_version: "1.0"
+lens_type: "0000"
+imu_type: "0000"
+nominal_baseline: 120

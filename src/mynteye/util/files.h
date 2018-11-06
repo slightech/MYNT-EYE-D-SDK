@@ -4,7 +4,7 @@
 #include "mynteye/stubs/global.h"
 #include "mynteye/util/strings.h"
 
-#if defined(OS_WIN) && !defined(OS_MINGW) && !defined(OS_CYGWIN)
+#if defined(MYNTEYE_OS_WIN) && !defined(MYNTEYE_OS_MINGW) && !defined(MYNTEYE_OS_CYGWIN)
 #include <direct.h>
 #else
 #include <sys/stat.h>
@@ -17,13 +17,13 @@ MYNTEYE_BEGIN_NAMESPACE
 namespace files {
 
 bool _mkdir(const std::string &path) {
-#if defined(OS_MINGW) || defined(OS_CYGWIN)
+#if defined(MYNTEYE_OS_MINGW) || defined(MYNTEYE_OS_CYGWIN)
   const int status = ::mkdir(path.c_str());
-#elif defined(OS_WIN)
+#elif defined(MYNTEYE_OS_WIN)
   const int status = ::_mkdir(path.c_str());
 #else
   const int status =
-    ::mkdir(path.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+    mkdir(path.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 #endif
 
   if (status != 0 && errno != EEXIST) {

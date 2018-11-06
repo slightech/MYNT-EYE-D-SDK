@@ -21,6 +21,7 @@
 #include <bitset>
 #include <string>
 #include <vector>
+#include <iostream>
 
 #include "mynteye/stubs/global.h"
 
@@ -36,7 +37,7 @@ MYNTEYE_BEGIN_NAMESPACE
   }                                  \
                                      \
  private:                            \
-  TYPE NAME##_;
+  TYPE NAME##_;                      \
 
 /**
  * Version.

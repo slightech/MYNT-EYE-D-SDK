@@ -17,7 +17,6 @@
 #include <stdexcept>
 #include <string>
 #include <chrono>
-#include <sys/time.h>
 
 #include "mynteye/internal/camera_p.h"
 #include "mynteye/internal/channels.h"
@@ -74,6 +73,9 @@ inline std::uint8_t check_sum(std::uint8_t *buf, std::uint8_t length) {
   return crc8;
 }
 
+void compensate_imu(double temp) {
+}
+
 }  // namespace
 
 CameraPrivate::CameraPrivate()
@@ -112,6 +114,8 @@ CameraPrivate::CameraPrivate()
   is_enable_image_[ImageType::IMAGE_DEPTH] = false;
 
   channels_ = std::make_shared<Channels>();
+  channels_->Open();
+  ReadAllInfos();
 }
 
 CameraPrivate::~CameraPrivate() {
@@ -120,7 +124,9 @@ CameraPrivate::~CameraPrivate() {
   free(stream_depth_info_ptr_);
 
   channels_->StopHidTracking();
-  StopCaptureImage();
+  if (is_capture_image_) {
+    StopCaptureImage();
+  }
   Close();
 }
 
@@ -489,9 +495,6 @@ ErrorCode CameraPrivate::Open(const InitParams& params) {
 #endif
 
   if (ETronDI_OK == ret) {
-    channels_->Start();
-    ReadAllInfos();
-    // sleep(10);
     StartHidTracking();
     StartCaptureImage();
     SyncCameraLogData();
@@ -1093,7 +1096,7 @@ void CameraPrivate::ReadAllInfos() {
     return;
   }
 
-  LOGI("Device info: name: %s", device_params_->name.c_str());
+  LOGI("\nDevice info: name: %s", device_params_->name.c_str());
   LOGI("             serial_number: %s", device_params_->serial_number.c_str());
   LOGI("             firmware_version: %s",
       device_params_->firmware_version.to_string().c_str());

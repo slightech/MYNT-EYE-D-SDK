@@ -21,12 +21,41 @@ set_outdir(
 )
 
 include_directories(
+  ${eSPDI_INCLUDE_DIRS}
   ${PRO_DIR}/src
 )
-## record
 
-make_executable(record
-  SRCS record.cc dataset.cc
-  LINK_LIBS  mynteye_core ${OpenCV_LIBS}
+set(MYNTEYE_DLL_SEARCH_PATHS
+  ${PRO_DIR}/_install/bin
+  ${PRO_DIR}/_install/bin/3rdparty
+  ${OpenCV_LIB_SEARCH_PATH}
+)
+
+## device_writer
+
+add_library(device_writer STATIC device_writer.cc)
+target_link_libraries(device_writer mynteye_core ${OpenCV_LIBS})
+
+## device_info_writer
+
+make_executable(device_info_writer
+  SRCS device_info_writer.cc
+  LINK_LIBS device_writer
+  DLL_SEARCH_PATHS ${PRO_DIR}/_install/bin ${MYNTEYE_DLL_SEARCH_PATHS}
+)
+
+## imu_params_writer
+
+make_executable(imu_params_writer
+  SRCS imu_params_writer.cc
+  LINK_LIBS device_writer
+  DLL_SEARCH_PATHS ${PRO_DIR}/_install/bin ${MYNTEYE_DLL_SEARCH_PATHS}
+)
+
+## save_all_infos
+
+make_executable(save_all_infos
+  SRCS save_all_infos.cc
+  LINK_LIBS device_writer
   DLL_SEARCH_PATHS ${PRO_DIR}/_install/bin ${MYNTEYE_DLL_SEARCH_PATHS}
 )
