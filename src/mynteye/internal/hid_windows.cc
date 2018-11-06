@@ -28,6 +28,11 @@ hid_device::~hid_device() {
   free_all_hid();
 }
 
+int hid_device::get_device_class() {
+  // TODO: fix
+  return -1;
+}
+
 /**
  * receive - receive a packet
  *

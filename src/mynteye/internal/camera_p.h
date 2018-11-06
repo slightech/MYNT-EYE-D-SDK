@@ -41,7 +41,7 @@ MYNTEYE_BEGIN_NAMESPACE
 class Rate;
 class Channels;
 
-class CameraPrivate {
+class MYNTEYE_API CameraPrivate {
  public:
   using image_size_t = unsigned long int;  // NOLINT
   using stream_data_t = device::StreamData;
