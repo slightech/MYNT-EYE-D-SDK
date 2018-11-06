@@ -1,4 +1,6 @@
-#include <sys/time.h>
+#include "mynteye/internal/channels.h"
+
+// #include <sys/time.h>
 #include <string>
 #include <vector>
 #include <algorithm>
@@ -9,8 +11,7 @@
 #include <stdexcept>
 
 #include "mynteye/util/log.h"
-#include "../util/strings.h"
-#include "mynteye/internal/channels.h"
+#include "mynteye/util/strings.h"
 
 #define PACKET_SIZE 64
 #define DATA_SIZE 15
@@ -197,7 +198,7 @@ double _from_data(const std::uint8_t *data) {
 
 std::string _from_data(const std::uint8_t *data, std::size_t count) {
   std::string s(reinterpret_cast<const char *>(data), count);
-  sstrings::trim(s);
+  strings::trim(s);
   return s;
 }
 

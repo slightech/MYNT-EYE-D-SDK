@@ -43,7 +43,7 @@ bool _mkdir(const std::string &path) {
 }
 
 bool mkdir(const std::string &path) {
-  auto &&dirs = sstrings::split(path, MYNTEYE_OS_SEP);
+  auto &&dirs = strings::split(path, MYNTEYE_OS_SEP);
   auto &&size = dirs.size();
   if (size <= 0)
     return false;

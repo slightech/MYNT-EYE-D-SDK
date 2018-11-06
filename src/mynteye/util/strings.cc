@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#include "strings.h"   // NOLINT
+#include "mynteye/util/strings.h"
 
 #include <algorithm>
 #include <cctype>
@@ -20,7 +20,7 @@
 
 MYNTEYE_BEGIN_NAMESPACE
 
-namespace sstrings {
+namespace strings {
 
 namespace {
 
@@ -107,6 +107,6 @@ std::string trim_copy(const std::string &text) {
   return s;
 }
 
-}  // namespace sstrings
+}  // namespace strings
 
 MYNTEYE_END_NAMESPACE
