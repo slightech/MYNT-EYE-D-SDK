@@ -42,6 +42,7 @@ if ! _detect_cmd makensis; then
 fi
 
 export OpenCV_DIR="$ROOT_DIR/3rdparty/opencv/build"
+export PATH="$ROOT_DIR/3rdparty/libjpeg-turbo64/bin:$PATH"
 
 _rm() {
   [ -e "$1" ] && (rm -r "$1" && _echo_i "RM: $1")
@@ -77,6 +78,15 @@ _rm "$ROOT_DIR/tools/_build"
 _rm "$ROOT_DIR/tools/_output"
 mv "$ROOT_DIR/tools/linter" "$ROOT_DIR/3rdparty/linter"
 mv "$ROOT_DIR/tools" "$ROOT_DIR/_install/tools"
+
+# platforms/win
+mv "$ROOT_DIR/platforms/win/README.txt" "$ROOT_DIR/_install"
+
+_rm "$ROOT_DIR/platforms/projects/vs2017/mynteyed_demo/.vs"
+_rm "$ROOT_DIR/platforms/projects/vs2017/mynteyed_demo/x64"
+_rm "$ROOT_DIR/platforms/projects/vs2017/mynteyed_demo/mynteyed_demo/x64"
+_rm "$ROOT_DIR/platforms/projects/vs2017/mynteyed_demo/mynteyed_demo/mynteyed_demo.vcxproj.user"
+mv "$ROOT_DIR/platforms/projects" "$ROOT_DIR/_install/projects"
 
 ################################################################################
 # copy to _install
@@ -143,6 +153,11 @@ mv "$ROOT_DIR/_install/samples" "$ROOT_DIR/samples"
 # tools
 mv "$ROOT_DIR/_install/tools" "$ROOT_DIR/tools"
 mv "$ROOT_DIR/3rdparty/linter" "$ROOT_DIR/tools/linter"
+
+# platforms/win
+mv "$ROOT_DIR/_install/README.txt" "$ROOT_DIR/platforms/win"
+
+mv "$ROOT_DIR/_install/projects" "$ROOT_DIR/platforms/projects"
 
 ################################################################################
 # clean build
