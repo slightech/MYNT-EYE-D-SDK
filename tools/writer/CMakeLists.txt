@@ -34,7 +34,7 @@ set(MYNTEYE_DLL_SEARCH_PATHS
 ## device_writer
 
 add_library(device_writer STATIC device_writer.cc)
-target_link_libraries(device_writer mynteye_core ${OpenCV_LIBS})
+target_link_libraries(device_writer mynteye_depth ${OpenCV_LIBS})
 
 ## device_info_writer
 

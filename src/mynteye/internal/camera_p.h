@@ -151,9 +151,12 @@ class CameraPrivate {
     return channels_;
   }
 
-  inline StreamMode GetStreamMode() { return stream_mode_; }
+  StreamMode GetStreamMode() { return stream_mode_; }
+
+  void EnableImuProcessMode(const ProcessMode &mode);
 
  private:
+  void Init();
   void OnInit();
   void OnPreWait();
   void OnPostWait();
@@ -185,20 +188,20 @@ class CameraPrivate {
 
   PETRONDI_STREAM_INFO stream_color_info_ptr_;
   PETRONDI_STREAM_INFO stream_depth_info_ptr_;
-  int color_res_index_;
-  int depth_res_index_;
-  int framerate_;
+  int color_res_index_ = 0;
+  int depth_res_index_ = 0;
+  int framerate_ = 0;
   std::unique_ptr<Rate> rate_;
 
-  std::int32_t stream_info_dev_index_;
+  std::int32_t stream_info_dev_index_ = -1;
 
-  int color_serial_number_;
-  int depth_serial_number_;
-  image_size_t color_image_size_;
-  image_size_t depth_image_size_;
-  Image::pointer color_image_buf_;
-  Image::pointer depth_image_buf_;
-  unsigned char* depth_buf_;
+  int color_serial_number_ = 0;
+  int depth_serial_number_ = 0;
+  image_size_t color_image_size_ = 0;
+  image_size_t depth_image_size_ = 0;
+  Image::pointer color_image_buf_ = nullptr;
+  Image::pointer depth_image_buf_ = nullptr;
+  unsigned char* depth_buf_ = nullptr;
 
 #ifdef MYNTEYE_OS_WIN
   std::mutex mtx_imgs_;
@@ -233,10 +236,10 @@ class CameraPrivate {
   stream_datas_t left_color_data_;
   stream_datas_t right_color_data_;
   stream_datas_t depth_data_;
-  bool is_capture_image_;
-  bool is_imu_open_;
+  bool is_capture_image_ = false;
+  bool is_imu_open_ = false;
 
-  bool is_start_;
+  bool is_start_ = false;
 
   std::map<ImageType, bool> is_enable_image_;
   StreamMode stream_mode_;
@@ -247,6 +250,8 @@ class CameraPrivate {
   std::shared_ptr<MotionIntrinsics> motion_intrinsics_;
   std::shared_ptr<Extrinsics> motion_from_extrinsics_;
   std::size_t motion_count_ = 0;
+
+  std::map<ProcessMode, bool> is_process_mode_;
 };
 
 MYNTEYE_END_NAMESPACE
