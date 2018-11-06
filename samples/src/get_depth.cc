@@ -17,6 +17,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include "mynteye/camera.h"
+#include "mynteye/utils.h"
 
 #include "util/cam_utils.h"
 #include "util/counter.h"
