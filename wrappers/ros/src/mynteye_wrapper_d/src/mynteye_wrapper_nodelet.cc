@@ -92,12 +92,6 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
   std::string dashes;
 
-  ros::Time timeBeginPointOnRos;
-
-  std::uint32_t timeBeginPointOnDevice;
-
-  bool isImuTimeInited;
-
  public:
   MYNTEYEWrapperNodelet() : dashes(std::string(30, '-')) {
   }
@@ -291,6 +285,20 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     pub_temp.publish(msg);
   }
 
+  ros::Time hardTimeToSoftTime(double _hard_time) {
+    static bool isInited = false;
+    static double soft_time_begin(0), hard_time_begin(0);
+
+    if (false == isInited) {
+      soft_time_begin = ros::Time::now().toSec();
+      hard_time_begin = _hard_time;
+      isInited = true;
+    }
+
+    return ros::Time(
+        soft_time_begin + (_hard_time - hard_time_begin) * 0.00001f);
+  }
+
   void device_poll() {
     // Main loop
     mynteye->SetImageMode(mynteye::ImageMode::IMAGE_RAW);
@@ -305,123 +313,115 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     cv::Mat color_left, mono_left, color_right, mono_right, depth;
     ros::Rate loop_rate(params.framerate);
     while (nh_ns.ok()) {
-      // printf("1\n");
       // Check for subscribers
       int color_Right_SubNumber = pub_color_right.getNumSubscribers();
       int mono_Right_SubNumber = pub_mono_right.getNumSubscribers();
-      int color_Left_SubNumber = pub_color_left.getNumSubscribers();
+      int color_Left_SubNumber = 1;//pub_color_left.getNumSubscribers();
       int mono_Left_SubNumber = pub_mono_left.getNumSubscribers();
       int depth_SubNumber = pub_depth.getNumSubscribers();
       int points_SubNumber = pub_points.getNumSubscribers();
-      int imu_SubNumber = pub_imu.getNumSubscribers();
+      int imu_SubNumber = 1;//pub_imu.getNumSubscribers();
       int temp_SubNumber = pub_temp.getNumSubscribers();
 
       bool img_Sub = (mono_Right_SubNumber + mono_Left_SubNumber +
         color_Left_SubNumber + color_Right_SubNumber +
         depth_SubNumber + points_SubNumber) > 0;
       bool imu_Sub = (imu_SubNumber + temp_SubNumber) > 0;
-      if (img_Sub || imu_Sub) {
-        // printf("2\n");
-        // publish points, the depth mode must be DEPTH_RAW.
-        bool points_subscribed = (points_SubNumber > 0) && (depth_mode == 0);
+      
+      // publish points, the depth mode must be DEPTH_RAW.
+      bool points_subscribed = (points_SubNumber > 0) && (depth_mode == 0);
 
-        ros::Time t = ros::Time::now();
+      bool color_right_ok = false;
+      bool mono_right_ok = false;
+      ros::Time rightTimeStamp;
+      if (color_Right_SubNumber > 0
+          || points_subscribed
+          || mono_Right_SubNumber > 0) {
+        auto image_color = mynteye->RetrieveImage(
+            mynteye::ImageType::IMAGE_RIGHT_COLOR);
+        if (image_color.img) {
+          rightTimeStamp = hardTimeToSoftTime(image_color.img_info -> timestamp);
 
-        bool color_right_ok = false;
-        bool mono_right_ok = false;
-        if (color_Right_SubNumber > 0
-            || points_subscribed
-            || mono_Right_SubNumber > 0) {
-          auto image_color = mynteye->RetrieveImage(
-              mynteye::ImageType::IMAGE_RIGHT_COLOR);
-          if (image_color.img) {
-            static std::size_t count = 0;
-            ++count;
-            if (color_Right_SubNumber > 0) {
-              color_right_ok = true;
-              publishColor(color_frame_right_id, pub_color_right,
-                image_color.img, t, &color_right, count);
-            }
-            if (mono_Right_SubNumber > 0) {
-              mono_right_ok = true;
-              publishMono(mono_frame_right_id, pub_mono_right,
-                image_color.img, t, &mono_right, count);
-            }
+          static std::size_t count = 0;
+          ++count;
+          if (color_Right_SubNumber > 0) {
+            color_right_ok = true;
+            publishColor(color_frame_right_id, pub_color_right,
+              image_color.img, rightTimeStamp, &color_right, count);
           }
-        }
-
-        bool color_left_ok = false;
-        bool mono_left_ok = false;
-        if (color_Left_SubNumber > 0
-            || points_subscribed
-            || mono_Left_SubNumber > 0) {
-          auto image_color = mynteye->RetrieveImage(
-              mynteye::ImageType::IMAGE_LEFT_COLOR);
-          if (image_color.img) {
-            static std::size_t count = 0;
-            ++count;
-            if (color_Left_SubNumber > 0 || points_subscribed) {
-              color_left_ok = true;
-              publishColor(color_frame_left_id, pub_color_left,
-                image_color.img, t, &color_left, count);
-            }
-            if (mono_Left_SubNumber > 0) {
-              mono_left_ok = true;
-              publishMono(mono_frame_left_id, pub_mono_left,
-                image_color.img, t, &mono_left, count);
-            }
-          }
-        }
-
-        bool depth_ok = false;
-        if (depth_SubNumber > 0 || points_subscribed) {
-          auto image_depth = mynteye->RetrieveImage(
-              mynteye::ImageType::IMAGE_DEPTH);
-          if (image_depth.img) {
-            depth_ok = true;
-            publishDepth(image_depth.img, t, &depth);
-          }
-        }
-
-        // after update (89ced6e) and get the new hardware camera ,
-        // depth data back to normal , so focus this problem later on.
-        if (points_subscribed && color_left_ok && depth_ok) {
-          pointcloud_generator->Push(color_left, depth, t);
-        }
-
-        if (imu_Sub) {
-          // NODELET_INFO_STREAM("Retrieve motions");
-          auto motion_datas = mynteye->RetrieveMotions();
-          if (motion_datas.size() > 0) {
-            for (auto data : motion_datas) {
-              ros::Time tImg = timeBeginPointOnRos;
-              if (isImuTimeInited) {
-                tImg += ros::Duration(
-                  (data.imu->timestamp - timeBeginPointOnDevice)/100000,
-                  (data.imu->timestamp - timeBeginPointOnDevice)%100000*10000);
-              } else {
-                isImuTimeInited = true;
-                timeBeginPointOnDevice = data.imu->timestamp;
-                timeBeginPointOnRos = ros::Time::now();
-              }
-              if (data.imu) {
-                if (data.imu->flag == 1) {  // accelerometer
-                  imu_accel = data.imu;
-                  publishImu(tImg, temp_SubNumber > 0);
-                } else if (data.imu->flag == 2) {  // gyroscope
-                  imu_gyro = data.imu;
-                  publishImu(tImg, temp_SubNumber > 0);
-                } else {
-                  NODELET_WARN_STREAM("Imu type is unknown");
-                }
-              } else {
-                NODELET_WARN_STREAM("Motion data is empty");
-              }
-            }
+          if (mono_Right_SubNumber > 0) {
+            mono_right_ok = true;
+            publishMono(mono_frame_right_id, pub_mono_right,
+              image_color.img, rightTimeStamp, &mono_right, count);
           }
         }
       }
-      if (img_Sub) loop_rate.sleep();
+
+      bool color_left_ok = false;
+      bool mono_left_ok = false;
+      bool left_get_ok = false;
+      ros::Time leftTimeStamp;
+      if (color_Left_SubNumber > 0
+          || points_subscribed
+          || mono_Left_SubNumber > 0
+          || depth_SubNumber > 0) {
+        auto image_color = mynteye->RetrieveImage(
+            mynteye::ImageType::IMAGE_LEFT_COLOR);
+        if (image_color.img) {
+          left_get_ok = true;
+          leftTimeStamp = hardTimeToSoftTime(image_color.img_info -> timestamp);
+          static std::size_t count = 0;
+          ++count;
+          if (color_Left_SubNumber > 0 || points_subscribed) {
+            color_left_ok = true;
+            publishColor(color_frame_left_id, pub_color_left,
+              image_color.img, leftTimeStamp, &color_left, count);
+          }
+          if (mono_Left_SubNumber > 0) {
+            mono_left_ok = true;
+            publishMono(mono_frame_left_id, pub_mono_left,
+              image_color.img, leftTimeStamp, &mono_left, count);
+          }
+        }
+      }
+
+      bool depth_ok = false;
+      if (depth_SubNumber > 0 || points_subscribed) {
+        auto image_depth = mynteye->RetrieveImage(
+            mynteye::ImageType::IMAGE_DEPTH);
+        if (image_depth.img) {
+          if (left_get_ok) {
+            depth_ok = true;
+            publishDepth(image_depth.img, leftTimeStamp, &depth);
+          }
+        }
+      }
+
+      if (points_subscribed && color_left_ok && depth_ok) {
+        pointcloud_generator->Push(color_left, depth, leftTimeStamp);
+      }
+
+      // NODELET_INFO_STREAM("Retrieve motions");
+      auto motion_datas = mynteye->RetrieveMotions();
+      if (motion_datas.size() > 0) {
+        for (auto data : motion_datas) {
+          ros::Time stamp = hardTimeToSoftTime(data.imu->timestamp);
+          if (data.imu) {
+            if (data.imu->flag == 1) {  // accelerometer
+              imu_accel = data.imu;
+              publishImu(stamp, temp_SubNumber > 0);
+            } else if (data.imu->flag == 2) {  // gyroscope
+              imu_gyro = data.imu;
+              publishImu(stamp, temp_SubNumber > 0);
+            } else {
+              NODELET_WARN_STREAM("Imu type is unknown");
+            }
+          } else {
+            NODELET_WARN_STREAM("Motion data is empty");
+          }
+        }
+      }
+      loop_rate.sleep();
     }
 
     mynteye.reset();
@@ -442,7 +442,6 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     state_awb = true;
     ir_intensity = 0;
     gravity = 9.8;
-    isImuTimeInited = false;
     std::uint32_t timeBeginPointOnDevice = 0;
 
     nh_ns.getParam("dev_index", dev_index);
