@@ -13,7 +13,7 @@
 # limitations under the License.
 cmake_minimum_required(VERSION 3.0)
 
-project(mynteye_samples)
+project(mynteye_samples VERSION 1.3.6 LANGUAGES C CXX)
 
 get_filename_component(PRO_DIR ${PROJECT_SOURCE_DIR} DIRECTORY)
 

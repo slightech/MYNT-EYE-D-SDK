@@ -165,6 +165,12 @@ enum class Info : std::uint8_t {
   LAST
 };
 
+enum class ProcessMode : std::uint8_t {
+  ASSEMBLY,
+  WARM_DRIFT,
+  ALL
+};
+
 struct MYNTEYE_API CameraCtrlRectLogData {
 	union {
 		unsigned char uByteArray[1024];/**< union data defined as below struct { }*/

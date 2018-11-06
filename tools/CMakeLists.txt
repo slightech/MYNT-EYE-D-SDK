@@ -13,7 +13,7 @@
 # limitations under the License.
 cmake_minimum_required(VERSION 3.0)
 
-project(mynteye_tools VERSION 2.0.0 LANGUAGES C CXX)
+project(mynteye_tools VERSION 1.3.6 LANGUAGES C CXX)
 
 get_filename_component(PRO_DIR ${PROJECT_SOURCE_DIR} DIRECTORY)
 
@@ -73,10 +73,7 @@ set(OUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/_output")
 # tools
 
 include_directories(
-  #${PRO_DIR}/src
-  #${PRO_DIR}/include
   ${CMAKE_CURRENT_SOURCE_DIR}
-  #${OpenCV_INCLUDE_DIRS}
 )
 
 # dataset

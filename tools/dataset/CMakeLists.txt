@@ -23,6 +23,7 @@ set_outdir(
 include_directories(
   ${PRO_DIR}/src
 )
+
 ## record
 
 make_executable(record

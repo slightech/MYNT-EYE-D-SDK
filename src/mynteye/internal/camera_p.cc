@@ -79,26 +79,14 @@ void compensate_imu(double temp) {
 }  // namespace
 
 CameraPrivate::CameraPrivate()
-  : etron_di_(nullptr),
-    dev_sel_info_({-1}),
-    color_res_index_(0),
-    depth_res_index_(0),
-    framerate_(10),
-    rate_(nullptr),
-    stream_info_dev_index_(-1),
-    color_serial_number_(0),
-    depth_serial_number_(0),
-    color_image_size_(0),
-    depth_image_size_(0),
-    color_image_buf_(nullptr),
-    depth_image_buf_(nullptr),
-    depth_buf_(nullptr),
-    is_capture_image_(false),
-    is_imu_open_(false),
-    is_start_(false) {
-
+  : etron_di_(nullptr), dev_sel_info_({-1}), rate_(nullptr) {
   DBG_LOGD(__func__);
 
+  Init();
+  ReadAllInfos();
+}
+
+void CameraPrivate::Init() {
   int ret = EtronDI_Init(&etron_di_, false);
   DBG_LOGI("MYNTEYE Init: %d", ret);
   UNUSED(ret);
@@ -107,15 +95,23 @@ CameraPrivate::CameraPrivate()
       (PETRONDI_STREAM_INFO)malloc(sizeof(ETRONDI_STREAM_INFO)*64);
   stream_depth_info_ptr_ =
       (PETRONDI_STREAM_INFO)malloc(sizeof(ETRONDI_STREAM_INFO)*64);
+  // default image type
   depth_data_type_ = 9;
+  // default frame rate
+  framerate_ = 10;
+
   OnInit();
-  is_enable_image_[ImageType::IMAGE_LEFT_COLOR] = false;
-  is_enable_image_[ImageType::IMAGE_RIGHT_COLOR] = false;
-  is_enable_image_[ImageType::IMAGE_DEPTH] = false;
+
+  is_enable_image_ = {{ImageType::IMAGE_LEFT_COLOR, false},
+                      {ImageType::IMAGE_RIGHT_COLOR, false},
+                      {ImageType::IMAGE_DEPTH, false}};
+
+  is_process_mode_ = {{ProcessMode::ASSEMBLY, false},
+                      {ProcessMode::WARM_DRIFT, false},
+                      {ProcessMode::ALL, false}};
 
   channels_ = std::make_shared<Channels>();
   channels_->Open();
-  ReadAllInfos();
 }
 
 CameraPrivate::~CameraPrivate() {
@@ -1113,8 +1109,8 @@ void CameraPrivate::ReadAllInfos() {
   if (imu_params.ok) {
     SetMotionIntrinsics({imu_params.in_accel, imu_params.in_gyro});
     SetMotionExtrinsics(imu_params.ex_left_to_imu);
-    std::cout << GetMotionIntrinsics() << std::endl;
-    std::cout << GetMotionExtrinsics() << std::endl;
+    // std::cout << GetMotionIntrinsics() << std::endl;
+    // std::cout << GetMotionExtrinsics() << std::endl;
   } else {
     LOGE("%s %d:: Motion intrinsics & extrinsics not exist",
         __FILE__, __LINE__);
@@ -1182,4 +1178,12 @@ void CameraPrivate::SetMotionExtrinsics(const Extrinsics &ex) {
     motion_from_extrinsics_ = std::make_shared<Extrinsics>();
   }
   *motion_from_extrinsics_ = ex;
+}
+
+void EnableImuProcessMode(const ProcessMode &mode) {
+  switch (mode) {
+    case ProcessMode::ASSEMBLY: break;
+    case ProcessMode::WARM_DRIFT: break;
+    case ProcessMode::ALL: break;
+  }
 }
