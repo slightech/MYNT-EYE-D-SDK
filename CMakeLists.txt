@@ -102,9 +102,9 @@ include_directories(
 
 add_definitions(-DMYNTEYE_EXPORTS)
 
-## mynteye_core
+## mynteye_depth
 
-set(MYNTEYE_CORE ${MYNTEYE_NAME}_core)
+set(MYNTEYE_DEPTH ${MYNTEYE_NAME}_depth)
 
 if(OS_WIN)
   set(DEVICE_SRC "src/mynteye/internal/hid_windows.cc")
@@ -114,7 +114,7 @@ else()
   set(DEVICE_SRC "src/mynteye/internal/hid_linux.cc")
 endif()
 
-set(MYNTEYE_CORE_SRCS
+set(MYNTEYE_DEPTH_SRCS
   src/mynteye/camera.cc
   src/mynteye/image.cc
   src/mynteye/device_info.cc
@@ -130,7 +130,7 @@ set(MYNTEYE_CORE_SRCS
   src/mynteye/util/strings.cc
   ${DEVICE_SRC}
 )
-#file(GLOB_RECURSE MYNTEYE_CORE_SRCS "src/mynteye/*.cc")
+#file(GLOB_RECURSE MYNTEYE_DEPTH_SRCS "src/mynteye/*.cc")
 
 if(OS_WIN)
   set(MYNTEYE_LINK_LIBS ${eSPDI_LIBS})
@@ -145,17 +145,17 @@ if(WITH_JPEG)
   list(APPEND MYNTEYE_LINK_LIBS ${JPEG_LIBRARIES})
 endif()
 
-make_shared_library(${MYNTEYE_CORE}
-  SRCS ${MYNTEYE_CORE_SRCS}
+make_shared_library(${MYNTEYE_DEPTH}
+  SRCS ${MYNTEYE_DEPTH_SRCS}
   LINK_LIBS ${MYNTEYE_LINK_LIBS}
 )
 
-target_include_directories(${MYNTEYE_CORE} PUBLIC
+target_include_directories(${MYNTEYE_DEPTH} PUBLIC
   "$<BUILD_INTERFACE:${MYNTEYE_ROOT}/src>"
   "$<INSTALL_INTERFACE:include>"
 )
 
-set_target_properties(${MYNTEYE_CORE} PROPERTIES
+set_target_properties(${MYNTEYE_DEPTH} PROPERTIES
   VERSION ${PROJECT_VERSION}
   SOVERSION ${PROJECT_VERSION_MAJOR}
 )
@@ -262,7 +262,7 @@ install(DIRECTORY "${__3rdparty_out_dir}"
   FILES_MATCHING PATTERN "*.so*" PATTERN "*.dll" PATTERN "*.dylib"
 )
 
-install(TARGETS ${MYNTEYE_CORE}
+install(TARGETS ${MYNTEYE_DEPTH}
   EXPORT mynteye-targets
   ARCHIVE DESTINATION ${MYNTEYE_CMAKE_LIBDIR}
   LIBRARY DESTINATION ${MYNTEYE_CMAKE_LIBDIR}
