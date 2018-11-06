@@ -24,6 +24,6 @@ set_outdir(
 
 make_executable(record
   SRCS record.cc dataset.cc
-  LINK_LIBS  mynteye_core ${OpenCV_LIBS}
+  LINK_LIBS  mynteye_depth ${OpenCV_LIBS}
   DLL_SEARCH_PATHS ${PRO_DIR}/_install/bin ${MYNTEYE_DLL_SEARCH_PATHS}
 )

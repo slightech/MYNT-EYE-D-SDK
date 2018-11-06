@@ -59,20 +59,61 @@ make samples tools
 ################################################################################
 # move to _install
 
+# 3rdparty/opencv
+_md "$ROOT_DIR/_install/3rdparty"
+mv "$ROOT_DIR/3rdparty/opencv" "$ROOT_DIR/_install/3rdparty/opencv"
+
+# samples
+mv "$ROOT_DIR/samples/_output/bin" "$ROOT_DIR/_install/bin/samples"
+mv "$ROOT_DIR/samples/_output/lib" "$ROOT_DIR/_install/lib/samples"
+_rm "$ROOT_DIR/samples/_build"
+_rm "$ROOT_DIR/samples/_output"
+mv "$ROOT_DIR/samples" "$ROOT_DIR/_install/samples"
+
+# tools
+mv "$ROOT_DIR/tools/_output/bin" "$ROOT_DIR/_install/bin/tools"
+mv "$ROOT_DIR/tools/_output/lib" "$ROOT_DIR/_install/lib/tools"
+_rm "$ROOT_DIR/tools/_build"
+_rm "$ROOT_DIR/tools/_output"
+mv "$ROOT_DIR/tools/linter" "$ROOT_DIR/3rdparty/linter"
+mv "$ROOT_DIR/tools" "$ROOT_DIR/_install/tools"
+
 ################################################################################
 # copy to _install
+
+# 3rdparty/libjpeg-turbo64
+_md "$ROOT_DIR/_install/bin/3rdparty"
+cp -f "$ROOT_DIR/3rdparty/libjpeg-turbo64/bin/jpeg62.dll" "$ROOT_DIR/_install/bin/3rdparty"
+cp -f "$ROOT_DIR/3rdparty/libjpeg-turbo64/bin/turbojpeg.dll" "$ROOT_DIR/_install/bin/3rdparty"
+
+# cmake
+_md "$ROOT_DIR/_install/cmake"
+cp -f "$ROOT_DIR/cmake/Common.cmake" "$ROOT_DIR/_install/cmake"
+cp -f "$ROOT_DIR/cmake/DetectCXX11.cmake" "$ROOT_DIR/_install/cmake"
+cp -f "$ROOT_DIR/cmake/DetectOpenCV.cmake" "$ROOT_DIR/_install/cmake"
+cp -f "$ROOT_DIR/cmake/IncludeGuard.cmake" "$ROOT_DIR/_install/cmake"
+cp -f "$ROOT_DIR/cmake/TargetArch.cmake" "$ROOT_DIR/_install/cmake"
+_md "$ROOT_DIR/_install/cmake/templates"
+cp -f "$ROOT_DIR/cmake/templates/exe.bat.in" "$ROOT_DIR/_install/cmake/templates"
+
+cp -f "$ROOT_DIR/scripts/win/cmake/mynteye-targets.cmake" "$ROOT_DIR/_install/lib/cmake/mynteye/"
+cp -f "$ROOT_DIR/scripts/win/cmake/mynteye-targets-release.cmake" "$ROOT_DIR/_install/lib/cmake/mynteye/"
+
+# generate.bat
+cp -f "$ROOT_DIR/scripts/win/generate.bat" "$ROOT_DIR/_install/samples/"
+cp -f "$ROOT_DIR/scripts/win/generate.bat" "$ROOT_DIR/_install/tools/"
 
 ################################################################################
 # archive exe
 
 source "$ROOT_DIR/ocvinfo.sh"
 _pkgname="$1-opencv-$OpenCV_VERSION"
-_echo_i "pkgname: $_pkgname"
+# _echo_i "pkgname: $_pkgname"
 
 _rm "$ROOT_DIR/$_pkgname.exe"
 mv "$ROOT_DIR/_install" "$ROOT_DIR/$_pkgname"
 
-# makensis "$ROOT_DIR/winpack.nsi"
+makensis "$ROOT_DIR/winpack.nsi"
 
 if _detect_cmd git; then
   _git_branch=`git symbolic-ref --short -q HEAD`
@@ -87,8 +128,21 @@ mv "$ROOT_DIR/$_pkgname" "$ROOT_DIR/_install"
 ################################################################################
 # remove from _install
 
+_rm "$ROOT_DIR/_install/samples/generate.bat"
+_rm "$ROOT_DIR/_install/tools/generate.bat"
+
 ################################################################################
 # move back from _install
+
+# 3rdparty/opencv
+mv "$ROOT_DIR/_install/3rdparty/opencv" "$ROOT_DIR/3rdparty/opencv"
+
+# samples
+mv "$ROOT_DIR/_install/samples" "$ROOT_DIR/samples"
+
+# tools
+mv "$ROOT_DIR/_install/tools" "$ROOT_DIR/tools"
+mv "$ROOT_DIR/3rdparty/linter" "$ROOT_DIR/tools/linter"
 
 ################################################################################
 # clean build
