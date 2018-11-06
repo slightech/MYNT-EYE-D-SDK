@@ -11,23 +11,24 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#include "util/cam_utils.h"
+#ifndef MYNTEYE_UTILS_H_
+#define MYNTEYE_UTILS_H_
+#pragma once
 
-#include <iostream>
+#include "mynteye/camera.h"
 
-namespace mynteye {
+MYNTEYE_BEGIN_NAMESPACE
+
 namespace util {
 
-std::shared_ptr<std::ios> new_format(int width, int prec, char fillch) {
-  auto fmt = std::make_shared<std::ios>(nullptr);
-  fmt->setf(std::ios::fixed);
-  if (width > 0)
-    fmt->width(std::move(width));
-  if (prec > 0)
-    fmt->precision(std::move(prec));
-  fmt->fill(std::move(fillch));
-  return fmt;
-}
+MYNTEYE_API
+bool select(const Camera& cam, DeviceInfo* info);
+
+MYNTEYE_API
+void print_stream_infos(const Camera& cam, const std::int32_t& dev_index);
 
 }  // namespace util
-}  // namespace mynteye
+
+MYNTEYE_END_NAMESPACE
+
+#endif  // MYNTEYE_UTILS_H_

@@ -17,73 +17,23 @@
 #include <opencv2/highgui/highgui.hpp>
 
 #include "mynteye/camera.h"
-#include "dataset/dataset.h"
+#include "mynteye/utils.h"
 #include "mynteye/util/times.h"
+
+#include "dataset/dataset.h"
 
 MYNTEYE_USE_NAMESPACE
 
 int main(int argc, char const *argv[]) {
-  std::string dashes(80, '-');
-
   mynteye::Camera cam;
-
   mynteye::DeviceInfo dev_info;
-  {
-    std::vector<mynteye::DeviceInfo> dev_infos = cam.GetDevices();
-    size_t n = dev_infos.size();
-    if (n <= 0) {
-      std::cerr << "Error: Device not found" << std::endl;
-      return 1;
-    }
-
-    std::cout << dashes << std::endl;
-    std::cout << "Index | Device Information" << std::endl;
-    std::cout << dashes << std::endl;
-    for (auto &&info : dev_infos) {
-      std::cout << std::setw(5) << info.index << " | " << info << std::endl;
-    }
-    std::cout << dashes << std::endl;
-
-    if (n <= 2) {
-      dev_info = dev_infos[0];
-      std::cout << "Auto select a device to open, index: 0"<< std::endl;
-    } else {
-      size_t i;
-      std::cout << "Please select a device to open, index: ";
-      std::cin >> i;
-      std::cout << std::endl;
-      if (i >= n) {
-        std::cerr << "Error: Index out of range" << std::endl;
-        return 1;
-      }
-      dev_info = dev_infos[i];
-    }
+  if (!mynteye::util::select(cam, &dev_info)) {
+    return 1;
   }
-
-  {
-    std::vector<mynteye::StreamInfo> color_infos;
-    std::vector<mynteye::StreamInfo> depth_infos;
-    cam.GetResolutions(dev_info.index, &color_infos, &depth_infos);
-
-    std::cout << dashes << std::endl;
-    std::cout << "Index | Color Stream Information" << std::endl;
-    std::cout << dashes << std::endl;
-    for (auto &&info : color_infos) {
-      std::cout << std::setw(5) << info.index << " | " << info << std::endl;
-    }
-    std::cout << dashes << std::endl << std::endl;
-
-    std::cout << dashes << std::endl;
-    std::cout << "Index | Depth Stream Information" << std::endl;
-    std::cout << dashes << std::endl;
-    for (auto &&info : depth_infos) {
-      std::cout << std::setw(5) << info.index << " | " << info << std::endl;
-    }
-    std::cout << dashes << std::endl << std::endl;
-  }
+  mynteye::util::print_stream_infos(cam, dev_info.index);
 
   std::cout << "Open device: " << dev_info.index << ", "
-    << dev_info.name << std::endl << std::endl;
+      << dev_info.name << std::endl << std::endl;
 
   // Warning: Color stream format MJPG doesn't work.
   mynteye::InitParams params(dev_info.index);

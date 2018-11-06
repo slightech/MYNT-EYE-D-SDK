@@ -20,14 +20,8 @@
 #include <memory>
 #include <utility>
 
-#include "mynteye/camera.h"
-
 namespace mynteye {
 namespace util {
-
-bool select(const Camera& cam, DeviceInfo* info);
-
-void print_stream_infos(const Camera& cam, const std::int32_t& dev_index);
 
 inline
 std::ostringstream& clear(std::ostringstream& os) {

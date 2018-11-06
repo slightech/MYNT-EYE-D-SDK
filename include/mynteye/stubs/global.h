@@ -87,6 +87,9 @@
 #define MYNTEYE_LANG_CXX11 1
 #endif
 
+#define MYNTEYE_STRINGIFY_HELPER(X) #X
+#define MYNTEYE_STRINGIFY(X) MYNTEYE_STRINGIFY_HELPER(X)
+
 #define MYNTEYE_DISABLE_COPY(Class) \
   Class(const Class&) = delete; \
   Class& operator=(const Class&) = delete;
