@@ -309,11 +309,9 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       return;
     }
     NODELET_INFO_STREAM("Open camera success");
-
     std::size_t imu_count = 0;
     std::size_t img_count = 0;
     cv::Mat color_left, mono_left, color_right, mono_right, depth_mat;
-    ros::Rate loop_rate(params.framerate);
     while (nh_ns.ok()) {
       // Check for subscribers
       int color_Right_SubNumber = pub_color_right.getNumSubscribers();
@@ -329,10 +327,8 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
         color_Left_SubNumber + color_Right_SubNumber +
         depth_SubNumber + points_SubNumber) > 0;
       bool imu_Sub = (imu_SubNumber + temp_SubNumber) > 0;
-
       // publish points, the depth mode must be DEPTH_RAW.
       bool points_subscribed = (points_SubNumber > 0) && (depth_mode == 0);
-      //For frame [mynteye_points_frame]: No transform to fixed frame [mynteye_link_frame].  TF error: [Lookup would require extrapolation into the future.  Requested time 1541497747.729968071 but the latest data is at time 1541497746.181709490, when looking up transform from frame [mynteye_points_frame] to frame [mynteye_link_frame]]
       auto &&left_color = mynteye->RetrieveImages(
         mynteye::ImageType::IMAGE_LEFT_COLOR);
       auto &&right_color = mynteye->RetrieveImages(
@@ -345,76 +341,73 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       imu_count += motion_datas.size();
 
       {
-        if (img_Sub) {
-          bool color_left_ok = false;
-          ros::Time leftTimeStamp;
+        bool color_left_ok = false;
+        ros::Time leftTimeStamp;
+        if (color_Left_SubNumber > 0
+            || points_subscribed
+            || mono_Left_SubNumber > 0
+            || depth_SubNumber > 0) {
           for (auto &&left : left_color) {
-            if (color_Left_SubNumber > 0
-              || points_subscribed
-              || mono_Left_SubNumber > 0
-              || depth_SubNumber > 0) {
-              if (left.img) {
-                color_left_ok = true;
-                leftTimeStamp = hardTimeToSoftTime(left.img_info -> timestamp);
+            if (left.img) {
+              color_left_ok = true;
+              leftTimeStamp = hardTimeToSoftTime(left.img_info -> timestamp);
 
-                static std::size_t count = 0;
-                ++count;
-                if (color_Left_SubNumber > 0) {
-                  publishColor(color_frame_left_id, pub_color_left,
-                    left.img, leftTimeStamp, &color_left, count);
-                }
-                if (mono_Left_SubNumber > 0) {
-                  publishMono(color_frame_left_id, pub_mono_left,
-                    left.img, leftTimeStamp, &mono_left, count);
-                }
-              } else {
-                static int k_l = 0;
-                std:: cout << "left.img == nullptr count: "
-                          << k_l++ << std::endl;
+              static std::size_t count = 0;
+              ++count;
+              if (color_Left_SubNumber > 0) {
+                publishColor(color_frame_left_id, pub_color_left,
+                  left.img, leftTimeStamp, &color_left, count);
               }
-            }
-          }
-
-          bool depth_ok = false;
-          if (depth_SubNumber > 0 ||
-              points_subscribed && color_left_ok) {
-            for (auto &&depth : image_depth) {
-              depth_ok = true;
-              publishDepth(depth.img, leftTimeStamp, &depth_mat);
-            }
-          }
-
-          if (points_subscribed && color_left_ok && depth_ok) {
-            pointcloud_generator->Push(color_left, depth_mat, leftTimeStamp);
-          }
-
-          for (auto &&right : right_color) {
-            ros::Time rightTimeStamp;
-            if (color_Right_SubNumber > 0
-                || points_subscribed
-                || mono_Right_SubNumber > 0) {
-              if (right.img) {
-                rightTimeStamp = hardTimeToSoftTime(right.img_info -> timestamp);
-
-                static std::size_t count = 0;
-                ++count;
-                if (color_Right_SubNumber > 0) {
-                  publishColor(color_frame_right_id, pub_color_right,
-                    right.img, rightTimeStamp, &color_right, count);
-                }
-                if (mono_Right_SubNumber > 0) {
-                  publishMono(mono_frame_right_id, pub_mono_right,
-                    right.img, rightTimeStamp, &mono_right, count);
-                }
-              } else {
-                static int k_r = 0;
-                std:: cout << "right.img == nullptr count: "
-                          << k_r++ << std::endl;
+              if (mono_Left_SubNumber > 0) {
+                publishMono(color_frame_left_id, pub_mono_left,
+                  left.img, leftTimeStamp, &mono_left, count);
               }
+            } else {
+              static int k_l = 0;
+              std:: cout << "left.img == nullptr count: "
+                        << k_l++ << std::endl;
             }
           }
         }
-        
+
+        bool depth_ok = false;
+        if (depth_SubNumber > 0 ||
+            points_subscribed && color_left_ok) {
+          for (auto &&depth : image_depth) {
+            depth_ok = true;
+            publishDepth(depth.img, leftTimeStamp, &depth_mat);
+          }
+        }
+
+        if (points_subscribed && color_left_ok && depth_ok) {
+          pointcloud_generator->Push(color_left, depth_mat, leftTimeStamp);
+        }
+
+        for (auto &&right : right_color) {
+          ros::Time rightTimeStamp;
+          if (color_Right_SubNumber > 0
+              || points_subscribed
+              || mono_Right_SubNumber > 0) {
+            if (right.img) {
+              rightTimeStamp = hardTimeToSoftTime(right.img_info -> timestamp);
+
+              static std::size_t count = 0;
+              ++count;
+              if (color_Right_SubNumber > 0) {
+                publishColor(color_frame_right_id, pub_color_right,
+                  right.img, rightTimeStamp, &color_right, count);
+              }
+              if (mono_Right_SubNumber > 0) {
+                publishMono(mono_frame_right_id, pub_mono_right,
+                  right.img, rightTimeStamp, &mono_right, count);
+              }
+            } else {
+              static int k_r = 0;
+              std:: cout << "right.img == nullptr count: "
+                        << k_r++ << std::endl;
+            }
+          }
+        }
         if (imu_Sub) {
           if (motion_datas.size() > 0) {
             for (auto data : motion_datas) {
@@ -436,7 +429,6 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
           }
         }
       }
-      if (img_Sub) loop_rate.sleep();
     }
 
     mynteye.reset();
