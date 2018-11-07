@@ -143,6 +143,9 @@ class MYNTEYE_API Camera {
   /** Get the extrinsics from left to motion. */
   Extrinsics GetMotionExtrinsics() const;
 
+  /** Set imu data process mode. */
+  void EnableImuProcessMode(const ProcessMode &mode);
+
  private:
   std::unique_ptr<CameraPrivate> p_;
 };

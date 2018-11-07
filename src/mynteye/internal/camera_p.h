@@ -252,6 +252,8 @@ class MYNTEYE_API CameraPrivate {
   std::size_t motion_count_ = 0;
 
   std::map<ProcessMode, bool> is_process_mode_;
+  void TempCompensate(std::shared_ptr<ImuData> data);
+  void ScaleAssemCompensate(std::shared_ptr<ImuData> data);
 };
 
 MYNTEYE_END_NAMESPACE

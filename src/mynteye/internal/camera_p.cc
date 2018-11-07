@@ -65,15 +65,26 @@ std::string get_stream_format_string(const StreamFormat& stream_format) {
   }
 }
 
-inline std::uint8_t check_sum(std::uint8_t *buf, std::uint8_t length) {
-  std::uint8_t crc8 = 0;
-  while (length--) {
-    crc8 = crc8 ^ (*buf++);
+void matrix_3x1(const double (*src1)[3], const double (*src2)[1],
+    double (*dst)[1]) {
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 1; j++) {
+      for (int k = 0; k < 3; k++) {
+        dst[i][j] += src1[i][k] * src2[k][j];
+      }
+    }
   }
-  return crc8;
 }
 
-void compensate_imu(double temp) {
+void matrix_3x3(const double (*src1)[3], const double (*src2)[3],
+    double (*dst)[3]) {
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 3; j++) {
+      for (int k = 0; k < 3; k++) {
+        dst[i][j] += src1[i][k] * src2[k][j];
+      }
+    }
+  }
 }
 
 }  // namespace
@@ -793,6 +804,15 @@ void CameraPrivate::ImuDataCallback(const ImuPacket &packet) {
       imu->Reset();
     }
 
+    if (is_process_mode_[ProcessMode::ASSEMBLY]) {
+      ScaleAssemCompensate(imu);
+    } else if (is_process_mode_[ProcessMode::WARM_DRIFT]) {
+      TempCompensate(imu);
+    } else if (is_process_mode_[ProcessMode::ALL]) {
+      ScaleAssemCompensate(imu);
+      TempCompensate(imu);
+    }
+
     ++motion_count_;
     if (motion_count_ > 20) {
       motion_data_t tmp = {imu};
@@ -1180,10 +1200,74 @@ void CameraPrivate::SetMotionExtrinsics(const Extrinsics &ex) {
   *motion_from_extrinsics_ = ex;
 }
 
-void EnableImuProcessMode(const ProcessMode &mode) {
+void CameraPrivate::EnableImuProcessMode(const ProcessMode &mode) {
   switch (mode) {
-    case ProcessMode::ASSEMBLY: break;
-    case ProcessMode::WARM_DRIFT: break;
-    case ProcessMode::ALL: break;
+    case ProcessMode::ASSEMBLY:
+      is_process_mode_[mode] = true;
+      break;
+    case ProcessMode::WARM_DRIFT:
+      is_process_mode_[mode] = true;
+      break;
+    case ProcessMode::ALL:
+      is_process_mode_[mode] = true;
+      break;
+    default:
+      break;
+  }
+}
+
+void CameraPrivate::TempCompensate(std::shared_ptr<ImuData> data) {
+  if (nullptr == motion_intrinsics_) {
+    return;
+  }
+
+  double temp = data->temperature;
+  if (data->flag == 1) {
+    data->accel[0] -= motion_intrinsics_->accel.x[1] * temp
+      + motion_intrinsics_->accel.x[0];
+    data->accel[1] -= motion_intrinsics_->accel.y[1] * temp
+      + motion_intrinsics_->accel.y[0];
+    data->accel[2] -= motion_intrinsics_->accel.z[1] * temp
+      + motion_intrinsics_->accel.z[0];
+  } else if (data->flag == 2) {
+    data->gyro[0] -= motion_intrinsics_->gyro.x[1] * temp
+      + motion_intrinsics_->gyro.x[0];
+    data->gyro[1] -= motion_intrinsics_->gyro.y[1] * temp
+      + motion_intrinsics_->gyro.y[0];
+    data->gyro[2] -= motion_intrinsics_->gyro.z[1] * temp
+      + motion_intrinsics_->gyro.z[0];
+  }
+}
+
+void CameraPrivate::ScaleAssemCompensate(std::shared_ptr<ImuData> data) {
+  if (nullptr == motion_intrinsics_) {
+    return;
+  }
+
+  double dst[3][3] = {0};
+  if (data->flag == 1) {
+    matrix_3x3(motion_intrinsics_->accel.scale,
+        motion_intrinsics_->accel.assembly, dst);
+    double s[3][1] = {0};
+    double d[3][1] = {0};
+    for (int i = 0; i < 3; i++) {
+      s[i][0] = data->accel[i];
+    }
+    matrix_3x1(dst, s, d);
+    for (int i = 0; i < 3; i++) {
+      data->accel[i] = d[i][0];
+    }
+  } else if (data->flag == 2) {
+    matrix_3x3(motion_intrinsics_->gyro.scale,
+        motion_intrinsics_->gyro.assembly, dst);
+    double s[3][1] = {0};
+    double d[3][1] = {0};
+    for (int i = 0; i < 3; i++) {
+      s[i][0] = data->gyro[i];
+    }
+    matrix_3x1(dst, s, d);
+    for (int i = 0; i < 3; i++) {
+      data->gyro[i] = d[i][0];
+    }
   }
 }

@@ -141,3 +141,7 @@ Extrinsics Camera::GetMotionExtrinsics() const {
 StreamMode Camera::GetStreamMode() {
   return p_->GetStreamMode();
 }
+
+void Camera::EnableImuProcessMode(const ProcessMode &mode) {
+  return p_->EnableImuProcessMode(mode);
+}

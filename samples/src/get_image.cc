@@ -44,6 +44,7 @@ int main(int argc, char const* argv[]) {
 
   // cam.SetImageMode(mynteye::ImageMode::IMAGE_RECTIFIED);
   cam.EnableImageType(mynteye::ImageType::ALL);
+  // cam.EnableImuProcessMode(mynteye::ProcessMode::ALL);
   cam.Open(params);
 
   std::cout << std::endl;
