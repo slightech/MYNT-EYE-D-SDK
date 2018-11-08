@@ -41,6 +41,7 @@ class MYNTEYE_API Channels {
   void SetImuCallback(imu_callback_t callback);
   void SetImgInfoCallback(img_callback_t callback);
   void Open();
+  void Close();
   void StartHidTracking();
   bool StopHidTracking();
   void DoHidTrack();
@@ -65,8 +66,8 @@ class MYNTEYE_API Channels {
  private:
   std::shared_ptr<hid::hid_device> device_;
 
-  bool is_hid_tracking_;
-  volatile bool hid_track_stop_;
+  bool is_hid_tracking_ = false;
+  volatile bool hid_track_stop_ = false;
   std::thread hid_track_thread_;
 
   imu_callback_t imu_callback_;
@@ -74,6 +75,8 @@ class MYNTEYE_API Channels {
 
   std::uint8_t req_count_ = 0;
   std::uint16_t package_sn_ = 0;
+
+  bool is_hid_open_ = false;
 };
 
 MYNTEYE_END_NAMESPACE

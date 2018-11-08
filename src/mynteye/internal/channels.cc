@@ -52,16 +52,20 @@ void CheckSpecVersion(const Version *spec_version) {
 
 } // namespace
 
-Channels::Channels() : is_hid_tracking_(false),
-  hid_track_stop_(false),
-  imu_callback_(nullptr),
-  img_callback_(nullptr),
-  req_count_(0) {
-    device_ = std::make_shared<hid::hid_device>();
+Channels::Channels() : imu_callback_(nullptr),
+  img_callback_(nullptr) {
+
+  device_ = std::make_shared<hid::hid_device>();
+  Open();
 }
 
 Channels::~Channels() {
-  StopHidTracking();
+  if (is_hid_tracking_) {
+    StopHidTracking();
+  }
+  if (is_hid_open_) {
+    Close();
+  }
 }
 
 void Channels::SetImuCallback(imu_callback_t callback) {
@@ -91,7 +95,6 @@ void Channels::DoHidTrack() {
 }
 
 void Channels::Open() {
-  is_hid_tracking_ = true;
   // open device
   if (device_->open(1, -1, -1) < 0) {
     if (device_->open(1, -1, -1) < 0) {
@@ -99,25 +102,16 @@ void Channels::Open() {
       return;
     }
   }
+  is_hid_open_ = true;
 }
 
 void Channels::StartHidTracking() {
-  if (!is_hid_tracking_) {
+  if (is_hid_tracking_) {
     LOGE("Error:: imu device was opened already.");
     return;
   }
 
-  /*
   is_hid_tracking_ = true;
-  // open device
-  if (device_->open(1, -1, -1) < 0) {
-    if (device_->open(1, -1, -1) < 0) {
-      LOGE("Error:: open imu device is failure.");
-      return;
-    }
-  }
-  */
-
   hid_track_thread_ = std::thread([this]() {
     while (!hid_track_stop_) {
       DoHidTrack();
@@ -176,6 +170,11 @@ bool Channels::StopHidTracking() {
   }
 
   return true;
+}
+
+void Channels::Close() {
+  device_->close(0);
+  is_hid_open_ = false;
 }
 
 namespace {

@@ -122,7 +122,6 @@ void CameraPrivate::Init() {
                       {ProcessMode::ALL, false}};
 
   channels_ = std::make_shared<Channels>();
-  channels_->Open();
 }
 
 CameraPrivate::~CameraPrivate() {
