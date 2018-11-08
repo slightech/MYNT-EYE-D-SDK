@@ -84,7 +84,7 @@ class MYNTEYEListener {
 };
 
 int main(int argc, char* argv[]) {
-  ros::init(argc, argv, "mynteye_listener");
+  ros::init(argc, argv, "mynteye_listener_d");
 
   MYNTEYEListener l;
 

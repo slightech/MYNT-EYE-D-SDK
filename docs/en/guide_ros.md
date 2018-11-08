@@ -44,5 +44,5 @@ roslaunch mynteye_wrapper_d mynteye.launch
 
 ```
 source ./wrappers/ros/devel/setup.bash
-rosrun mynteye_wrapper_d mynteye_listener
+rosrun mynteye_wrapper_d mynteye_listener_d
 ```

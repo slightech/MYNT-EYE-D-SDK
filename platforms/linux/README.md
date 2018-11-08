@@ -109,7 +109,7 @@ $ roslaunch mynteye_wrapper mynteye.launch
 
 ```
 $ source ./wrappers/ros/devel/setup.bash
-$ rosrun mynteye_wrapper mynteye_listener
+$ rosrun mynteye_wrapper mynteye_listener_d
 ```
 
 ## Clean All

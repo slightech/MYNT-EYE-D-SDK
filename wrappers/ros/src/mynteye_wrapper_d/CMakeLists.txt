@@ -82,8 +82,8 @@ add_dependencies(mynteye_wrapper_d ${PROJECT_NAME}_generate_messages_cpp)
 add_executable(mynteye_wrapper_d_node src/mynteye_wrapper_node.cc)
 target_link_libraries(mynteye_wrapper_d_node mynteye_wrapper_d ${LINK_LIBRARIES})
 
-add_executable(mynteye_listener src/mynteye_listener.cc)
-target_link_libraries(mynteye_listener ${LINK_LIBRARIES})
+add_executable(mynteye_listener_d src/mynteye_listener.cc)
+target_link_libraries(mynteye_listener_d ${LINK_LIBRARIES})
 
 # install
 
