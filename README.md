@@ -15,8 +15,8 @@ MYNT® EYE D SDK is a library for MYNT® EYE Depth cameras.
 
 API reference and the guide documentations.
 
-* en: [![](https://img.shields.io/badge/Download-PDF-blue.svg?style=flat)]() [![](https://img.shields.io/badge/Download-HTML-blue.svg?style=flat)]() [![](https://img.shields.io/badge/Online-HTML-lightgray.svg?style=flat)]()
-* zh-Hans: [![](https://img.shields.io/badge/Download-PDF-blue.svg?style=flat)]() [![](https://img.shields.io/badge/Download-HTML-blue.svg?style=flat)]() [![](https://img.shields.io/badge/Online-HTML-blue.svg?style=flat)](https://slightech.github.io/MYNT-EYE-D-SDK/)
+* en: [![](https://img.shields.io/badge/Download-PDF-blue.svg?style=flat)](https://github.com/slightech/MYNT-EYE-D-SDK/files/2562662/mynt-eye-d-sdk-apidoc-1.5.0-rc0-en.pdf) [![](https://img.shields.io/badge/Download-HTML-blue.svg?style=flat)](https://github.com/slightech/MYNT-EYE-D-SDK/files/2562663/mynt-eye-d-sdk-apidoc-1.5.0-rc0-en.zip) [![](https://img.shields.io/badge/Online-HTML-lightgray.svg?style=flat)]()
+* zh-Hans: [![](https://img.shields.io/badge/Download-PDF-blue.svg?style=flat)](https://github.com/slightech/MYNT-EYE-D-SDK/files/2562664/mynt-eye-d-sdk-apidoc-1.5.0-rc0-zh-Hans.pdf) [![](https://img.shields.io/badge/Download-HTML-blue.svg?style=flat)](https://github.com/slightech/MYNT-EYE-D-SDK/files/2562665/mynt-eye-d-sdk-apidoc-1.5.0-rc0-zh-Hans.zip) [![](https://img.shields.io/badge/Online-HTML-blue.svg?style=flat)](https://slightech.github.io/MYNT-EYE-D-SDK/)
 
 ### Quick Start Guide
 
