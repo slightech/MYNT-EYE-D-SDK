@@ -40,16 +40,30 @@ _generate() {
     [ -e "$outdir" ] || mkdir -p "$outdir"
     echo "doxygen $DOXYFILE"
     doxygen $DOXYFILE
+
+    version=`cat $DOXYFILE | grep -m1 "^PROJECT_NUMBER\s*=" | \
+      sed -E "s/^.*=[[:space:]]*(.*)[[:space:]]*$/\1/g"`
+
+    # html
+    if [ -d "$outdir/html" ]; then
+      dirname="mynt-eye-d-sdk-apidoc"; \
+        [ -n "$version" ] && dirname="$dirname-$version"; \
+        dirname="$dirname-$lang"
+      cd "$outdir"
+      [ -d "$dirname" ] && rm -rf "$dirname"
+      mv "html" "$dirname" && zip -r "$dirname.zip" "$dirname"
+    fi
+
+    # latex
     if type "pdflatex" &> /dev/null && [ -f "$outdir/latex/Makefile" ]; then
       echo "doxygen make latex"
-      version=`cat $DOXYFILE | grep -m1 "^PROJECT_NUMBER\s*=" | \
-        sed -E "s/^.*=[[:space:]]*(.*)[[:space:]]*$/\1/g"`
       filename="mynt-eye-d-sdk-apidoc"; \
         [ -n "$version" ] && filename="$filename-$version"; \
         filename="$filename-$lang.pdf"
       cd "$outdir/latex" && _texcjk refman.tex && make
       [ -f "refman.pdf" ] && mv "refman.pdf" "../$filename"
     fi
+
     echo "doxygen completed"
   else
     echo "$DOXYFILE not found"
