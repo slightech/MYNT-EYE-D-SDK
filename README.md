@@ -27,6 +27,10 @@ API reference and the guide documentations.
   * [Linux SDK 用户指南](docs/zh-Hans/guide_build_linux.md)
   * [Windows SDK 用户指南](docs/zh-Hans/guide_build_win.md)
 
+## Mirrors
+
+国内镜像：[码云](https://gitee.com/mynt/MYNT-EYE-D-SDK)。
+
 ## License
 
 This project is licensed under the [Apache License, Version 2.0](/LICENSE). Copyright 2018 Slightech Co., Ltd.
