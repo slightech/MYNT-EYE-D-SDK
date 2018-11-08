@@ -77,6 +77,7 @@ add_library(mynteye_wrapper_d
   src/pointcloud_generator.cc
 )
 target_link_libraries(mynteye_wrapper_d ${LINK_LIBRARIES})
+add_dependencies(mynteye_wrapper_d ${PROJECT_NAME}_generate_messages_cpp)
 
 add_executable(mynteye_wrapper_d_node src/mynteye_wrapper_node.cc)
 target_link_libraries(mynteye_wrapper_d_node mynteye_wrapper_d ${LINK_LIBRARIES})

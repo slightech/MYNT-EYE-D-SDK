@@ -53,7 +53,6 @@ pipeline {
         sh '. /opt/ros/kinetic/setup.sh; make tools'
       }
     }
-    /*
     stage('ROS') {
       steps {
         echo 'make ros ..'
@@ -64,7 +63,6 @@ pipeline {
         '''
       }
     }
-    */
     /*
     stage('Clean') {
       steps {
