@@ -1,0 +1,145 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.14"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>MYNT EYE D SDK: Linux SDK 用户指南</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+  $(document).ready(initResizable);
+/* @license-end */</script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="custom.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">MYNT EYE D SDK
+   &#160;<span id="projectnumber">1.5.0-rc0</span>
+   </div>
+   <div id="projectbrief">http://www.myntai.com/mynteye/depth</div>
+  </td>
+   <td>        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.png"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="搜索" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+          </span>
+        </div>
+</td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.8.14 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(document).ready(function(){initNavTree('md_guide_build_linux.html','');});
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div class="header">
+  <div class="headertitle">
+<div class="title">Linux SDK 用户指南 </div>  </div>
+</div><!--header-->
+<div class="contents">
+<div class="textblock"><h2>1. 安装 SDK 依赖</h2>
+<p>注意: 因为设备权限的问题，命令执行完成之后，您必须重新拔插设备(这个操作在同一台电脑上，只需要做一次). </p><div class="fragment"><div class="line">make init</div></div><!-- fragment --><h3>1.1 安装 OpenCV</h3>
+<p><em>如果您已经安装了 opencv 或者您想要使用 ROS，您可以跳过这步.</em></p>
+<h4>1.1.1 apt 或者编译安装 OpenCV (选择一个)</h4>
+<h5>1.1.1.1 使用 apt 安装 OpenCV (推荐)</h5>
+<div class="fragment"><div class="line">sudo apt-get install libopencv-dev</div></div><!-- fragment --><h5>1.1.1.2 编译安装 OpenCV</h5>
+<div class="fragment"><div class="line">git clone https://github.com/opencv/opencv.git</div><div class="line">cd opencv/</div><div class="line">git checkout tags/3.4.0</div><div class="line"></div><div class="line">cd opencv/</div><div class="line">mkdir build</div><div class="line">cd build/</div><div class="line"></div><div class="line">cmake ..</div><div class="line"></div><div class="line">make -j4</div><div class="line">sudo make install</div></div><!-- fragment --><h3>1.2 安装点云例程依赖的 PCL 库 (可选)</h3>
+<div class="fragment"><div class="line">sudo add-apt-repository ppa:v-launchpad-jochen-sprickerhof-de/pcl</div><div class="line">sudo apt-get update</div><div class="line">sudo apt-get install libpcl-all</div></div><!-- fragment --><h3>1.3 建立 libGL.so 软链接用以解决在 TX1/TX2 上的 bug (可选)</h3>
+<div class="fragment"><div class="line">sudo ln -sf /usr/lib/aarch64-linux-gnu/tegra/libGL.so /usr/lib/aarch64-linux-gnu/libGL.so</div></div><!-- fragment --><h2>2. 编译 SDK</h2>
+<div class="fragment"><div class="line">cd &lt;sdk&gt;</div><div class="line">make all</div></div><!-- fragment --><h2>3. 运行例程</h2>
+<p>1) get_image 显示左目的图像和彩色深度图</p>
+<div class="fragment"><div class="line">./samples/_output/bin/get_image</div></div><!-- fragment --><p>2) get_depth 显示左目的图像，16UC1的深度图和鼠标选中的像素的深度值(mm)</p>
+<div class="fragment"><div class="line">./samples/_output/bin/get_depth</div></div><!-- fragment --><p>3) get_points 显示左目的图像，16UC1的深度图和点云</p>
+<div class="fragment"><div class="line">./samples/_output/bin/get_points</div></div><!-- fragment --><h2>4 安装带有 OpenCV 的 ROS</h2>
+<p>如果您不使用 ROS(The Robot Operation System), 您可以跳过此部分.</p>
+<h3>4.1 安装 ROS Kinectic 版本</h3>
+<div class="fragment"><div class="line">cd ~</div><div class="line">wget https://raw.githubusercontent.com/oroca/oroca-ros-pkg/master/ros_install.sh &amp;&amp; \</div><div class="line">chmod 755 ./ros_install.sh &amp;&amp; bash ./ros_install.sh catkin_ws kinetic</div></div><!-- fragment --><blockquote class="doxtable">
+<p>ROS Kinetic 会自动安装 OpenCV, JPEG. </p>
+</blockquote>
+<h3>4.2 编译 ROS Wrapper</h3>
+<div class="fragment"><div class="line">make ros</div></div><!-- fragment --><p><b>Core:</b></p>
+<div class="fragment"><div class="line">roscore</div></div><!-- fragment --><p><b>RViz Display:</b></p>
+<div class="fragment"><div class="line">source ./wrappers/ros/devel/setup.bash</div><div class="line">roslaunch mynteye_wrapper_d display.launch</div></div><!-- fragment --><p><b>Publish:</b></p>
+<div class="fragment"><div class="line">source ./wrappers/ros/devel/setup.bash</div><div class="line">roslaunch mynteye_wrapper_d mynteye.launch</div></div><!-- fragment --><p><b>Subscribe:</b></p>
+<div class="fragment"><div class="line">source ./wrappers/ros/devel/setup.bash</div><div class="line">rosrun mynteye_wrapper_d mynteye_listener_d</div></div><!-- fragment --><h2>5. 打包</h2>
+<p>如果打包指定版本OpenCV的包：</p>
+<div class="fragment"><div class="line">cd &lt;sdk&gt;</div><div class="line">make cleanall</div><div class="line">export OpenCV_DIR=&lt;install prefix&gt;</div><div class="line"></div><div class="line">export OpenCV_DIR=/usr/local</div><div class="line">export OpenCV_DIR=$HOME/opencv-2.4.13.3</div></div><!-- fragment --><p>Packaging:</p>
+<div class="fragment"><div class="line">cd &lt;sdk&gt;</div><div class="line">make pkg</div></div><!-- fragment --><h2>6. 清理</h2>
+<div class="fragment"><div class="line">cd &lt;sdk&gt;</div><div class="line">make cleanall</div></div><!-- fragment --> </div></div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.14 </li>
+  </ul>
+</div>
+</body>
+</html>
