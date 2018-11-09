@@ -808,8 +808,8 @@ void CameraPrivate::ImuDataCallback(const ImuPacket &packet) {
     } else if (is_process_mode_[ProcessMode::WARM_DRIFT]) {
       TempCompensate(imu);
     } else if (is_process_mode_[ProcessMode::ALL]) {
-      ScaleAssemCompensate(imu);
       TempCompensate(imu);
+      ScaleAssemCompensate(imu);
     }
 
     ++motion_count_;
