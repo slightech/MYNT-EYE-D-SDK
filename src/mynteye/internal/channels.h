@@ -5,6 +5,7 @@
 #include <map>
 #include <memory>
 #include <thread>
+#include <functional>
 
 #include "mynteye/types.h"
 #include "mynteye/internal/types.h"
