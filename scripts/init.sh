@@ -54,4 +54,6 @@ if [ "$HOST_NAME" = "Ubuntu" ]; then
   _echo "  https://askubuntu.com/questions/829310/how-to-upgrade-cmake-in-ubuntu"
 fi
 
+_echo_s " "
+_echo_s "Note:: Because of the problem of device permissions, you must reinsert the camera device after the command is executed and on the same computer, this operation only needs to be done once.."
 exit 0

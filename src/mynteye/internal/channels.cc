@@ -1,6 +1,7 @@
 #include "mynteye/internal/channels.h"
 
-// #include <sys/time.h>
+#include <sys/time.h>
+#include <unistd.h>
 #include <string>
 #include <vector>
 #include <algorithm>
@@ -98,17 +99,19 @@ void Channels::Open() {
   // open device
   if (device_->open(1, -1, -1) < 0) {
     if (device_->open(1, -1, -1) < 0) {
-      LOGE("Error:: open imu device is failure.");
+      LOGE("%s, %d:: Open device failed, You must first execute the \"make init\" command.",
+          __FILE__, __LINE__);
       return;
     }
   }
   is_hid_open_ = true;
 }
 
-void Channels::StartHidTracking() {
+bool Channels::StartHidTracking() {
   if (is_hid_tracking_) {
-    LOGE("Error:: imu device was opened already.");
-    return;
+    LOGE("WARNING:: imu device was opened already.");
+  } else if (!is_hid_open_) {
+    return false;
   }
 
   is_hid_tracking_ = true;
@@ -117,6 +120,8 @@ void Channels::StartHidTracking() {
       DoHidTrack();
     }
   });
+
+  return true;
 }
 
 bool Channels::ExtractHidData(ImuResPacket &imu, ImgInfoResPacket &img) {

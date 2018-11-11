@@ -97,7 +97,7 @@ class MYNTEYE_API CameraPrivate {
   stream_data_t RetrieveLatestImage(const ImageType& type, ErrorCode* code);
 
   /** Start hid device */
-  ErrorCode StartHidTracking();
+  bool StartHidTracking();
   // void StopHidTracking();
   /** Set callback of hid */
   void SetHidCallback();

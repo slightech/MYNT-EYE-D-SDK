@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+#include <unistd.h>
 #include <string.h>
 #include <fstream>
 
@@ -22,6 +23,7 @@
 #include "mynteye/internal/channels.h"
 #include "mynteye/util/log.h"
 #include "mynteye/util/rate.h"
+#include "mynteye/util/times.h"
 
 MYNTEYE_USE_NAMESPACE
 
@@ -398,7 +400,10 @@ bool CameraPrivate::SetFWRegister(std::uint16_t address, std::uint16_t value,
 
 ErrorCode CameraPrivate::Open(const InitParams& params) {
   if (stream_mode_ == StreamMode::STREAM_2560x720 &&
-      params.framerate == 60) {
+      params.framerate > 30) {
+    LOGI("The frame rate chosen is too large, please use a smaller frame rate.");
+    return ErrorCode::ERROR_FAILURE;
+  } else if (params.framerate > 60) {
     LOGI("The frame rate chosen is too large, please use a smaller frame rate.");
     return ErrorCode::ERROR_FAILURE;
   }
@@ -501,7 +506,10 @@ ErrorCode CameraPrivate::Open(const InitParams& params) {
 #endif
 
   if (ETronDI_OK == ret) {
-    StartHidTracking();
+    if (!StartHidTracking()) {
+      std::cout << "--------------" << std::endl;
+      return ErrorCode::ERROR_IMU_OPEN_FAILED;
+    }
     StartCaptureImage();
     SyncCameraLogData();
     /*
@@ -524,24 +532,6 @@ bool CameraPrivate::IsOpened() const {
 void CameraPrivate::CheckOpened() const {
   if (!IsOpened()) throw std::runtime_error("Error: Camera not opened.");
 }
-
-/*
-Image::pointer CameraPrivate::RetrieveImage(const ImageType& type,
-    ErrorCode* code) {
-  if (!IsOpened()) {
-    *code = ErrorCode::ERROR_CAMERA_NOT_OPENED;
-    return nullptr;
-  }
-  switch (type) {
-    case ImageType::IMAGE_COLOR:
-      return RetrieveImageColor(code);
-    case ImageType::IMAGE_DEPTH:
-      return RetrieveImageDepth(code);
-    default:
-      throw new std::runtime_error("RetrieveImage: ImageType is unknown");
-  }
-}
-*/
 
 std::vector<device::StreamData> CameraPrivate::RetrieveImage(const ImageType& type,
     ErrorCode* code) {
@@ -716,6 +706,7 @@ void CameraPrivate::StartCaptureImage() {
       if (is_enable_image_[ImageType::IMAGE_DEPTH]) {
         CaptureImageDepth(&code);
       }
+      usleep(10);
     }
   });
   sync_thread_ = std::thread([this]() {
@@ -727,6 +718,7 @@ void CameraPrivate::StartCaptureImage() {
       if (is_enable_image_[ImageType::IMAGE_DEPTH]) {
         SyntheticImageDepth();
       }
+      usleep(10);
     }
   });
 }
@@ -767,15 +759,17 @@ void CameraPrivate::ReleaseBuf() {
   }
 }
 
-ErrorCode CameraPrivate::StartHidTracking() {
+bool CameraPrivate::StartHidTracking() {
   channels_->SetImuCallback(std::bind(&CameraPrivate::ImuDataCallback,
         this, std::placeholders::_1));
   channels_->SetImgInfoCallback(std::bind(&CameraPrivate::ImageInfoCallback,
         this, std::placeholders::_1));
-  is_imu_open_ = true;
-  channels_->StartHidTracking();
+  if (!channels_->StartHidTracking()) {
+    return false;
+  }
 
-  return ErrorCode::SUCCESS;
+  is_imu_open_ = true;
+  return true;
 }
 
 void CameraPrivate::ImuDataCallback(const ImuPacket &packet) {
@@ -1143,6 +1137,7 @@ std::shared_ptr<DeviceParams> CameraPrivate::GetInfo() const {
 std::string CameraPrivate::GetInfo(const Info &info) const {
   if (!device_params_) {
     LOGE("%s %d:: Device information not found", __FILE__, __LINE__);
+    return "";
   }
   switch (info) {
     case Info::DEVICE_NAME:
