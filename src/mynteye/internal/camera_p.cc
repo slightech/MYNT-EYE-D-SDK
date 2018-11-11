@@ -468,6 +468,8 @@ ErrorCode CameraPrivate::Open(const InitParams& params) {
   ReleaseBuf();
 
 #ifdef MYNTEYE_OS_WIN
+
+  SetHWPostProcess(true);
   // int EtronDI_OpenDeviceEx(
   //     void* pHandleEtronDI,
   //     PDEVSELINFO pDevSelInfo,

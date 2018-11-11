@@ -86,6 +86,8 @@ class MYNTEYE_API CameraPrivate {
   bool SetFWRegister(std::uint16_t address, std::uint16_t value,
       int flag = FG_Address_1Byte);
 
+  bool SetHWPostProcess(bool enable);
+
   ErrorCode Open(const InitParams& params);
 
   bool IsOpened() const;
