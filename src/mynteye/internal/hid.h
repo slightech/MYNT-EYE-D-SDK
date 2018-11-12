@@ -61,6 +61,7 @@ class hid_device {
   void close(int num);
   void droped();
   int get_device_class();
+  bool find_device();
 
  protected:
   void add_hid(hid_t *hid);

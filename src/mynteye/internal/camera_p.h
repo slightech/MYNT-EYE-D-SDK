@@ -161,6 +161,9 @@ class MYNTEYE_API CameraPrivate {
 
   void EnableImuProcessMode(const ProcessMode &mode);
 
+ protected:
+  void IsHidExist();
+
  private:
   void Init();
   void OnInit();
@@ -169,11 +172,14 @@ class MYNTEYE_API CameraPrivate {
 
   void SyntheticImageColor();
   void SyntheticImageDepth();
+  void OldSyntheticImageColor();
   void CaptureImageColor(ErrorCode *code);
   void CaptureImageDepth(ErrorCode *code);
 
   void TransferColor(Image::pointer color, img_info_data_t info);
   void CutPart(ImageType type, Image::pointer color, img_info_data_t info);
+  void OldTransferColor(Image::pointer color);
+  void OldCutPart(ImageType type, Image::pointer color);
 
   Image::pointer RetrieveImageColor(ErrorCode* code);
   Image::pointer RetrieveImageDepth(ErrorCode* code);
@@ -261,6 +267,8 @@ class MYNTEYE_API CameraPrivate {
   std::map<ProcessMode, bool> is_process_mode_;
   void TempCompensate(std::shared_ptr<ImuData> data);
   void ScaleAssemCompensate(std::shared_ptr<ImuData> data);
+
+  bool is_hid_exist_ = false;
 };
 
 MYNTEYE_END_NAMESPACE

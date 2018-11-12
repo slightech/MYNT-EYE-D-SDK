@@ -768,4 +768,8 @@ bool Channels::SetFiles(device_info_t *info,
   return true;
 }
 
+bool Channels::IsHidExist() {
+  return device_->find_device();
+}
+
 MYNTEYE_END_NAMESPACE
