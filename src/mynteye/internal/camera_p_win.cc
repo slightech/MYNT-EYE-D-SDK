@@ -308,7 +308,7 @@ Image::pointer CameraPrivate::RetrieveImageDepth(ErrorCode* code) {
   return nullptr;
 }
 
-bool CameraPrivate::SetHWPostProcess() {
+bool CameraPrivate::SetHWPostProcess(bool enable) {
   return ETronDI_OK == EtronDI_SetHWPostProcess(etron_di_, &dev_sel_info_, enable);
 }
 

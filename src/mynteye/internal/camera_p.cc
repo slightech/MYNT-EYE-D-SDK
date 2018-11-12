@@ -509,10 +509,10 @@ ErrorCode CameraPrivate::Open(const InitParams& params) {
 
   if (ETronDI_OK == ret) {
     if (!StartHidTracking()) {
-      std::cout << "--------------" << std::endl;
       return ErrorCode::ERROR_IMU_OPEN_FAILED;
     }
     StartCaptureImage();
+    StartSyntheticImage();
     SyncCameraLogData();
     /*
     unsigned char pdata[100] = {};
@@ -711,6 +711,17 @@ void CameraPrivate::StartCaptureImage() {
       usleep(10);
     }
   });
+}
+
+void CameraPrivate::StopCaptureImage() {
+  is_capture_image_ = false;
+  cap_image_thread_.join();
+  image_color_wait_.notify_all();
+  image_depth_wait_.notify_all();
+}
+
+void CameraPrivate::StartSyntheticImage() {
+  is_synthetic_image_ = true;
   sync_thread_ = std::thread([this]() {
     while (is_capture_image_) {
       if (is_enable_image_[ImageType::IMAGE_LEFT_COLOR] ||
@@ -725,11 +736,8 @@ void CameraPrivate::StartCaptureImage() {
   });
 }
 
-void CameraPrivate::StopCaptureImage() {
-  is_capture_image_ = false;
-  cap_image_thread_.join();
-  image_color_wait_.notify_all();
-  image_depth_wait_.notify_all();
+void CameraPrivate::StopSyntheticImage() {
+  is_synthetic_image_ = false;
   sync_thread_.join();
 }
 
@@ -744,6 +752,7 @@ void CameraPrivate::Wait() {
 void CameraPrivate::Close() {
   if (dev_sel_info_.index != -1) {
     StopCaptureImage();
+    StopSyntheticImage();
     channels_->StopHidTracking();
     EtronDI_CloseDevice(etron_di_, &dev_sel_info_);
     dev_sel_info_.index = -1;

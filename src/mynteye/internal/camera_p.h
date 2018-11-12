@@ -111,6 +111,10 @@ class MYNTEYE_API CameraPrivate {
   void StartCaptureImage();
   /** Stop capture image */
   void StopCaptureImage();
+  /** Start synthetic image */
+  void StartSyntheticImage();
+  /** Stop synthetic image */
+  void StopSyntheticImage();
   /** Get imu data */
   motion_datas_t GetImuDatas();
 
@@ -239,6 +243,7 @@ class MYNTEYE_API CameraPrivate {
   stream_datas_t right_color_data_;
   stream_datas_t depth_data_;
   bool is_capture_image_ = false;
+  bool is_synthetic_image_ = false;
   bool is_imu_open_ = false;
 
   bool is_start_ = false;
