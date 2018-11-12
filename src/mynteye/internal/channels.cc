@@ -1,7 +1,5 @@
 #include "mynteye/internal/channels.h"
 
-#include <sys/time.h>
-#include <unistd.h>
 #include <string>
 #include <vector>
 #include <algorithm>

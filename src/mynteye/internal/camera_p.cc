@@ -11,7 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#include <unistd.h>
 #include <string.h>
 #include <fstream>
 
@@ -708,7 +707,8 @@ void CameraPrivate::StartCaptureImage() {
       if (is_enable_image_[ImageType::IMAGE_DEPTH]) {
         CaptureImageDepth(&code);
       }
-      usleep(10);
+      std::this_thread::sleep_for(
+          std::chrono::milliseconds(1));
     }
   });
 }
@@ -731,7 +731,8 @@ void CameraPrivate::StartSyntheticImage() {
       if (is_enable_image_[ImageType::IMAGE_DEPTH]) {
         SyntheticImageDepth();
       }
-      usleep(10);
+      std::this_thread::sleep_for(
+          std::chrono::milliseconds(1));
     }
   });
 }
