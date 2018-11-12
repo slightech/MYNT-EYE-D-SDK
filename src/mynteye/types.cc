@@ -21,24 +21,6 @@
 
 MYNTEYE_BEGIN_NAMESPACE
 
-std::ostream& operator<<(std::ostream& os, const StreamFormat& code) {
-  switch (code) {
-    case StreamFormat::STREAM_MJPG: {
-      os << "STREAM_MJPG";
-    } break;
-    case StreamFormat::STREAM_YUYV: {
-      os << "STREAM_YUYV";
-    } break;
-    case StreamFormat::STREAM_FORMAT_LAST: {
-      os << "STREAM_LAST";
-    } break;
-    default: {
-      os << "UNKNOWN";
-    } break;
-  }
-  return os;
-}
-
 std::ostream &operator<<(std::ostream &os, const ImuIntrinsics &in) {
   os << FULL_PRECISION << "scale: [";
   for (int i = 0; i <= 2; i++)

@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#include "mynteye/internal/camera_p.h"
+#include "mynteye/device/device.h"
 
 #ifdef MYNTEYE_OS_WIN
 
@@ -168,20 +168,14 @@ void UpdateZ14DisplayImage_DIB24(RGBQUAD* pColorPaletteZ14, BYTE* pDepthZ14,
 
 }  // namespace
 
-void CameraPrivate::OnInit() {
+void Device::OnInit() {
   DmColorMode14(color_palette_z14_, 0/*normal*/);
 }
 
-void CameraPrivate::OnPreWait() {
-}
-
-void CameraPrivate::OnPostWait() {
-}
-
-void CameraPrivate::ImgCallback(EtronDIImageType::Value imgType, int imgId,
+void Device::ImgCallback(EtronDIImageType::Value imgType, int imgId,
       unsigned char* imgBuf, int imgSize, int width, int height,
       int serialNumber, void *pParam) {
-  CameraPrivate* p = static_cast<CameraPrivate*>(pParam);
+  Device* p = static_cast<Device*>(pParam);
   std::lock_guard<std::mutex> _(p->mtx_imgs_);
 
   if (EtronDIImageType::IsImageColor(imgType)) {
@@ -196,7 +190,7 @@ void CameraPrivate::ImgCallback(EtronDIImageType::Value imgType, int imgId,
       if (imgType == EtronDIImageType::COLOR_RGB24) {
         p->color_image_buf_ = ImageColor::Create(ImageFormat::COLOR_RGB,
             color_img_width, color_img_height, true);
-            */
+      */
       if (imgType == EtronDIImageType::COLOR_YUY2) {
         p->color_image_buf_ = ImageColor::Create(ImageFormat::COLOR_YUYV,
             color_img_width, color_img_height, true);
@@ -231,10 +225,9 @@ void CameraPrivate::ImgCallback(EtronDIImageType::Value imgType, int imgId,
   }
 }
 
-Image::pointer CameraPrivate::RetrieveImageColor(ErrorCode* code) {
-  // LOGI("Retrieve image color");
+Image::pointer Device::GetImageColor() {
+  // LOGI("Get image color");
   if (!color_image_buf_) {
-    *code = ErrorCode::ERROR_CAMERA_RETRIEVE_FAILED;
     return nullptr;
   }
   std::lock_guard<std::mutex> _(mtx_imgs_);
@@ -246,32 +239,28 @@ Image::pointer CameraPrivate::RetrieveImageColor(ErrorCode* code) {
         stream_color_info_ptr_[color_res_index_].nHeight);
 
     if (color_image_buf_->format() == ImageFormat::COLOR_MJPG) {  // mjpg
-      *code = ErrorCode::SUCCESS;
       // return clone as it will be changed in imgcallback
       return color_image_buf_->Clone();
     } else if (color_image_buf_->format() == ImageFormat::COLOR_YUYV) {  // YUYV
       /*
       // clone as it will be changed in imgcallback
       auto color = color_image_buf_->Clone();
-      // flip afer clone, because the buffer may not updated when retrieve again
+      // flip afer clone, because the buffer may not updated when get again
       FLIP_UP_DOWN_C3(color->data(), color_img_width, color_img_height);
       RGB_TO_BGR(color->data(), color_img_width, color_img_height);
       */
-      *code = ErrorCode::SUCCESS;
       return color_image_buf_->Clone();
     } else {
       LOGE("Unknown image color type.");
     }
   }
 
-  *code = ErrorCode::ERROR_CAMERA_RETRIEVE_FAILED;
   return nullptr;
 }
 
-Image::pointer CameraPrivate::RetrieveImageDepth(ErrorCode* code) {
-  // LOGI("Retrieve image depth");
+Image::pointer Device::GetImageDepth() {
+  // LOGI("Get image depth");
   if (!depth_image_buf_) {
-    *code = ErrorCode::ERROR_CAMERA_RETRIEVE_FAILED;
     return nullptr;
   }
   std::lock_guard<std::mutex> _(mtx_imgs_);
@@ -285,12 +274,10 @@ Image::pointer CameraPrivate::RetrieveImageDepth(ErrorCode* code) {
 
     switch (depth_mode_) {
       case DepthMode::DEPTH_RAW:
-        *code = ErrorCode::SUCCESS;
         // return clone as it will be changed in imgcallback
         return depth_image_buf_->Clone();
       // case DepthMode::DEPTH_GRAY:
-      //   // cv::normalize(depth_raw_, depth, 0, 255, cv::NORM_MINMAX, CV_8UC1);
-      //   *code = ErrorCode::SUCCESS;
+      //   cv::normalize(depth_raw_, depth, 0, 255, cv::NORM_MINMAX, CV_8UC1);
       //   return depth_gray_buf;
       case DepthMode::DEPTH_COLORFUL:
         static auto depth_rgb_buf = ImageDepth::Create(ImageFormat::DEPTH_RGB,
@@ -299,17 +286,11 @@ Image::pointer CameraPrivate::RetrieveImageDepth(ErrorCode* code) {
         UpdateZ14DisplayImage_DIB24(color_palette_z14_,
             depth_image_buf_->data(), depth_rgb_buf->data(),
             depth_img_width, depth_img_height);
-        *code = ErrorCode::SUCCESS;
         return depth_rgb_buf;
     }
   }
 
-  *code = ErrorCode::ERROR_CAMERA_RETRIEVE_FAILED;
   return nullptr;
-}
-
-bool CameraPrivate::SetHWPostProcess(bool enable) {
-  return ETronDI_OK == EtronDI_SetHWPostProcess(etron_di_, &dev_sel_info_, enable);
 }
 
 #endif

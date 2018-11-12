@@ -11,9 +11,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#include "mynteye/image.h"
+#include "mynteye/device/image.h"
 
-#include "mynteye/util/convertor.h"
+#include "mynteye/device/convertor.h"
 #include "mynteye/util/log.h"
 
 MYNTEYE_USE_NAMESPACE
@@ -123,11 +123,13 @@ Image::pointer Image::CutPart(ImageType type) const {
   image->resize();
   switch (type) {
     case ImageType::IMAGE_LEFT_COLOR:
-      // std::copy(data_.begin(), data_.begin() + (valid_size_ / 2 - 1), image->data_.begin());
+      // std::copy(data_.begin(), data_.begin() + (valid_size_ / 2 - 1),
+      //     image->data_.begin());
       copyLeft(data_.data(), image->data(), width_, height_);
       break;
     case ImageType::IMAGE_RIGHT_COLOR:
-      // std::copy(data_.begin() + (valid_size_ / 2), data_.end(), image->data_.begin());
+      // std::copy(data_.begin() + (valid_size_ / 2), data_.end(),
+      //     image->data_.begin());
       copyRight(data_.data(), image->data(), width_, height_);
       break;
     default:

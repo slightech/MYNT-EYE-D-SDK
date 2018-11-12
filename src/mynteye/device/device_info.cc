@@ -11,30 +11,25 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#include "mynteye/init_params.h"
+#include "mynteye/device/device_info.h"
 
-#include <utility>
+#include <iomanip>
+#include <iostream>
 
-#include "mynteye/util/log.h"
+MYNTEYE_BEGIN_NAMESPACE
 
-MYNTEYE_USE_NAMESPACE
-
-InitParams::InitParams() {
+std::ostream& operator<<(std::ostream& os, const DeviceInfo& info) {
+  std::ios fmt{nullptr};
+  fmt.copyfmt(os);  // clear format
+  os << "index: " << info.index
+    << ", name: " << info.name
+    << ", type: " << info.type
+    << ", pid: 0x" << std::hex << info.pid
+    << ", vid: 0x" << std::hex << info.vid
+    << ", chip_id: 0x" << std::hex << info.chip_id
+    << ", fw_version: " << info.fw_version;
+  os.copyfmt(fmt);  // restore format
+  return os;
 }
 
-InitParams::InitParams(const std::int32_t& dev_index)
-  : dev_index(std::move(dev_index)),
-    framerate(10),
-    depth_mode(DepthMode::DEPTH_COLORFUL),
-    stream_mode(StreamMode::STREAM_1280x720),
-    color_stream_format(StreamFormat::STREAM_YUYV),
-    depth_stream_format(StreamFormat::STREAM_YUYV),
-    state_ae(true),
-    state_awb(true),
-    ir_intensity(0) {
-  DBG_LOGD(__func__);
-}
-
-InitParams::~InitParams() {
-  DBG_LOGD(__func__);
-}
+MYNTEYE_END_NAMESPACE

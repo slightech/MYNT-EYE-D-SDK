@@ -117,11 +117,16 @@ else()
 endif()
 
 set(MYNTEYE_DEPTH_SRCS
+  src/mynteye/device/convertor.cc
+  src/mynteye/device/device_info.cc
+  src/mynteye/device/device.cc
+  src/mynteye/device/device_linux.cc
+  src/mynteye/device/device_win.cc
+  src/mynteye/device/image.cc
+  src/mynteye/device/open_params.cc
+  src/mynteye/device/stream_info.cc
+  src/mynteye/device/types.cc
   src/mynteye/camera.cc
-  src/mynteye/image.cc
-  src/mynteye/device_info.cc
-  src/mynteye/init_params.cc
-  src/mynteye/stream_info.cc
   src/mynteye/types.cc
   src/mynteye/utils.cc
   src/mynteye/internal/camera_p.cc
@@ -129,7 +134,6 @@ set(MYNTEYE_DEPTH_SRCS
   src/mynteye/internal/camera_p_win.cc
   src/mynteye/internal/channels.cc
   src/mynteye/internal/types.cc
-  src/mynteye/util/convertor.cc
   src/mynteye/util/rate.cc
   src/mynteye/util/strings.cc
   ${DEVICE_SRC}

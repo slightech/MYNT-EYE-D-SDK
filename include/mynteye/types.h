@@ -18,6 +18,7 @@
 #include <cstdint>
 #include <ostream>
 
+#include "mynteye/device/types.h"
 #include "mynteye/stubs/global.h"
 
 MYNTEYE_BEGIN_NAMESPACE
@@ -51,84 +52,6 @@ enum class ErrorCode : std::int32_t {
   /** Last guard. */
   ERROR_CODE_LAST
 };
-
-/**
- * @ingroup enumerations
- * @brief List image types.
- */
-enum class ImageType : std::int32_t {
-  /** LEFT Color. */
-  IMAGE_LEFT_COLOR,
-  /** RIGHT Color. */
-  IMAGE_RIGHT_COLOR,
-  /** Depth. */
-  IMAGE_DEPTH,
-  /** All. */
-  ALL,
-};
-
-/**
- * @ingroup enumerations
- * @brief List image formats.
- */
-enum class ImageFormat : std::int32_t {
-  IMAGE_BGR_24,   // 8UC3
-  IMAGE_RGB_24,   // 8UC3
-  IMAGE_GRAY_8,   // 8UC1
-  IMAGE_GRAY_16,  // 16UC1
-  IMAGE_GRAY_24,  // 8UC3
-  IMAGE_YUYV,     // 8UC2
-  IMAGE_MJPG,
-  // color
-  COLOR_BGR   = IMAGE_BGR_24,  // > COLOR_RGB
-  COLOR_RGB   = IMAGE_RGB_24,  // > COLOR_BGR
-  COLOR_YUYV  = IMAGE_YUYV,    // > COLOR_BGR, COLOR_RGB
-  COLOR_MJPG  = IMAGE_MJPG,    // > COLOR_BGR, COLOR_RGB
-  // depth
-  DEPTH_RAW     = IMAGE_GRAY_16,  // > DEPTH_GRAY
-  DEPTH_GRAY    = IMAGE_GRAY_8,
-  DEPTH_GRAY_24 = IMAGE_GRAY_24,
-  DEPTH_BGR     = IMAGE_BGR_24,   // > DEPTH_RGB
-  DEPTH_RGB     = IMAGE_RGB_24,   // > DEPTH_BGR
-  /** Last guard. */
-  IMAGE_FORMAT_LAST
-};
-
-/**
- * @ingroup enumerations
- * @brief List depth modes.
- */
-enum class DepthMode : std::int32_t {
-  DEPTH_RAW      = 0,  // ImageFormat::DEPTH_RAW
-  DEPTH_GRAY     = 1,  // ImageFormat::DEPTH_GRAY_24
-  DEPTH_COLORFUL = 2,  // ImageFormat::DEPTH_RGB
-  DEPTH_MODE_LAST
-};
-
-/**
- * @ingroup enumerations
- * @brief List stream mode.
- */
-enum class StreamMode : std::int32_t {
-  STREAM_1280x720 = 0,
-  STREAM_2560x720 = 1,
-  STREAM_1280x480 = 2,
-  STREAM_640x480  = 3,
-  STREAM_MODE_LAST
-};
-
-/**
- * @ingroup enumerations
- * @brief List stream formats.
- */
-enum class StreamFormat : std::int32_t {
-  STREAM_MJPG = 0,
-  STREAM_YUYV = 1,
-  STREAM_FORMAT_LAST
-};
-
-MYNTEYE_API
-std::ostream& operator<<(std::ostream& os, const StreamFormat& code);
 
 /**
  * @ingroup enumerations

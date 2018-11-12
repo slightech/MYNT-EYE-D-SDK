@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#include "mynteye/internal/camera_p.h"
+#include "mynteye/device/device.h"
 
 #ifdef MYNTEYE_OS_LINUX
 
@@ -22,14 +22,8 @@
 
 MYNTEYE_USE_NAMESPACE
 
-void CameraPrivate::OnInit() {
+void Device::OnInit() {
   dtc_ = DEPTH_IMG_NON_TRANSFER;
-}
-
-void CameraPrivate::OnPreWait() {
-}
-
-void CameraPrivate::OnPostWait() {
 }
 
 // int ret = EtronDI_Get2Image(etron_di_, &dev_sel_info_,
@@ -37,7 +31,7 @@ void CameraPrivate::OnPostWait() {
 //     &color_image_size_, &depth_image_size_,
 //     &color_serial_number_, &depth_serial_number_, depth_data_type_);
 
-Image::pointer CameraPrivate::RetrieveImageColor(ErrorCode* code) {
+Image::pointer Device::GetImageColor() {
   unsigned int color_img_width  = (unsigned int)(
       stream_color_info_ptr_[color_res_index_].nWidth);
   unsigned int color_img_height = (unsigned int)(
@@ -56,19 +50,17 @@ Image::pointer CameraPrivate::RetrieveImageColor(ErrorCode* code) {
       color_image_buf_->data(), &color_image_size_, &color_serial_number_, 0);
 
   if (ETronDI_OK != ret) {
-    DBG_LOGI("RetrieveImageColor: %d", ret);
-    *code = ErrorCode::ERROR_CAMERA_RETRIEVE_FAILED;
+    DBG_LOGI("GetImageColor: %d", ret);
     return nullptr;
   }
 
   color_image_buf_->set_valid_size(color_image_size_);
   color_image_buf_->set_frame_id(color_serial_number_);
 
-  *code = ErrorCode::SUCCESS;
   return color_image_buf_;
 }
 
-Image::pointer CameraPrivate::RetrieveImageDepth(ErrorCode* code) {
+Image::pointer Device::GetImageDepth() {
   unsigned int depth_img_width  = (unsigned int)(
       stream_depth_info_ptr_[depth_res_index_].nWidth);
   unsigned int depth_img_height = (unsigned int)(
@@ -106,15 +98,13 @@ Image::pointer CameraPrivate::RetrieveImageDepth(ErrorCode* code) {
       &depth_image_size_, &depth_serial_number_, depth_data_type_);
 
   if (ETronDI_OK != ret) {
-    DBG_LOGI("RetrieveImageDepth: %d", ret);
-    *code = ErrorCode::ERROR_CAMERA_RETRIEVE_FAILED;
+    DBG_LOGI("GetImageDepth: %d", ret);
     return nullptr;
   }
 
   depth_image_buf_->set_valid_size(depth_image_size_);
   depth_image_buf_->set_frame_id(depth_serial_number_);
 
-  *code = ErrorCode::SUCCESS;
   if (depth_raw) {
     return depth_image_buf_;
   } else {

@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#include "mynteye/util/convertor.h"
+#include "mynteye/device/convertor.h"
 
 #include "mynteye/util/log.h"
 
@@ -236,7 +236,8 @@ void swap(unsigned char* a, unsigned char* b, unsigned char* tmp) {
 
 }  // namespace
 
-void FLIP_UP_DOWN_C3(unsigned char* rgb, unsigned int width, unsigned int height) {
+void FLIP_UP_DOWN_C3(unsigned char* rgb, unsigned int width,
+                     unsigned int height) {
   if (height <= 1) return;
   width = width * 3;  // channel 3
   unsigned char* up;
@@ -248,7 +249,7 @@ void FLIP_UP_DOWN_C3(unsigned char* rgb, unsigned int width, unsigned int height
     up = rgb + m * width;
     down = rgb + (height - 1 - m) * width;
     for (unsigned int n = 0; n < width; n++) {
-      swap(up + n, down + n, &tmp);
+      swap(up + n, down + n, &tmp);  // NOLINT
     }
   }
 }

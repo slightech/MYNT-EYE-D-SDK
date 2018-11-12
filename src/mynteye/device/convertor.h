@@ -11,8 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#ifndef MYNTEYE_UTIL_CONVERTOR_H_
-#define MYNTEYE_UTIL_CONVERTOR_H_
+#ifndef MYNTEYE_DEVICE_CONVERTOR_H_
+#define MYNTEYE_DEVICE_CONVERTOR_H_
 #pragma once
 
 #ifdef WITH_JPEG
@@ -58,8 +58,9 @@ extern void RGB_TO_BGR(unsigned char* rgb,
 extern void BGR_TO_RGB(unsigned char* bgr,
     unsigned int width, unsigned int height);
 
-extern void FLIP_UP_DOWN_C3(unsigned char* rgb, unsigned int width, unsigned int height);
+extern void FLIP_UP_DOWN_C3(unsigned char* rgb, unsigned int width,
+                            unsigned int height);
 
 MYNTEYE_END_NAMESPACE
 
-#endif  // MYNTEYE_UTIL_CONVERTOR_H_
+#endif  // MYNTEYE_DEVICE_CONVERTOR_H_
