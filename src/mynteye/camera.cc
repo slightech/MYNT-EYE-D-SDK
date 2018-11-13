@@ -114,11 +114,11 @@ void Camera::SetCalibrationWithFile(const std::string &file_name) {
 void Camera::GetHDCameraLogDataFile() { p_->GetHDCameraLogData(); }
 void Camera::GetVGACameraLogDataFile() { p_->GetVGACameraLogData(); }
 
-struct CameraCtrlRectLogData Camera::GetHDCameraCtrlData() {
+CameraCtrlRectLogData Camera::GetHDCameraCtrlData() {
   return p_->GetHDCameraCtrlData();
 }
 
-struct CameraCtrlRectLogData Camera::GetVGACameraCtrlData() {
+CameraCtrlRectLogData Camera::GetVGACameraCtrlData() {
   return p_->GetVGACameraCtrlData();
 }
 

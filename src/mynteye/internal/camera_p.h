@@ -127,11 +127,11 @@ class MYNTEYE_API CameraPrivate {
   void GetHDCameraLogData();
   void GetVGACameraLogData();
 
-  struct CameraCtrlRectLogData GetHDCameraCtrlData();
-  struct CameraCtrlRectLogData GetVGACameraCtrlData();
+  CameraCtrlRectLogData GetHDCameraCtrlData();
+  CameraCtrlRectLogData GetVGACameraCtrlData();
 
   void GetCameraLogData(int index);
-  struct CameraCtrlRectLogData GetCameraCtrlData(int index);
+  CameraCtrlRectLogData GetCameraCtrlData(int index);
   void SetCameraLogData(const std::string& file);
 
   void SyncCameraLogData();
@@ -191,7 +191,7 @@ class MYNTEYE_API CameraPrivate {
       unsigned char* imgBuf, int imgSize, int width, int height,
       int serialNumber, void *pParam);
 #endif
-  std::vector <struct CameraCtrlRectLogData> camera_log_datas_;
+  std::vector<CameraCtrlRectLogData> camera_log_datas_;
 
   void* etron_di_;
 

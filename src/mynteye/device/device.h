@@ -65,6 +65,14 @@ class Device {
   /** Get depth image, nullptr if failed */
   Image::pointer GetImageDepth();  // cross
 
+  /** Get camera calibration. */
+  CameraCalibration GetCameraCalibration(const StreamMode& stream_mode);
+  /** Get camera calibration file. */
+  void GetCameraCalibrationFile(const StreamMode& stream_mode,
+                                const std::string& filename);
+  /** Set camera calibration bin file. */
+  void SetCameraCalibrationBinFile(const std::string& filename);
+
   /** Wait according to framerate */
   void Wait();
 
@@ -100,6 +108,11 @@ class Device {
       int flag = FG_Address_1Byte);
   bool SetFWRegister(std::uint16_t address, std::uint16_t value,
       int flag = FG_Address_1Byte);
+
+  CameraCalibration GetCameraCalibration(int index);
+  void GetCameraCalibrationFile(int index, const std::string& filename);
+
+  void SyncCameraCalibrations();
 
  private:
   void Init();
@@ -142,6 +155,8 @@ class Device {
 #endif
 
   DepthMode depth_mode_;
+
+  std::vector<CameraCalibration> camera_calibrations_;
 };
 
 MYNTEYE_END_NAMESPACE

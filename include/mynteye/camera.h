@@ -124,12 +124,12 @@ class MYNTEYE_API Camera {
   /** Get camera stream mode*/
   StreamMode GetStreamMode();
 
-  /** Get camera HD stream config information 
-    return struct CameraCtrlRectLogData.*/
-  struct CameraCtrlRectLogData GetHDCameraCtrlData();
-  /** Get camera VGA stream config information 
-    return struct CameraCtrlRectLogData.*/
-  struct CameraCtrlRectLogData GetVGACameraCtrlData();
+  /** Get camera HD stream config information
+    return CameraCtrlRectLogData.*/
+  CameraCtrlRectLogData GetHDCameraCtrlData();
+  /** Get camera VGA stream config information
+    return CameraCtrlRectLogData.*/
+  CameraCtrlRectLogData GetVGACameraCtrlData();
 
   /** Set Image mode ( raw image and rectified image )*/
   void SetImageMode(const ImageMode& mode);

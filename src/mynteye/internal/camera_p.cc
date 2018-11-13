@@ -914,7 +914,7 @@ void CameraPrivate::GetVGACameraLogData() {
 void CameraPrivate::SyncCameraLogData() {
   camera_log_datas_.clear();
   for (int index = 0; index < 2 ; index++) {
-    struct CameraCtrlRectLogData camera_log_data;
+    CameraCtrlRectLogData camera_log_data;
     eSPCtrl_RectLogData eSPRectLogData;
     EtronDI_GetRectifyMatLogData(etron_di_,
       &dev_sel_info_, &eSPRectLogData, index);
@@ -972,7 +972,7 @@ void CameraPrivate::SyncCameraLogData() {
   }
 }
 
-struct CameraCtrlRectLogData  CameraPrivate::GetCameraCtrlData(int index) {
+CameraCtrlRectLogData  CameraPrivate::GetCameraCtrlData(int index) {
   return camera_log_datas_[index];
 }
 
@@ -1113,10 +1113,10 @@ void CameraPrivate::SetCameraLogData(const std::string& file) {
   SyncCameraLogData();
 }
 
-struct CameraCtrlRectLogData CameraPrivate::GetHDCameraCtrlData() {
+CameraCtrlRectLogData CameraPrivate::GetHDCameraCtrlData() {
   return GetCameraCtrlData(0);
 }
-struct CameraCtrlRectLogData CameraPrivate::GetVGACameraCtrlData() {
+CameraCtrlRectLogData CameraPrivate::GetVGACameraCtrlData() {
   return GetCameraCtrlData(1);
 }
 

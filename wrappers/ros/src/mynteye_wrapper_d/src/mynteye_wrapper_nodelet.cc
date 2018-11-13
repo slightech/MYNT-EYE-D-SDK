@@ -139,7 +139,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     sensor_msgs::CameraInfo *camera_info = new sensor_msgs::CameraInfo();
     camera_info_ptr_ = sensor_msgs::CameraInfoPtr(camera_info);
 
-    struct MYNTEYE_NAMESPACE::CameraCtrlRectLogData camera_ctrl_data;
+    MYNTEYE_NAMESPACE::CameraCtrlRectLogData camera_ctrl_data;
 
     // <arg name="stream_1280x720"   default="0" />
     // <arg name="stream_2560x720"   default="1" />
