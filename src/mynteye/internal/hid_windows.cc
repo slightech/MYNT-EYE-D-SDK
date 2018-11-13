@@ -285,6 +285,11 @@ void hid_device::hid_close(hid_t *hid) {
   hid->handle = NULL;
 }
 
+bool hid_device::find_device() {
+  // TODO qujunyang
+  return true;
+}
+
 } // namespace hid
 
 MYNTEYE_END_NAMESPACE

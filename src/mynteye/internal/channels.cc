@@ -1,7 +1,5 @@
 #include "mynteye/internal/channels.h"
 
-#include <sys/time.h>
-#include <unistd.h>
 #include <string>
 #include <vector>
 #include <algorithm>
@@ -768,6 +766,10 @@ bool Channels::SetFiles(device_info_t *info,
   }
 
   return true;
+}
+
+bool Channels::IsHidExist() {
+  return device_->find_device();
 }
 
 MYNTEYE_END_NAMESPACE

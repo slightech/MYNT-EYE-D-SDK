@@ -11,7 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#include <unistd.h>
 #include <string.h>
 #include <fstream>
 
@@ -96,7 +95,9 @@ CameraPrivate::CameraPrivate()
   DBG_LOGD(__func__);
 
   Init();
-  ReadAllInfos();
+  if (is_hid_exist_) {
+    ReadAllInfos();
+  }
 }
 
 void CameraPrivate::Init() {
@@ -124,6 +125,7 @@ void CameraPrivate::Init() {
                       {ProcessMode::ALL, false}};
 
   channels_ = std::make_shared<Channels>();
+  IsHidExist();
 }
 
 CameraPrivate::~CameraPrivate() {
@@ -131,7 +133,9 @@ CameraPrivate::~CameraPrivate() {
   free(stream_color_info_ptr_);
   free(stream_depth_info_ptr_);
 
-  channels_->StopHidTracking();
+  if (is_hid_exist_) {
+    channels_->StopHidTracking();
+  }
   if (is_capture_image_) {
     StopCaptureImage();
   }
@@ -508,8 +512,10 @@ ErrorCode CameraPrivate::Open(const InitParams& params) {
 #endif
 
   if (ETronDI_OK == ret) {
-    if (!StartHidTracking()) {
-      return ErrorCode::ERROR_IMU_OPEN_FAILED;
+    if (is_hid_exist_) {
+      if (!StartHidTracking()) {
+        return ErrorCode::ERROR_IMU_OPEN_FAILED;
+      }
     }
     StartCaptureImage();
     StartSyntheticImage();
@@ -656,6 +662,19 @@ void CameraPrivate::SyntheticImageColor() {
   img_info_.clear();
 }
 
+void CameraPrivate::OldSyntheticImageColor() {
+  std::unique_lock<std::mutex> _(cap_color_mtx_);
+  image_color_wait_.wait_for(_, std::chrono::seconds(1));
+  if (image_color_.empty()) { return; }
+
+  for (auto color : image_color_) {
+    OldTransferColor(color);
+    if (left_color_data_.size() > 30) { left_color_data_.clear(); }
+    if (right_color_data_.size() > 30) { right_color_data_.clear(); }
+  }
+  image_color_.clear();
+}
+
 void CameraPrivate::TransferColor(Image::pointer color, img_info_data_t info) {
   if (!is_enable_image_[ImageType::IMAGE_RIGHT_COLOR]) {
     stream_data_t data;
@@ -669,11 +688,35 @@ void CameraPrivate::TransferColor(Image::pointer color, img_info_data_t info) {
   }
 }
 
+void CameraPrivate::OldTransferColor(Image::pointer color) {
+  if (!is_enable_image_[ImageType::IMAGE_RIGHT_COLOR]) {
+    stream_data_t data;
+    data.img_info = nullptr;
+    data.img = color->Clone();
+    left_color_data_.push_back(data);
+  } else {
+    OldCutPart(ImageType::IMAGE_LEFT_COLOR, color);
+    OldCutPart(ImageType::IMAGE_RIGHT_COLOR, color);
+  }
+}
+
 void CameraPrivate::CutPart(ImageType type,
     Image::pointer color, img_info_data_t info) {
   stream_data_t data;
   data.img_info = std::make_shared<ImgInfo>();
   *data.img_info = *info.img_info;
+  if (type == ImageType::IMAGE_LEFT_COLOR) {
+    data.img = color->CutPart(ImageType::IMAGE_LEFT_COLOR);
+    left_color_data_.push_back(data);
+  } else if (type == ImageType::IMAGE_RIGHT_COLOR) {
+    data.img = color->CutPart(ImageType::IMAGE_RIGHT_COLOR);
+    right_color_data_.push_back(data);
+  }
+}
+
+void CameraPrivate::OldCutPart(ImageType type, Image::pointer color) {
+  stream_data_t data;
+  data.img_info = nullptr;
   if (type == ImageType::IMAGE_LEFT_COLOR) {
     data.img = color->CutPart(ImageType::IMAGE_LEFT_COLOR);
     left_color_data_.push_back(data);
@@ -708,7 +751,8 @@ void CameraPrivate::StartCaptureImage() {
       if (is_enable_image_[ImageType::IMAGE_DEPTH]) {
         CaptureImageDepth(&code);
       }
-      usleep(10);
+      std::this_thread::sleep_for(
+          std::chrono::milliseconds(1));
     }
   });
 }
@@ -726,12 +770,17 @@ void CameraPrivate::StartSyntheticImage() {
     while (is_capture_image_) {
       if (is_enable_image_[ImageType::IMAGE_LEFT_COLOR] ||
           is_enable_image_[ImageType::IMAGE_RIGHT_COLOR]) {
-        SyntheticImageColor();
+        if (is_hid_exist_) {
+          SyntheticImageColor();
+        } else {
+          OldSyntheticImageColor();
+        }
       }
       if (is_enable_image_[ImageType::IMAGE_DEPTH]) {
         SyntheticImageDepth();
       }
-      usleep(10);
+      std::this_thread::sleep_for(
+          std::chrono::milliseconds(1));
     }
   });
 }
@@ -1275,4 +1324,8 @@ void CameraPrivate::ScaleAssemCompensate(std::shared_ptr<ImuData> data) {
       data->gyro[i] = d[i][0];
     }
   }
+}
+
+void CameraPrivate::IsHidExist() {
+  is_hid_exist_ = channels_->IsHidExist();
 }

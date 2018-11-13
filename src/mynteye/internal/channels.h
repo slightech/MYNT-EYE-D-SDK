@@ -55,6 +55,8 @@ class MYNTEYE_API Channels {
       imu_params_t *imu_params,
       Version *spec_version);
 
+  bool IsHidExist();
+
  protected:
   bool ExtractHidData(ImuResPacket &imu, ImgInfoResPacket &img);
   bool RequireFileData(bool device_info,

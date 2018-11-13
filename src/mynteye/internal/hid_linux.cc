@@ -352,31 +352,27 @@ void hid_device::process_usb_dev(int max,
   }
 }
 
+bool hid_device::find_device() {
+  usb_init();
+  usb_find_busses();
+  usb_find_devices();
+
+  for (usb_bus_t *bus = usb_get_busses(); bus; bus = bus->next) {
+    for (usb_device_t *dev = bus->devices; dev; dev = dev->next) {
+      if (VID > 0 && dev->descriptor.idVendor != VID) {
+        continue;
+      }
+      if (PID > 0 && dev->descriptor.idProduct != PID) {
+        continue;
+      }
+
+      return true;
+    }
+  }
+
+  return false;
+}
+
 }  // namespace hid
 
 MYNTEYE_END_NAMESPACE
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
