@@ -11,33 +11,99 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#ifndef MYNTEYE_INTERNAL_TYPES_H_  // NOLINT
-#define MYNTEYE_INTERNAL_TYPES_H_
+#ifndef MYNTEYE_TYPES_DATA_H_
+#define MYNTEYE_TYPES_DATA_H_
 #pragma once
 
-#include <cstdint>
-
-#include <array>
+#include <algorithm>
 #include <bitset>
+#include <cstdint>
 #include <string>
 #include <vector>
-#include <iostream>
 
 #include "mynteye/stubs/global.h"
 
 MYNTEYE_BEGIN_NAMESPACE
 
+/**
+ * @ingroup datatypes
+ * @brief Image information
+ */
+struct MYNTEYE_API ImgInfo {
+  /** Image frame id */
+  std::uint16_t frame_id;
+
+  /** Image timestamp */
+  std::uint32_t timestamp;
+
+  /** Image exposure time */
+  std::uint16_t exposure_time;
+
+  void Reset() {
+    frame_id = 0;
+    timestamp = 0;
+    exposure_time = 0;
+  }
+
+  ImgInfo() {
+    Reset();
+  }
+  ImgInfo(const ImgInfo &other) {
+    frame_id = other.frame_id;
+    timestamp = other.timestamp;
+    exposure_time = other.exposure_time;
+  }
+  ImgInfo &operator=(const ImgInfo &other) {
+    frame_id = other.frame_id;
+    timestamp = other.timestamp;
+    exposure_time = other.exposure_time;
+    return *this;
+  }
+};
+
+/**
+ * @ingroup datatypes
+ * @brief Imu data
+ */
+struct MYNTEYE_API ImuData {
+  /**
+   * Data type
+   * 1: accelerometer
+   * 2: gyroscope
+   * */
+  std::uint8_t flag;
+
+  /** Imu gyroscope or accelerometer or frame timestamp */
+  std::uint64_t timestamp;
+
+  /** temperature */
+  double temperature;
+
+  /** Imu accelerometer data for 3-axis: X, Y, X. */
+  double accel[3];
+
+  /** Imu gyroscope data for 3-axis: X, Y, Z. */
+  double gyro[3];
+
+  void Reset() {
+    flag = 0;
+    timestamp = 0;
+    temperature = 0;
+    std::fill(accel, accel + 3, 0);
+    std::fill(gyro, gyro + 3, 0);
+  }
+
+  ImuData() {
+    Reset();
+  }
+};
+
 #define MYNTEYE_PROPERTY(TYPE, NAME) \
  public:                             \
-  void set_##NAME(TYPE NAME) {       \
-    NAME##_ = NAME;                  \
-  }                                  \
-  TYPE NAME() const {                \
-    return NAME##_;                  \
-  }                                  \
-                                     \
- private:                            \
-  TYPE NAME##_;                      \
+  void set_##NAME(TYPE NAME) { NAME##_ = NAME; } \
+  TYPE NAME() const { return NAME##_; }          \
+ private:       \
+  TYPE NAME##_; \
 
 /**
  * Version.
@@ -127,7 +193,7 @@ class MYNTEYE_API Type {
 
 /**
  * @ingroup datatypes
- * Device infomation.
+ * Device parameters.
  */
 struct MYNTEYE_API DeviceParams {
   std::string name;
@@ -140,116 +206,6 @@ struct MYNTEYE_API DeviceParams {
   std::uint16_t nominal_baseline;
 };
 
-/**
- * @ingroup datatypes
- * Image packet.
- */
-#pragma pack(push, 1)
-struct ImgInfoPacket {
-  std::uint16_t frame_id;
-  std::uint32_t timestamp;
-  std::uint16_t exposure_time;
-
-  ImgInfoPacket() = default;
-  explicit ImgInfoPacket(std::uint8_t *data) {
-    from_data(data);
-  }
-
-  void from_data(std::uint8_t *data) {
-    timestamp = (*(data + 2)) | (*(data + 3) << 8) | (*(data + 4) << 16) |
-                (*(data + 5) << 24);
-    frame_id = (*(data + 6)) | (*(data + 7) << 8);
-    exposure_time = (*(data + 8)) | (*(data + 9) << 8);
-  }
-};
-#pragma pack(pop)
-
-/**
- * @ingroup datatypes
- * Image response packet
- */
-#pragma pack(push, 1)
-struct ImgInfoResPacket {
-  std::vector<ImgInfoPacket> packets;
-
-  ImgInfoResPacket() = default;
-  explicit ImgInfoResPacket(std::uint8_t *data) {
-    from_data(data);
-  }
-
-  void from_data(std::uint8_t *data) {
-    ImgInfoPacket packet(data);
-    packets.push_back(packet);
-  }
-};
-#pragma pack(pop)
-
-/**
- * @ingroup datatypes
- * Imu segment.
- */
-#pragma pack(push, 1)
-struct ImuSegment {
-  std::uint8_t flag;
-  std::uint32_t timestamp;
-  std::int16_t temperature;
-  std::int16_t accel_or_gyro[3];
-
-  ImuSegment() = default;
-  explicit ImuSegment(std::uint8_t *data) {
-    from_data(data);
-  }
-
-  void from_data(std::uint8_t *data) {
-    flag = *data + 1;
-    timestamp =
-        *(data + 2) | *(data + 3) << 8 | *(data + 4) << 16 | *(data + 5) << 24;
-    accel_or_gyro[0] = *(data + 6) | *(data + 7) << 8;
-    accel_or_gyro[1] = *(data + 8) | *(data + 9) << 8;
-    accel_or_gyro[2] = *(data + 10) | *(data + 11) << 8;
-    temperature = *(data + 12) | *(data + 13) << 8;
-  }
-};
-#pragma pack(pop)
-
-/**
- * @ingroup datatypes
- * Imu packet.
- */
-#pragma pack(push, 1)
-struct ImuPacket {
-  std::vector<ImuSegment> segments;
-
-  ImuPacket() = default;
-  explicit ImuPacket(std::uint8_t *data) {
-    from_data(data);
-  }
-  void from_data(std::uint8_t *data) {
-    segments.push_back(ImuSegment(data));
-  }
-};
-#pragma pack(pop)
-
-/**
- * @ingroup datatypes
- * Imu response packet.
- */
-#pragma pack(push, 1)
-struct ImuResPacket {
-  std::vector<ImuPacket> packets;
-
-  ImuResPacket() = default;
-  explicit ImuResPacket(std::uint8_t *data) {
-    from_data(data);
-  }
-
-  void from_data(std::uint8_t *data) {
-    ImuPacket packet(data);
-    packets.push_back(packet);
-  }
-};
-#pragma pack(pop)
-
 MYNTEYE_END_NAMESPACE
 
-#endif //MYNTEYE_INTERNAL_TYPES_H_ // NOLINT
+#endif  // MYNTEYE_TYPES_DATA_H_

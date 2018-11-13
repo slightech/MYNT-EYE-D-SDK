@@ -20,8 +20,8 @@
 #include <thread>
 #include <functional>
 
+#include "mynteye/data/types_internal.h"
 #include "mynteye/types.h"
-#include "mynteye/internal/types.h"
 
 MYNTEYE_BEGIN_NAMESPACE
 
