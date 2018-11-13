@@ -57,15 +57,6 @@ enum class ErrorCode : std::int32_t {
 
 /**
  * @ingroup enumerations
- * @brief List image mode.
- */
-enum class ImageMode : std::int32_t {
-  IMAGE_RAW,
-  IMAGE_RECTIFIED
-};
-
-/**
- * @ingroup enumerations
  * @brief Camera info fields are read-only strings that can be queried from the
  * device.
  */

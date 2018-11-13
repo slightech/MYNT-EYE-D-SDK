@@ -35,14 +35,14 @@ int main(int argc, char const* argv[]) {
 
   // Warning: Color stream format MJPG doesn't work.
   mynteye::InitParams params(dev_info.index);
-  // params.depth_mode = DepthMode::DEPTH_GRAY;
+  // params.color_mode = mynteye::ColorMode::COLOR_RECTIFIED;
+  // params.depth_mode = mynteye::DepthMode::DEPTH_GRAY;
   params.depth_mode = mynteye::DepthMode::DEPTH_COLORFUL;
-  // params.stream_mode = StreamMode::STREAM_640x480;
-  // params.stream_mode = mynteye::StreamMode::STREAM_2560x720;
+  // params.stream_mode = mynteye::StreamMode::STREAM_640x480;
+  params.stream_mode = mynteye::StreamMode::STREAM_2560x720;
   params.ir_intensity = 4;
   params.framerate = 30;
 
-  // cam.SetImageMode(mynteye::ImageMode::IMAGE_RECTIFIED);
   cam.EnableImageType(mynteye::ImageType::ALL);
   // cam.EnableImuProcessMode(mynteye::ProcessMode::ALL);
   cam.Open(params);

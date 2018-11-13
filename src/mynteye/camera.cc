@@ -122,10 +122,6 @@ CameraCtrlRectLogData Camera::GetVGACameraCtrlData() {
   return p_->GetVGACameraCtrlData();
 }
 
-void Camera::SetImageMode(const ImageMode& mode) {
-  p_->SetImageMode(mode);
-}
-
 std::string Camera::GetInfo(const Info &info) const {
   return p_->GetInfo(info);
 }

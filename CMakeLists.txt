@@ -130,8 +130,6 @@ set(MYNTEYE_DEPTH_SRCS
   src/mynteye/types.cc
   src/mynteye/utils.cc
   src/mynteye/internal/camera_p.cc
-  src/mynteye/internal/camera_p_linux.cc
-  src/mynteye/internal/camera_p_win.cc
   src/mynteye/internal/channels.cc
   src/mynteye/internal/types.cc
   src/mynteye/util/rate.cc

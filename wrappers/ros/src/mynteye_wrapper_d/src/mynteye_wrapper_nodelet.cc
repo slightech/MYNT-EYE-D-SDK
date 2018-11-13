@@ -301,7 +301,6 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
   void device_poll() {
     // Main loop
-    mynteye->SetImageMode(mynteye::ImageMode::IMAGE_RAW);
     mynteye->EnableImageType(mynteye::ImageType::ALL);
     mynteye->Open(params);
     if (!mynteye->IsOpened()) {

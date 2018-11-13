@@ -29,8 +29,6 @@
 #include <condition_variable>
 #include <map>
 
-#include "eSPDI.h"
-
 #include "mynteye/image.h"
 #include "mynteye/types.h"
 #include "mynteye/internal/types.h"
@@ -38,12 +36,11 @@
 
 MYNTEYE_BEGIN_NAMESPACE
 
-class Rate;
+class Device;
 class Channels;
 
 class MYNTEYE_API CameraPrivate {
  public:
-  using image_size_t = unsigned long int;  // NOLINT
   using stream_data_t = device::StreamData;
   using stream_datas_t = std::vector<stream_data_t>;
   using motion_data_t = device::MotionData;
@@ -59,34 +56,8 @@ class MYNTEYE_API CameraPrivate {
       std::vector<StreamInfo>* color_infos,
       std::vector<StreamInfo>* depth_infos);
 
-  void GetResolutionIndex(const InitParams& params,
-      int* color_res_index,
-      int* depth_res_index);
-  void GetResolutionIndex(const std::int32_t& dev_index,
-      const StreamMode& stream_mode,
-      const StreamFormat& color_stream_format,
-      const StreamFormat& depth_stream_format,
-      int* color_res_index,
-      int* depth_res_index);
-
   ErrorCode SetAutoExposureEnabled(bool enabled);
   ErrorCode SetAutoWhiteBalanceEnabled(bool enabled);
-
-  bool GetSensorRegister(int id, std::uint16_t address, std::uint16_t* value,
-      int flag = FG_Address_1Byte);
-  bool GetHWRegister(std::uint16_t address, std::uint16_t* value,
-      int flag = FG_Address_1Byte);
-  bool GetFWRegister(std::uint16_t address, std::uint16_t* value,
-      int flag = FG_Address_1Byte);
-
-  bool SetSensorRegister(int id, std::uint16_t address, std::uint16_t value,
-      int flag = FG_Address_1Byte);
-  bool SetHWRegister(std::uint16_t address, std::uint16_t value,
-      int flag = FG_Address_1Byte);
-  bool SetFWRegister(std::uint16_t address, std::uint16_t value,
-      int flag = FG_Address_1Byte);
-
-  bool SetHWPostProcess(bool enable);
 
   ErrorCode Open(const InitParams& params);
 
@@ -130,14 +101,7 @@ class MYNTEYE_API CameraPrivate {
   CameraCtrlRectLogData GetHDCameraCtrlData();
   CameraCtrlRectLogData GetVGACameraCtrlData();
 
-  void GetCameraLogData(int index);
-  CameraCtrlRectLogData GetCameraCtrlData(int index);
   void SetCameraLogData(const std::string& file);
-
-  void SyncCameraLogData();
-
-  /** Set image mode (raw image or rectified image) */
-  void SetImageMode(const ImageMode &mode);
 
   /** Get the device info. */
   std::shared_ptr<DeviceParams> GetInfo() const;
@@ -166,9 +130,6 @@ class MYNTEYE_API CameraPrivate {
 
  private:
   void Init();
-  void OnInit();
-  void OnPreWait();
-  void OnPostWait();
 
   void SyntheticImageColor();
   void SyntheticImageDepth();
@@ -184,45 +145,7 @@ class MYNTEYE_API CameraPrivate {
   Image::pointer RetrieveImageColor(ErrorCode* code);
   Image::pointer RetrieveImageDepth(ErrorCode* code);
 
-  void ReleaseBuf();
-
-#ifdef MYNTEYE_OS_WIN
-  static void ImgCallback(EtronDIImageType::Value imgType, int imgId,
-      unsigned char* imgBuf, int imgSize, int width, int height,
-      int serialNumber, void *pParam);
-#endif
-  std::vector<CameraCtrlRectLogData> camera_log_datas_;
-
-  void* etron_di_;
-
-  DEVSELINFO dev_sel_info_;
-  int depth_data_type_;
-
-  PETRONDI_STREAM_INFO stream_color_info_ptr_;
-  PETRONDI_STREAM_INFO stream_depth_info_ptr_;
-  int color_res_index_ = 0;
-  int depth_res_index_ = 0;
-  int framerate_ = 0;
-  std::unique_ptr<Rate> rate_;
-
-  std::int32_t stream_info_dev_index_ = -1;
-
-  int color_serial_number_ = 0;
-  int depth_serial_number_ = 0;
-  image_size_t color_image_size_ = 0;
-  image_size_t depth_image_size_ = 0;
-  Image::pointer color_image_buf_ = nullptr;
-  Image::pointer depth_image_buf_ = nullptr;
-  unsigned char* depth_buf_ = nullptr;
-
-#ifdef MYNTEYE_OS_WIN
-  std::mutex mtx_imgs_;
-  RGBQUAD color_palette_z14_[16384];
-#else  // MYNTEYE_OS_LINUX
-  DEPTH_TRANSFER_CTRL dtc_;
-#endif
-
-  DepthMode depth_mode_;
+  std::shared_ptr<Device> device_;
 
   std::shared_ptr<Channels> channels_;
   std::mutex mtx_img_info_;

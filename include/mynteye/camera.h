@@ -131,9 +131,6 @@ class MYNTEYE_API Camera {
     return CameraCtrlRectLogData.*/
   CameraCtrlRectLogData GetVGACameraCtrlData();
 
-  /** Set Image mode ( raw image and rectified image )*/
-  void SetImageMode(const ImageMode& mode);
-
   /** Get device information of Info*/
   std::string GetInfo(const Info &info) const;
 

@@ -37,6 +37,11 @@ struct MYNTEYE_API OpenParams {
   std::int32_t framerate;
 
   /**
+   * Color mode, default COLOR_RAW.
+   */
+  ColorMode color_mode;
+
+  /**
    * Depth mode, default DEPTH_COLORFUL.
    */
   DepthMode depth_mode;

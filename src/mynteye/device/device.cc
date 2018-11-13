@@ -229,6 +229,16 @@ bool Device::Open(const OpenParams& params) {
 
   dev_sel_info_.index = params.dev_index;
 
+  switch (params.color_mode) {
+    case ColorMode::COLOR_RECTIFIED:
+      depth_data_type_ = 4;  // ETronDI_DEPTH_DATA_11_BITS
+      break;
+    case ColorMode::COLOR_RAW:
+    default:
+      depth_data_type_ = 9;  // ETronDI_DEPTH_DATA_11_BITS_RAW
+      break;
+  }
+
   EtronDI_SetDepthDataType(etron_di_, &dev_sel_info_, depth_data_type_);
   DBG_LOGI("SetDepthDataType: %d", depth_data_type_);
 

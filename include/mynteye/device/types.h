@@ -24,6 +24,27 @@ MYNTEYE_BEGIN_NAMESPACE
 
 /**
  * @ingroup enumerations
+ * @brief List color modes.
+ */
+enum class ColorMode : std::int32_t {
+  COLOR_RAW       = 0,  // color raw
+  COLOR_RECTIFIED = 1,  // color rectified
+  COLOR_MODE_LAST
+};
+
+/**
+ * @ingroup enumerations
+ * @brief List depth modes.
+ */
+enum class DepthMode : std::int32_t {
+  DEPTH_RAW      = 0,  // ImageFormat::DEPTH_RAW
+  DEPTH_GRAY     = 1,  // ImageFormat::DEPTH_GRAY_24
+  DEPTH_COLORFUL = 2,  // ImageFormat::DEPTH_RGB
+  DEPTH_MODE_LAST
+};
+
+/**
+ * @ingroup enumerations
  * @brief List stream mode.
  */
 enum class StreamMode : std::int32_t {
@@ -46,17 +67,6 @@ enum class StreamFormat : std::int32_t {
 
 MYNTEYE_API
 std::ostream& operator<<(std::ostream& os, const StreamFormat& code);
-
-/**
- * @ingroup enumerations
- * @brief List depth modes.
- */
-enum class DepthMode : std::int32_t {
-  DEPTH_RAW      = 0,  // ImageFormat::DEPTH_RAW
-  DEPTH_GRAY     = 1,  // ImageFormat::DEPTH_GRAY_24
-  DEPTH_COLORFUL = 2,  // ImageFormat::DEPTH_RGB
-  DEPTH_MODE_LAST
-};
 
 /**
  * @ingroup enumerations
