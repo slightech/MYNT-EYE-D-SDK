@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+#include <termio.h>
 #include <iostream>
 
 #include <opencv2/highgui/highgui.hpp>
@@ -35,13 +36,6 @@ int main(int argc, char const* argv[]) {
 
   // Warning: Color stream format MJPG doesn't work.
   mynteye::InitParams params(dev_info.index);
-  // params.depth_mode = DepthMode::DEPTH_GRAY;
-  params.depth_mode = mynteye::DepthMode::DEPTH_COLORFUL;
-  // params.stream_mode = StreamMode::STREAM_640x480;
-  params.ir_intensity = 4;
-  params.framerate = 10;
-
-  cam.EnableImageType(mynteye::ImageType::IMAGE_LEFT_COLOR);
   cam.Open(params);
 
   std::cout << std::endl;
@@ -53,19 +47,9 @@ int main(int argc, char const* argv[]) {
 
   std::cout << "Press ESC/Q on Windows to terminate" << std::endl;
 
-  cv::namedWindow("color");
-
   mynteye::util::Counter counter;
   for (;;) {
     counter.Update();
-
-    auto image_color = cam.RetrieveImage(mynteye::ImageType::IMAGE_LEFT_COLOR);
-    if (image_color.img) {
-      cv::Mat color = image_color.img->To(mynteye::ImageFormat::COLOR_BGR)->ToMat();
-      mynteye::util::draw(color, mynteye::util::to_string(counter.fps(), 5, 1),
-          mynteye::util::TOP_RIGHT);
-      cv::imshow("color", color);
-    }
 
     auto motion_datas = cam.RetrieveMotions();
     std::cout << "Imu count: " << motion_datas.size() << std::endl;
@@ -96,7 +80,7 @@ int main(int argc, char const* argv[]) {
       std::cout << std::endl;
     }
 
-    char key = static_cast<char>(cv::waitKey(1));
+    char key = mynteye::util::waitKey();
     if (key == 27 || key == 'q' || key == 'Q') {  // ESC/Q
       break;
     }
@@ -104,6 +88,5 @@ int main(int argc, char const* argv[]) {
   }
 
   cam.Close();
-  cv::destroyAllWindows();
   return 0;
 }

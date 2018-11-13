@@ -15,6 +15,8 @@
 #define MYNTEYE_SAMPLES_UTIL_CAM_UTILS_H_
 #pragma once
 
+#include <stdio.h>
+#include <termio.h>
 #include <sstream>
 #include <string>
 #include <memory>
@@ -52,6 +54,8 @@ std::string to_string(T val, int width, int prec, char fillch = ' ') {
   auto fmt = new_format(std::move(width), std::move(prec), std::move(fillch));
   return to_string(val, fmt);
 }
+
+char waitKey();
 
 }  // namespace util
 }  // namespace mynteye
