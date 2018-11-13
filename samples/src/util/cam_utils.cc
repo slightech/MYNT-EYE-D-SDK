@@ -29,6 +29,7 @@ std::shared_ptr<std::ios> new_format(int width, int prec, char fillch) {
   return fmt;
 }
 
+#ifdef MYNTEYE_OS_LINUX
 char waitKey() {
   int ret = system("stty -icanon");
   fd_set rfds;
@@ -47,6 +48,19 @@ char waitKey() {
 
   return 'n';
 }
+#endif
+
+#ifdef MYNTEYE_OS_WIN
+char waitKey() {
+  int ch;
+  if(_kbhit()) {
+    ch = _getch();
+	return static_cast<char>(ch);
+  }
+  
+  return 'n';
+}
+#endif
 
 
 }  // namespace util

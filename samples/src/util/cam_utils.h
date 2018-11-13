@@ -16,7 +16,12 @@
 #pragma once
 
 #include <stdio.h>
+#ifdef MYNTEYE_OS_LINUX
 #include <termio.h>
+#endif
+#ifdef MYNTEYE_OS_WIN
+#include <conio.h>
+#endif
 #include <sstream>
 #include <string>
 #include <memory>
