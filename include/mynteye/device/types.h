@@ -45,7 +45,7 @@ enum class DepthMode : std::int32_t {
 
 /**
  * @ingroup enumerations
- * @brief List stream mode.
+ * @brief List stream modes.
  */
 enum class StreamMode : std::int32_t {
   STREAM_640x480  = 0,  // 480p, vga, left+right

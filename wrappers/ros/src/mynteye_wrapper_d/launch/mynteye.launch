@@ -1,18 +1,19 @@
 <launch>
+  <!-- Color mode -->
+  <arg name="color_raw"         default="0" />
+  <arg name="color_rectified"   default="1" />
+  <!-- Depth mode -->
+  <arg name="depth_raw"         default="0" />
+  <arg name="depth_gray"        default="1" />
+  <arg name="depth_colorful"    default="2" />
   <!-- Stream mode -->
   <arg name="stream_640x480"    default="0" />
   <arg name="stream_1280x480"   default="1" />
   <arg name="stream_1280x720"   default="2" />
   <arg name="stream_2560x720"   default="3" />
-
   <!-- Stream format -->
   <arg name="stream_mjpg"       default="0" />
   <arg name="stream_yuyv"       default="1" />
-
-  <!-- Depth mode -->
-  <arg name="depth_raw"         default="0" />
-  <arg name="depth_gray"        default="1" />
-  <arg name="depth_colorful"    default="2" />
 
   <!-- Camera Params -->
 
@@ -21,6 +22,7 @@
   <!-- Framerate -->
   <arg name="framerate" default="10" />
 
+  <arg name="color_mode" default="$(arg color_raw)" />
   <arg name="depth_mode" default="$(arg depth_raw)" />
   <arg name="stream_mode" default="$(arg stream_2560x720)" />
   <arg name="color_stream_format" default="$(arg stream_yuyv)" />
@@ -78,6 +80,7 @@
     <!-- Camera params -->
     <param name="dev_index"     value="$(arg dev_index)" />
     <param name="framerate"     value="$(arg framerate)" />
+    <param name="color_mode"    value="$(arg color_mode)" />
     <param name="depth_mode"    value="$(arg depth_mode)" />
     <param name="stream_mode"   value="$(arg stream_mode)" />
     <param name="color_stream_format" value="$(arg color_stream_format)" />

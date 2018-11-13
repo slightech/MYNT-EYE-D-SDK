@@ -60,15 +60,6 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   sensor_msgs::CameraInfoPtr camera_info_ptr_;
 
   // Launch params
-  int dev_index;
-  int framerate;
-  int depth_mode;
-  int stream_mode;
-  int color_stream_format;
-  int depth_stream_format;
-  bool state_ae;
-  bool state_awb;
-  int ir_intensity;
   int gravity;
 
   std::string base_frame_id;
@@ -192,15 +183,15 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     header.frame_id = depth_frame_id;
 
     auto &&info = getCameraInfo();
-    if (depth_mode == 0) {  // DEPTH_RAW
+    if (params.depth_mode == DepthMode::DEPTH_RAW) {
       *mat = img->To(mynteye::ImageFormat::DEPTH_RAW)->ToMat();
       pub_depth.publish(
           cv_bridge::CvImage(header, enc::MONO16, *mat).toImageMsg(), info);
-    } else if (depth_mode == 1) {  // DEPTH_GRAY
+    } else if (params.depth_mode == DepthMode::DEPTH_GRAY) {
       *mat = img->To(mynteye::ImageFormat::DEPTH_GRAY_24)->ToMat();
       pub_depth.publish(
           cv_bridge::CvImage(header, enc::RGB8, *mat).toImageMsg(), info);
-    } else if (depth_mode == 2) {  // DEPTH_COLORFUL
+    } else if (params.depth_mode == DepthMode::DEPTH_COLORFUL) {
       *mat = img->To(mynteye::ImageFormat::DEPTH_RGB)->ToMat();
       pub_depth.publish(
           cv_bridge::CvImage(header, enc::RGB8, *mat).toImageMsg(), info);
@@ -217,7 +208,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     }
     sensor_msgs::Imu msg;
 
-    //msg.header.seq = seq;
+    // msg.header.seq = seq;
     msg.header.stamp = stamp;
     msg.header.frame_id = imu_frame_id;
 
@@ -316,7 +307,8 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
         depth_SubNumber + points_SubNumber) > 0;
       bool imu_Sub = (imu_SubNumber + temp_SubNumber) > 0;
       // publish points, the depth mode must be DEPTH_RAW.
-      bool points_subscribed = (points_SubNumber > 0) && (depth_mode == 0);
+      bool points_subscribed = (points_SubNumber > 0) \
+          && (params.depth_mode == DepthMode::DEPTH_RAW);
 
       auto &&left_color = mynteye->RetrieveImages(
         mynteye::ImageType::IMAGE_LEFT_COLOR);
@@ -428,20 +420,20 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     nh_ns = getMTPrivateNodeHandle();
 
     // Launch params
-    dev_index = 0;
-    framerate = 10;
-    depth_mode = 0;
-    stream_mode = 0;
-    color_stream_format = 0;
-    depth_stream_format = 0;
-    state_ae = true;
-    state_awb = true;
-    ir_intensity = 0;
+    int dev_index = 0;
+    int framerate = 10;
+    int color_mode = 0;
+    int depth_mode = 0;
+    int stream_mode = 0;
+    int color_stream_format = 0;
+    int depth_stream_format = 0;
+    bool state_ae = true;
+    bool state_awb = true;
+    int ir_intensity = 0;
     gravity = 9.8;
-    std::uint32_t timeBeginPointOnDevice = 0;
-
     nh_ns.getParam("dev_index", dev_index);
     nh_ns.getParam("framerate", framerate);
+    nh_ns.getParam("color_mode", color_mode);
     nh_ns.getParam("depth_mode", depth_mode);
     nh_ns.getParam("stream_mode", stream_mode);
     nh_ns.getParam("color_stream_format", color_stream_format);
@@ -487,7 +479,6 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     std::string points_topic = "mynteye/points";
     std::string imu_topic = "mynteye/imu";
     std::string temp_topic = "mynteye/temp";
-
     nh_ns.getParam("left_mono_topic", left_mono_topic);
     nh_ns.getParam("left_color_topic", left_color_topic);
     nh_ns.getParam("right_mono_topic", right_mono_topic);
@@ -537,6 +528,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       NODELET_INFO_STREAM(dashes);
     }
     params.framerate = framerate;
+    params.color_mode = static_cast<mynteye::ColorMode>(color_mode);
     params.depth_mode = static_cast<mynteye::DepthMode>(depth_mode);
     params.stream_mode = static_cast<mynteye::StreamMode>(stream_mode);
     params.color_stream_format =
