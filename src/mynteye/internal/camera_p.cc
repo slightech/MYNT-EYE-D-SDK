@@ -106,7 +106,7 @@ ErrorCode CameraPrivate::SetAutoWhiteBalanceEnabled(bool enabled) {
   return ok ? ErrorCode::SUCCESS : ErrorCode::ERROR_FAILURE;
 }
 
-ErrorCode CameraPrivate::Open(const InitParams& params) {
+ErrorCode CameraPrivate::Open(const OpenParams& params) {
   bool ok = device_->Open(params);
   if (!ok) {
     return ErrorCode::ERROR_FAILURE;

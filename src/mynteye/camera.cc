@@ -50,10 +50,10 @@ ErrorCode Camera::Open() {
     LOGE("Error: Device not found");
     return ErrorCode::ERROR_CAMERA_OPEN_FAILED;
   }
-  return Open(InitParams(0));
+  return Open(OpenParams(0));
 }
 
-ErrorCode Camera::Open(const InitParams& params) {
+ErrorCode Camera::Open(const OpenParams& params) {
   return p_->Open(params);
 }
 

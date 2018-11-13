@@ -30,7 +30,6 @@
 #include <map>
 
 #include "mynteye/data/types_internal.h"
-#include "mynteye/image.h"
 #include "mynteye/types.h"
 
 MYNTEYE_BEGIN_NAMESPACE
@@ -59,7 +58,7 @@ class MYNTEYE_API CameraPrivate {
   ErrorCode SetAutoExposureEnabled(bool enabled);
   ErrorCode SetAutoWhiteBalanceEnabled(bool enabled);
 
-  ErrorCode Open(const InitParams& params);
+  ErrorCode Open(const OpenParams& params);
 
   bool IsOpened() const;
   void CheckOpened() const;

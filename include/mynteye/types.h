@@ -21,6 +21,7 @@
 
 MYNTEYE_BEGIN_NAMESPACE
 
+// @Deprecated
 using CameraCtrlRectLogData = CameraCalibration;
 
 struct ImgInfoData {

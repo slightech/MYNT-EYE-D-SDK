@@ -20,13 +20,16 @@
 #include <vector>
 #include <string>
 
-#include "mynteye/device_info.h"
-#include "mynteye/image.h"
-#include "mynteye/init_params.h"
-#include "mynteye/stream_info.h"
+#include "mynteye/device/device_info.h"
+#include "mynteye/device/image.h"
+#include "mynteye/device/open_params.h"
+#include "mynteye/device/stream_info.h"
 #include "mynteye/types.h"
 
 MYNTEYE_BEGIN_NAMESPACE
+
+// @Deprecated
+using InitParams = OpenParams;
 
 class CameraPrivate;
 
@@ -49,7 +52,7 @@ class MYNTEYE_API Camera {
   /** Open camera */
   ErrorCode Open();
   /** Open camera with params */
-  ErrorCode Open(const InitParams& params);
+  ErrorCode Open(const OpenParams& params);
 
   /** Get the work status of the camera true(working)/false(stopped) */
   bool IsOpened() const;
