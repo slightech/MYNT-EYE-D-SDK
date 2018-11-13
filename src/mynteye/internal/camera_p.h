@@ -50,18 +50,49 @@ class MYNTEYE_API CameraPrivate {
   CameraPrivate();
   ~CameraPrivate();
 
-  void GetDevices(std::vector<DeviceInfo>* dev_infos);
-  void GetResolutions(const std::int32_t& dev_index,
+  /** Get all device infos */
+  void GetDeviceInfos(std::vector<DeviceInfo>* dev_infos) const;
+
+  /** Get all stream infos */
+  void GetStreamInfos(const std::int32_t& dev_index,
       std::vector<StreamInfo>* color_infos,
-      std::vector<StreamInfo>* depth_infos);
+      std::vector<StreamInfo>* depth_infos) const;
 
-  ErrorCode SetAutoExposureEnabled(bool enabled);
-  ErrorCode SetAutoWhiteBalanceEnabled(bool enabled);
-
+  /** Open camera */
   ErrorCode Open(const OpenParams& params);
 
+  /** Whethor camera is opened or not */
   bool IsOpened() const;
+  /** Check camera is opened, otherwise error */
   void CheckOpened() const;
+
+  /** Get all device informations */
+  std::shared_ptr<DeviceParams> GetInfo() const;
+  /** Get one device information of Info */
+  std::string GetInfo(const Info &info) const;
+
+  /** Get camera calibration */
+  CameraCalibration GetCameraCalibration(const StreamMode& stream_mode);
+  /** Get camera calibration file */
+  void GetCameraCalibrationFile(const StreamMode& stream_mode,
+                                const std::string& filename);
+
+  /** Set camera calibration bin file */
+  void WriteCameraCalibrationBinFile(const std::string& filename);
+
+  /** Get the intrinsics of motion */
+  MotionIntrinsics GetMotionIntrinsics() const;
+  /** Get the extrinsics from left to motion */
+  Extrinsics GetMotionExtrinsics() const;
+
+  /** Close the camera */
+  void Close();
+
+  // todo
+
+  void EnableImageType(const ImageType& type);
+
+  void EnableImuProcessMode(const ProcessMode &mode);
 
   /** Get datas of stream and status */
   stream_datas_t RetrieveImage(const ImageType& type, ErrorCode* code);
@@ -88,44 +119,18 @@ class MYNTEYE_API CameraPrivate {
   /** Get imu data */
   motion_datas_t GetImuDatas();
 
-  void EnableImageType(const ImageType& type);
-
-  /** Wait according to framerate. */
-  void Wait();
-  void Close();
-
-  void GetHDCameraLogData();
-  void GetVGACameraLogData();
-
-  CameraCtrlRectLogData GetHDCameraCtrlData();
-  CameraCtrlRectLogData GetVGACameraCtrlData();
-
-  void SetCameraLogData(const std::string& file);
-
-  /** Get the device info. */
-  std::shared_ptr<DeviceParams> GetInfo() const;
-  /** Get the device info of a field. */
-  std::string GetInfo(const Info &info) const;
-  /** Get the intrinsics of motion. */
-  MotionIntrinsics GetMotionIntrinsics() const;
-  /** Get the extrinsics from left to motion. */
-  Extrinsics GetMotionExtrinsics() const;
-  /** Set the intrinsics of motion. */
-  void SetMotionIntrinsics(const MotionIntrinsics &in);
-  /** Set the extrinsics from left to motion. */
-  void SetMotionExtrinsics(const Extrinsics &ex);
-
   // protected:
   std::shared_ptr<Channels> channels() const {
     return channels_;
   }
 
-  StreamMode GetStreamMode() { return stream_mode_; }
-
-  void EnableImuProcessMode(const ProcessMode &mode);
-
  protected:
   void IsHidExist();
+
+  /** Set the intrinsics of motion */
+  void SetMotionIntrinsics(const MotionIntrinsics &in);
+  /** Set the extrinsics from left to motion */
+  void SetMotionExtrinsics(const Extrinsics &ex);
 
  private:
   void Init();

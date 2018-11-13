@@ -86,24 +86,14 @@ CameraPrivate::~CameraPrivate() {
   device_ = nullptr;
 }
 
-void CameraPrivate::GetDevices(std::vector<DeviceInfo>* dev_infos) {
+void CameraPrivate::GetDeviceInfos(std::vector<DeviceInfo>* dev_infos) const {
   return device_->GetDeviceInfos(dev_infos);
 }
 
-void CameraPrivate::GetResolutions(const std::int32_t& dev_index,
+void CameraPrivate::GetStreamInfos(const std::int32_t& dev_index,
     std::vector<StreamInfo>* color_infos,
-    std::vector<StreamInfo>* depth_infos) {
+    std::vector<StreamInfo>* depth_infos) const {
   return device_->GetStreamInfos(dev_index, color_infos, depth_infos);
-}
-
-ErrorCode CameraPrivate::SetAutoExposureEnabled(bool enabled) {
-  bool ok = device_->SetAutoExposureEnabled(enabled);
-  return ok ? ErrorCode::SUCCESS : ErrorCode::ERROR_FAILURE;
-}
-
-ErrorCode CameraPrivate::SetAutoWhiteBalanceEnabled(bool enabled) {
-  bool ok = device_->SetAutoWhiteBalanceEnabled(enabled);
-  return ok ? ErrorCode::SUCCESS : ErrorCode::ERROR_FAILURE;
 }
 
 ErrorCode CameraPrivate::Open(const OpenParams& params) {
@@ -133,6 +123,97 @@ bool CameraPrivate::IsOpened() const {
 void CameraPrivate::CheckOpened() const {
   device_->CheckOpened();
 }
+
+std::shared_ptr<DeviceParams> CameraPrivate::GetInfo() const {
+  return device_params_;
+}
+
+std::string CameraPrivate::GetInfo(const Info &info) const {
+  if (!device_params_) {
+    LOGE("%s %d:: Device information not found", __FILE__, __LINE__);
+    return "";
+  }
+  switch (info) {
+    case Info::DEVICE_NAME:
+      return device_params_->name;
+    case Info::SERIAL_NUMBER:
+      return device_params_->serial_number;
+    case Info::FIRMWARE_VERSION:
+      return device_params_->firmware_version.to_string();
+    case Info::HARDWARE_VERSION:
+      return device_params_->hardware_version.to_string();
+    case Info::SPEC_VERSION:
+      return device_params_->spec_version.to_string();
+    case Info::LENS_TYPE:
+      return device_params_->lens_type.to_string();
+    case Info::IMU_TYPE:
+      return device_params_->imu_type.to_string();
+    case Info::NOMINAL_BASELINE:
+      return std::to_string(device_params_->nominal_baseline);
+    default:
+      LOGE("%s %d:: Unknown device info", __FILE__, __LINE__);
+      return "";
+  }
+}
+
+CameraCalibration CameraPrivate::GetCameraCalibration(
+    const StreamMode& stream_mode) {
+  return device_->GetCameraCalibration(stream_mode);
+}
+
+void CameraPrivate::GetCameraCalibrationFile(
+    const StreamMode& stream_mode, const std::string& filename) {
+  return device_->GetCameraCalibrationFile(stream_mode, filename);
+}
+
+void CameraPrivate::WriteCameraCalibrationBinFile(const std::string& filename) {
+  device_->SetCameraCalibrationBinFile(filename);
+}
+
+MotionIntrinsics CameraPrivate::GetMotionIntrinsics() const {
+  if (motion_intrinsics_) {
+    return *motion_intrinsics_;
+  } else {
+    LOGE("Error: Motion intrinsics not found");
+    return {};
+  }
+}
+
+Extrinsics CameraPrivate::GetMotionExtrinsics() const {
+  if (motion_from_extrinsics_) {
+    return *motion_from_extrinsics_;
+  } else {
+    LOGE("Error: Motion extrinsics not found");
+    return {};
+  }
+}
+
+void CameraPrivate::Close() {
+  if (device_->IsOpened()) {
+    StopCaptureImage();
+    StopSyntheticImage();
+    channels_->StopHidTracking();
+  }
+  device_->Close();
+}
+
+// ...
+
+void CameraPrivate::SetMotionIntrinsics(const MotionIntrinsics &in) {
+  if (!motion_intrinsics_) {
+    motion_intrinsics_ = std::make_shared<MotionIntrinsics>();
+  }
+  *motion_intrinsics_ = in;
+}
+
+void CameraPrivate::SetMotionExtrinsics(const Extrinsics &ex) {
+  if (!motion_from_extrinsics_) {
+    motion_from_extrinsics_ = std::make_shared<Extrinsics>();
+  }
+  *motion_from_extrinsics_ = ex;
+}
+
+// todo
 
 std::vector<StreamData> CameraPrivate::RetrieveImage(const ImageType& type,
     ErrorCode* code) {
@@ -383,19 +464,6 @@ void CameraPrivate::StopSyntheticImage() {
   sync_thread_.join();
 }
 
-void CameraPrivate::Wait() {
-  device_->Wait();
-}
-
-void CameraPrivate::Close() {
-  if (device_->IsOpened()) {
-    StopCaptureImage();
-    StopSyntheticImage();
-    channels_->StopHidTracking();
-  }
-  device_->Close();
-}
-
 bool CameraPrivate::StartHidTracking() {
   channels_->SetImuCallback(std::bind(&CameraPrivate::ImuDataCallback,
         this, std::placeholders::_1));
@@ -479,28 +547,6 @@ std::vector<MotionData> CameraPrivate::GetImuDatas() {
   return tmp;
 }
 
-void CameraPrivate::GetHDCameraLogData() {
-  device_->GetCameraCalibrationFile(StreamMode::STREAM_1280x720,
-      "RectfyLog_PUMA_1.txt");
-}
-
-void CameraPrivate::GetVGACameraLogData() {
-  device_->GetCameraCalibrationFile(StreamMode::STREAM_640x480,
-      "RectfyLog_PUMA_2.txt");
-}
-
-CameraCtrlRectLogData CameraPrivate::GetHDCameraCtrlData() {
-  return device_->GetCameraCalibration(StreamMode::STREAM_1280x720);
-}
-
-CameraCtrlRectLogData CameraPrivate::GetVGACameraCtrlData() {
-  return device_->GetCameraCalibration(StreamMode::STREAM_640x480);
-}
-
-void CameraPrivate::SetCameraLogData(const std::string& file) {
-  device_->SetCameraCalibrationBinFile(file);
-}
-
 void CameraPrivate::EnableImageType(const ImageType& type) {
   switch (type) {
     case ImageType::IMAGE_LEFT_COLOR:
@@ -556,70 +602,6 @@ void CameraPrivate::ReadAllInfos() {
     LOGE("%s %d:: Motion intrinsics & extrinsics not exist",
         __FILE__, __LINE__);
   }
-}
-
-std::shared_ptr<DeviceParams> CameraPrivate::GetInfo() const {
-  return device_params_;
-}
-
-std::string CameraPrivate::GetInfo(const Info &info) const {
-  if (!device_params_) {
-    LOGE("%s %d:: Device information not found", __FILE__, __LINE__);
-    return "";
-  }
-  switch (info) {
-    case Info::DEVICE_NAME:
-      return device_params_->name;
-    case Info::SERIAL_NUMBER:
-      return device_params_->serial_number;
-    case Info::FIRMWARE_VERSION:
-      return device_params_->firmware_version.to_string();
-    case Info::HARDWARE_VERSION:
-      return device_params_->hardware_version.to_string();
-    case Info::SPEC_VERSION:
-      return device_params_->spec_version.to_string();
-    case Info::LENS_TYPE:
-      return device_params_->lens_type.to_string();
-    case Info::IMU_TYPE:
-      return device_params_->imu_type.to_string();
-    case Info::NOMINAL_BASELINE:
-      return std::to_string(device_params_->nominal_baseline);
-    default:
-      LOGE("%s %d:: Unknown device info", __FILE__, __LINE__);
-      return "";
-  }
-}
-
-MotionIntrinsics CameraPrivate::GetMotionIntrinsics() const {
-  if (motion_intrinsics_) {
-    return *motion_intrinsics_;
-  } else {
-    LOGE("%s %d:: Motion intrinsics not found", __FILE__, __LINE__);
-    return {};
-  }
-}
-
-Extrinsics CameraPrivate::GetMotionExtrinsics() const {
-  if (motion_from_extrinsics_) {
-    return *motion_from_extrinsics_;
-  } else {
-    LOGE("%s %d:: Motion extrinsics not found", __FILE__, __LINE__);
-    return {};
-  }
-}
-
-void CameraPrivate::SetMotionIntrinsics(const MotionIntrinsics &in) {
-  if (!motion_intrinsics_) {
-    motion_intrinsics_ = std::make_shared<MotionIntrinsics>();
-  }
-  *motion_intrinsics_ = in;
-}
-
-void CameraPrivate::SetMotionExtrinsics(const Extrinsics &ex) {
-  if (!motion_from_extrinsics_) {
-    motion_from_extrinsics_ = std::make_shared<Extrinsics>();
-  }
-  *motion_from_extrinsics_ = ex;
 }
 
 void CameraPrivate::EnableImuProcessMode(const ProcessMode &mode) {

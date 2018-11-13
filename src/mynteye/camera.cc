@@ -27,21 +27,20 @@ Camera::~Camera() {
   p_.release();
 }
 
-std::vector<DeviceInfo> Camera::GetDevices() const {
+std::vector<DeviceInfo> Camera::GetDeviceInfos() const {
   std::vector<DeviceInfo> device_infos;
-  GetDevices(&device_infos);
+  GetDeviceInfos(&device_infos);
   return device_infos;
 }
 
-void Camera::GetDevices(std::vector<DeviceInfo>* dev_infos) const {
-  p_->GetDevices(dev_infos);
+void Camera::GetDeviceInfos(std::vector<DeviceInfo>* dev_infos) const {
+  p_->GetDeviceInfos(dev_infos);
 }
 
-void Camera::GetResolutions(
-    const std::int32_t& dev_index,
+void Camera::GetStreamInfos(const std::int32_t& dev_index,
     std::vector<StreamInfo>* color_infos,
     std::vector<StreamInfo>* depth_infos) const {
-  p_->GetResolutions(dev_index, color_infos, depth_infos);
+  p_->GetStreamInfos(dev_index, color_infos, depth_infos);
 }
 
 ErrorCode Camera::Open() {
@@ -60,6 +59,42 @@ ErrorCode Camera::Open(const OpenParams& params) {
 bool Camera::IsOpened() const {
   return p_->IsOpened();
 }
+
+std::shared_ptr<DeviceParams> Camera::GetInfo() const {
+  return p_->GetInfo();
+}
+
+std::string Camera::GetInfo(const Info &info) const {
+  return p_->GetInfo(info);
+}
+
+CameraCalibration Camera::GetCameraCalibration(
+    const StreamMode& stream_mode) {
+  return p_->GetCameraCalibration(stream_mode);
+}
+
+void Camera::GetCameraCalibrationFile(
+    const StreamMode& stream_mode, const std::string& filename) {
+  p_->GetCameraCalibrationFile(stream_mode, filename);
+}
+
+void Camera::WriteCameraCalibrationBinFile(const std::string& filename) {
+  p_->WriteCameraCalibrationBinFile(filename);
+}
+
+MotionIntrinsics Camera::GetMotionIntrinsics() const {
+  return p_->GetMotionIntrinsics();
+}
+
+Extrinsics Camera::GetMotionExtrinsics() const {
+  return p_->GetMotionExtrinsics();
+}
+
+void Camera::Close() {
+  p_->Close();
+}
+
+// todo
 
 void Camera::EnableImageType(const ImageType& type) {
   p_->EnableImageType(type);
@@ -93,45 +128,48 @@ std::vector<mynteye::MotionData> Camera::RetrieveMotions() {
   return datas;
 }
 
+void Camera::EnableImuProcessMode(const ProcessMode &mode) {
+  return p_->EnableImuProcessMode(mode);
+}
+
+// @Deprecated
+
+std::vector<DeviceInfo> Camera::GetDevices() const {
+  return GetDeviceInfos();
+}
+
+void Camera::GetDevices(std::vector<DeviceInfo>* dev_infos) const {
+  GetDeviceInfos(dev_infos);
+}
+
+void Camera::GetResolutions(
+    const std::int32_t& dev_index,
+    std::vector<StreamInfo>* color_infos,
+    std::vector<StreamInfo>* depth_infos) const {
+  GetStreamInfos(dev_index, color_infos, depth_infos);
+}
+
 void Camera::Wait() const {
-  p_->Wait();
 }
-
-void Camera::Close() {
-  p_->Close();
-}
-
-void Camera::SetCalibrationWithFile(const std::string &file_name) {
-  p_->SetCameraLogData(file_name);
-}
-
-void Camera::GetHDCameraLogDataFile() { p_->GetHDCameraLogData(); }
-void Camera::GetVGACameraLogDataFile() { p_->GetVGACameraLogData(); }
 
 CameraCtrlRectLogData Camera::GetHDCameraCtrlData() {
-  return p_->GetHDCameraCtrlData();
+  return GetCameraCalibration(StreamMode::STREAM_1280x720);
 }
 
 CameraCtrlRectLogData Camera::GetVGACameraCtrlData() {
-  return p_->GetVGACameraCtrlData();
+  return GetCameraCalibration(StreamMode::STREAM_640x480);
 }
 
-std::string Camera::GetInfo(const Info &info) const {
-  return p_->GetInfo(info);
+void Camera::GetHDCameraLogDataFile() {
+  GetCameraCalibrationFile(StreamMode::STREAM_1280x720,
+      "RectfyLog_PUMA_1.txt");
 }
 
-MotionIntrinsics Camera::GetMotionIntrinsics() const {
-  return p_->GetMotionIntrinsics();
+void Camera::GetVGACameraLogDataFile() {
+  GetCameraCalibrationFile(StreamMode::STREAM_640x480,
+      "RectfyLog_PUMA_2.txt");
 }
 
-Extrinsics Camera::GetMotionExtrinsics() const {
-  return p_->GetMotionExtrinsics();
-}
-
-StreamMode Camera::GetStreamMode() {
-  return p_->GetStreamMode();
-}
-
-void Camera::EnableImuProcessMode(const ProcessMode &mode) {
-  return p_->EnableImuProcessMode(mode);
+void Camera::SetCalibrationWithFile(const std::string &file_name) {
+  WriteCameraCalibrationBinFile(file_name);
 }

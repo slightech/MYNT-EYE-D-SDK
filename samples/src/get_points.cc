@@ -94,7 +94,7 @@ int main(int argc, char const* argv[]) {
   cam.EnableImageType(mynteye::ImageType::IMAGE_LEFT_COLOR);
   cam.EnableImageType(mynteye::ImageType::IMAGE_DEPTH);
 
-  mynteye::StreamMode streamMode = cam.GetStreamMode();
+  mynteye::StreamMode streamMode = params.stream_mode;
 
   if (streamMode == mynteye::StreamMode::STREAM_1280x720
       || streamMode == mynteye::StreamMode::STREAM_2560x720) {
