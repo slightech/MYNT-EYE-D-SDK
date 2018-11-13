@@ -18,9 +18,11 @@
 #include <algorithm>
 #include <bitset>
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
 
+#include "mynteye/device/image.h"
 #include "mynteye/stubs/global.h"
 
 MYNTEYE_BEGIN_NAMESPACE
@@ -97,6 +99,43 @@ struct MYNTEYE_API ImuData {
     Reset();
   }
 };
+
+/**
+ * @ingroup datatypes
+ * Stream data.
+ */
+struct MYNTEYE_API StreamData {
+  /** Image data */
+  std::shared_ptr<Image> img;
+  /** Image information */
+  std::shared_ptr<ImgInfo> img_info;
+
+  bool operator==(const StreamData& other) const {
+    if (img_info && other.img_info) {
+      return img_info->frame_id == other.img_info->frame_id &&
+             img_info->timestamp == other.img_info->timestamp;
+    }
+    return false;
+  }
+};
+
+/**
+ * @ingroup datatypes
+ * Motion data.
+ */
+struct MYNTEYE_API MotionData {
+  /** ImuData. */
+  std::shared_ptr<ImuData> imu;
+
+  bool operator==(const MotionData &other) const {
+    if (imu && other.imu) {
+      return imu->flag == other.imu->flag &&
+             imu->timestamp == other.imu->timestamp;
+    }
+    return false;
+  }
+};
+
 
 #define MYNTEYE_PROPERTY(TYPE, NAME) \
  public:                             \

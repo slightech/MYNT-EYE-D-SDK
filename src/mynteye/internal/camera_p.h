@@ -32,7 +32,6 @@
 #include "mynteye/data/types_internal.h"
 #include "mynteye/image.h"
 #include "mynteye/types.h"
-#include "mynteye/callbacks.h"
 
 MYNTEYE_BEGIN_NAMESPACE
 
@@ -41,11 +40,12 @@ class Channels;
 
 class MYNTEYE_API CameraPrivate {
  public:
-  using stream_data_t = device::StreamData;
+  using stream_data_t = StreamData;
   using stream_datas_t = std::vector<stream_data_t>;
-  using motion_data_t = device::MotionData;
+  using motion_data_t = MotionData;
   using motion_datas_t = std::vector<motion_data_t>;
-  using img_info_data_t = device::ImgInfoData;
+
+  using img_info_data_t = ImgInfoData;
   using img_info_datas_t = std::vector<img_info_data_t>;
 
   CameraPrivate();

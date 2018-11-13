@@ -72,12 +72,7 @@ std::vector<mynteye::StreamData> Camera::RetrieveImages(const ImageType& type) {
 
 std::vector<mynteye::StreamData> Camera::RetrieveImages(
     const ImageType& type, ErrorCode* code) {
-  std::vector<mynteye::StreamData> datas;
-  for (auto &&data : p_->RetrieveImage(type, code)) {
-    mynteye::StreamData tmp = {data.img_info, data.img};
-    datas.push_back(tmp);
-  }
-  return datas;
+  return p_->RetrieveImage(type, code);
 }
 
 mynteye::StreamData Camera::RetrieveImage(const ImageType& type) {
@@ -87,8 +82,7 @@ mynteye::StreamData Camera::RetrieveImage(const ImageType& type) {
 
 mynteye::StreamData Camera::RetrieveImage(const ImageType& type,
     ErrorCode* code) {
-  auto data = p_->RetrieveLatestImage(type, code);
-  return {data.img_info, data.img};
+  return p_->RetrieveLatestImage(type, code);
 }
 
 std::vector<mynteye::MotionData> Camera::RetrieveMotions() {

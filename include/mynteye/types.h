@@ -23,6 +23,10 @@ MYNTEYE_BEGIN_NAMESPACE
 
 using CameraCtrlRectLogData = CameraCalibration;
 
+struct ImgInfoData {
+  std::shared_ptr<ImgInfo> img_info;
+};
+
 /**
  * @ingroup enumerations
  * @brief List error codes.

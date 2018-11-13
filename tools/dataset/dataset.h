@@ -19,7 +19,6 @@
 #include <string>
 #include <map>
 
-#include "mynteye/callbacks.h"
 #include "mynteye/camera.h"
 
 MYNTEYE_BEGIN_NAMESPACE

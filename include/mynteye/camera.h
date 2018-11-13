@@ -25,49 +25,8 @@
 #include "mynteye/init_params.h"
 #include "mynteye/stream_info.h"
 #include "mynteye/types.h"
-#include "mynteye/callbacks.h"
 
 MYNTEYE_BEGIN_NAMESPACE
-
-/**
- * @ingroup datatypes
- * Camera motion data.
- */
-struct MYNTEYE_API MotionData {
-  /** ImuData */
-  std::shared_ptr<ImuData> imu;
-
-  bool operator==(const MotionData &other) const {
-    if (imu && other.imu) {
-      return imu->flag == other.imu->flag &&
-        imu->timestamp == other.imu->timestamp &&
-        imu->temperature == other.imu->temperature;
-    }
-    return false;
-  }
-};
-
-/**
- * @ingroup datatypes
- * Camera stream data.
- */
-struct MYNTEYE_API StreamData {
-  /** Image information */
-  std::shared_ptr<ImgInfo> img_info;
-
-  /** Image data */
-  std::shared_ptr<Image> img;
-
-  bool operator==(const StreamData& other) const {
-    if (img_info && other.img_info) {
-      return img_info->frame_id == other.img_info->frame_id &&
-             img_info->timestamp == other.img_info->timestamp &&
-             img_info->exposure_time == other.img_info->exposure_time;
-    }
-
-    return false;
-  }
-};
 
 class CameraPrivate;
 

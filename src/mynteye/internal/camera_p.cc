@@ -134,7 +134,7 @@ void CameraPrivate::CheckOpened() const {
   device_->CheckOpened();
 }
 
-std::vector<device::StreamData> CameraPrivate::RetrieveImage(const ImageType& type,
+std::vector<StreamData> CameraPrivate::RetrieveImage(const ImageType& type,
     ErrorCode* code) {
   if (!IsOpened()) {
     *code = ErrorCode::ERROR_CAMERA_NOT_OPENED;
@@ -470,7 +470,7 @@ void CameraPrivate::ImageInfoCallback(const ImgInfoPacket &packet) {
   cache_image_info_.clear();
 }
 
-std::vector<device::MotionData> CameraPrivate::GetImuDatas() {
+std::vector<MotionData> CameraPrivate::GetImuDatas() {
   if (!is_imu_open_)
     LOGE("Imu is not opened !");
 
