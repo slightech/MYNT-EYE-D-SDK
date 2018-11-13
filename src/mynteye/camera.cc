@@ -60,12 +60,12 @@ bool Camera::IsOpened() const {
   return p_->IsOpened();
 }
 
-std::shared_ptr<DeviceParams> Camera::GetInfo() const {
-  return p_->GetInfo();
+std::shared_ptr<device::Descriptors> Camera::GetDescriptors() const {
+  return p_->GetDescriptors();
 }
 
-std::string Camera::GetInfo(const Info &info) const {
-  return p_->GetInfo(info);
+std::string Camera::GetDescriptor(const Descriptor &desc) const {
+  return p_->GetDescriptor(desc);
 }
 
 CameraCalibration Camera::GetCameraCalibration(
@@ -78,8 +78,8 @@ void Camera::GetCameraCalibrationFile(
   p_->GetCameraCalibrationFile(stream_mode, filename);
 }
 
-void Camera::WriteCameraCalibrationBinFile(const std::string& filename) {
-  p_->WriteCameraCalibrationBinFile(filename);
+bool Camera::WriteCameraCalibrationBinFile(const std::string& filename) {
+  return p_->WriteCameraCalibrationBinFile(filename);
 }
 
 MotionIntrinsics Camera::GetMotionIntrinsics() const {
@@ -88,6 +88,13 @@ MotionIntrinsics Camera::GetMotionIntrinsics() const {
 
 Extrinsics Camera::GetMotionExtrinsics() const {
   return p_->GetMotionExtrinsics();
+}
+
+bool Camera::WriteDeviceFlash(
+    device::Descriptors *desc,
+    device::ImuParams *imu_params,
+    Version *spec_version) {
+  return p_->WriteDeviceFlash(desc, imu_params, spec_version);
 }
 
 void Camera::Wait() const {
@@ -135,6 +142,7 @@ void Camera::EnableImuProcessMode(const ProcessMode &mode) {
   return p_->EnableImuProcessMode(mode);
 }
 
+#ifdef MYNTEYE_DEPRECATED_COMPAT
 // @Deprecated
 
 std::vector<DeviceInfo> Camera::GetDevices() const {
@@ -150,6 +158,10 @@ void Camera::GetResolutions(
     std::vector<StreamInfo>* color_infos,
     std::vector<StreamInfo>* depth_infos) const {
   GetStreamInfos(dev_index, color_infos, depth_infos);
+}
+
+std::string Camera::GetInfo(const Info &info) const {
+  return GetDescriptor(info);
 }
 
 CameraCtrlRectLogData Camera::GetHDCameraCtrlData() {
@@ -173,3 +185,4 @@ void Camera::GetVGACameraLogDataFile() {
 void Camera::SetCalibrationWithFile(const std::string &file_name) {
   WriteCameraCalibrationBinFile(file_name);
 }
+#endif

@@ -1,5 +1,3 @@
-#include "mynteye/internal/camera_p.h"
-
 #include "writer/device_writer.h"
 
 MYNTEYE_USE_NAMESPACE
@@ -13,12 +11,10 @@ int main(int argc, char *argv[]) {
     return 2;
   }
 
-  auto &&device = std::make_shared<CameraPrivate>();
-  if (!device)
-    return 1;
+  auto &&device = std::make_shared<Camera>();
 
   tools::DeviceWriter writer(device);
-  writer.WriteDeviceInfo(filepath);
+  writer.WriteDescriptors(filepath);
 
   return 0;
 }

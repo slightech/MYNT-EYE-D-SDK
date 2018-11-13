@@ -26,10 +26,18 @@
 #include "mynteye/device/stream_info.h"
 #include "mynteye/types.h"
 
+#define MYNTEYE_DEPRECATED_COMPAT
+
 MYNTEYE_BEGIN_NAMESPACE
 
+#ifdef MYNTEYE_DEPRECATED_COMPAT
 // @Deprecated
 using InitParams = OpenParams;
+// @Deprecated
+using Info = Descriptor;
+// @Deprecated
+using CameraCtrlRectLogData = CameraCalibration;
+#endif
 
 class CameraPrivate;
 
@@ -56,10 +64,10 @@ class MYNTEYE_API Camera {
   /** Whethor camera is opened or not */
   bool IsOpened() const;
 
-  /** Get all device informations */
-  std::shared_ptr<DeviceParams> GetInfo() const;
-  /** Get one device information of Info */
-  std::string GetInfo(const Info &info) const;
+  /** Get all device descriptors */
+  std::shared_ptr<device::Descriptors> GetDescriptors() const;
+  /** Get one device descriptor */
+  std::string GetDescriptor(const Descriptor &desc) const;
 
   /** Get camera calibration */
   CameraCalibration GetCameraCalibration(const StreamMode& stream_mode);
@@ -67,15 +75,21 @@ class MYNTEYE_API Camera {
   void GetCameraCalibrationFile(const StreamMode& stream_mode,
                                 const std::string& filename);
 
-  /** Set camera calibration bin file */
-  void WriteCameraCalibrationBinFile(const std::string& filename);
+  /** Write camera calibration bin file */
+  bool WriteCameraCalibrationBinFile(const std::string& filename);
 
   /** Get the intrinsics of motion */
   MotionIntrinsics GetMotionIntrinsics() const;
   /** Get the extrinsics from left to motion */
   Extrinsics GetMotionExtrinsics() const;
 
-  /** @deprecated Useless */
+  /** Write device flash */
+  bool WriteDeviceFlash(
+      device::Descriptors *desc,
+      device::ImuParams *imu_params,
+      Version *spec_version = nullptr);
+
+  /** Wait according to framerate */
   void Wait() const;
 
   /** Close the camera */
@@ -103,6 +117,7 @@ class MYNTEYE_API Camera {
   /** Set imu data process mode */
   void EnableImuProcessMode(const ProcessMode &mode);
 
+#ifdef MYNTEYE_DEPRECATED_COMPAT
   // @Deprecated
 
   /** @deprecated Replaced by GetDeviceInfos() */
@@ -119,6 +134,9 @@ class MYNTEYE_API Camera {
   /** @deprecated Useless */
   // StreamMode GetStreamMode();
 
+  /** @deprecated Replaced by GetDescriptor() */
+  std::string GetInfo(const Info &info) const;
+
   /** @deprecated Replaced by GetCameraCalibration() */
   CameraCtrlRectLogData GetHDCameraCtrlData();
   /** @deprecated Replaced by GetCameraCalibration() */
@@ -133,6 +151,7 @@ class MYNTEYE_API Camera {
 
   /** @deprecated Replaced by WriteCameraCalibrationBinFile() */
   void SetCalibrationWithFile(const std::string& file_name);
+#endif
 
  private:
   std::unique_ptr<CameraPrivate> p_;

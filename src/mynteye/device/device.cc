@@ -395,7 +395,7 @@ void Device::GetCameraCalibrationFile(const StreamMode& stream_mode,
   }
 }
 
-void Device::SetCameraCalibrationBinFile(const std::string& filename) {
+bool Device::SetCameraCalibrationBinFile(const std::string& filename) {
   std::ifstream t;
   int length;
   t.open(filename.c_str());
@@ -408,13 +408,13 @@ void Device::SetCameraCalibrationBinFile(const std::string& filename) {
 
   int nActualLength = 0;
 
-  if ( ETronDI_OK != EtronDI_SetLogData( etron_di_, &dev_sel_info_,
-    (unsigned char*)buffer, length, &nActualLength, 0)) {
-    printf("error when setLogData\n");
-  }
+  bool ok = (ETronDI_OK == EtronDI_SetLogData(etron_di_, &dev_sel_info_,
+      (unsigned char*)buffer, length, &nActualLength, 0));
+  if (!ok) printf("error when setLogData\n");
   delete[] buffer;
 
   SyncCameraCalibrations();
+  return ok;
 }
 
 void Device::Wait() {

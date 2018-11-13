@@ -66,10 +66,10 @@ class MYNTEYE_API CameraPrivate {
   /** Check camera is opened, otherwise error */
   void CheckOpened() const;
 
-  /** Get all device informations */
-  std::shared_ptr<DeviceParams> GetInfo() const;
-  /** Get one device information of Info */
-  std::string GetInfo(const Info &info) const;
+  /** Get all device descriptors */
+  std::shared_ptr<device::Descriptors> GetDescriptors() const;
+  /** Get one device descriptor */
+  std::string GetDescriptor(const Descriptor &desc) const;
 
   /** Get camera calibration */
   CameraCalibration GetCameraCalibration(const StreamMode& stream_mode);
@@ -77,13 +77,19 @@ class MYNTEYE_API CameraPrivate {
   void GetCameraCalibrationFile(const StreamMode& stream_mode,
                                 const std::string& filename);
 
-  /** Set camera calibration bin file */
-  void WriteCameraCalibrationBinFile(const std::string& filename);
+  /** Write camera calibration bin file */
+  bool WriteCameraCalibrationBinFile(const std::string& filename);
 
   /** Get the intrinsics of motion */
   MotionIntrinsics GetMotionIntrinsics() const;
   /** Get the extrinsics from left to motion */
   Extrinsics GetMotionExtrinsics() const;
+
+  /** Write device flash */
+  bool WriteDeviceFlash(
+      device::Descriptors *desc,
+      device::ImuParams *imu_params,
+      Version *spec_version = nullptr);
 
   /** Close the camera */
   void Close();
@@ -125,8 +131,6 @@ class MYNTEYE_API CameraPrivate {
   }
 
  protected:
-  void IsHidExist();
-
   /** Set the intrinsics of motion */
   void SetMotionIntrinsics(const MotionIntrinsics &in);
   /** Set the extrinsics from left to motion */
@@ -184,11 +188,11 @@ class MYNTEYE_API CameraPrivate {
   std::map<ImageType, bool> is_enable_image_;
   StreamMode stream_mode_;
 
-  void ReadAllInfos();
-  std::shared_ptr<DeviceParams> device_params_;
-
+  void ReadDescriptors();
+  std::shared_ptr<device::Descriptors> descriptors_;
   std::shared_ptr<MotionIntrinsics> motion_intrinsics_;
-  std::shared_ptr<Extrinsics> motion_from_extrinsics_;
+  std::shared_ptr<Extrinsics> motion_extrinsics_;
+
   std::size_t motion_count_ = 0;
 
   std::map<ProcessMode, bool> is_process_mode_;

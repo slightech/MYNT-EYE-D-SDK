@@ -1,43 +1,42 @@
+#include "writer/device_writer.h"
+
 #include <vector>
 
 #include <opencv2/core/core.hpp>
 
-#include "writer/device_writer.h"
 #include "mynteye/util/files.h"
-#include "mynteye/types.h"
 
 MYNTEYE_BEGIN_NAMESPACE
 
 namespace tools {
 
-DeviceWriter::DeviceWriter(std::shared_ptr<CameraPrivate> device) : device_(device) {
+DeviceWriter::DeviceWriter(std::shared_ptr<Camera> device)
+    : device_(device) {
 }
 
 DeviceWriter::~DeviceWriter() {
 }
 
-bool DeviceWriter::WriteDeviceInfo(const dev_info_t &info) {
-  auto &&channels = device_->channels();
-  channels->Open();
-  auto &&dev_info = device_->GetInfo();
-  if (nullptr == dev_info) {
+bool DeviceWriter::WriteDescriptors(const device_desc_t &desc) {
+  auto &&dev_desc = device_->GetDescriptors();
+  if (nullptr == dev_desc) {
     std::cerr << "Device was not initialization." << std::endl;
     return false;
   }
-  dev_info->lens_type = Type(info.lens_type);
-  dev_info->imu_type = Type(info.imu_type);
-  dev_info->nominal_baseline = info.nominal_baseline;
-  if (channels->SetFiles(dev_info.get(), nullptr, nullptr)) {
+  dev_desc->lens_type = Type(desc.lens_type);
+  dev_desc->imu_type = Type(desc.imu_type);
+  dev_desc->nominal_baseline = desc.nominal_baseline;
+  if (device_->WriteDeviceFlash(dev_desc.get(), nullptr, nullptr)) {
     std::cout << std::endl;
     std::cout << "Write device info success" << std::endl;
-    std::cout << "Device info: {name: " << dev_info->name
-      << " serial_number: " << dev_info->serial_number
-      << " firmware_version: " << dev_info->firmware_version.to_string()
-      << " hardware_version: " << dev_info->hardware_version.to_string()
-      << " spec_version: " << dev_info->spec_version.to_string()
-      << " lens_type: " << dev_info->lens_type.to_string()
-      << " imu_type: " << dev_info->imu_type.to_string()
-      << " nominal_baseline: " << dev_info->nominal_baseline
+    std::cout << "Device info: {name: " << dev_desc->name
+      << " serial_number: " << dev_desc->serial_number
+      << " firmware_version: " << dev_desc->firmware_version.to_string()
+      << " hardware_version: " << dev_desc->hardware_version.to_string()
+      << " spec_version: " << dev_desc->spec_version.to_string()
+      << " lens_type: " << dev_desc->lens_type.to_string()
+      << " imu_type: " << dev_desc->imu_type.to_string()
+      << " nominal_baseline: " << dev_desc->nominal_baseline
       << "}" << std::endl;
     std::cout << std::endl;
     return true;
@@ -47,26 +46,24 @@ bool DeviceWriter::WriteDeviceInfo(const dev_info_t &info) {
   }
 }
 
-bool DeviceWriter::WriteDeviceInfo(const std::string &filepath) {
-  return WriteDeviceInfo(LoadDeviceInfo(filepath));
+bool DeviceWriter::WriteDescriptors(const std::string &filepath) {
+  return WriteDescriptors(LoadDescriptors(filepath));
 }
 
 bool DeviceWriter::WriteImuParams(const imu_params_t &params) {
-  auto &&channels = device_->channels();
-  channels->Open();
-  auto &&dev_info = device_->GetInfo();
-  if (nullptr == dev_info) {
+  auto &&dev_desc = device_->GetDescriptors();
+  if (nullptr == dev_desc) {
     std::cerr << "Device was not initialization." << std::endl;
     return false;
   }
-  if (channels->SetFiles(dev_info.get(),
-        const_cast<imu_params_t *>(&params), &dev_info->spec_version)) {
-    std::cout << std::endl;
-    std::cout << "Write imu params success" << std::endl;
-    std::cout << "Imu intrinsics accel: {" << params.in_accel << "}" << std::endl;
-    std::cout << "Imu intrinsics gyro: {" << params.in_gyro << "}" << std::endl;
-    std::cout << "Imu extrinsics left to imu: {" << params.ex_left_to_imu << "}" << std::endl;
-    std::cout << std::endl;
+  if (device_->WriteDeviceFlash(dev_desc.get(),
+        const_cast<imu_params_t *>(&params), &dev_desc->spec_version)) {
+    std::cout << std::endl
+        << "Write imu params success" << std::endl
+        << "Imu intrinsics accel: {" << params.in_accel << "}" << std::endl
+        << "Imu intrinsics gyro: {" << params.in_gyro << "}" << std::endl
+        << "Imu extrinsics left to imu: {" << params.ex_left_to_imu << "}"
+        << std::endl << std::endl;
     return true;
   } else {
     std::cerr << "Write imu params failed" << std::endl;
@@ -117,24 +114,24 @@ cv::FileStorage &operator<<(cv::FileStorage &fs, const Extrinsics &ex) {
   return fs;
 }
 
-} // namespace
+}  // namespace
 
-bool DeviceWriter::SaveDeviceInfo(
-    const dev_info_t &info, const std::string &filepath) {
+bool DeviceWriter::SaveDescriptors(
+    const device_desc_t &desc, const std::string &filepath) {
   using FileStorage = cv::FileStorage;
   FileStorage fs(filepath, FileStorage::WRITE);
   if (!fs.isOpened()) {
     std::cout << "Failed to save file: " << filepath << std::endl;
     return false;
   }
-  fs << "device_name" << info.name;
-  fs << "serial_number" << info.serial_number;
-  fs << "firmware_version" << info.firmware_version.to_string();
-  fs << "hardware_version" << info.hardware_version.to_string();
-  fs << "spec_version" << info.spec_version.to_string();
-  fs << "lens_type" << info.lens_type.to_string();
-  fs << "imu_type" << info.imu_type.to_string();
-  fs << "nominal_baseline" << info.nominal_baseline;
+  fs << "device_name" << desc.name;
+  fs << "serial_number" << desc.serial_number;
+  fs << "firmware_version" << desc.firmware_version.to_string();
+  fs << "hardware_version" << desc.hardware_version.to_string();
+  fs << "spec_version" << desc.spec_version.to_string();
+  fs << "lens_type" << desc.lens_type.to_string();
+  fs << "imu_type" << desc.imu_type.to_string();
+  fs << "nominal_baseline" << desc.nominal_baseline;
   fs.release();
   return true;
 }
@@ -153,18 +150,17 @@ bool DeviceWriter::SaveImuParams(
   return true;
 }
 
-void DeviceWriter::SaveAllInfos(const std::string &dir) {
+void DeviceWriter::SaveAllDatas(const std::string &dir) {
   if (!files::mkdir(dir)) {
     std::cout << "Create directory failed: " << std::endl;
   }
-  SaveDeviceInfo(*device_->GetInfo(), dir + MYNTEYE_OS_SEP "device.info");
+  SaveDescriptors(*device_->GetDescriptors(),
+      dir + MYNTEYE_OS_SEP "device.info");
   auto &&m_in = device_->GetMotionIntrinsics();
-  SaveImuParams(
-      {
-          false, m_in.accel, m_in.gyro,
-          device_->GetMotionExtrinsics(),
-      },
-      dir + MYNTEYE_OS_SEP "imu.params");
+  SaveImuParams({
+    false, m_in.accel, m_in.gyro,
+    device_->GetMotionExtrinsics(),
+  }, dir + MYNTEYE_OS_SEP "imu.params");
 }
 
 namespace {
@@ -223,26 +219,26 @@ void operator>>(const cv::FileNode &n, Extrinsics &ex) {
   }
 }
 
-} // namespace
+}  // namespace
 
-DeviceWriter::dev_info_t DeviceWriter::LoadDeviceInfo(
+DeviceWriter::device_desc_t DeviceWriter::LoadDescriptors(
     const std::string &filepath) {
   using FileStorage = cv::FileStorage;
   FileStorage fs(filepath, FileStorage::READ);
   if (!fs.isOpened()) {
     std::cout << "Failed to load file: " << filepath << std::endl;
   }
-  DeviceParams info;
-  fs["device_name"] >> info.name;
-  fs["serial_number"] >> info.serial_number;
-  info.firmware_version = Version(std::string(fs["firmware_version"]));
-  info.hardware_version = HardwareVersion(std::string(fs["hardware_version"]));
-  info.spec_version = Version(std::string(fs["spec_version"]));
-  info.lens_type = Type(std::string(fs["lens_type"]));
-  info.imu_type = Type(std::string(fs["imu_type"]));
-  fs["nominal_baseline"] >> info.nominal_baseline;
+  device_desc_t desc;
+  fs["device_name"] >> desc.name;
+  fs["serial_number"] >> desc.serial_number;
+  desc.firmware_version = Version(std::string(fs["firmware_version"]));
+  desc.hardware_version = HardwareVersion(std::string(fs["hardware_version"]));
+  desc.spec_version = Version(std::string(fs["spec_version"]));
+  desc.lens_type = Type(std::string(fs["lens_type"]));
+  desc.imu_type = Type(std::string(fs["imu_type"]));
+  fs["nominal_baseline"] >> desc.nominal_baseline;
   fs.release();
-  return info;
+  return desc;
 }
 
 DeviceWriter::imu_params_t DeviceWriter::LoadImuParams(
@@ -260,7 +256,6 @@ DeviceWriter::imu_params_t DeviceWriter::LoadImuParams(
   return params;
 }
 
-
-} // namespace tools
+}  // namespace tools
 
 MYNTEYE_END_NAMESPACE

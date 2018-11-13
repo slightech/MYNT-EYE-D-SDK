@@ -20,11 +20,6 @@ set_outdir(
   RUNTIME ${OUT_DIR}/bin/${DIR_NAME}
 )
 
-include_directories(
-  ${eSPDI_INCLUDE_DIRS}
-  ${PRO_DIR}/src
-)
-
 set(MYNTEYE_DLL_SEARCH_PATHS
   ${PRO_DIR}/_install/bin
   ${PRO_DIR}/_install/bin/3rdparty

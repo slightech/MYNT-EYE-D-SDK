@@ -71,7 +71,7 @@ class Device {
   void GetCameraCalibrationFile(const StreamMode& stream_mode,
                                 const std::string& filename);
   /** Set camera calibration bin file. */
-  void SetCameraCalibrationBinFile(const std::string& filename);
+  bool SetCameraCalibrationBinFile(const std::string& filename);
 
   /** Wait according to framerate */
   void Wait();

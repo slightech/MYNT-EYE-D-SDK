@@ -23,7 +23,7 @@
 #include <vector>
 
 #include "mynteye/device/image.h"
-#include "mynteye/stubs/global.h"
+#include "mynteye/types_calib.h"
 
 MYNTEYE_BEGIN_NAMESPACE
 
@@ -230,11 +230,14 @@ class MYNTEYE_API Type {
   MYNTEYE_PROPERTY(value_t, product)
 };
 
+namespace device {
+
 /**
  * @ingroup datatypes
- * Device parameters.
+ * Device descriptors.
  */
-struct MYNTEYE_API DeviceParams {
+struct MYNTEYE_API Descriptors {
+  bool ok;
   std::string name;
   std::string serial_number;
   Version firmware_version;
@@ -244,6 +247,19 @@ struct MYNTEYE_API DeviceParams {
   Type imu_type;
   std::uint16_t nominal_baseline;
 };
+
+/**
+ * @ingroup datatypes
+ * Device imu paramters.
+ */
+struct MYNTEYE_API ImuParams {
+  bool ok;
+  ImuIntrinsics in_accel;
+  ImuIntrinsics in_gyro;
+  Extrinsics ex_left_to_imu;
+};
+
+}  // namespace device
 
 MYNTEYE_END_NAMESPACE
 

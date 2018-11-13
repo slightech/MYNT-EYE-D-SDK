@@ -21,9 +21,6 @@
 
 MYNTEYE_BEGIN_NAMESPACE
 
-// @Deprecated
-using CameraCtrlRectLogData = CameraCalibration;
-
 struct ImgInfoData {
   std::shared_ptr<ImgInfo> img_info;
 };
@@ -60,10 +57,9 @@ enum class ErrorCode : std::int32_t {
 
 /**
  * @ingroup enumerations
- * @brief Camera info fields are read-only strings that can be queried from the
- * device.
+ * @brief The descriptor fields.
  */
-enum class Info : std::uint8_t {
+enum class Descriptor : std::uint8_t {
   /** Device name */
   DEVICE_NAME,
   /** Serial number */

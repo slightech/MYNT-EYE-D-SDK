@@ -58,7 +58,7 @@ CameraPrivate::CameraPrivate() : device_(std::make_shared<Device>()) {
 
   Init();
   if (is_hid_exist_) {
-    ReadAllInfos();
+    ReadDescriptors();
   }
 }
 
@@ -72,7 +72,7 @@ void CameraPrivate::Init() {
                       {ProcessMode::ALL, false}};
 
   channels_ = std::make_shared<Channels>();
-  IsHidExist();
+  is_hid_exist_ = channels_->IsHidExist();
 }
 
 CameraPrivate::~CameraPrivate() {
@@ -124,32 +124,32 @@ void CameraPrivate::CheckOpened() const {
   device_->CheckOpened();
 }
 
-std::shared_ptr<DeviceParams> CameraPrivate::GetInfo() const {
-  return device_params_;
+std::shared_ptr<device::Descriptors> CameraPrivate::GetDescriptors() const {
+  return descriptors_;
 }
 
-std::string CameraPrivate::GetInfo(const Info &info) const {
-  if (!device_params_) {
+std::string CameraPrivate::GetDescriptor(const Descriptor &desc) const {
+  if (!descriptors_) {
     LOGE("%s %d:: Device information not found", __FILE__, __LINE__);
     return "";
   }
-  switch (info) {
-    case Info::DEVICE_NAME:
-      return device_params_->name;
-    case Info::SERIAL_NUMBER:
-      return device_params_->serial_number;
-    case Info::FIRMWARE_VERSION:
-      return device_params_->firmware_version.to_string();
-    case Info::HARDWARE_VERSION:
-      return device_params_->hardware_version.to_string();
-    case Info::SPEC_VERSION:
-      return device_params_->spec_version.to_string();
-    case Info::LENS_TYPE:
-      return device_params_->lens_type.to_string();
-    case Info::IMU_TYPE:
-      return device_params_->imu_type.to_string();
-    case Info::NOMINAL_BASELINE:
-      return std::to_string(device_params_->nominal_baseline);
+  switch (desc) {
+    case Descriptor::DEVICE_NAME:
+      return descriptors_->name;
+    case Descriptor::SERIAL_NUMBER:
+      return descriptors_->serial_number;
+    case Descriptor::FIRMWARE_VERSION:
+      return descriptors_->firmware_version.to_string();
+    case Descriptor::HARDWARE_VERSION:
+      return descriptors_->hardware_version.to_string();
+    case Descriptor::SPEC_VERSION:
+      return descriptors_->spec_version.to_string();
+    case Descriptor::LENS_TYPE:
+      return descriptors_->lens_type.to_string();
+    case Descriptor::IMU_TYPE:
+      return descriptors_->imu_type.to_string();
+    case Descriptor::NOMINAL_BASELINE:
+      return std::to_string(descriptors_->nominal_baseline);
     default:
       LOGE("%s %d:: Unknown device info", __FILE__, __LINE__);
       return "";
@@ -166,8 +166,8 @@ void CameraPrivate::GetCameraCalibrationFile(
   return device_->GetCameraCalibrationFile(stream_mode, filename);
 }
 
-void CameraPrivate::WriteCameraCalibrationBinFile(const std::string& filename) {
-  device_->SetCameraCalibrationBinFile(filename);
+bool CameraPrivate::WriteCameraCalibrationBinFile(const std::string& filename) {
+  return device_->SetCameraCalibrationBinFile(filename);
 }
 
 MotionIntrinsics CameraPrivate::GetMotionIntrinsics() const {
@@ -180,12 +180,19 @@ MotionIntrinsics CameraPrivate::GetMotionIntrinsics() const {
 }
 
 Extrinsics CameraPrivate::GetMotionExtrinsics() const {
-  if (motion_from_extrinsics_) {
-    return *motion_from_extrinsics_;
+  if (motion_extrinsics_) {
+    return *motion_extrinsics_;
   } else {
     LOGE("Error: Motion extrinsics not found");
     return {};
   }
+}
+
+bool CameraPrivate::WriteDeviceFlash(
+    device::Descriptors *desc,
+    device::ImuParams *imu_params,
+    Version *spec_version) {
+  return channels_->SetFiles(desc, imu_params, spec_version);
 }
 
 void CameraPrivate::Close() {
@@ -207,10 +214,10 @@ void CameraPrivate::SetMotionIntrinsics(const MotionIntrinsics &in) {
 }
 
 void CameraPrivate::SetMotionExtrinsics(const Extrinsics &ex) {
-  if (!motion_from_extrinsics_) {
-    motion_from_extrinsics_ = std::make_shared<Extrinsics>();
+  if (!motion_extrinsics_) {
+    motion_extrinsics_ = std::make_shared<Extrinsics>();
   }
-  *motion_from_extrinsics_ = ex;
+  *motion_extrinsics_ = ex;
 }
 
 // todo
@@ -569,29 +576,27 @@ void CameraPrivate::EnableImageType(const ImageType& type) {
   }
 }
 
-void CameraPrivate::ReadAllInfos() {
-  device_params_ = std::make_shared<DeviceParams>();
+void CameraPrivate::ReadDescriptors() {
+  descriptors_ = std::make_shared<device::Descriptors>();
 
   Channels::imu_params_t imu_params;
-  if (!channels_->GetFiles(device_params_.get(), &imu_params)) {
-    LOGE("%s %d:: Read device infos failed. Please upgrade"
-        "your firmware to the latest version.", __FILE__, __LINE__);
+  if (!channels_->GetFiles(descriptors_.get(), &imu_params)) {
+    LOGE("%s %d:: Read device descriptors failed. Please upgrade"
+         "your firmware to the latest version.", __FILE__, __LINE__);
     return;
   }
 
-  LOGI("\nDevice info: name: %s", device_params_->name.c_str());
-  LOGI("             serial_number: %s", device_params_->serial_number.c_str());
-  LOGI("             firmware_version: %s",
-      device_params_->firmware_version.to_string().c_str());
-  LOGI("             hardware_version: %s",
-      device_params_->hardware_version.to_string().c_str());
-  LOGI("             spec_version: %s",
-      device_params_->spec_version.to_string().c_str());
-  LOGI("             lens_type: %s",
-      device_params_->lens_type.to_string().c_str());
-  LOGI("             imu_type: %s",
-      device_params_->imu_type.to_string().c_str());
-  LOGI("             nominal_baseline: %u", device_params_->nominal_baseline);
+  LOGI("\nDevice descriptors:");
+  LOGI("  name: %s", descriptors_->name.c_str());
+  LOGI("  serial_number: %s", descriptors_->serial_number.c_str());
+  LOGI("  firmware_version: %s",
+      descriptors_->firmware_version.to_string().c_str());
+  LOGI("  hardware_version: %s",
+      descriptors_->hardware_version.to_string().c_str());
+  LOGI("  spec_version: %s", descriptors_->spec_version.to_string().c_str());
+  LOGI("  lens_type: %s", descriptors_->lens_type.to_string().c_str());
+  LOGI("  imu_type: %s", descriptors_->imu_type.to_string().c_str());
+  LOGI("  nominal_baseline: %u", descriptors_->nominal_baseline);
 
   if (imu_params.ok) {
     SetMotionIntrinsics({imu_params.in_accel, imu_params.in_gyro});
@@ -674,10 +679,6 @@ void CameraPrivate::ScaleAssemCompensate(std::shared_ptr<ImuData> data) {
       data->gyro[i] = d[i][0];
     }
   }
-}
-
-void CameraPrivate::IsHidExist() {
-  is_hid_exist_ = channels_->IsHidExist();
 }
 
 Image::pointer CameraPrivate::RetrieveImageColor(ErrorCode* code) {

@@ -5,10 +5,7 @@
 #include <memory>
 #include <string>
 
-#include "mynteye/data/channels.h"
-#include "mynteye/internal/camera_p.h"
-#include "mynteye/stubs/global.h"
-#include "mynteye/types.h"
+#include "mynteye/camera.h"
 
 MYNTEYE_BEGIN_NAMESPACE
 
@@ -18,32 +15,32 @@ namespace tools {
 
 class DeviceWriter {
  public:
-  using dev_info_t = DeviceParams;
-  using imu_params_t = Channels::imu_params_t;
+  using device_desc_t = device::Descriptors;
+  using imu_params_t = device::ImuParams;
 
-  explicit DeviceWriter(std::shared_ptr<CameraPrivate> device);
+  explicit DeviceWriter(std::shared_ptr<Camera> device);
   ~DeviceWriter();
 
-  bool WriteDeviceInfo(const dev_info_t &info);
-  bool WriteDeviceInfo(const std::string &filepath);
+  bool WriteDescriptors(const device_desc_t &desc);
+  bool WriteDescriptors(const std::string &filepath);
 
   bool WriteImuParams(const imu_params_t &params);
   bool WriteImuParams(const std::string &filepath);
 
-  bool SaveDeviceInfo(const dev_info_t &info, const std::string &filepath);
+  bool SaveDescriptors(const device_desc_t &desc, const std::string &filepath);
   bool SaveImuParams(const imu_params_t &params, const std::string &filepath);
 
-  /** Save all infos of this device */
-  void SaveAllInfos(const std::string &dir);
+  /** Save all datas of this device */
+  void SaveAllDatas(const std::string &dir);
 
  private:
-  dev_info_t LoadDeviceInfo(const std::string &filepath);
+  device_desc_t LoadDescriptors(const std::string &filepath);
   imu_params_t LoadImuParams(const std::string &filepath);
 
-  std::shared_ptr<CameraPrivate> device_;
+  std::shared_ptr<Camera> device_;
 };
 
-} // namespace tools
+}  // namespace tools
 
 MYNTEYE_END_NAMESPACE
 

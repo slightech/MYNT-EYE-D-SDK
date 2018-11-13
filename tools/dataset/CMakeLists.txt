@@ -20,10 +20,6 @@ set_outdir(
   RUNTIME ${OUT_DIR}/bin/${DIR_NAME}
 )
 
-include_directories(
-  ${PRO_DIR}/src
-)
-
 ## record
 
 make_executable(record

@@ -22,7 +22,7 @@
 #include <vector>
 
 #include "mynteye/data/types_internal.h"
-#include "mynteye/types.h"
+#include "mynteye/types_data.h"
 
 MYNTEYE_BEGIN_NAMESPACE
 
@@ -35,20 +35,14 @@ class hid_device;
 class MYNTEYE_API Channels {
  public:
   typedef enum FileId {
-    FID_DEVICE_INFO = 1,  // device info
+    FID_DEVICE_DESC = 1,  // device desc
     FID_RESERVE = 2,      // reserve
-    FID_IMU_PARAMS = 4,   // imu intrinsics & extrinsics
+    FID_IMU_PARAMS = 4,   // imu params
     FID_LAST,
   } file_id_t;
 
-  using device_info_t = DeviceParams;
-
-  typedef struct ImuParams {
-    bool ok;
-    ImuIntrinsics in_accel;
-    ImuIntrinsics in_gyro;
-    Extrinsics ex_left_to_imu;
-  } imu_params_t;
+  using device_desc_t = device::Descriptors;
+  using imu_params_t = device::ImuParams;
 
   using imu_packets_t = std::vector<ImuDataPacket>;
   using img_packets_t = std::vector<ImgInfoPacket>;
@@ -70,11 +64,11 @@ class MYNTEYE_API Channels {
 
   void DoHidTrack();
 
-  bool GetFiles(device_info_t *info,
+  bool GetFiles(device_desc_t *desc,
       imu_params_t *imu_params,
       Version *spec_version = nullptr);
 
-  bool SetFiles(device_info_t *info,
+  bool SetFiles(device_desc_t *desc,
       imu_params_t *imu_params,
       Version *spec_version);
 

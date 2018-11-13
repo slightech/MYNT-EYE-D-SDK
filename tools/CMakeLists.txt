@@ -64,13 +64,9 @@ endif()
 
 include(${PRO_DIR}/cmake/DetectOpenCV.cmake)
 
-find_package(eSPDI REQUIRED)
-
 # targets
 
 set(OUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/_output")
-
-# tools
 
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}
