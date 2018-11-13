@@ -1,11 +1,23 @@
-#ifndef MYNTEYE_INTERNAL_HID_H_ // NOLINT
-#define MYNTEYE_INTERNAL_HID_H_
+// Copyright 2018 Slightech Co., Ltd. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+#ifndef MYNTEYE_DATA_HID_HID_H_
+#define MYNTEYE_DATA_HID_HID_H_
+#pragma once
 
 #include <memory>
 
 #include "mynteye/stubs/global.h"
-#include "mynteye/types.h"
-
 
 #ifdef MYNTEYE_OS_WIN
 #include <windows.h>
@@ -40,7 +52,7 @@ typedef struct hid_struct {
   int open;
   struct hid_struct *prev;
   struct hid_struct *next;
-}hid_t;
+} hid_t;
 
 class hid_device {
  public:
@@ -74,8 +86,8 @@ class hid_device {
       usb_device_t *dev,
       usb_interface_t *iface,
       usb_dev_handle *handle,
-      int &count,
-      int &claimed,
+      int &count,    // NOLINT
+      int &claimed,  // NOLINT
       int usage,
       int usage_page);
 #endif
@@ -97,4 +109,4 @@ class hid_device {
 
 MYNTEYE_END_NAMESPACE
 
-#endif //MYNTEYE_INTERNAL_HID_H_ // NOLINT
+#endif  // MYNTEYE_DATA_HID_HID_H_

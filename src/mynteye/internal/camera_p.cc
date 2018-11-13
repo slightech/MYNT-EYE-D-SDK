@@ -18,9 +18,9 @@
 #include <string>
 #include <chrono>
 
+#include "mynteye/data/channels.h"
 #include "mynteye/device/device.h"
 #include "mynteye/internal/camera_p.h"
-#include "mynteye/internal/channels.h"
 #include "mynteye/util/log.h"
 #include "mynteye/util/rate.h"
 #include "mynteye/util/times.h"

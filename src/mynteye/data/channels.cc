@@ -1,4 +1,17 @@
-#include "mynteye/internal/channels.h"
+// Copyright 2018 Slightech Co., Ltd. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+#include "mynteye/data/channels.h"
 
 #include <string>
 #include <vector>
@@ -9,6 +22,7 @@
 #include <chrono>
 #include <stdexcept>
 
+#include "mynteye/data/hid/hid.h"
 #include "mynteye/util/log.h"
 #include "mynteye/util/strings.h"
 
@@ -49,11 +63,9 @@ void CheckSpecVersion(const Version *spec_version) {
       ss.str().c_str());
 }
 
-} // namespace
+}  // namespace
 
-Channels::Channels() : imu_callback_(nullptr),
-  img_callback_(nullptr) {
-
+Channels::Channels() : imu_callback_(nullptr), img_callback_(nullptr) {
   device_ = std::make_shared<hid::hid_device>();
   Open();
 }
@@ -97,8 +109,8 @@ void Channels::Open() {
   // open device
   if (device_->open(1, -1, -1) < 0) {
     if (device_->open(1, -1, -1) < 0) {
-      LOGE("%s, %d:: Open device failed, You must first execute the \"make init\" command.",
-          __FILE__, __LINE__);
+      LOGE("%s, %d:: Open device failed, You must first execute "
+          "the \"make init\" command.", __FILE__, __LINE__);
       return;
     }
   }
@@ -327,7 +339,7 @@ std::size_t from_data(
   return i;
 }
 
-} // namespace
+}  // namespace
 
 bool Channels::RequireFileData(bool device_info,
     bool reserve,
@@ -638,11 +650,11 @@ std::size_t to_data(
   return size + 3;
 }
 
-} // namespace
+}  // namespace
 
 bool Channels::UpdateFileData(
     std::uint8_t *data, std::uint16_t size) {
-  std::uint8_t cmd[64];
+    std::uint8_t cmd[64];
 
   cmd[0] = 0x8A;
   cmd[1] = 4;

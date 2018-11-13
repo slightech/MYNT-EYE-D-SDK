@@ -62,15 +62,19 @@ install: build
 
 .PHONY: install
 
+# all
+
+all: init samples tools ros
+
+.PHONY: all
+
 # samples
 
 samples: install
 	@$(call echo,Make $@)
 	@$(call cmake_build,./samples/_build)
 
-all: samples
-
-.PHONY: all samples
+.PHONY: samples
 
 # tools
 
@@ -82,12 +86,12 @@ tools: install
 
 # ros
 
-.PHONY: ros
 ros: install
+ifeq ($(HOST_OS),Linux)
 	@$(call echo,Make $@)
 	@cd ./wrappers/ros && catkin_make
+endif
 
-.PHONY: cleanros
 cleanros:
 	@$(call echo,Make $@)
 	@$(call rm,./wrappers/ros/build/)
@@ -95,6 +99,8 @@ cleanros:
 	@$(call rm,./wrappers/ros/install/)
 	@$(call rm,./wrappers/ros/.catkin_workspace)
 	@$(call rm,./wrappers/ros/src/CMakeLists.txt)
+
+.PHONY: ros cleanros
 
 # doc
 

@@ -5,8 +5,8 @@
 #include <memory>
 #include <string>
 
+#include "mynteye/data/channels.h"
 #include "mynteye/stubs/global.h"
-#include "mynteye/internal/channels.h"
 #include "mynteye/internal/camera_p.h"
 #include "mynteye/internal/types.h"
 

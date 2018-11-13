@@ -1,5 +1,18 @@
-#ifndef MYNTEYE_INTERNAL_CHANNELS_H_ // NOLINT
-#define MYNTEYE_INTERNAL_CHANNELS_H_
+// Copyright 2018 Slightech Co., Ltd. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+#ifndef MYNTEYE_DATA_CHANNELS_H_
+#define MYNTEYE_DATA_CHANNELS_H_
 #pragma once
 
 #include <map>
@@ -9,17 +22,20 @@
 
 #include "mynteye/types.h"
 #include "mynteye/internal/types.h"
-#include "mynteye/internal/hid.h"
 
 MYNTEYE_BEGIN_NAMESPACE
 
+namespace hid {
+
 class hid_device;
+
+}  // namespace hid
 
 class MYNTEYE_API Channels {
  public:
   typedef enum FileId {
     FID_DEVICE_INFO = 1,  // device info
-    FID_RESERVE = 2,   // reserve
+    FID_RESERVE = 2,      // reserve
     FID_IMU_PARAMS = 4,   // imu intrinsics & extrinsics
     FID_LAST,
   } file_id_t;
@@ -41,15 +57,18 @@ class MYNTEYE_API Channels {
 
   void SetImuCallback(imu_callback_t callback);
   void SetImgInfoCallback(img_callback_t callback);
+
   void Open();
   void Close();
+
   bool StartHidTracking();
   bool StopHidTracking();
+
   void DoHidTrack();
 
   bool GetFiles(device_info_t *info,
-    imu_params_t *imu_params,
-    Version *spec_version = nullptr);
+      imu_params_t *imu_params,
+      Version *spec_version = nullptr);
 
   bool SetFiles(device_info_t *info,
       imu_params_t *imu_params,
@@ -58,12 +77,12 @@ class MYNTEYE_API Channels {
   bool IsHidExist();
 
  protected:
-  bool ExtractHidData(ImuResPacket &imu, ImgInfoResPacket &img);
+  bool ExtractHidData(ImuResPacket &imu, ImgInfoResPacket &img);  // NOLINT
   bool RequireFileData(bool device_info,
       bool reserve,
       bool imu_params,
       std::uint8_t *data,
-      std::uint16_t &file_size);
+      std::uint16_t &file_size);  // NOLINT
   bool UpdateFileData(std::uint8_t *data, std::uint16_t size);
 
  private:
@@ -84,4 +103,4 @@ class MYNTEYE_API Channels {
 
 MYNTEYE_END_NAMESPACE
 
-#endif // MYNTEYE_INTERNAL_CHANNELS_H_
+#endif  // MYNTEYE_DATA_CHANNELS_H_

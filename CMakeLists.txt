@@ -108,15 +108,8 @@ add_definitions(-DMYNTEYE_EXPORTS)
 
 set(MYNTEYE_DEPTH ${MYNTEYE_NAME}_depth)
 
-if(OS_WIN)
-  set(DEVICE_SRC "src/mynteye/internal/hid_windows.cc")
-elseif(OS_MAC)
-  set(DEVICE_SRC "src/mynteye/internal/hid_macos.cc")
-else()
-  set(DEVICE_SRC "src/mynteye/internal/hid_linux.cc")
-endif()
-
 set(MYNTEYE_DEPTH_SRCS
+  src/mynteye/data/channels.cc
   src/mynteye/device/convertor.cc
   src/mynteye/device/device_info.cc
   src/mynteye/device/device.cc
@@ -130,13 +123,15 @@ set(MYNTEYE_DEPTH_SRCS
   src/mynteye/types.cc
   src/mynteye/utils.cc
   src/mynteye/internal/camera_p.cc
-  src/mynteye/internal/channels.cc
   src/mynteye/internal/types.cc
   src/mynteye/util/rate.cc
   src/mynteye/util/strings.cc
-  ${DEVICE_SRC}
 )
-#file(GLOB_RECURSE MYNTEYE_DEPTH_SRCS "src/mynteye/*.cc")
+if(OS_WIN)
+  list(APPEND MYNTEYE_DEPTH_SRCS "src/mynteye/data/hid/hid_win.cc")
+else()
+  list(APPEND MYNTEYE_DEPTH_SRCS "src/mynteye/data/hid/hid_linux.cc")
+endif()
 
 if(OS_WIN)
   set(MYNTEYE_LINK_LIBS ${eSPDI_LIBS})
