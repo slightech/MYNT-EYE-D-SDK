@@ -15,10 +15,11 @@
 #define MYNTEYE_DATA_CHANNELS_H_
 #pragma once
 
+#include <functional>
 #include <map>
 #include <memory>
 #include <thread>
-#include <functional>
+#include <vector>
 
 #include "mynteye/data/types_internal.h"
 #include "mynteye/types.h"
@@ -49,11 +50,14 @@ class MYNTEYE_API Channels {
     Extrinsics ex_left_to_imu;
   } imu_params_t;
 
+  using imu_packets_t = std::vector<ImuDataPacket>;
+  using img_packets_t = std::vector<ImgInfoPacket>;
+
+  using imu_callback_t = std::function<void(const ImuDataPacket &packet)>;
+  using img_callback_t = std::function<void(const ImgInfoPacket &packet)>;
+
   Channels();
   virtual ~Channels();
-
-  using imu_callback_t = std::function<void(const ImuPacket &packet)>;
-  using img_callback_t = std::function<void(const ImgInfoPacket &packet)>;
 
   void SetImuCallback(imu_callback_t callback);
   void SetImgInfoCallback(img_callback_t callback);
@@ -77,7 +81,7 @@ class MYNTEYE_API Channels {
   bool IsHidExist();
 
  protected:
-  bool ExtractHidData(ImuResPacket &imu, ImgInfoResPacket &img);  // NOLINT
+  bool ExtractHidData(imu_packets_t &imu, img_packets_t &img);  // NOLINT
   bool RequireFileData(bool device_info,
       bool reserve,
       bool imu_params,

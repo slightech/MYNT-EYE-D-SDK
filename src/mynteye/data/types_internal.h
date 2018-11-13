@@ -24,7 +24,7 @@ MYNTEYE_BEGIN_NAMESPACE
 
 /**
  * @ingroup datatypes
- * Image packet.
+ * Image info packet.
  */
 #pragma pack(push, 1)
 struct ImgInfoPacket {
@@ -48,37 +48,17 @@ struct ImgInfoPacket {
 
 /**
  * @ingroup datatypes
- * Image response packet
+ * Imu data packet.
  */
 #pragma pack(push, 1)
-struct ImgInfoResPacket {
-  std::vector<ImgInfoPacket> packets;
-
-  ImgInfoResPacket() = default;
-  explicit ImgInfoResPacket(std::uint8_t *data) {
-    from_data(data);
-  }
-
-  void from_data(std::uint8_t *data) {
-    ImgInfoPacket packet(data);
-    packets.push_back(packet);
-  }
-};
-#pragma pack(pop)
-
-/**
- * @ingroup datatypes
- * Imu segment.
- */
-#pragma pack(push, 1)
-struct ImuSegment {
+struct ImuDataPacket {
   std::uint8_t flag;
   std::uint32_t timestamp;
   std::int16_t temperature;
   std::int16_t accel_or_gyro[3];
 
-  ImuSegment() = default;
-  explicit ImuSegment(std::uint8_t *data) {
+  ImuDataPacket() = default;
+  explicit ImuDataPacket(std::uint8_t *data) {
     from_data(data);
   }
 
@@ -90,44 +70,6 @@ struct ImuSegment {
     accel_or_gyro[1] = *(data + 8) | *(data + 9) << 8;
     accel_or_gyro[2] = *(data + 10) | *(data + 11) << 8;
     temperature = *(data + 12) | *(data + 13) << 8;
-  }
-};
-#pragma pack(pop)
-
-/**
- * @ingroup datatypes
- * Imu packet.
- */
-#pragma pack(push, 1)
-struct ImuPacket {
-  std::vector<ImuSegment> segments;
-
-  ImuPacket() = default;
-  explicit ImuPacket(std::uint8_t *data) {
-    from_data(data);
-  }
-  void from_data(std::uint8_t *data) {
-    segments.push_back(ImuSegment(data));
-  }
-};
-#pragma pack(pop)
-
-/**
- * @ingroup datatypes
- * Imu response packet.
- */
-#pragma pack(push, 1)
-struct ImuResPacket {
-  std::vector<ImuPacket> packets;
-
-  ImuResPacket() = default;
-  explicit ImuResPacket(std::uint8_t *data) {
-    from_data(data);
-  }
-
-  void from_data(std::uint8_t *data) {
-    ImuPacket packet(data);
-    packets.push_back(packet);
   }
 };
 #pragma pack(pop)

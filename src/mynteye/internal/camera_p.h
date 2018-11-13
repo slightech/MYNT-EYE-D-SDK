@@ -74,7 +74,7 @@ class MYNTEYE_API CameraPrivate {
   /** Set callback of hid */
   void SetHidCallback();
   /** Callback of imu data */
-  void ImuDataCallback(const ImuPacket &packet);
+  void ImuDataCallback(const ImuDataPacket &packet);
   /** Callback of image information */
   void ImageInfoCallback(const ImgInfoPacket &packet);
   /** Start capture image */

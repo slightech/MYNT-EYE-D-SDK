@@ -409,49 +409,48 @@ bool CameraPrivate::StartHidTracking() {
   return true;
 }
 
-void CameraPrivate::ImuDataCallback(const ImuPacket &packet) {
-  for (auto &&seg : packet.segments) {
-    auto &&imu = std::make_shared<ImuData>();
-    imu->flag = seg.flag;
-    imu->temperature = static_cast<double>(seg.temperature * 0.125 + 23);
-    imu->timestamp = seg.timestamp;
+void CameraPrivate::ImuDataCallback(const ImuDataPacket &packet) {
+  auto &&imu = std::make_shared<ImuData>();
+  imu->flag = packet.flag;
+  imu->temperature = static_cast<double>(packet.temperature * 0.125 + 23);
+  imu->timestamp = packet.timestamp;
 
-    if (imu->flag == 1) {
-      imu->accel[0] = seg.accel_or_gyro[0] * 12.f / 0x10000;
-      imu->accel[1] = seg.accel_or_gyro[1] * 12.f / 0x10000;
-      imu->accel[2] = seg.accel_or_gyro[2] * 12.f / 0x10000;
-      imu->gyro[0] = 0;
-      imu->gyro[1] = 0;
-      imu->gyro[2] = 0;
-    } else if (imu->flag == 2) {
-      imu->accel[0] = 0;
-      imu->accel[1] = 0;
-      imu->accel[2] = 0;
-      imu->gyro[0] = seg.accel_or_gyro[0] * 2000.f / 0x10000;
-      imu->gyro[1] = seg.accel_or_gyro[1] * 2000.f / 0x10000;
-      imu->gyro[2] = seg.accel_or_gyro[2] * 2000.f / 0x10000;
-    } else {
-      imu->Reset();
-    }
+  if (imu->flag == 1) {
+    imu->accel[0] = packet.accel_or_gyro[0] * 12.f / 0x10000;
+    imu->accel[1] = packet.accel_or_gyro[1] * 12.f / 0x10000;
+    imu->accel[2] = packet.accel_or_gyro[2] * 12.f / 0x10000;
+    imu->gyro[0] = 0;
+    imu->gyro[1] = 0;
+    imu->gyro[2] = 0;
+  } else if (imu->flag == 2) {
+    imu->accel[0] = 0;
+    imu->accel[1] = 0;
+    imu->accel[2] = 0;
+    imu->gyro[0] = packet.accel_or_gyro[0] * 2000.f / 0x10000;
+    imu->gyro[1] = packet.accel_or_gyro[1] * 2000.f / 0x10000;
+    imu->gyro[2] = packet.accel_or_gyro[2] * 2000.f / 0x10000;
+  } else {
+    LOGW("Unaccpected imu, flag=%d is wrong", imu->flag);
+    return;
+  }
 
-    if (is_process_mode_[ProcessMode::ASSEMBLY]) {
-      ScaleAssemCompensate(imu);
-    } else if (is_process_mode_[ProcessMode::WARM_DRIFT]) {
-      TempCompensate(imu);
-    } else if (is_process_mode_[ProcessMode::ALL]) {
-      TempCompensate(imu);
-      ScaleAssemCompensate(imu);
-    }
+  if (is_process_mode_[ProcessMode::ASSEMBLY]) {
+    ScaleAssemCompensate(imu);
+  } else if (is_process_mode_[ProcessMode::WARM_DRIFT]) {
+    TempCompensate(imu);
+  } else if (is_process_mode_[ProcessMode::ALL]) {
+    TempCompensate(imu);
+    ScaleAssemCompensate(imu);
+  }
 
-    ++motion_count_;
-    if (motion_count_ > 20) {
-      motion_data_t tmp = {imu};
-      cache_imu_data_.push_back(tmp);
-      std::lock_guard<std::mutex> _(mtx_imu_);
-      imu_data_.insert(imu_data_.end(), cache_imu_data_.begin(),
-          cache_imu_data_.end());
-      cache_imu_data_.clear();
-    }
+  ++motion_count_;
+  if (motion_count_ > 20) {
+    motion_data_t tmp = {imu};
+    cache_imu_data_.push_back(tmp);
+    std::lock_guard<std::mutex> _(mtx_imu_);
+    imu_data_.insert(imu_data_.end(), cache_imu_data_.begin(),
+        cache_imu_data_.end());
+    cache_imu_data_.clear();
   }
 }
 

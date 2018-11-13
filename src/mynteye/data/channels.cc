@@ -88,18 +88,20 @@ void Channels::SetImgInfoCallback(img_callback_t callback) {
 }
 
 void Channels::DoHidTrack() {
-  ImuResPacket imu_res_packet;
-  ImgInfoResPacket img_res_packet;
+  static imu_packets_t imu_packets;
+  static img_packets_t img_packets;
+  imu_packets.clear();
+  img_packets.clear();
 
-  if (!ExtractHidData(imu_res_packet, img_res_packet)) {
+  if (!ExtractHidData(imu_packets, img_packets)) {
     return;
   }
 
   if (imu_callback_ && img_callback_) {
-    for (auto &&imu_packet : imu_res_packet.packets) {
+    for (auto &&imu_packet : imu_packets) {
       imu_callback_(imu_packet);
     }
-    for (auto &&img_packet : img_res_packet.packets) {
+    for (auto &&img_packet : img_packets) {
       img_callback_(img_packet);
     }
   }
@@ -134,7 +136,7 @@ bool Channels::StartHidTracking() {
   return true;
 }
 
-bool Channels::ExtractHidData(ImuResPacket &imu, ImgInfoResPacket &img) {
+bool Channels::ExtractHidData(imu_packets_t &imu, img_packets_t &img) {
   std::uint8_t data[PACKET_SIZE * 2]{};
   std::fill(data, data + PACKET_SIZE * 2, 0);
 
@@ -144,7 +146,6 @@ bool Channels::ExtractHidData(ImuResPacket &imu, ImgInfoResPacket &img) {
     LOGE("Error:: Reading, device went offline !");
     return false;
   }
-
 
   for (int i = 0; i < size / PACKET_SIZE; i++) {
     std::uint8_t *packet = data + i * PACKET_SIZE;
@@ -162,10 +163,10 @@ bool Channels::ExtractHidData(ImuResPacket &imu, ImgInfoResPacket &img) {
     for (int offset = 3; offset <= PACKET_SIZE - DATA_SIZE;
         offset += DATA_SIZE) {
       if (*(packet + offset) == 2) {
-        img.from_data(packet + offset);
+        img.push_back(ImgInfoPacket(packet + offset));
       } else if (*(packet + offset) == 0 ||
           *(packet + offset) == 1) {
-        imu.from_data(packet + offset);
+        imu.push_back(ImuDataPacket(packet + offset));
       }
     }
   }
