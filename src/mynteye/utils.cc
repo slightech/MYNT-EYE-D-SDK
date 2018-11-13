@@ -25,7 +25,7 @@ bool select(const Camera& cam, DeviceInfo* info) {
   std::cout << std::endl;
   std::string dashes(80, '-');
 
-  std::vector<DeviceInfo> dev_infos = cam.GetDevices();
+  std::vector<DeviceInfo> dev_infos = cam.GetDeviceInfos();
   size_t n = dev_infos.size();
   if (n <= 0) {
     std::cerr << "Error: Device not found" << std::endl;
@@ -63,7 +63,7 @@ void print_stream_infos(const Camera& cam, const std::int32_t& dev_index) {
 
   std::vector<StreamInfo> color_infos;
   std::vector<StreamInfo> depth_infos;
-  cam.GetResolutions(dev_index, &color_infos, &depth_infos);
+  cam.GetStreamInfos(dev_index, &color_infos, &depth_infos);
 
   std::cout << dashes << std::endl;
   std::cout << "Index | Color Stream Information" << std::endl;

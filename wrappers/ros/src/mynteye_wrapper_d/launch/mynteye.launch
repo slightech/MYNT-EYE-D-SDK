@@ -1,9 +1,9 @@
 <launch>
   <!-- Stream mode -->
-  <arg name="stream_1280x720"   default="0" />
-  <arg name="stream_2560x720"   default="1" />
-  <arg name="stream_1280x480"   default="2" />
-  <arg name="stream_640x480"    default="3" />
+  <arg name="stream_640x480"    default="0" />
+  <arg name="stream_1280x480"   default="1" />
+  <arg name="stream_1280x720"   default="2" />
+  <arg name="stream_2560x720"   default="3" />
 
   <!-- Stream format -->
   <arg name="stream_mjpg"       default="0" />

@@ -82,7 +82,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   std::string temp_frame_id;
 
   // MYNTEYE objects
-  mynteye::InitParams params;
+  mynteye::OpenParams params;
   std::unique_ptr<mynteye::Camera> mynteye;
 
   std::unique_ptr<PointCloudGenerator> pointcloud_generator;
@@ -139,46 +139,35 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     sensor_msgs::CameraInfo *camera_info = new sensor_msgs::CameraInfo();
     camera_info_ptr_ = sensor_msgs::CameraInfoPtr(camera_info);
 
-    MYNTEYE_NAMESPACE::CameraCtrlRectLogData camera_ctrl_data;
+    MYNTEYE_NAMESPACE::CameraCalibration calib;
 
-    // <arg name="stream_1280x720"   default="0" />
-    // <arg name="stream_2560x720"   default="1" />
-    // GetHDCameraCtrlData();
-    // <arg name="stream_1280x480"   default="2" />
-    // <arg name="stream_640x480"    default="3" />
-    // GetVGACameraCtrlData();
-
-    if (stream_mode == 0 || stream_mode == 1) {
-      camera_ctrl_data = mynteye->GetHDCameraCtrlData();
-    } else if (stream_mode == 2 || stream_mode == 3) {
-      camera_ctrl_data = mynteye->GetVGACameraCtrlData();
-    }
+    calib = mynteye->GetCameraCalibration(params.stream_mode);
 
     // camera_info->header.frame_id = color_frame_id;
-    camera_info->width = camera_ctrl_data.OutImgWidth;
-    camera_info->height = camera_ctrl_data.OutImgHeight;
+    camera_info->width = calib.OutImgWidth;
+    camera_info->height = calib.OutImgHeight;
 
     //     [fx  0 cx]
     // K = [ 0 fy cy]
     //     [ 0  0  1]
-    camera_info->K.at(0) = camera_ctrl_data.CamMat1[0];
-    camera_info->K.at(2) = camera_ctrl_data.CamMat1[2];
-    camera_info->K.at(4) = camera_ctrl_data.CamMat1[4];
-    camera_info->K.at(5) = camera_ctrl_data.CamMat1[5];
+    camera_info->K.at(0) = calib.CamMat1[0];
+    camera_info->K.at(2) = calib.CamMat1[2];
+    camera_info->K.at(4) = calib.CamMat1[4];
+    camera_info->K.at(5) = calib.CamMat1[5];
     camera_info->K.at(8) = 1;
 
     //     [fx'  0  cx' Tx]
     // P = [ 0  fy' cy' Ty]
     //     [ 0   0   1   0]
     for (int i = 0; i < 12; i++) {
-        camera_info->P.at(i) = camera_ctrl_data.NewCamMat1[i];
+        camera_info->P.at(i) = calib.NewCamMat1[i];
     }
 
     camera_info->distortion_model = "plumb_bob";
 
     // D of plumb_bob: (k1, k2, t1, t2, k3)
     for (int i = 0; i < 5; i++) {
-      camera_info->D.push_back(camera_ctrl_data.CamDist1[i]);
+      camera_info->D.push_back(calib.CamDist1[i]);
     }
 
     // R to identity matrix
@@ -511,7 +500,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     // MYNTEYE objects
     mynteye.reset(new mynteye::Camera);
     {
-      std::vector<mynteye::DeviceInfo> dev_infos = mynteye->GetDevices();
+      std::vector<mynteye::DeviceInfo> dev_infos = mynteye->GetDeviceInfos();
       size_t n = dev_infos.size();
       if (n <= 0 || dev_index < 0 || dev_index >= n) {
         NODELET_ERROR_STREAM("Device not found, index: " << dev_index);
@@ -531,7 +520,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     {
       std::vector<mynteye::StreamInfo> color_infos;
       std::vector<mynteye::StreamInfo> depth_infos;
-      mynteye->GetResolutions(dev_index, &color_infos, &depth_infos);
+      mynteye->GetStreamInfos(dev_index, &color_infos, &depth_infos);
 
       NODELET_INFO_STREAM("Color Stream Information");
       NODELET_INFO_STREAM(dashes);

@@ -44,7 +44,7 @@ void Camera::GetStreamInfos(const std::int32_t& dev_index,
 }
 
 ErrorCode Camera::Open() {
-  std::vector<DeviceInfo> dev_infos = GetDevices();
+  std::vector<DeviceInfo> dev_infos = GetDeviceInfos();
   if (dev_infos.size() <= 0) {
     LOGE("Error: Device not found");
     return ErrorCode::ERROR_CAMERA_OPEN_FAILED;
@@ -88,6 +88,9 @@ MotionIntrinsics Camera::GetMotionIntrinsics() const {
 
 Extrinsics Camera::GetMotionExtrinsics() const {
   return p_->GetMotionExtrinsics();
+}
+
+void Camera::Wait() const {
 }
 
 void Camera::Close() {
@@ -147,9 +150,6 @@ void Camera::GetResolutions(
     std::vector<StreamInfo>* color_infos,
     std::vector<StreamInfo>* depth_infos) const {
   GetStreamInfos(dev_index, color_infos, depth_infos);
-}
-
-void Camera::Wait() const {
 }
 
 CameraCtrlRectLogData Camera::GetHDCameraCtrlData() {

@@ -162,7 +162,7 @@ int main(int argc, char const* argv[]) {
       << dev_info.name << endl << endl;
 
   // Warning: Color stream format MJPG doesn't work.
-  InitParams params(dev_info.index);
+  OpenParams params(dev_info.index);
   params.depth_mode = DepthMode::DEPTH_RAW;
   // params.stream_mode = StreamMode::STREAM_1280x720;
   params.ir_intensity = 4;

@@ -75,6 +75,9 @@ class MYNTEYE_API Camera {
   /** Get the extrinsics from left to motion */
   Extrinsics GetMotionExtrinsics() const;
 
+  /** @deprecated Useless */
+  void Wait() const;
+
   /** Close the camera */
   void Close();
 
@@ -115,9 +118,6 @@ class MYNTEYE_API Camera {
 
   /** @deprecated Useless */
   // StreamMode GetStreamMode();
-
-  /** @deprecated Useless */
-  void Wait() const;
 
   /** @deprecated Replaced by GetCameraCalibration() */
   CameraCtrlRectLogData GetHDCameraCtrlData();

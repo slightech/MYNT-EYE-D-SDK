@@ -34,7 +34,7 @@ int main(int argc, char const* argv[]) {
       << dev_info.name << std::endl << std::endl;
 
   // Warning: Color stream format MJPG doesn't work.
-  mynteye::InitParams params(dev_info.index);
+  mynteye::OpenParams params(dev_info.index);
   // params.color_mode = mynteye::ColorMode::COLOR_RECTIFIED;
   // params.depth_mode = mynteye::DepthMode::DEPTH_GRAY;
   params.depth_mode = mynteye::DepthMode::DEPTH_COLORFUL;
