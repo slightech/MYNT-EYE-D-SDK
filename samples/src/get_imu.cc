@@ -11,7 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#include <termio.h>
 #include <iostream>
 
 #include <opencv2/highgui/highgui.hpp>
@@ -80,10 +79,6 @@ int main(int argc, char const* argv[]) {
       std::cout << std::endl;
     }
 
-    char key = mynteye::util::waitKey();
-    if (key == 27 || key == 'q' || key == 'Q') {  // ESC/Q
-      break;
-    }
     cam.Wait();  // keep frequency
   }
 
