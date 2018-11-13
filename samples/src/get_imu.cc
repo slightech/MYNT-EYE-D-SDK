@@ -79,12 +79,6 @@ int main(int argc, char const* argv[]) {
       std::cout << std::endl;
     }
 
-#ifdef MYNTEYE_OS_LINUX
-    char key = mynteye::util::waitKey();
-    if (key == 27 || key == 'q' || key == 'Q') {  // ESC/Q
-      break;
-    }
-#endif
     cam.Wait();  // keep frequency
   }
 
