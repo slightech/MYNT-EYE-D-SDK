@@ -53,16 +53,18 @@ class MYNTEYE_API Channels {
   Channels();
   virtual ~Channels();
 
-  void SetImuCallback(imu_callback_t callback);
+  bool IsAvaliable() const;
+  bool IsOpened() const;
+
+  void SetImuDataCallback(imu_callback_t callback);
   void SetImgInfoCallback(img_callback_t callback);
 
-  void Open();
-  void Close();
+  bool IsHidAvaliable() const;
+  bool IsHidOpened() const;
+  bool IsHidTracking() const;
 
   bool StartHidTracking();
   bool StopHidTracking();
-
-  void DoHidTrack();
 
   bool GetFiles(device_desc_t *desc,
       imu_params_t *imu_params,
@@ -72,31 +74,38 @@ class MYNTEYE_API Channels {
       imu_params_t *imu_params,
       Version *spec_version);
 
-  bool IsHidExist();
-
  protected:
-  bool ExtractHidData(imu_packets_t &imu, img_packets_t &img);  // NOLINT
-  bool RequireFileData(bool device_info,
+  void Detect();
+  bool Open();
+  void Close();
+
+  void DetectHid();
+  bool OpenHid();
+  void CloseHid();
+
+ private:
+  void DoHidTrack();
+  bool DoHidDataExtract(imu_packets_t &imu, img_packets_t &img);  // NOLINT
+
+  bool PullFileData(bool device_info,
       bool reserve,
       bool imu_params,
       std::uint8_t *data,
       std::uint16_t &file_size);  // NOLINT
-  bool UpdateFileData(std::uint8_t *data, std::uint16_t size);
+  bool PushFileData(std::uint8_t *data, std::uint16_t size);
 
- private:
-  std::shared_ptr<hid::hid_device> device_;
+  std::shared_ptr<hid::hid_device> hid_;
 
+  bool is_hid_exist_ = false;
+  bool is_hid_opened_ = false;
   bool is_hid_tracking_ = false;
-  volatile bool hid_track_stop_ = false;
-  std::thread hid_track_thread_;
 
   imu_callback_t imu_callback_;
   img_callback_t img_callback_;
 
-  std::uint8_t req_count_ = 0;
-  std::uint16_t package_sn_ = 0;
+  std::thread hid_track_thread_;
 
-  bool is_hid_open_ = false;
+  std::uint16_t package_sn_ = 0;
 };
 
 MYNTEYE_END_NAMESPACE
