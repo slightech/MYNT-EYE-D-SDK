@@ -323,7 +323,7 @@ bool Device::Open(const OpenParams& params) {
   int ret = EtronDI_OpenDeviceEx(etron_di_, &dev_sel_info_,
       color_res_index_, toRgb,
       depth_res_index_, depthStreamSwitch,
-      CameraPrivate::ImgCallback, this, &framerate_, ctrlMode);
+      Device::ImgCallback, this, &framerate_, ctrlMode);
 #else
   int ret = EtronDI_OpenDevice2(etron_di_, &dev_sel_info_,
       stream_color_info_ptr_[color_res_index_].nWidth,

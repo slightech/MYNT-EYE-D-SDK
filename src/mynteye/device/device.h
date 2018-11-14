@@ -15,9 +15,17 @@
 #define MYNTEYE_DEVICE_DEVICE_H_
 #pragma once
 
+#include "mynteye/stubs/global.h"
+
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <mutex>
+#include <thread>
+
+#ifdef MYNTEYE_OS_WIN
+#include <Windows.h>
+#endif
 
 #include "eSPDI.h"
 
