@@ -145,38 +145,6 @@ std::string CameraPrivate::GetDescriptor(const Descriptor &desc) const {
   }
 }
 
-CameraCalibration CameraPrivate::GetCameraCalibration(
-    const StreamMode& stream_mode) {
-  return device_->GetCameraCalibration(stream_mode);
-}
-
-void CameraPrivate::GetCameraCalibrationFile(
-    const StreamMode& stream_mode, const std::string& filename) {
-  return device_->GetCameraCalibrationFile(stream_mode, filename);
-}
-
-bool CameraPrivate::WriteCameraCalibrationBinFile(const std::string& filename) {
-  return device_->SetCameraCalibrationBinFile(filename);
-}
-
-MotionIntrinsics CameraPrivate::GetMotionIntrinsics() const {
-  if (motion_intrinsics_) {
-    return *motion_intrinsics_;
-  } else {
-    LOGE("Error: Motion intrinsics not found");
-    return {};
-  }
-}
-
-MotionExtrinsics CameraPrivate::GetMotionExtrinsics() const {
-  if (motion_extrinsics_) {
-    return *motion_extrinsics_;
-  } else {
-    LOGE("Error: Motion extrinsics not found");
-    return {};
-  }
-}
-
 StreamIntrinsics CameraPrivate::GetStreamIntrinsics(
     const StreamMode& stream_mode) {
   if (!stream_intrinsics_) {
@@ -220,6 +188,28 @@ StreamExtrinsics CameraPrivate::GetStreamExtrinsics(
   return *stream_extrinsics_;
 }
 
+bool CameraPrivate::WriteCameraCalibrationBinFile(const std::string& filename) {
+  return device_->SetCameraCalibrationBinFile(filename);
+}
+
+MotionIntrinsics CameraPrivate::GetMotionIntrinsics() const {
+  if (motion_intrinsics_) {
+    return *motion_intrinsics_;
+  } else {
+    LOGE("Error: Motion intrinsics not found");
+    return {};
+  }
+}
+
+MotionExtrinsics CameraPrivate::GetMotionExtrinsics() const {
+  if (motion_extrinsics_) {
+    return *motion_extrinsics_;
+  } else {
+    LOGE("Error: Motion extrinsics not found");
+    return {};
+  }
+}
+
 bool CameraPrivate::WriteDeviceFlash(
     device::Descriptors *desc,
     device::ImuParams *imu_params,
@@ -238,6 +228,16 @@ void CameraPrivate::Close() {
     StopDataTracking();
   }
   device_->Close();
+}
+
+CameraCalibration CameraPrivate::GetCameraCalibration(
+    const StreamMode& stream_mode) {
+  return device_->GetCameraCalibration(stream_mode);
+}
+
+void CameraPrivate::GetCameraCalibrationFile(
+    const StreamMode& stream_mode, const std::string& filename) {
+  return device_->GetCameraCalibrationFile(stream_mode, filename);
 }
 
 // ...

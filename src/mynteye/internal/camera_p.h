@@ -118,6 +118,7 @@ class MYNTEYE_API CameraPrivate {
   void StartSyntheticImage();
   /** Stop synthetic image */
   void StopSyntheticImage();
+
   /** Get imu data */
   motion_datas_t GetImuDatas();
 
