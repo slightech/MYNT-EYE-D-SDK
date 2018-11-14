@@ -68,14 +68,14 @@ std::string Camera::GetDescriptor(const Descriptor &desc) const {
   return p_->GetDescriptor(desc);
 }
 
-CameraCalibration Camera::GetCameraCalibration(
-    const StreamMode& stream_mode) {
-  return p_->GetCameraCalibration(stream_mode);
+StreamIntrinsics Camera::GetStreamIntrinsics(
+    const StreamMode& stream_mode) const {
+  return p_->GetStreamIntrinsics(stream_mode);
 }
 
-void Camera::GetCameraCalibrationFile(
-    const StreamMode& stream_mode, const std::string& filename) {
-  p_->GetCameraCalibrationFile(stream_mode, filename);
+StreamExtrinsics Camera::GetStreamExtrinsics(
+    const StreamMode& stream_mode) const {
+  return p_->GetStreamExtrinsics(stream_mode);
 }
 
 bool Camera::WriteCameraCalibrationBinFile(const std::string& filename) {
@@ -88,14 +88,6 @@ MotionIntrinsics Camera::GetMotionIntrinsics() const {
 
 MotionExtrinsics Camera::GetMotionExtrinsics() const {
   return p_->GetMotionExtrinsics();
-}
-
-StreamIntrinsics Camera::GetStreamIntrinsics(const StreamMode& stream_mode) const {
-  return p_->GetStreamIntrinsics(stream_mode);
-}
-
-StreamExtrinsics Camera::GetStreamExtrinsics(const StreamMode& stream_mode) const {
-  return p_->GetStreamExtrinsics(stream_mode);
 }
 
 bool Camera::WriteDeviceFlash(
@@ -173,20 +165,20 @@ std::string Camera::GetInfo(const Info &info) const {
 }
 
 CameraCtrlRectLogData Camera::GetHDCameraCtrlData() {
-  return GetCameraCalibration(StreamMode::STREAM_1280x720);
+  return p_->GetCameraCalibration(StreamMode::STREAM_1280x720);
 }
 
 CameraCtrlRectLogData Camera::GetVGACameraCtrlData() {
-  return GetCameraCalibration(StreamMode::STREAM_640x480);
+  return p_->GetCameraCalibration(StreamMode::STREAM_640x480);
 }
 
 void Camera::GetHDCameraLogDataFile() {
-  GetCameraCalibrationFile(StreamMode::STREAM_1280x720,
+  p_->GetCameraCalibrationFile(StreamMode::STREAM_1280x720,
       "RectfyLog_PUMA_1.txt");
 }
 
 void Camera::GetVGACameraLogDataFile() {
-  GetCameraCalibrationFile(StreamMode::STREAM_640x480,
+  p_->GetCameraCalibrationFile(StreamMode::STREAM_640x480,
       "RectfyLog_PUMA_2.txt");
 }
 

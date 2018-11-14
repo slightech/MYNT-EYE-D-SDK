@@ -130,35 +130,34 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     sensor_msgs::CameraInfo *camera_info = new sensor_msgs::CameraInfo();
     camera_info_ptr_ = sensor_msgs::CameraInfoPtr(camera_info);
 
-    MYNTEYE_NAMESPACE::CameraCalibration calib;
-
-    calib = mynteye->GetCameraCalibration(params.stream_mode);
+    // todo: right
+    auto calib = (mynteye->GetStreamIntrinsics(params.stream_mode)).left;
 
     // camera_info->header.frame_id = color_frame_id;
-    camera_info->width = calib.InImgWidth/2;
-    camera_info->height = calib.InImgHeight;
+    camera_info->width = calib.width;
+    camera_info->height = calib.height;
 
     //     [fx  0 cx]
     // K = [ 0 fy cy]
     //     [ 0  0  1]
-    camera_info->K.at(0) = calib.CamMat1[0];
-    camera_info->K.at(2) = calib.CamMat1[2];
-    camera_info->K.at(4) = calib.CamMat1[4];
-    camera_info->K.at(5) = calib.CamMat1[5];
+    camera_info->K.at(0) = calib.fx;
+    camera_info->K.at(2) = calib.cx;
+    camera_info->K.at(4) = calib.fy;
+    camera_info->K.at(5) = calib.cy;
     camera_info->K.at(8) = 1;
 
     //     [fx'  0  cx' Tx]
     // P = [ 0  fy' cy' Ty]
     //     [ 0   0   1   0]
-    for (int i = 0; i < 12; i++) {
-        camera_info->P.at(i) = calib.NewCamMat1[i];
-    }
+    // for (int i = 0; i < 12; i++) {
+    //     camera_info->P.at(i) = calib.NewCamMat1[i];
+    // }
 
     camera_info->distortion_model = "plumb_bob";
 
     // D of plumb_bob: (k1, k2, t1, t2, k3)
     for (int i = 0; i < 5; i++) {
-      camera_info->D.push_back(calib.CamDist1[i]);
+      camera_info->D.push_back(calib.coeffs[i]);
     }
 
     // R to identity matrix

@@ -129,11 +129,14 @@ std::ostream &operator<<(std::ostream &os, const Extrinsics &ex);
 
 /**
  * @ingroup calibration
+ * Stream extrinsics.
+ */
+using StreamExtrinsics = Extrinsics;
+/**
+ * @ingroup calibration
  * Motion extrinsics.
  */
 using MotionExtrinsics = Extrinsics;
-
-using StreamExtrinsics = Extrinsics;
 
 MYNTEYE_END_NAMESPACE
 

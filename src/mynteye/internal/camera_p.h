@@ -71,11 +71,10 @@ class MYNTEYE_API CameraPrivate {
   /** Get one device descriptor */
   std::string GetDescriptor(const Descriptor &desc) const;
 
-  /** Get camera calibration */
-  CameraCalibration GetCameraCalibration(const StreamMode& stream_mode);
-  /** Get camera calibration file */
-  void GetCameraCalibrationFile(const StreamMode& stream_mode,
-                                const std::string& filename);
+  /** Get the intrinsics of camera */
+  StreamIntrinsics GetStreamIntrinsics(const StreamMode& stream_mode);
+  /** Get the extrinsics from left to right */
+  StreamExtrinsics GetStreamExtrinsics(const StreamMode& stream_mode);
 
   /** Write camera calibration bin file */
   bool WriteCameraCalibrationBinFile(const std::string& filename);
@@ -84,10 +83,6 @@ class MYNTEYE_API CameraPrivate {
   MotionIntrinsics GetMotionIntrinsics() const;
   /** Get the extrinsics from left to motion */
   MotionExtrinsics GetMotionExtrinsics() const;
-  /** Get the intrinsics of camera */
-  StreamIntrinsics GetStreamIntrinsics(const StreamMode& stream_mode);
-  /** Get the extrinsics from left to right */
-  StreamExtrinsics GetStreamExtrinsics(const StreamMode& stream_mode);
 
   /** Write device flash */
   bool WriteDeviceFlash(
@@ -97,6 +92,12 @@ class MYNTEYE_API CameraPrivate {
 
   /** Close the camera */
   void Close();
+
+  /** @deprecated Get camera calibration */
+  CameraCalibration GetCameraCalibration(const StreamMode& stream_mode);
+  /** @deprecated Get camera calibration file */
+  void GetCameraCalibrationFile(const StreamMode& stream_mode,
+                                const std::string& filename);
 
   // todo
 
