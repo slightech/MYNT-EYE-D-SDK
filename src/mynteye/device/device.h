@@ -15,24 +15,23 @@
 #define MYNTEYE_DEVICE_DEVICE_H_
 #pragma once
 
-#include "mynteye/stubs/global.h"
-
 #include <cstdint>
 #include <string>
 #include <vector>
 #include <mutex>
 #include <thread>
 
+#include "eSPDI.h"
+
+#include "mynteye/stubs/global.h"
+
 #ifdef MYNTEYE_OS_WIN
 #include <Windows.h>
 #endif
 
-#include "eSPDI.h"
-
 #include "mynteye/device/device_info.h"
-#include "mynteye/device/stream_info.h"
-
 #include "mynteye/device/open_params.h"
+#include "mynteye/device/stream_info.h"
 
 #include "mynteye/device/image.h"
 
