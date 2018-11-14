@@ -15,6 +15,7 @@
 #define MYNTEYE_INTERNAL_MOTIONS_H_
 #pragma once
 
+#include <cstdint>
 #include <mutex>
 #include <vector>
 
@@ -31,6 +32,10 @@ class Motions {
   Motions();
   ~Motions();
 
+  void SetMotionIntrinsics(const std::shared_ptr<MotionIntrinsics>& ex);
+
+  void EnableProcessMode(const std::int32_t& mode);
+
   void EnableMotionDatas(std::size_t max_size);
   bool IsMotionDatasEnabled();
 
@@ -39,6 +44,13 @@ class Motions {
   void ImuDataCallback(const ImuDataPacket &packet);
 
  private:
+  void ProcImuAssembly(std::shared_ptr<ImuData> data) const;
+  void ProcImuWarmDrift(std::shared_ptr<ImuData> data) const;
+
+  std::shared_ptr<MotionIntrinsics> motion_intrinsics_;
+
+  std::int32_t proc_mode_;
+
   bool is_motion_datas_enabled_;
   std::size_t motion_datas_max_size_;
 

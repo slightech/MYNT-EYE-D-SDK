@@ -19,12 +19,48 @@
 
 MYNTEYE_USE_NAMESPACE
 
+namespace {
+
+void matrix_3x1(const double (*src1)[3], const double (*src2)[1],
+    double (*dst)[1]) {
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 1; j++) {
+      for (int k = 0; k < 3; k++) {
+        dst[i][j] += src1[i][k] * src2[k][j];
+      }
+    }
+  }
+}
+
+void matrix_3x3(const double (*src1)[3], const double (*src2)[3],
+    double (*dst)[3]) {
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 3; j++) {
+      for (int k = 0; k < 3; k++) {
+        dst[i][j] += src1[i][k] * src2[k][j];
+      }
+    }
+  }
+}
+
+}  // namespace
+
 Motions::Motions()
-  : is_motion_datas_enabled_(false),
+  : motion_intrinsics_(nullptr),
+    proc_mode_(static_cast<const std::int32_t>(ProcessMode::PROC_NONE)),
+    is_motion_datas_enabled_(false),
     motion_datas_max_size_(1000) {
 }
 
 Motions::~Motions() {
+}
+
+void Motions::SetMotionIntrinsics(const std::shared_ptr<MotionIntrinsics>& ex) {
+  motion_intrinsics_ = ex;
+}
+
+void Motions::EnableProcessMode(const std::int32_t& mode) {
+  proc_mode_ = mode;
 }
 
 void Motions::EnableMotionDatas(std::size_t max_size) {
@@ -73,14 +109,16 @@ void Motions::ImuDataCallback(const ImuDataPacket &packet) {
     return;
   }
 
-  // if (is_process_mode_[ProcessMode::ASSEMBLY]) {
-  //   ScaleAssemCompensate(imu);
-  // } else if (is_process_mode_[ProcessMode::WARM_DRIFT]) {
-  //   TempCompensate(imu);
-  // } else if (is_process_mode_[ProcessMode::ALL]) {
-  //   TempCompensate(imu);
-  //   ScaleAssemCompensate(imu);
-  // }
+  bool proc_assembly = ((proc_mode_ & ProcessMode::PROC_IMU_ASSEMBLY) > 0);
+  bool proc_warm_drift = ((proc_mode_ & ProcessMode::PROC_IMU_WARM_DRIFT) > 0);
+  if (proc_assembly && proc_warm_drift) {
+    ProcImuWarmDrift(imu);
+    ProcImuAssembly(imu);
+  } else if (proc_assembly) {
+    ProcImuAssembly(imu);
+  } else if (proc_warm_drift) {
+    ProcImuWarmDrift(imu);
+  }
 
   std::lock_guard<std::mutex> _(mtx_datas_);
 
@@ -91,5 +129,57 @@ void Motions::ImuDataCallback(const ImuDataPacket &packet) {
   data_t data = {imu};
   if (is_motion_datas_enabled_) {
     motion_datas_.push_back(data);
+  }
+}
+
+void Motions::ProcImuAssembly(std::shared_ptr<ImuData> data) const {
+  if (nullptr == motion_intrinsics_) return;
+
+  double dst[3][3] = {0};
+  if (data->flag == 1) {
+    matrix_3x3(motion_intrinsics_->accel.scale,
+        motion_intrinsics_->accel.assembly, dst);
+    double s[3][1] = {0};
+    double d[3][1] = {0};
+    for (int i = 0; i < 3; i++) {
+      s[i][0] = data->accel[i];
+    }
+    matrix_3x1(dst, s, d);
+    for (int i = 0; i < 3; i++) {
+      data->accel[i] = d[i][0];
+    }
+  } else if (data->flag == 2) {
+    matrix_3x3(motion_intrinsics_->gyro.scale,
+        motion_intrinsics_->gyro.assembly, dst);
+    double s[3][1] = {0};
+    double d[3][1] = {0};
+    for (int i = 0; i < 3; i++) {
+      s[i][0] = data->gyro[i];
+    }
+    matrix_3x1(dst, s, d);
+    for (int i = 0; i < 3; i++) {
+      data->gyro[i] = d[i][0];
+    }
+  }
+}
+
+void Motions::ProcImuWarmDrift(std::shared_ptr<ImuData> data) const {
+  if (nullptr == motion_intrinsics_) return;
+
+  double temp = data->temperature;
+  if (data->flag == 1) {
+    data->accel[0] -= motion_intrinsics_->accel.x[1] * temp
+      + motion_intrinsics_->accel.x[0];
+    data->accel[1] -= motion_intrinsics_->accel.y[1] * temp
+      + motion_intrinsics_->accel.y[0];
+    data->accel[2] -= motion_intrinsics_->accel.z[1] * temp
+      + motion_intrinsics_->accel.z[0];
+  } else if (data->flag == 2) {
+    data->gyro[0] -= motion_intrinsics_->gyro.x[1] * temp
+      + motion_intrinsics_->gyro.x[0];
+    data->gyro[1] -= motion_intrinsics_->gyro.y[1] * temp
+      + motion_intrinsics_->gyro.y[0];
+    data->gyro[2] -= motion_intrinsics_->gyro.z[1] * temp
+      + motion_intrinsics_->gyro.z[0];
   }
 }

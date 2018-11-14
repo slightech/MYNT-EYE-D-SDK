@@ -87,6 +87,11 @@ class MYNTEYE_API CameraPrivate {
       device::ImuParams *imu_params,
       Version *spec_version = nullptr);
 
+  /** Enable process mode, e.g. imu assembly, warm_drift */
+  void EnableProcessMode(const ProcessMode& mode);
+  /** Enable process mode, e.g. imu assembly, warm_drift */
+  void EnableProcessMode(const std::int32_t& mode);
+
   /** Enable cache motion datas, then get them using GetMotionDatas() */
   void EnableMotionDatas(std::size_t max_size);
   /** Get cached motion datas. Besides, you can also get them from callback */
@@ -104,8 +109,6 @@ class MYNTEYE_API CameraPrivate {
   // todo
 
   void EnableImageType(const ImageType& type);
-
-  void EnableImuProcessMode(const ProcessMode &mode);
 
   /** Get datas of stream and status */
   stream_datas_t RetrieveImage(const ImageType& type, ErrorCode* code);
@@ -198,10 +201,6 @@ class MYNTEYE_API CameraPrivate {
 
   std::map<ImageType, bool> is_enable_image_;
   StreamMode stream_mode_;
-
-  std::map<ProcessMode, bool> is_process_mode_;
-  void TempCompensate(std::shared_ptr<ImuData> data);
-  void ScaleAssemCompensate(std::shared_ptr<ImuData> data);
 };
 
 MYNTEYE_END_NAMESPACE

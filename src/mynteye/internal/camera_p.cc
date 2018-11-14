@@ -27,32 +27,6 @@
 
 MYNTEYE_USE_NAMESPACE
 
-namespace {
-
-void matrix_3x1(const double (*src1)[3], const double (*src2)[1],
-    double (*dst)[1]) {
-  for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 1; j++) {
-      for (int k = 0; k < 3; k++) {
-        dst[i][j] += src1[i][k] * src2[k][j];
-      }
-    }
-  }
-}
-
-void matrix_3x3(const double (*src1)[3], const double (*src2)[3],
-    double (*dst)[3]) {
-  for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 3; j++) {
-      for (int k = 0; k < 3; k++) {
-        dst[i][j] += src1[i][k] * src2[k][j];
-      }
-    }
-  }
-}
-
-}  // namespace
-
 CameraPrivate::CameraPrivate() : device_(std::make_shared<Device>()) {
   DBG_LOGD(__func__);
   Init();
@@ -62,10 +36,6 @@ void CameraPrivate::Init() {
   is_enable_image_ = {{ImageType::IMAGE_LEFT_COLOR, false},
                       {ImageType::IMAGE_RIGHT_COLOR, false},
                       {ImageType::IMAGE_DEPTH, false}};
-
-  is_process_mode_ = {{ProcessMode::ASSEMBLY, false},
-                      {ProcessMode::WARM_DRIFT, false},
-                      {ProcessMode::ALL, false}};
 
   channels_ = std::make_shared<Channels>();
   if (channels_->IsAvaliable()) {
@@ -222,6 +192,14 @@ bool CameraPrivate::WriteDeviceFlash(
   return channels_->SetFiles(desc, imu_params, spec_version);
 }
 
+void CameraPrivate::EnableProcessMode(const ProcessMode& mode) {
+  EnableProcessMode(static_cast<std::int32_t>(mode));
+}
+
+void CameraPrivate::EnableProcessMode(const std::int32_t& mode) {
+  motions_->EnableProcessMode(mode);
+}
+
 void CameraPrivate::EnableMotionDatas(std::size_t max_size) {
   motions_->EnableMotionDatas(std::move(max_size));
   StartDataTracking();
@@ -294,6 +272,7 @@ void CameraPrivate::SetMotionIntrinsics(const MotionIntrinsics &in) {
     motion_intrinsics_ = std::make_shared<MotionIntrinsics>();
   }
   *motion_intrinsics_ = in;
+  motions_->SetMotionIntrinsics(motion_intrinsics_);
 }
 
 void CameraPrivate::SetMotionExtrinsics(const MotionExtrinsics &ex) {
@@ -612,78 +591,6 @@ void CameraPrivate::EnableImageType(const ImageType& type) {
       break;
     default:
       LOGE("EnableImageType:: ImageType is unknown.");
-  }
-}
-
-void CameraPrivate::EnableImuProcessMode(const ProcessMode &mode) {
-  switch (mode) {
-    case ProcessMode::ASSEMBLY:
-      is_process_mode_[mode] = true;
-      break;
-    case ProcessMode::WARM_DRIFT:
-      is_process_mode_[mode] = true;
-      break;
-    case ProcessMode::ALL:
-      is_process_mode_[mode] = true;
-      break;
-    default:
-      break;
-  }
-}
-
-void CameraPrivate::TempCompensate(std::shared_ptr<ImuData> data) {
-  if (nullptr == motion_intrinsics_) {
-    return;
-  }
-
-  double temp = data->temperature;
-  if (data->flag == 1) {
-    data->accel[0] -= motion_intrinsics_->accel.x[1] * temp
-      + motion_intrinsics_->accel.x[0];
-    data->accel[1] -= motion_intrinsics_->accel.y[1] * temp
-      + motion_intrinsics_->accel.y[0];
-    data->accel[2] -= motion_intrinsics_->accel.z[1] * temp
-      + motion_intrinsics_->accel.z[0];
-  } else if (data->flag == 2) {
-    data->gyro[0] -= motion_intrinsics_->gyro.x[1] * temp
-      + motion_intrinsics_->gyro.x[0];
-    data->gyro[1] -= motion_intrinsics_->gyro.y[1] * temp
-      + motion_intrinsics_->gyro.y[0];
-    data->gyro[2] -= motion_intrinsics_->gyro.z[1] * temp
-      + motion_intrinsics_->gyro.z[0];
-  }
-}
-
-void CameraPrivate::ScaleAssemCompensate(std::shared_ptr<ImuData> data) {
-  if (nullptr == motion_intrinsics_) {
-    return;
-  }
-
-  double dst[3][3] = {0};
-  if (data->flag == 1) {
-    matrix_3x3(motion_intrinsics_->accel.scale,
-        motion_intrinsics_->accel.assembly, dst);
-    double s[3][1] = {0};
-    double d[3][1] = {0};
-    for (int i = 0; i < 3; i++) {
-      s[i][0] = data->accel[i];
-    }
-    matrix_3x1(dst, s, d);
-    for (int i = 0; i < 3; i++) {
-      data->accel[i] = d[i][0];
-    }
-  } else if (data->flag == 2) {
-    matrix_3x3(motion_intrinsics_->gyro.scale,
-        motion_intrinsics_->gyro.assembly, dst);
-    double s[3][1] = {0};
-    double d[3][1] = {0};
-    for (int i = 0; i < 3; i++) {
-      s[i][0] = data->gyro[i];
-    }
-    matrix_3x1(dst, s, d);
-    for (int i = 0; i < 3; i++) {
-      data->gyro[i] = d[i][0];
-    }
   }
 }
 

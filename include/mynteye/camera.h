@@ -89,6 +89,11 @@ class MYNTEYE_API Camera {
       device::ImuParams *imu_params,
       Version *spec_version = nullptr);
 
+  /** Enable process mode, e.g. imu assembly, warm_drift */
+  void EnableProcessMode(const ProcessMode& mode);
+  /** Enable process mode, e.g. imu assembly, warm_drift */
+  void EnableProcessMode(const std::int32_t& mode);
+
   /** Enable cache motion datas, then get them using GetMotionDatas() */
   void EnableMotionDatas(
       std::size_t max_size = std::numeric_limits<std::size_t>::max());
@@ -113,9 +118,6 @@ class MYNTEYE_API Camera {
   mynteye::StreamData RetrieveImage(const ImageType& type);
   /** Get the latest data of stream and status */
   mynteye::StreamData RetrieveImage(const ImageType& type, ErrorCode* code);
-
-  /** Set imu data process mode */
-  void EnableImuProcessMode(const ProcessMode &mode);
 
 #ifdef MYNTEYE_DEPRECATED_COMPAT
   // @Deprecated
@@ -154,6 +156,9 @@ class MYNTEYE_API Camera {
 
   /** @deprecated Replaced by WriteCameraCalibrationBinFile() */
   void SetCalibrationWithFile(const std::string& file_name);
+
+  /** @deprecated Replaced by EnableProcessMode() */
+  void EnableImuProcessMode(const ProcessMode &mode);
 
   /** @deprecated Replaced by GetMotionDatas() */
   std::vector<MotionData> RetrieveMotions();

@@ -97,6 +97,14 @@ bool Camera::WriteDeviceFlash(
   return p_->WriteDeviceFlash(desc, imu_params, spec_version);
 }
 
+void Camera::EnableProcessMode(const ProcessMode& mode) {
+  p_->EnableProcessMode(mode);
+}
+
+void Camera::EnableProcessMode(const std::int32_t& mode) {
+  p_->EnableProcessMode(mode);
+}
+
 void Camera::EnableMotionDatas(std::size_t max_size) {
   p_->EnableMotionDatas(std::move(max_size));
 }
@@ -133,10 +141,6 @@ mynteye::StreamData Camera::RetrieveImage(const ImageType& type) {
 mynteye::StreamData Camera::RetrieveImage(const ImageType& type,
     ErrorCode* code) {
   return p_->RetrieveLatestImage(type, code);
-}
-
-void Camera::EnableImuProcessMode(const ProcessMode &mode) {
-  return p_->EnableImuProcessMode(mode);
 }
 
 #ifdef MYNTEYE_DEPRECATED_COMPAT
@@ -184,6 +188,10 @@ void Camera::GetVGACameraLogDataFile() {
 
 void Camera::SetCalibrationWithFile(const std::string &file_name) {
   WriteCameraCalibrationBinFile(file_name);
+}
+
+void Camera::EnableImuProcessMode(const ProcessMode &mode) {
+  EnableProcessMode(mode);
 }
 
 std::vector<MotionData> Camera::RetrieveMotions() {
