@@ -17,10 +17,6 @@
 
 #include "mynteye/camera.h"
 
-#ifdef MYNTEYE_OS_WIN
-#include <Windows.h>
-#endif
-
 #include <string>
 #include <memory>
 #include <mutex>
@@ -36,6 +32,7 @@ MYNTEYE_BEGIN_NAMESPACE
 
 class Device;
 class Channels;
+class Motions;
 
 class MYNTEYE_API CameraPrivate {
  public:
@@ -90,6 +87,11 @@ class MYNTEYE_API CameraPrivate {
       device::ImuParams *imu_params,
       Version *spec_version = nullptr);
 
+  /** Enable cache motion datas, then get them using GetMotionDatas() */
+  void EnableMotionDatas(std::size_t max_size);
+  /** Get cached motion datas. Besides, you can also get them from callback */
+  std::vector<MotionData> GetMotionDatas();
+
   /** Close the camera */
   void Close();
 
@@ -119,9 +121,6 @@ class MYNTEYE_API CameraPrivate {
   /** Stop synthetic image */
   void StopSyntheticImage();
 
-  /** Get imu data */
-  motion_datas_t GetImuDatas();
-
  protected:
   std::shared_ptr<Channels> channels() const {
     return channels_;
@@ -147,6 +146,10 @@ class MYNTEYE_API CameraPrivate {
   /** Callback of image info */
   void ImageInfoCallback(const ImgInfoPacket &packet);
 
+  std::shared_ptr<Device> device_;
+  std::shared_ptr<Channels> channels_;
+  std::shared_ptr<Motions> motions_;
+
   std::shared_ptr<device::Descriptors> descriptors_;
   std::shared_ptr<MotionIntrinsics> motion_intrinsics_;
   std::shared_ptr<MotionExtrinsics> motion_extrinsics_;
@@ -169,14 +172,7 @@ class MYNTEYE_API CameraPrivate {
   Image::pointer RetrieveImageColor(ErrorCode* code);
   Image::pointer RetrieveImageDepth(ErrorCode* code);
 
-  std::shared_ptr<Device> device_;
-
-  std::shared_ptr<Channels> channels_;
   std::mutex mtx_img_info_;
-  std::mutex mtx_imu_;
-
-  motion_datas_t imu_data_;
-  motion_datas_t cache_imu_data_;
   img_info_datas_t img_info_;
   img_info_datas_t cache_image_info_;
 
@@ -197,14 +193,11 @@ class MYNTEYE_API CameraPrivate {
   stream_datas_t depth_data_;
   bool is_capture_image_ = false;
   bool is_synthetic_image_ = false;
-  bool is_imu_open_ = false;
 
   bool is_start_ = false;
 
   std::map<ImageType, bool> is_enable_image_;
   StreamMode stream_mode_;
-
-  std::size_t motion_count_ = 0;
 
   std::map<ProcessMode, bool> is_process_mode_;
   void TempCompensate(std::shared_ptr<ImuData> data);

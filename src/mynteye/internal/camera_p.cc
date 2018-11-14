@@ -11,16 +11,16 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#include <string.h>
-#include <fstream>
+#include "mynteye/internal/camera_p.h"
 
 #include <stdexcept>
 #include <string>
 #include <chrono>
+#include <utility>
 
 #include "mynteye/data/channels.h"
 #include "mynteye/device/device.h"
-#include "mynteye/internal/camera_p.h"
+#include "mynteye/internal/motions.h"
 #include "mynteye/util/log.h"
 #include "mynteye/util/rate.h"
 #include "mynteye/util/times.h"
@@ -71,6 +71,7 @@ void CameraPrivate::Init() {
   if (channels_->IsAvaliable()) {
     ReadDeviceFlash();
   }
+  motions_ = std::make_shared<Motions>();
 }
 
 CameraPrivate::~CameraPrivate() {
@@ -221,6 +222,15 @@ bool CameraPrivate::WriteDeviceFlash(
   return channels_->SetFiles(desc, imu_params, spec_version);
 }
 
+void CameraPrivate::EnableMotionDatas(std::size_t max_size) {
+  motions_->EnableMotionDatas(std::move(max_size));
+  StartDataTracking();
+}
+
+std::vector<MotionData> CameraPrivate::GetMotionDatas() {
+  return std::move(motions_->GetMotionDatas());
+}
+
 void CameraPrivate::Close() {
   if (device_->IsOpened()) {
     StopCaptureImage();
@@ -294,17 +304,21 @@ void CameraPrivate::SetMotionExtrinsics(const MotionExtrinsics &ex) {
 }
 
 bool CameraPrivate::StartDataTracking() {
-  if (!channels_->IsAvaliable()) {
+  // if (!IsOpened()) return false;  // ensure start after opened
+  // if (!motions_->IsMotionDatasEnabled() && ..) return false;
+  if (channels_->IsHidTracking()) return true;
+
+  if (!channels_->IsHidAvaliable()) {
     LOGW("Data channel is unavaliable, could not track device datas.");
     return false;
   }
-  channels_->SetImuDataCallback(std::bind(&CameraPrivate::ImuDataCallback,
-        this, std::placeholders::_1));
+
+  channels_->SetImuDataCallback(std::bind(&Motions::ImuDataCallback,
+        motions_, std::placeholders::_1));
   channels_->SetImgInfoCallback(std::bind(&CameraPrivate::ImageInfoCallback,
         this, std::placeholders::_1));
-  bool hid_tracking = channels_->StartHidTracking();
-  if (hid_tracking) is_imu_open_ = true;
-  return hid_tracking;
+
+  return channels_->StartHidTracking();
 }
 
 void CameraPrivate::StopDataTracking() {
@@ -564,51 +578,6 @@ void CameraPrivate::StopSyntheticImage() {
   sync_thread_.join();
 }
 
-void CameraPrivate::ImuDataCallback(const ImuDataPacket &packet) {
-  auto &&imu = std::make_shared<ImuData>();
-  imu->flag = packet.flag;
-  imu->temperature = static_cast<double>(packet.temperature * 0.125 + 23);
-  imu->timestamp = packet.timestamp;
-
-  if (imu->flag == 1) {
-    imu->accel[0] = packet.accel_or_gyro[0] * 12.f / 0x10000;
-    imu->accel[1] = packet.accel_or_gyro[1] * 12.f / 0x10000;
-    imu->accel[2] = packet.accel_or_gyro[2] * 12.f / 0x10000;
-    imu->gyro[0] = 0;
-    imu->gyro[1] = 0;
-    imu->gyro[2] = 0;
-  } else if (imu->flag == 2) {
-    imu->accel[0] = 0;
-    imu->accel[1] = 0;
-    imu->accel[2] = 0;
-    imu->gyro[0] = packet.accel_or_gyro[0] * 2000.f / 0x10000;
-    imu->gyro[1] = packet.accel_or_gyro[1] * 2000.f / 0x10000;
-    imu->gyro[2] = packet.accel_or_gyro[2] * 2000.f / 0x10000;
-  } else {
-    LOGW("Unaccpected imu, flag=%d is wrong", imu->flag);
-    return;
-  }
-
-  if (is_process_mode_[ProcessMode::ASSEMBLY]) {
-    ScaleAssemCompensate(imu);
-  } else if (is_process_mode_[ProcessMode::WARM_DRIFT]) {
-    TempCompensate(imu);
-  } else if (is_process_mode_[ProcessMode::ALL]) {
-    TempCompensate(imu);
-    ScaleAssemCompensate(imu);
-  }
-
-  ++motion_count_;
-  if (motion_count_ > 20) {
-    motion_data_t tmp = {imu};
-    cache_imu_data_.push_back(tmp);
-    std::lock_guard<std::mutex> _(mtx_imu_);
-    imu_data_.insert(imu_data_.end(), cache_imu_data_.begin(),
-        cache_imu_data_.end());
-    cache_imu_data_.clear();
-  }
-}
-
 void CameraPrivate::ImageInfoCallback(const ImgInfoPacket &packet) {
   auto &&img_info = std::make_shared<ImgInfo>();
 
@@ -622,16 +591,6 @@ void CameraPrivate::ImageInfoCallback(const ImgInfoPacket &packet) {
   std::lock_guard<std::mutex> _(mtx_img_info_);
   img_info_.insert(img_info_.end(), cache_image_info_.begin(), cache_image_info_.end());
   cache_image_info_.clear();
-}
-
-std::vector<MotionData> CameraPrivate::GetImuDatas() {
-  if (!is_imu_open_)
-    LOGE("Imu is not opened !");
-
-  std::lock_guard<std::mutex> _(mtx_imu_);
-  motion_datas_t tmp = imu_data_;
-  imu_data_.clear();
-  return tmp;
 }
 
 void CameraPrivate::EnableImageType(const ImageType& type) {

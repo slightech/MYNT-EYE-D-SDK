@@ -309,7 +309,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
         mynteye::ImageType::IMAGE_DEPTH);
       img_count += left_color.size();
 
-      auto &&motion_datas = mynteye->RetrieveMotions();
+      auto &&motion_datas = mynteye->GetMotionDatas();
       imu_count += motion_datas.size();
 
       {
@@ -562,6 +562,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
     // open the device
     mynteye->EnableImageType(mynteye::ImageType::ALL);
+    mynteye->EnableMotionDatas();
     mynteye->Open(params);
     if (!mynteye->IsOpened()) {
       NODELET_ERROR_STREAM("Open camera failed");

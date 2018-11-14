@@ -97,7 +97,12 @@ bool Camera::WriteDeviceFlash(
   return p_->WriteDeviceFlash(desc, imu_params, spec_version);
 }
 
-void Camera::Wait() const {
+void Camera::EnableMotionDatas(std::size_t max_size) {
+  p_->EnableMotionDatas(std::move(max_size));
+}
+
+std::vector<MotionData> Camera::GetMotionDatas() {
+  return std::move(p_->GetMotionDatas());
 }
 
 void Camera::Close() {
@@ -130,14 +135,6 @@ mynteye::StreamData Camera::RetrieveImage(const ImageType& type,
   return p_->RetrieveLatestImage(type, code);
 }
 
-std::vector<mynteye::MotionData> Camera::RetrieveMotions() {
-  std::vector<mynteye::MotionData> datas;
-  for (auto &&data : p_->GetImuDatas()) {
-    datas.push_back({data.imu});
-  }
-  return datas;
-}
-
 void Camera::EnableImuProcessMode(const ProcessMode &mode) {
   return p_->EnableImuProcessMode(mode);
 }
@@ -158,6 +155,9 @@ void Camera::GetResolutions(
     std::vector<StreamInfo>* color_infos,
     std::vector<StreamInfo>* depth_infos) const {
   GetStreamInfos(dev_index, color_infos, depth_infos);
+}
+
+void Camera::Wait() const {
 }
 
 std::string Camera::GetInfo(const Info &info) const {
@@ -184,5 +184,9 @@ void Camera::GetVGACameraLogDataFile() {
 
 void Camera::SetCalibrationWithFile(const std::string &file_name) {
   WriteCameraCalibrationBinFile(file_name);
+}
+
+std::vector<MotionData> Camera::RetrieveMotions() {
+  return GetMotionDatas();
 }
 #endif

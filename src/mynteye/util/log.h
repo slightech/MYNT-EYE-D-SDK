@@ -162,4 +162,9 @@ MYNTEYE_END_NAMESPACE
 #define DBG_LOGE(...)
 #endif
 
+#ifndef throw_error
+#include <stdexcept>
+#define throw_error(MSG) { LOGE(MSG); throw new std::runtime_error(MSG); }  // NOLINT
+#endif
+
 #endif  // MYNTEYE_UTIL_LOG_H_
