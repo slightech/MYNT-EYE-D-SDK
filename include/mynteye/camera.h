@@ -81,7 +81,7 @@ class MYNTEYE_API Camera {
   /** Get the intrinsics of motion */
   MotionIntrinsics GetMotionIntrinsics() const;
   /** Get the extrinsics from left to motion */
-  Extrinsics GetMotionExtrinsics() const;
+  MotionExtrinsics GetMotionExtrinsics() const;
 
   /** Write device flash */
   bool WriteDeviceFlash(

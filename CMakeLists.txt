@@ -119,10 +119,10 @@ set(MYNTEYE_DEPTH_SRCS
   src/mynteye/device/open_params.cc
   src/mynteye/device/stream_info.cc
   src/mynteye/device/types.cc
+  src/mynteye/stubs/types_calib.cc
   src/mynteye/util/rate.cc
   src/mynteye/util/strings.cc
   src/mynteye/camera.cc
-  src/mynteye/types_calib.cc
   src/mynteye/types_data.cc
   src/mynteye/utils.cc
   src/mynteye/internal/camera_p.cc

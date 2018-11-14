@@ -11,8 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#ifndef MYNTEYE_TYPES_CALIB_H_
-#define MYNTEYE_TYPES_CALIB_H_
+#ifndef MYNTEYE_STUBS_TYPES_CALIB_H_
+#define MYNTEYE_STUBS_TYPES_CALIB_H_
 #pragma once
 
 #include <ostream>
@@ -97,6 +97,12 @@ struct MYNTEYE_API Extrinsics {
 MYNTEYE_API
 std::ostream &operator<<(std::ostream &os, const Extrinsics &ex);
 
+/**
+ * @ingroup calibration
+ * Motion extrinsics.
+ */
+using MotionExtrinsics = Extrinsics;
+
 MYNTEYE_END_NAMESPACE
 
-#endif  // MYNTEYE_TYPES_CALIB_H_
+#endif  // MYNTEYE_STUBS_TYPES_CALIB_H_

@@ -16,7 +16,6 @@
 #pragma once
 
 #include "mynteye/device/types.h"
-#include "mynteye/types_calib.h"
 #include "mynteye/types_data.h"
 
 MYNTEYE_BEGIN_NAMESPACE

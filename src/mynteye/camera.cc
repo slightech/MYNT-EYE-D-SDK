@@ -86,7 +86,7 @@ MotionIntrinsics Camera::GetMotionIntrinsics() const {
   return p_->GetMotionIntrinsics();
 }
 
-Extrinsics Camera::GetMotionExtrinsics() const {
+MotionExtrinsics Camera::GetMotionExtrinsics() const {
   return p_->GetMotionExtrinsics();
 }
 

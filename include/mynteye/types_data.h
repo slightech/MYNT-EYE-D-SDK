@@ -23,7 +23,7 @@
 #include <vector>
 
 #include "mynteye/device/image.h"
-#include "mynteye/types_calib.h"
+#include "mynteye/stubs/types_calib.h"
 
 MYNTEYE_BEGIN_NAMESPACE
 

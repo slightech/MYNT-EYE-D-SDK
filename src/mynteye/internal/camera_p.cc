@@ -179,7 +179,7 @@ MotionIntrinsics CameraPrivate::GetMotionIntrinsics() const {
   }
 }
 
-Extrinsics CameraPrivate::GetMotionExtrinsics() const {
+MotionExtrinsics CameraPrivate::GetMotionExtrinsics() const {
   if (motion_extrinsics_) {
     return *motion_extrinsics_;
   } else {
@@ -213,9 +213,9 @@ void CameraPrivate::SetMotionIntrinsics(const MotionIntrinsics &in) {
   *motion_intrinsics_ = in;
 }
 
-void CameraPrivate::SetMotionExtrinsics(const Extrinsics &ex) {
+void CameraPrivate::SetMotionExtrinsics(const MotionExtrinsics &ex) {
   if (!motion_extrinsics_) {
-    motion_extrinsics_ = std::make_shared<Extrinsics>();
+    motion_extrinsics_ = std::make_shared<MotionExtrinsics>();
   }
   *motion_extrinsics_ = ex;
 }
