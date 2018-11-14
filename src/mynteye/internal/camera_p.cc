@@ -55,11 +55,7 @@ void matrix_3x3(const double (*src1)[3], const double (*src2)[3],
 
 CameraPrivate::CameraPrivate() : device_(std::make_shared<Device>()) {
   DBG_LOGD(__func__);
-
   Init();
-  if (is_hid_exist_) {
-    ReadDescriptors();
-  }
 }
 
 void CameraPrivate::Init() {
@@ -72,17 +68,14 @@ void CameraPrivate::Init() {
                       {ProcessMode::ALL, false}};
 
   channels_ = std::make_shared<Channels>();
-  is_hid_exist_ = channels_->IsHidExist();
+  if (channels_->IsAvaliable()) {
+    ReadDeviceFlash();
+  }
 }
 
 CameraPrivate::~CameraPrivate() {
   DBG_LOGD(__func__);
-  if (is_hid_exist_) {
-    channels_->StopHidTracking();
-  }
-  if (is_capture_image_) {
-    StopCaptureImage();
-  }
+  Close();
   device_ = nullptr;
 }
 
@@ -103,11 +96,7 @@ ErrorCode CameraPrivate::Open(const OpenParams& params) {
   }
 
   if (ok) {
-    if (is_hid_exist_) {
-      if (!StartHidTracking()) {
-        return ErrorCode::ERROR_IMU_OPEN_FAILED;
-      }
-    }
+    StartDataTracking();
     StartCaptureImage();
     StartSyntheticImage();
     return ErrorCode::SUCCESS;
@@ -235,6 +224,10 @@ bool CameraPrivate::WriteDeviceFlash(
     device::Descriptors *desc,
     device::ImuParams *imu_params,
     Version *spec_version) {
+  if (!channels_->IsAvaliable()) {
+    LOGW("Data channel is unavaliable, could not write device datas.");
+    return false;
+  }
   return channels_->SetFiles(desc, imu_params, spec_version);
 }
 
@@ -242,12 +235,49 @@ void CameraPrivate::Close() {
   if (device_->IsOpened()) {
     StopCaptureImage();
     StopSyntheticImage();
-    channels_->StopHidTracking();
+    StopDataTracking();
   }
   device_->Close();
 }
 
 // ...
+
+void CameraPrivate::ReadDeviceFlash() {
+  if (!channels_->IsAvaliable()) {
+    LOGW("Data channel is unavaliable, could not read device datas.");
+    return;
+  }
+  descriptors_ = std::make_shared<device::Descriptors>();
+
+  Channels::imu_params_t imu_params;
+  if (!channels_->GetFiles(descriptors_.get(), &imu_params)) {
+    LOGE("%s %d:: Read device descriptors failed. Please upgrade"
+         "your firmware to the latest version.", __FILE__, __LINE__);
+    return;
+  }
+
+  LOGI("\nDevice descriptors:");
+  LOGI("  name: %s", descriptors_->name.c_str());
+  LOGI("  serial_number: %s", descriptors_->serial_number.c_str());
+  LOGI("  firmware_version: %s",
+      descriptors_->firmware_version.to_string().c_str());
+  LOGI("  hardware_version: %s",
+      descriptors_->hardware_version.to_string().c_str());
+  LOGI("  spec_version: %s", descriptors_->spec_version.to_string().c_str());
+  LOGI("  lens_type: %s", descriptors_->lens_type.to_string().c_str());
+  LOGI("  imu_type: %s", descriptors_->imu_type.to_string().c_str());
+  LOGI("  nominal_baseline: %u", descriptors_->nominal_baseline);
+
+  if (imu_params.ok) {
+    SetMotionIntrinsics({imu_params.in_accel, imu_params.in_gyro});
+    SetMotionExtrinsics(imu_params.ex_left_to_imu);
+    // std::cout << GetMotionIntrinsics() << std::endl;
+    // std::cout << GetMotionExtrinsics() << std::endl;
+  } else {
+    LOGE("%s %d:: Motion intrinsics & extrinsics not exist",
+        __FILE__, __LINE__);
+  }
+}
 
 void CameraPrivate::SetMotionIntrinsics(const MotionIntrinsics &in) {
   if (!motion_intrinsics_) {
@@ -261,6 +291,26 @@ void CameraPrivate::SetMotionExtrinsics(const MotionExtrinsics &ex) {
     motion_extrinsics_ = std::make_shared<MotionExtrinsics>();
   }
   *motion_extrinsics_ = ex;
+}
+
+bool CameraPrivate::StartDataTracking() {
+  if (!channels_->IsAvaliable()) {
+    LOGW("Data channel is unavaliable, could not track device datas.");
+    return false;
+  }
+  channels_->SetImuDataCallback(std::bind(&CameraPrivate::ImuDataCallback,
+        this, std::placeholders::_1));
+  channels_->SetImgInfoCallback(std::bind(&CameraPrivate::ImageInfoCallback,
+        this, std::placeholders::_1));
+  bool hid_tracking = channels_->StartHidTracking();
+  if (hid_tracking) is_imu_open_ = true;
+  return hid_tracking;
+}
+
+void CameraPrivate::StopDataTracking() {
+  if (channels_->IsHidTracking()) {
+    channels_->StopHidTracking();
+  }
 }
 
 // todo
@@ -494,7 +544,7 @@ void CameraPrivate::StartSyntheticImage() {
     while (is_capture_image_) {
       if (is_enable_image_[ImageType::IMAGE_LEFT_COLOR] ||
           is_enable_image_[ImageType::IMAGE_RIGHT_COLOR]) {
-        if (is_hid_exist_) {
+        if (channels_->IsAvaliable()) {
           SyntheticImageColor();
         } else {
           OldSyntheticImageColor();
@@ -512,19 +562,6 @@ void CameraPrivate::StartSyntheticImage() {
 void CameraPrivate::StopSyntheticImage() {
   is_synthetic_image_ = false;
   sync_thread_.join();
-}
-
-bool CameraPrivate::StartHidTracking() {
-  channels_->SetImuCallback(std::bind(&CameraPrivate::ImuDataCallback,
-        this, std::placeholders::_1));
-  channels_->SetImgInfoCallback(std::bind(&CameraPrivate::ImageInfoCallback,
-        this, std::placeholders::_1));
-  if (!channels_->StartHidTracking()) {
-    return false;
-  }
-
-  is_imu_open_ = true;
-  return true;
 }
 
 void CameraPrivate::ImuDataCallback(const ImuDataPacket &packet) {
@@ -616,39 +653,6 @@ void CameraPrivate::EnableImageType(const ImageType& type) {
       break;
     default:
       LOGE("EnableImageType:: ImageType is unknown.");
-  }
-}
-
-void CameraPrivate::ReadDescriptors() {
-  descriptors_ = std::make_shared<device::Descriptors>();
-
-  Channels::imu_params_t imu_params;
-  if (!channels_->GetFiles(descriptors_.get(), &imu_params)) {
-    LOGE("%s %d:: Read device descriptors failed. Please upgrade"
-         "your firmware to the latest version.", __FILE__, __LINE__);
-    return;
-  }
-
-  LOGI("\nDevice descriptors:");
-  LOGI("  name: %s", descriptors_->name.c_str());
-  LOGI("  serial_number: %s", descriptors_->serial_number.c_str());
-  LOGI("  firmware_version: %s",
-      descriptors_->firmware_version.to_string().c_str());
-  LOGI("  hardware_version: %s",
-      descriptors_->hardware_version.to_string().c_str());
-  LOGI("  spec_version: %s", descriptors_->spec_version.to_string().c_str());
-  LOGI("  lens_type: %s", descriptors_->lens_type.to_string().c_str());
-  LOGI("  imu_type: %s", descriptors_->imu_type.to_string().c_str());
-  LOGI("  nominal_baseline: %u", descriptors_->nominal_baseline);
-
-  if (imu_params.ok) {
-    SetMotionIntrinsics({imu_params.in_accel, imu_params.in_gyro});
-    SetMotionExtrinsics(imu_params.ex_left_to_imu);
-    // std::cout << GetMotionIntrinsics() << std::endl;
-    // std::cout << GetMotionExtrinsics() << std::endl;
-  } else {
-    LOGE("%s %d:: Motion intrinsics & extrinsics not exist",
-        __FILE__, __LINE__);
   }
 }
 

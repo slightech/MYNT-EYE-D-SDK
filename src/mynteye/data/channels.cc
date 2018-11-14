@@ -66,7 +66,8 @@ void CheckSpecVersion(const Version *spec_version) {
 }  // namespace
 
 Channels::Channels() : imu_callback_(nullptr), img_callback_(nullptr) {
-  device_ = std::make_shared<hid::hid_device>();
+  hid_ = std::make_shared<hid::hid_device>();
+  Detect();
   Open();
 }
 
@@ -74,17 +75,114 @@ Channels::~Channels() {
   if (is_hid_tracking_) {
     StopHidTracking();
   }
-  if (is_hid_open_) {
-    Close();
-  }
+  Close();
 }
 
-void Channels::SetImuCallback(imu_callback_t callback) {
+bool Channels::IsAvaliable() const {
+  return IsHidAvaliable();
+}
+
+bool Channels::IsOpened() const {
+  return IsHidOpened();
+}
+
+void Channels::SetImuDataCallback(imu_callback_t callback) {
   imu_callback_ = callback;
 }
 
 void Channels::SetImgInfoCallback(img_callback_t callback) {
   img_callback_ = callback;
+}
+
+bool Channels::IsHidAvaliable() const {
+  return is_hid_exist_;
+}
+
+bool Channels::IsHidOpened() const {
+  return is_hid_opened_;
+}
+
+bool Channels::IsHidTracking() const {
+  return is_hid_tracking_;
+}
+
+bool Channels::StartHidTracking() {
+  if (!is_hid_opened_) {
+    LOGW("WARNING:: hid device was not opened.");
+    return false;
+  }
+  if (is_hid_tracking_) {
+    LOGI("INFO:: hid device was tracking already.");
+    return true;
+  }
+
+  is_hid_tracking_ = true;
+  hid_track_thread_ = std::thread([this]() {
+    while (is_hid_tracking_) {
+      DoHidTrack();
+    }
+  });
+
+  return true;
+}
+
+bool Channels::StopHidTracking() {
+  if (!is_hid_opened_) {
+    LOGW("WARNING:: hid device was not opened.");
+    return false;
+  }
+  if (!is_hid_tracking_) {
+    LOGI("INFO:: hid device was not tracking already.");
+    return true;
+  }
+
+  is_hid_tracking_ = false;
+  if (hid_track_thread_.joinable()) {
+    hid_track_thread_.join();
+  }
+  return true;
+}
+
+void Channels::Detect() {
+  DetectHid();
+}
+
+bool Channels::Open() {
+  return OpenHid();
+}
+
+void Channels::Close() {
+  CloseHid();
+}
+
+void Channels::DetectHid() {
+  is_hid_exist_ = hid_->find_device();
+  // LOGI("is_hid_exist_: %s", (is_hid_exist_ ? "true" : "false"));
+}
+
+bool Channels::OpenHid() {
+  if (is_hid_opened_) {
+    return true;
+  }
+  if (is_hid_exist_) {
+    if (hid_->open(1, -1, -1) < 0) {
+      if (hid_->open(1, -1, -1) < 0) {
+        LOGE("%s, %d:: Open device failed, You must first execute "
+            "the \"make init\" command.", __FILE__, __LINE__);
+        return false;
+      }
+    }
+    is_hid_opened_ = true;
+  }
+  return is_hid_opened_;
+}
+
+void Channels::CloseHid() {
+  if (!is_hid_opened_) {
+    return;
+  }
+  hid_->close(0);
+  is_hid_opened_ = false;
 }
 
 void Channels::DoHidTrack() {
@@ -93,7 +191,7 @@ void Channels::DoHidTrack() {
   imu_packets.clear();
   img_packets.clear();
 
-  if (!ExtractHidData(imu_packets, img_packets)) {
+  if (!DoHidDataExtract(imu_packets, img_packets)) {
     return;
   }
 
@@ -107,42 +205,12 @@ void Channels::DoHidTrack() {
   }
 }
 
-void Channels::Open() {
-  // open device
-  if (device_->open(1, -1, -1) < 0) {
-    if (device_->open(1, -1, -1) < 0) {
-      LOGE("%s, %d:: Open device failed, You must first execute "
-          "the \"make init\" command.", __FILE__, __LINE__);
-      return;
-    }
-  }
-  is_hid_open_ = true;
-}
-
-bool Channels::StartHidTracking() {
-  if (is_hid_tracking_) {
-    LOGE("WARNING:: imu device was opened already.");
-  } else if (!is_hid_open_) {
-    return false;
-  }
-
-  is_hid_tracking_ = true;
-  hid_track_thread_ = std::thread([this]() {
-    while (!hid_track_stop_) {
-      DoHidTrack();
-    }
-  });
-
-  return true;
-}
-
-bool Channels::ExtractHidData(imu_packets_t &imu, img_packets_t &img) {
+bool Channels::DoHidDataExtract(imu_packets_t &imu, img_packets_t &img) {
   std::uint8_t data[PACKET_SIZE * 2]{};
   std::fill(data, data + PACKET_SIZE * 2, 0);
 
-  int size = device_->receive(0, data, PACKET_SIZE * 2, 220);
+  int size = hid_->receive(0, data, PACKET_SIZE * 2, 220);
   if (size < 0) {
-    hid_track_stop_ = true;
     LOGE("Error:: Reading, device went offline !");
     return false;
   }
@@ -172,25 +240,6 @@ bool Channels::ExtractHidData(imu_packets_t &imu, img_packets_t &img) {
   }
 
   return true;
-}
-
-bool Channels::StopHidTracking() {
-  if (hid_track_stop_) {
-    return false;
-  }
-  if (hid_track_thread_.joinable()) {
-    hid_track_stop_ = true;
-    hid_track_thread_.join();
-    is_hid_tracking_ = false;
-    hid_track_stop_ = false;
-  }
-
-  return true;
-}
-
-void Channels::Close() {
-  device_->close(0);
-  is_hid_open_ = false;
 }
 
 namespace {
@@ -342,7 +391,7 @@ std::size_t from_data(
 
 }  // namespace
 
-bool Channels::RequireFileData(bool device_desc,
+bool Channels::PullFileData(bool device_desc,
     bool reserve,
     bool imu_params,
     std::uint8_t *data,
@@ -355,21 +404,22 @@ bool Channels::RequireFileData(bool device_desc,
   buffer[2] = 0x07 & ((device_desc << 0)
       | (reserve << 1) | (imu_params << 2));
 
-  if (device_->get_device_class() == 0xFF) {
+  if (hid_->get_device_class() == 0xFF) {
     LOGE("%s %d:: Not support filechannel, please update firmware.",
         __FILE__, __LINE__);
     return false;
   }
 
-  if (device_->send(0, buffer, 64, 200) <= 0) {
+  if (hid_->send(0, buffer, 64, 200) <= 0) {
     LOGE("%s %d:: Send commend of imu instrinsics failed.",
         __FILE__, __LINE__);
     return false;
   }
 
+  std::uint8_t req_count = 0;
   while (buffer[0] != 0x0B) {
-    device_->receive(0, buffer, 64, 2000);
-    if (++req_count_ > 5) {
+    hid_->receive(0, buffer, 64, 2000);
+    if (++req_count > 5) {
       LOGE("%s %d:: Error reading, device went offline.",
           __FILE__, __LINE__);
       return false;
@@ -381,7 +431,7 @@ bool Channels::RequireFileData(bool device_desc,
   std::uint32_t packets_index = 0;
   std::uint8_t *seek = data;
   while (true) {
-    int ret = device_->receive(0, buffer, 64, 220);
+    int ret = hid_->receive(0, buffer, 64, 220);
     if (ret <= 0) {
       LOGE("%s %d:: Require imu instrinsics failed.",
           __FILE__, __LINE__);
@@ -434,7 +484,7 @@ bool Channels::GetFiles(device_desc_t *desc,
   std::uint8_t data[2000]{};
   std::uint16_t file_len;
 
-  if (!RequireFileData(true, true, true, data, file_len)) {
+  if (!PullFileData(true, true, true, data, file_len)) {
     LOGE("%s %d:: GetFiles failed.", __FILE__, __LINE__);
     return false;
   }
@@ -652,10 +702,9 @@ std::size_t to_data(
 
 }  // namespace
 
-bool Channels::UpdateFileData(
+bool Channels::PushFileData(
     std::uint8_t *data, std::uint16_t size) {
     std::uint8_t cmd[64];
-
   cmd[0] = 0x8A;
   cmd[1] = 4;
   cmd[2] = size & 0xFF;
@@ -663,21 +712,22 @@ bool Channels::UpdateFileData(
   cmd[4] = (size & 0xFF0000) >> 16;
   cmd[5] = (size & 0xFF000000) >> 24;
 
-  if (device_->get_device_class() == 0xFF) {
+  if (hid_->get_device_class() == 0xFF) {
     LOGE("%s %d:: Not support filechannel, please update firmware.",
         __FILE__, __LINE__);
     return false;
   }
 
-  if (device_->send(0, cmd, 64, 200) <= 0) {
+  if (hid_->send(0, cmd, 64, 200) <= 0) {
     LOGE("%s %d:: Error reading, device not ready, retrying",
         __FILE__, __LINE__);
     return false;
   }
 
+  std::uint8_t req_count = 0;
   while (0x8B != cmd[0]) {
-    device_->receive(0, cmd, 64, 2000);
-    if (++req_count_ > 5) {
+    hid_->receive(0, cmd, 64, 2000);
+    if (++req_count > 5) {
       LOGE("%s %d:: Error reading, device went offline.",
           __FILE__, __LINE__);
       return false;
@@ -705,7 +755,7 @@ bool Channels::UpdateFileData(
     cmd[2] = current_sz;
     cmd[current_sz + 3] = check_sum(cmd + 3, current_sz);
 
-    if (device_->send(0, cmd, 64, 100) <= 0) {
+    if (hid_->send(0, cmd, 64, 100) <= 0) {
       LOGE("%s %d:: Update file data failure.", __FILE__, __LINE__);
       return false;
     }
@@ -714,7 +764,7 @@ bool Channels::UpdateFileData(
     if (file_size == 0) {
       cmd[0] = 0xAA;
       cmd[1] = 0xFF;
-      if (device_->send(0, cmd, 64, 100) <= 0) {
+      if (hid_->send(0, cmd, 64, 100) <= 0) {
         LOGE("%s %d:: Update file data failure.", __FILE__, __LINE__);
         return false;
       } else {
@@ -771,17 +821,13 @@ bool Channels::SetFiles(device_desc_t *desc,
   data[size + 3] = check_sum(data + 3, size);
   size += 4;
 
-  if (!UpdateFileData(data, size)) {
+  if (!PushFileData(data, size)) {
     LOGE("%s %d:: Update file data failure.",
         __FILE__, __LINE__);
     return false;
   }
 
   return true;
-}
-
-bool Channels::IsHidExist() {
-  return device_->find_device();
 }
 
 MYNTEYE_END_NAMESPACE

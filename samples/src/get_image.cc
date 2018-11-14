@@ -56,7 +56,8 @@ int main(int argc, char const* argv[]) {
 
   std::cout << "Press ESC/Q on Windows to terminate" << std::endl;
 
-  cv::namedWindow("color");
+  cv::namedWindow("left color");
+  cv::namedWindow("right color");
   cv::namedWindow("depth");
 
   mynteye::util::Counter counter;
@@ -71,9 +72,8 @@ int main(int argc, char const* argv[]) {
       cv::Mat right = right_color.img->To(mynteye::ImageFormat::COLOR_BGR)->ToMat();
       mynteye::util::draw(left, mynteye::util::to_string(counter.fps(), 5, 1),
           mynteye::util::TOP_RIGHT);
-      cv::Mat img;
-      cv::hconcat(left, right, img);
-      cv::imshow("color", img);
+      cv::imshow("left color", left);
+	  cv::imshow("right color", right);
     }
     if (image_depth.img) {
       cv::Mat depth = image_depth.img->To(mynteye::ImageFormat::DEPTH_BGR)->ToMat();

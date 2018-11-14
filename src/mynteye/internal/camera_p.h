@@ -109,15 +109,6 @@ class MYNTEYE_API CameraPrivate {
   /** Get the latest data of stream and status */
   stream_data_t RetrieveLatestImage(const ImageType& type, ErrorCode* code);
 
-  /** Start hid device */
-  bool StartHidTracking();
-  // void StopHidTracking();
-  /** Set callback of hid */
-  void SetHidCallback();
-  /** Callback of imu data */
-  void ImuDataCallback(const ImuDataPacket &packet);
-  /** Callback of image information */
-  void ImageInfoCallback(const ImgInfoPacket &packet);
   /** Start capture image */
   void StartCaptureImage();
   /** Stop capture image */
@@ -129,20 +120,39 @@ class MYNTEYE_API CameraPrivate {
   /** Get imu data */
   motion_datas_t GetImuDatas();
 
-  // protected:
+ protected:
   std::shared_ptr<Channels> channels() const {
     return channels_;
   }
 
- protected:
+ private:
+  void Init();
+
+  void ReadDeviceFlash();
+
   /** Set the intrinsics of motion */
   void SetMotionIntrinsics(const MotionIntrinsics &in);
   /** Set the extrinsics from left to motion */
   void SetMotionExtrinsics(const MotionExtrinsics &ex);
 
- private:
-  void Init();
+  /** Start data tracking */
+  bool StartDataTracking();
+  /** Stop data tracking */
+  void StopDataTracking();
 
+  /** Callback of imu data */
+  void ImuDataCallback(const ImuDataPacket &packet);
+  /** Callback of image info */
+  void ImageInfoCallback(const ImgInfoPacket &packet);
+
+  std::shared_ptr<device::Descriptors> descriptors_;
+  std::shared_ptr<MotionIntrinsics> motion_intrinsics_;
+  std::shared_ptr<MotionExtrinsics> motion_extrinsics_;
+
+  std::shared_ptr<StreamIntrinsics> stream_intrinsics_;
+  std::shared_ptr<StreamExtrinsics> stream_extrinsics_;
+
+ private:
   void SyntheticImageColor();
   void SyntheticImageDepth();
   void OldSyntheticImageColor();
@@ -192,20 +202,11 @@ class MYNTEYE_API CameraPrivate {
   std::map<ImageType, bool> is_enable_image_;
   StreamMode stream_mode_;
 
-  void ReadDescriptors();
-  std::shared_ptr<device::Descriptors> descriptors_;
-  std::shared_ptr<MotionIntrinsics> motion_intrinsics_;
-  std::shared_ptr<MotionExtrinsics> motion_extrinsics_;
-  std::shared_ptr<StreamIntrinsics> stream_intrinsics_;
-  std::shared_ptr<StreamExtrinsics> stream_extrinsics_;
-
   std::size_t motion_count_ = 0;
 
   std::map<ProcessMode, bool> is_process_mode_;
   void TempCompensate(std::shared_ptr<ImuData> data);
   void ScaleAssemCompensate(std::shared_ptr<ImuData> data);
-
-  bool is_hid_exist_ = false;
 };
 
 MYNTEYE_END_NAMESPACE
