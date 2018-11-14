@@ -381,7 +381,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
             }
           }
         }
-        // if (imu_Sub) {
+        if (imu_Sub) {
           if (motion_datas.size() > 0) {
             for (auto data : motion_datas) {
               ros::Time stamp = hardTimeToSoftTime(data.imu->timestamp);
@@ -400,7 +400,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
               }
             }
           }
-        // }
+        }
       }
     }
 
