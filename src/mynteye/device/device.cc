@@ -574,6 +574,7 @@ CameraCalibration Device::GetCameraCalibration(int index) {
 }
 
 void Device::GetCameraCalibrationFile(int index, const std::string& filename) {
+  if (!ExpectOpened(__func__)) return;
   int nRet;
 
   // for parse log test
@@ -690,6 +691,7 @@ void Device::GetCameraCalibrationFile(int index, const std::string& filename) {
 }
 
 void Device::SyncCameraCalibrations() {
+  if (!ExpectOpened(__func__)) return;
   camera_calibrations_.clear();
   for (int index = 0; index < 2; index++) {
     struct CameraCalibration camera_calib;
