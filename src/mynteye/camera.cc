@@ -90,6 +90,14 @@ MotionExtrinsics Camera::GetMotionExtrinsics() const {
   return p_->GetMotionExtrinsics();
 }
 
+StreamIntrinsics Camera::GetStreamIntrinsics(const StreamMode& stream_mode) const {
+  return p_->GetStreamIntrinsics(stream_mode);
+}
+
+StreamExtrinsics Camera::GetStreamExtrinsics(const StreamMode& stream_mode) const {
+  return p_->GetStreamExtrinsics(stream_mode);
+}
+
 bool Camera::WriteDeviceFlash(
     device::Descriptors *desc,
     device::ImuParams *imu_params,

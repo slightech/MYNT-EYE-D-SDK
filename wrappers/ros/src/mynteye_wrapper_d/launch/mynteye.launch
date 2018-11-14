@@ -35,11 +35,8 @@
   <!-- IR intensity -->
   <arg name="ir_intensity" default="4" />
 
-  <!-- Camera Intrinsics for generating points -->
-  <arg name="cx" default="0" />
-  <arg name="cy" default="0" />
-  <arg name="fx" default="0" />
-  <arg name="fy" default="0" />
+  <!-- Points display z distance scale ctrl pram -->
+  <arg name="factor" default="1000.0" />
 
   <!-- Generating points frequency, make slower than framerate -->
   <arg name="points_frequency" default="2" />
@@ -88,11 +85,7 @@
     <param name="state_ae"      value="$(arg state_ae)" />
     <param name="state_awb"     value="$(arg state_awb)" />
     <param name="ir_intensity"  value="$(arg ir_intensity)" />
-
-    <param name="cx" value="$(arg cx)" />
-    <param name="cy" value="$(arg cy)" />
-    <param name="fx" value="$(arg fx)" />
-    <param name="fy" value="$(arg fy)" />
+    <param name="factor"        value="$(arg factor)" />
 
     <param name="points_frequency" value="$(arg points_frequency)" />
 

@@ -135,8 +135,8 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     calib = mynteye->GetCameraCalibration(params.stream_mode);
 
     // camera_info->header.frame_id = color_frame_id;
-    camera_info->width = calib.OutImgWidth;
-    camera_info->height = calib.OutImgHeight;
+    camera_info->width = calib.InImgWidth/2;
+    camera_info->height = calib.InImgHeight;
 
     //     [fx  0 cx]
     // K = [ 0 fy cy]
@@ -280,14 +280,6 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   }
 
   void device_poll() {
-    // Main loop
-    mynteye->EnableImageType(mynteye::ImageType::ALL);
-    mynteye->Open(params);
-    if (!mynteye->IsOpened()) {
-      NODELET_ERROR_STREAM("Open camera failed");
-      return;
-    }
-    NODELET_INFO_STREAM("Open camera success");
     std::size_t imu_count = 0;
     std::size_t img_count = 0;
     cv::Mat color_left, mono_left, color_right, mono_right, depth_mat;
@@ -389,7 +381,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
             }
           }
         }
-        if (imu_Sub) {
+        // if (imu_Sub) {
           if (motion_datas.size() > 0) {
             for (auto data : motion_datas) {
               ros::Time stamp = hardTimeToSoftTime(data.imu->timestamp);
@@ -408,7 +400,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
               }
             }
           }
-        }
+        // }
       }
     }
 
@@ -430,6 +422,8 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     bool state_ae = true;
     bool state_awb = true;
     int ir_intensity = 0;
+    double factor = DEFAULT_POINTS_FACTOR;
+    std::int32_t points_frequency = DEFAULT_POINTS_FREQUENCE;
     gravity = 9.8;
     nh_ns.getParam("dev_index", dev_index);
     nh_ns.getParam("framerate", framerate);
@@ -487,6 +481,8 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     nh_ns.getParam("points_topic", points_topic);
     nh_ns.getParam("imu_topic", imu_topic);
     nh_ns.getParam("temp_topic", temp_topic);
+    nh_ns.getParam("points_frequency", points_frequency);
+    nh_ns.getParam("factor", factor);
 
     // MYNTEYE objects
     mynteye.reset(new mynteye::Camera);
@@ -565,29 +561,28 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     pub_temp = nh.advertise<mynteye_wrapper_d::Temp>(temp_topic, 1);
     NODELET_INFO_STREAM("Advertized on topic " << temp_topic);
 
-    double cx, cy, fx, fy;
-    std::int32_t points_frequency;
-    nh_ns.getParam("cx", cx);
-    nh_ns.getParam("cy", cy);
-    nh_ns.getParam("fx", fx);
-    nh_ns.getParam("fy", fy);
-    nh_ns.getParam("points_frequency", points_frequency);
+    // open the device
+    mynteye->EnableImageType(mynteye::ImageType::ALL);
+    mynteye->Open(params);
+    if (!mynteye->IsOpened()) {
+      NODELET_ERROR_STREAM("Open camera failed");
+      return;
+    }
+    NODELET_INFO_STREAM("Open camera success");
 
+    auto streamIntrinsics = mynteye->GetStreamIntrinsics(params.stream_mode);
+    // std::cout << streamIntrinsics.left.fx << "  " << streamIntrinsics.left.fy
+    //  << "  " <<  streamIntrinsics.left.cx << "  " << streamIntrinsics.left.cy
+    //  << std::endl;
     pointcloud_generator.reset(new PointCloudGenerator(
-      {
-        1000.0,  // factor, mm > m
-        cx > 0 ? cx : 682.3,  // cx
-        cy > 0 ? cy : 254.9,  // cy
-        fx > 0 ? fx : 979.8,  // fx
-        fy > 0 ? fy : 942.8,  // fy
-      },
+      streamIntrinsics.left,
       [this](sensor_msgs::PointCloud2 msg) {
         // msg.header.seq = 0;
         // msg.header.stamp = ros::Time::now();
         msg.header.frame_id = points_frame_id;
         pub_points.publish(msg);
         // NODELET_INFO_STREAM("Publish points");
-      }, points_frequency));
+      }, factor, points_frequency));
 
     device_poll_thread = boost::shared_ptr<boost::thread>(new boost::thread(
         boost::bind(&MYNTEYEWrapperNodelet::device_poll, this)));

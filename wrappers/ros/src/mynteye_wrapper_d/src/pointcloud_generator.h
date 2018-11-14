@@ -27,26 +27,27 @@
 #include <sensor_msgs/point_cloud2_iterator.h>
 
 #include "mynteye/util/rate.h"
+#include "mynteye/stubs/types_calib.h"
 
 MYNTEYE_BEGIN_NAMESPACE
 
-struct CameraIntrinsics {
-  double factor;
-  double cx;
-  double cy;
-  double fx;
-  double fy;
-};
+#define DEFAULT_POINTS_FREQUENCE (0)
+#define DEFAULT_POINTS_FACTOR (1000.0)
 
 class PointCloudGenerator {
  public:
   using Callback = std::function<void(sensor_msgs::PointCloud2)>;
 
   PointCloudGenerator(CameraIntrinsics in, Callback callback,
-      std::int32_t frequency = 0);
+      double factor = DEFAULT_POINTS_FACTOR,
+      std::int32_t frequency = DEFAULT_POINTS_FREQUENCE);
   ~PointCloudGenerator();
 
   bool Push(cv::Mat color, cv::Mat depth, ros::Time stamp);
+
+  inline void setFactor(double factor) {_factor = factor;}
+
+  inline double getFactor() { return _factor;}
 
  private:
   void Start();
@@ -68,6 +69,8 @@ class PointCloudGenerator {
   cv::Mat color_;
   cv::Mat depth_;
   ros::Time stamp_;
+
+  double _factor;
 
   bool generating_;
 };

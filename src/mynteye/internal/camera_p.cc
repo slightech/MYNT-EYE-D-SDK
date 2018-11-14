@@ -188,6 +188,49 @@ MotionExtrinsics CameraPrivate::GetMotionExtrinsics() const {
   }
 }
 
+StreamIntrinsics CameraPrivate::GetStreamIntrinsics(
+    const StreamMode& stream_mode) {
+  if (!stream_intrinsics_) {
+    stream_intrinsics_ = std::make_shared<StreamIntrinsics>();
+  }
+  auto streamData = GetCameraCalibration(stream_mode);
+  stream_intrinsics_->left.width = streamData.InImgWidth/2;
+  stream_intrinsics_->left.height = streamData.InImgHeight;
+  stream_intrinsics_->left.fx = streamData.CamMat1[0];
+  stream_intrinsics_->left.fy = streamData.CamMat1[4];
+  stream_intrinsics_->left.cx = streamData.CamMat1[2];
+  stream_intrinsics_->left.cy = streamData.CamMat1[5];
+  for (int i = 0; i < 5; i++) {
+    stream_intrinsics_->left.coeffs[i] = streamData.CamDist1[i];
+  }
+
+  stream_intrinsics_->right.width = streamData.InImgWidth/2;
+  stream_intrinsics_->right.height = streamData.InImgHeight;
+  stream_intrinsics_->right.fx = streamData.CamMat2[0];
+  stream_intrinsics_->right.fy = streamData.CamMat2[4];
+  stream_intrinsics_->right.cx = streamData.CamMat2[2];
+  stream_intrinsics_->right.cy = streamData.CamMat2[5];
+  for (int i = 0; i < 5; i++) {
+    stream_intrinsics_->right.coeffs[i] = streamData.CamDist2[i];
+  }
+  return *stream_intrinsics_;
+}
+
+StreamExtrinsics CameraPrivate::GetStreamExtrinsics(
+  const StreamMode& stream_mode) {
+  if (!stream_extrinsics_) {
+    stream_extrinsics_ = std::make_shared<StreamExtrinsics>();
+  }
+  auto streamData = GetCameraCalibration(stream_mode);
+  for (int i = 0; i < 9; i++) {
+    stream_extrinsics_->rotation[i/3][i%3] = streamData.RotaMat[i];
+  }
+  for (int j = 0; j < 3; j++) {
+    stream_extrinsics_->translation[j] = streamData.TranMat[j];
+  }
+  return *stream_extrinsics_;
+}
+
 bool CameraPrivate::WriteDeviceFlash(
     device::Descriptors *desc,
     device::ImuParams *imu_params,

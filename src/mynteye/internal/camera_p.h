@@ -84,6 +84,10 @@ class MYNTEYE_API CameraPrivate {
   MotionIntrinsics GetMotionIntrinsics() const;
   /** Get the extrinsics from left to motion */
   MotionExtrinsics GetMotionExtrinsics() const;
+  /** Get the intrinsics of camera */
+  StreamIntrinsics GetStreamIntrinsics(const StreamMode& stream_mode);
+  /** Get the extrinsics from left to right */
+  StreamExtrinsics GetStreamExtrinsics(const StreamMode& stream_mode);
 
   /** Write device flash */
   bool WriteDeviceFlash(
@@ -192,6 +196,8 @@ class MYNTEYE_API CameraPrivate {
   std::shared_ptr<device::Descriptors> descriptors_;
   std::shared_ptr<MotionIntrinsics> motion_intrinsics_;
   std::shared_ptr<MotionExtrinsics> motion_extrinsics_;
+  std::shared_ptr<StreamIntrinsics> stream_intrinsics_;
+  std::shared_ptr<StreamExtrinsics> stream_extrinsics_;
 
   std::size_t motion_count_ = 0;
 

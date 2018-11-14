@@ -69,12 +69,6 @@ class MYNTEYE_API Camera {
   /** Get one device descriptor */
   std::string GetDescriptor(const Descriptor &desc) const;
 
-  /** Get camera calibration */
-  CameraCalibration GetCameraCalibration(const StreamMode& stream_mode);
-  /** Get camera calibration file */
-  void GetCameraCalibrationFile(const StreamMode& stream_mode,
-                                const std::string& filename);
-
   /** Write camera calibration bin file */
   bool WriteCameraCalibrationBinFile(const std::string& filename);
 
@@ -82,6 +76,11 @@ class MYNTEYE_API Camera {
   MotionIntrinsics GetMotionIntrinsics() const;
   /** Get the extrinsics from left to motion */
   MotionExtrinsics GetMotionExtrinsics() const;
+
+  /** Get the intrinsics of camera */
+  StreamIntrinsics GetStreamIntrinsics(const StreamMode& stream_mode) const;
+  /** Get the extrinsics of camera */
+  StreamExtrinsics GetStreamExtrinsics(const StreamMode& stream_mode) const;
 
   /** Write device flash */
   bool WriteDeviceFlash(
@@ -148,6 +147,12 @@ class MYNTEYE_API Camera {
   /** @deprecated Replaced by GetCameraCalibrationFile()
    *              Saved to RectfyLog_PUMA_2.txt */
   void GetVGACameraLogDataFile();
+
+  /** Get camera calibration */
+  CameraCalibration GetCameraCalibration(const StreamMode& stream_mode);
+  /** Get camera calibration file */
+  void GetCameraCalibrationFile(const StreamMode& stream_mode,
+                                const std::string& filename);
 
   /** @deprecated Replaced by WriteCameraCalibrationBinFile() */
   void SetCalibrationWithFile(const std::string& file_name);

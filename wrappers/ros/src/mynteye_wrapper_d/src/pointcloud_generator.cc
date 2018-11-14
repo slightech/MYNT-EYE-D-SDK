@@ -18,12 +18,13 @@
 MYNTEYE_USE_NAMESPACE
 
 PointCloudGenerator::PointCloudGenerator(CameraIntrinsics in, Callback callback,
-    std::int32_t frequency)
+    double factor, std::int32_t frequency)
   : in_(std::move(in)),
     callback_(std::move(callback)),
     rate_(nullptr),
     running_(false),
-    generating_(false) {
+    generating_(false),
+    _factor(factor) {
   if (frequency > 0) {
     rate_.reset(new mynteye::Rate(frequency));
   }
@@ -114,7 +115,7 @@ void PointCloudGenerator::Run() {
         if (d == 0 || d == 4096)
           continue;
 
-        *iter_z = d / in_.factor;
+        *iter_z = d / _factor;
         *iter_x = (n - in_.cx) * *iter_z / in_.fx;
         *iter_y = (m - in_.cy) * *iter_z / in_.fy;
 

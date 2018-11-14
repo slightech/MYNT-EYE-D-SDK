@@ -23,6 +23,36 @@ MYNTEYE_BEGIN_NAMESPACE
 
 /**
  * @ingroup calibration
+ * Camera intrinsics: size, coeffs and camera matrix.
+ */
+struct MYNTEYE_API CameraIntrinsics {
+  /** The width of the image in pixels */
+  std::uint16_t width;
+  /** The height of the image in pixels */
+  std::uint16_t height;
+  /** The focal length of the image plane, as a multiple of pixel width */
+  double fx;
+  /** The focal length of the image plane, as a multiple of pixel height */
+  double fy;
+  /** The horizontal coordinate of the principal point of the image */
+  double cx;
+  /** The vertical coordinate of the principal point of the image */
+  double cy;
+  /** The distortion coefficients: k1,k2,p1,p2,k3 */
+  double coeffs[5];
+};
+
+/**
+ * @ingroup calibration
+ * Camera intrinsics: size, coeffs and camera matrix.
+ */
+struct MYNTEYE_API StreamIntrinsics {
+  CameraIntrinsics left;
+  CameraIntrinsics right;
+};
+
+/**
+ * @ingroup calibration
  * IMU intrinsics: scale, drift and variances.
  */
 struct MYNTEYE_API ImuIntrinsics {
@@ -79,8 +109,8 @@ std::ostream &operator<<(std::ostream &os, const MotionIntrinsics &in);
  * Extrinsics, represent how the different datas are connected.
  */
 struct MYNTEYE_API Extrinsics {
-  double rotation[3][3]; /**< Rotation matrix */
-  double translation[3]; /**< Translation vector */
+  double rotation[3][3]; /**< Rotation matrix left camera to right camera*/
+  double translation[3]; /**< Translation vector left camera to right camera*/
 
   /**
    * Inverse this extrinsics.
@@ -102,6 +132,8 @@ std::ostream &operator<<(std::ostream &os, const Extrinsics &ex);
  * Motion extrinsics.
  */
 using MotionExtrinsics = Extrinsics;
+
+using StreamExtrinsics = Extrinsics;
 
 MYNTEYE_END_NAMESPACE
 
