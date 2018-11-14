@@ -51,8 +51,8 @@ int main(int argc, char const* argv[]) {
     counter.Update();
 
     auto motion_datas = cam.RetrieveMotions();
-    std::cout << "Imu count: " << motion_datas.size() << std::endl;
     if (motion_datas.size() > 0) {
+      std::cout << "Imu count: " << motion_datas.size() << std::endl;
       for (auto data : motion_datas) {
         if (data.imu) {
           if (data.imu->flag == 1) {  // accelerometer
