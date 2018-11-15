@@ -22,10 +22,6 @@
 
 MYNTEYE_BEGIN_NAMESPACE
 
-struct ImgInfoData {
-  std::shared_ptr<ImgInfo> img_info;
-};
-
 /**
  * @ingroup enumerations
  * @brief List error codes.

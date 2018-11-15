@@ -73,8 +73,8 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   std::string temp_frame_id;
 
   // MYNTEYE objects
-  mynteye::OpenParams params;
-  std::unique_ptr<mynteye::Camera> mynteye;
+  OpenParams params;
+  std::unique_ptr<Camera> mynteye;
 
   std::unique_ptr<PointCloudGenerator> pointcloud_generator;
 
@@ -88,7 +88,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   }
 
   void publishColor(const std::string& frame_id, image_transport::CameraPublisher& pub,  // NOLINT
-    mynteye::Image::pointer img, ros::Time stamp,
+    Image::pointer img, ros::Time stamp,
       cv::Mat* mat, std::uint32_t seq) {
     if (pub.getNumSubscribers() == 0)
       return;
@@ -96,7 +96,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     // header.seq = 0;
     header.stamp = stamp;
     header.frame_id = frame_id;
-    *mat = img->To(mynteye::ImageFormat::COLOR_RGB)->ToMat();
+    *mat = img->To(ImageFormat::COLOR_RGB)->ToMat();
 
     auto &&msg =
         cv_bridge::CvImage(header, enc::RGB8, *mat).toImageMsg();
@@ -106,7 +106,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   }
 
   void publishMono(const std::string& frame_id, image_transport::CameraPublisher& pub, // NOLINT
-    mynteye::Image::pointer img, ros::Time stamp,
+    Image::pointer img, ros::Time stamp,
       cv::Mat* mat, std::uint32_t seq) {
     if (pub.getNumSubscribers() == 0)
       return;
@@ -114,7 +114,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     // header.seq = 0;
     header.stamp = stamp;
     header.frame_id = frame_id;
-    *mat = img->To(mynteye::ImageFormat::COLOR_RGB)->ToMat();
+    *mat = img->To(ImageFormat::COLOR_RGB)->ToMat();
     cv::Mat dst;
     cv::cvtColor(*mat, dst, CV_RGB2GRAY);
     auto &&msg =
@@ -174,7 +174,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     return camera_info_ptr_;
   }
 
-  void publishDepth(mynteye::Image::pointer img, ros::Time stamp,
+  void publishDepth(Image::pointer img, ros::Time stamp,
       cv::Mat* mat) {
     std_msgs::Header header;
     // header.seq = 0;
@@ -183,15 +183,15 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
     auto &&info = getCameraInfo();
     if (params.depth_mode == DepthMode::DEPTH_RAW) {
-      *mat = img->To(mynteye::ImageFormat::DEPTH_RAW)->ToMat();
+      *mat = img->To(ImageFormat::DEPTH_RAW)->ToMat();
       pub_depth.publish(
           cv_bridge::CvImage(header, enc::MONO16, *mat).toImageMsg(), info);
     } else if (params.depth_mode == DepthMode::DEPTH_GRAY) {
-      *mat = img->To(mynteye::ImageFormat::DEPTH_GRAY_24)->ToMat();
+      *mat = img->To(ImageFormat::DEPTH_GRAY_24)->ToMat();
       pub_depth.publish(
           cv_bridge::CvImage(header, enc::RGB8, *mat).toImageMsg(), info);
     } else if (params.depth_mode == DepthMode::DEPTH_COLORFUL) {
-      *mat = img->To(mynteye::ImageFormat::DEPTH_RGB)->ToMat();
+      *mat = img->To(ImageFormat::DEPTH_RGB)->ToMat();
       pub_depth.publish(
           cv_bridge::CvImage(header, enc::RGB8, *mat).toImageMsg(), info);
     } else {
@@ -301,12 +301,12 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       bool points_subscribed = (points_SubNumber > 0) \
           && (params.depth_mode == DepthMode::DEPTH_RAW);
 
-      auto &&left_color = mynteye->RetrieveImages(
-        mynteye::ImageType::IMAGE_LEFT_COLOR);
-      auto &&right_color = mynteye->RetrieveImages(
-        mynteye::ImageType::IMAGE_RIGHT_COLOR);
-      auto &&image_depth = mynteye->RetrieveImages(
-        mynteye::ImageType::IMAGE_DEPTH);
+      auto &&left_color = mynteye->GetStreamDatas(
+        ImageType::IMAGE_LEFT_COLOR);
+      auto &&right_color = mynteye->GetStreamDatas(
+        ImageType::IMAGE_RIGHT_COLOR);
+      auto &&image_depth = mynteye->GetStreamDatas(
+        ImageType::IMAGE_DEPTH);
       img_count += left_color.size();
 
       auto &&motion_datas = mynteye->GetMotionDatas();
@@ -484,9 +484,9 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     nh_ns.getParam("factor", factor);
 
     // MYNTEYE objects
-    mynteye.reset(new mynteye::Camera);
+    mynteye.reset(new Camera);
     {
-      std::vector<mynteye::DeviceInfo> dev_infos = mynteye->GetDeviceInfos();
+      std::vector<DeviceInfo> dev_infos = mynteye->GetDeviceInfos();
       size_t n = dev_infos.size();
       if (n <= 0 || dev_index < 0 || dev_index >= n) {
         NODELET_ERROR_STREAM("Device not found, index: " << dev_index);
@@ -504,8 +504,8 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       params.dev_index = dev_index;
     }
     {
-      std::vector<mynteye::StreamInfo> color_infos;
-      std::vector<mynteye::StreamInfo> depth_infos;
+      std::vector<StreamInfo> color_infos;
+      std::vector<StreamInfo> depth_infos;
       mynteye->GetStreamInfos(dev_index, &color_infos, &depth_infos);
 
       NODELET_INFO_STREAM("Color Stream Information");
@@ -523,13 +523,13 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       NODELET_INFO_STREAM(dashes);
     }
     params.framerate = framerate;
-    params.color_mode = static_cast<mynteye::ColorMode>(color_mode);
-    params.depth_mode = static_cast<mynteye::DepthMode>(depth_mode);
-    params.stream_mode = static_cast<mynteye::StreamMode>(stream_mode);
+    params.color_mode = static_cast<ColorMode>(color_mode);
+    params.depth_mode = static_cast<DepthMode>(depth_mode);
+    params.stream_mode = static_cast<StreamMode>(stream_mode);
     params.color_stream_format =
-        static_cast<mynteye::StreamFormat>(color_stream_format);
+        static_cast<StreamFormat>(color_stream_format);
     params.depth_stream_format =
-        static_cast<mynteye::StreamFormat>(depth_stream_format);
+        static_cast<StreamFormat>(depth_stream_format);
     params.state_ae = state_ae;
     params.state_awb = state_awb;
     params.ir_intensity = ir_intensity;
@@ -561,7 +561,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     NODELET_INFO_STREAM("Advertized on topic " << temp_topic);
 
     // open the device
-    mynteye->EnableImageType(mynteye::ImageType::ALL);
+    mynteye->EnableStreamData(ImageType::IMAGE_ALL);
     mynteye->EnableMotionDatas();
     mynteye->Open(params);
     if (!mynteye->IsOpened()) {

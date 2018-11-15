@@ -81,8 +81,10 @@ enum class ImageType : std::int32_t {
   IMAGE_DEPTH,
   /** All. */
   IMAGE_ALL,
+#ifdef MYNTEYE_DEPRECATED_COMPAT
   /** @deprecated */
   ALL = IMAGE_ALL,
+#endif
 };
 
 MYNTEYE_API

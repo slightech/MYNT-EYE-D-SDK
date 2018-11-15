@@ -27,8 +27,6 @@
 #include "mynteye/device/stream_info.h"
 #include "mynteye/types.h"
 
-#define MYNTEYE_DEPRECATED_COMPAT
-
 MYNTEYE_BEGIN_NAMESPACE
 
 #ifdef MYNTEYE_DEPRECATED_COMPAT

@@ -50,7 +50,7 @@ void Streams::EnableStreamData(const ImageType& type) {
         image_queue_map_[type] = std::make_shared<image_queue_t>(4);
       }
       break;
-    case ImageType::ALL:
+    case ImageType::IMAGE_ALL:
       EnableStreamData(ImageType::IMAGE_LEFT_COLOR);
       EnableStreamData(ImageType::IMAGE_RIGHT_COLOR);
       EnableStreamData(ImageType::IMAGE_DEPTH);

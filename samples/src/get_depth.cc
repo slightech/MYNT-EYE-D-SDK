@@ -27,7 +27,7 @@
 namespace {
 
 class DepthRegion {
-public:
+ public:
   explicit DepthRegion(std::uint32_t n)
     : n_(std::move(n)),
       show_(false),
@@ -161,14 +161,37 @@ int main(int argc, char const* argv[]) {
   cout << "Open device: " << dev_info.index << ", "
       << dev_info.name << endl << endl;
 
-  // Warning: Color stream format MJPG doesn't work.
   OpenParams params(dev_info.index);
-  params.depth_mode = DepthMode::DEPTH_RAW;
-  // params.stream_mode = StreamMode::STREAM_1280x720;
-  params.ir_intensity = 4;
+  {
+    // Framerate: 10(default), [0,60], [0,30](STREAM_2560x720)
+    // params.framerate = 30;
 
-  cam.EnableImageType(mynteye::ImageType::IMAGE_LEFT_COLOR);
-  cam.EnableImageType(mynteye::ImageType::IMAGE_DEPTH);
+    // Color mode: raw(default), rectified
+    // params.color_mode = ColorMode::COLOR_RECTIFIED;
+
+    // Depth mode: colorful(default), gray, raw
+    params.depth_mode = DepthMode::DEPTH_RAW;
+
+    // Stream mode: left color only
+    // params.stream_mode = StreamMode::STREAM_640x480;  // vga
+    params.stream_mode = StreamMode::STREAM_1280x720;  // hd
+    // Stream mode: left+right color
+    // params.stream_mode = StreamMode::STREAM_1280x480;  // vga
+    // params.stream_mode = StreamMode::STREAM_2560x720;  // hd
+
+    // Auto-exposure: true(default), false
+    // params.state_ae = false;
+
+    // Auto-white balance: true(default), false
+    // params.state_awb = false;
+
+    // Infrared intensity: 0(default), [0,6]
+    params.ir_intensity = 4;
+  }
+
+  // Enable what stream datas: left_color, right_color, depth
+  cam.EnableStreamData(ImageType::IMAGE_LEFT_COLOR);
+  cam.EnableStreamData(ImageType::IMAGE_DEPTH);
 
   cam.Open(params);
 
@@ -209,18 +232,19 @@ int main(int argc, char const* argv[]) {
   for (;;) {
     counter.Update();
 
-    auto image_color = cam.RetrieveImages(ImageType::IMAGE_LEFT_COLOR);
-    auto image_depth = cam.RetrieveImages(ImageType::IMAGE_DEPTH);
-    for (auto data : image_color) {
-      cv::Mat color = data.img->To(ImageFormat::COLOR_BGR)->ToMat();
+    auto image_color = cam.GetStreamData(ImageType::IMAGE_LEFT_COLOR);
+    if (image_color.img) {
+      cv::Mat color = image_color.img->To(ImageFormat::COLOR_BGR)->ToMat();
       util::draw(color, util::to_string(counter.fps(), 5, 1), util::TOP_RIGHT);
 
       cv::setMouseCallback("color", OnDepthMouseCallback, &depth_region);
       depth_region.DrawRect(color);
       cv::imshow("color", color);
     }
-    for (auto data : image_depth) {
-      cv::Mat depth = data.img->To(ImageFormat::DEPTH_RAW)->ToMat();
+
+    auto image_depth = cam.GetStreamData(ImageType::IMAGE_DEPTH);
+    if (image_depth.img) {
+      cv::Mat depth = image_depth.img->To(ImageFormat::DEPTH_RAW)->ToMat();
 
       cv::setMouseCallback("depth", OnDepthMouseCallback, &depth_region);
       // Note: DrawRect will change some depth values to show the rect.

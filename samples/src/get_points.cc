@@ -74,31 +74,33 @@ void show_points(cv::Mat rgb, cv::Mat depth) {
   cloud->points.clear();
 }
 
+MYNTEYE_USE_NAMESPACE
+
 int main(int argc, char const* argv[]) {
-  mynteye::Camera cam;
-  mynteye::DeviceInfo dev_info;
-  if (!mynteye::util::select(cam, &dev_info)) {
+  Camera cam;
+  DeviceInfo dev_info;
+  if (!util::select(cam, &dev_info)) {
     return 1;
   }
-  mynteye::util::print_stream_infos(cam, dev_info.index);
+  util::print_stream_infos(cam, dev_info.index);
 
   std::cout << "Open device: " << dev_info.index << ", "
       << dev_info.name << std::endl << std::endl;
 
-  // Warning: Color stream format MJPG doesn't work.
-  mynteye::OpenParams params(dev_info.index);
-  params.depth_mode = mynteye::DepthMode::DEPTH_RAW;
-  // params.stream_mode = StreamMode::STREAM_1280x720;
+  OpenParams params(dev_info.index);
+  params.depth_mode = DepthMode::DEPTH_RAW;
+  params.stream_mode = StreamMode::STREAM_1280x720;
   params.ir_intensity = 4;
 
-  cam.EnableImageType(mynteye::ImageType::IMAGE_LEFT_COLOR);
-  cam.EnableImageType(mynteye::ImageType::IMAGE_DEPTH);
+  // Enable what stream datas: left_color, right_color, depth
+  cam.EnableStreamData(ImageType::IMAGE_LEFT_COLOR);
+  cam.EnableStreamData(ImageType::IMAGE_DEPTH);
 
-  mynteye::StreamMode streamMode = params.stream_mode;
+  StreamMode stream_mode = params.stream_mode;
 
   cam.Open(params);
 
-  auto streamIntrinsics = cam.GetStreamIntrinsics(streamMode);
+  auto streamIntrinsics = cam.GetStreamIntrinsics(stream_mode);
 
   camera_cx = streamIntrinsics.left.cx;
   camera_cy = streamIntrinsics.left.cy;
@@ -126,17 +128,19 @@ int main(int argc, char const* argv[]) {
   cv::namedWindow("color");
   cv::namedWindow("depth");
 
-  mynteye::util::Counter counter;
+  util::Counter counter;
   for (;;) {
     counter.Update();
 
-    auto image_color = cam.RetrieveImage(mynteye::ImageType::IMAGE_LEFT_COLOR);
-    auto image_depth = cam.RetrieveImage(mynteye::ImageType::IMAGE_DEPTH);
+    auto image_color = cam.GetStreamData(ImageType::IMAGE_LEFT_COLOR);
+    auto image_depth = cam.GetStreamData(ImageType::IMAGE_DEPTH);
     if (image_color.img && image_depth.img) {
-      cv::Mat color = image_color.img->To(mynteye::ImageFormat::COLOR_BGR)->ToMat();
-      cv::Mat depth = image_depth.img->To(mynteye::ImageFormat::DEPTH_RAW)->ToMat();
-      mynteye::util::draw(color, mynteye::util::to_string(counter.fps(), 5, 1),
-          mynteye::util::TOP_RIGHT);
+      cv::Mat color = image_color.img->To(ImageFormat::COLOR_BGR)
+          ->ToMat();
+      cv::Mat depth = image_depth.img->To(ImageFormat::DEPTH_RAW)
+          ->ToMat();
+      util::draw(color, util::to_string(counter.fps(), 5, 1),
+          util::TOP_RIGHT);
       cv::imshow("color", color);
       cv::imshow("depth", depth);
       show_points(color, depth);

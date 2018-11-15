@@ -88,7 +88,7 @@ int main(int argc, char const* argv[]) {
   for (;;) {
     counter.Update();
 
-    auto left_color = cam.RetrieveImage(ImageType::IMAGE_LEFT_COLOR);
+    auto left_color = cam.GetStreamData(ImageType::IMAGE_LEFT_COLOR);
     if (left_color.img) {
       cv::Mat left = left_color.img->To(ImageFormat::COLOR_BGR)->ToMat();
       util::draw(left, util::to_string(counter.fps(), 5, 1),
@@ -99,7 +99,7 @@ int main(int argc, char const* argv[]) {
     }
 
     if (util::is_right_color_supported(params.stream_mode)) {
-      auto right_color = cam.RetrieveImage(ImageType::IMAGE_RIGHT_COLOR);
+      auto right_color = cam.GetStreamData(ImageType::IMAGE_RIGHT_COLOR);
       if (right_color.img) {
         cv::Mat right = right_color.img->To(ImageFormat::COLOR_BGR)->ToMat();
         cv::imshow("right color", right);
@@ -108,7 +108,7 @@ int main(int argc, char const* argv[]) {
       }
     }
 
-    auto image_depth = cam.RetrieveImage(ImageType::IMAGE_DEPTH);
+    auto image_depth = cam.GetStreamData(ImageType::IMAGE_DEPTH);
     if (image_depth.img) {
       cv::Mat depth = image_depth.img->To(ImageFormat::DEPTH_BGR)->ToMat();
       cv::imshow("depth", depth);
