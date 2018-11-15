@@ -22,9 +22,8 @@
 #include "mynteye/device/device.h"
 #include "mynteye/internal/image_utils.h"
 #include "mynteye/internal/motions.h"
+#include "mynteye/internal/streams.h"
 #include "mynteye/util/log.h"
-#include "mynteye/util/rate.h"
-#include "mynteye/util/times.h"
 
 MYNTEYE_USE_NAMESPACE
 
@@ -34,15 +33,12 @@ CameraPrivate::CameraPrivate() : device_(std::make_shared<Device>()) {
 }
 
 void CameraPrivate::Init() {
-  is_enable_image_ = {{ImageType::IMAGE_LEFT_COLOR, false},
-                      {ImageType::IMAGE_RIGHT_COLOR, false},
-                      {ImageType::IMAGE_DEPTH, false}};
-
   channels_ = std::make_shared<Channels>();
   if (channels_->IsAvaliable()) {
     ReadDeviceFlash();
   }
   motions_ = std::make_shared<Motions>();
+  streams_ = std::make_shared<Streams>(device_);
 }
 
 CameraPrivate::~CameraPrivate() {
@@ -62,6 +58,10 @@ void CameraPrivate::GetStreamInfos(const std::int32_t& dev_index,
 }
 
 ErrorCode CameraPrivate::Open(const OpenParams& params) {
+  if (IsOpened()) {
+    return ErrorCode::SUCCESS;
+  }
+
   bool ok = device_->Open(params);
   if (!ok) {
     return ErrorCode::ERROR_FAILURE;
@@ -69,8 +69,7 @@ ErrorCode CameraPrivate::Open(const OpenParams& params) {
 
   if (ok) {
     StartDataTracking();
-    StartCaptureImage();
-    StartSyntheticImage();
+    streams_->OnCameraOpen();
     return ErrorCode::SUCCESS;
   } else {
     return ErrorCode::ERROR_CAMERA_OPEN_FAILED;
@@ -201,6 +200,31 @@ void CameraPrivate::EnableProcessMode(const std::int32_t& mode) {
   motions_->EnableProcessMode(mode);
 }
 
+void CameraPrivate::EnableImageInfo(bool sync) {
+  streams_->EnableImageInfo(sync);
+  StartDataTracking();
+}
+
+void CameraPrivate::EnableStreamData(const ImageType& type) {
+  streams_->EnableStreamData(type);
+}
+
+bool CameraPrivate::IsStreamDataEnabled(const ImageType& type) {
+  return streams_->IsStreamDataEnabled(type);
+}
+
+bool CameraPrivate::HasStreamDataEnabled() {
+  return streams_->HasStreamDataEnabled();
+}
+
+StreamData CameraPrivate::GetStreamData(const ImageType& type) {
+  return streams_->GetStreamData(type);
+}
+
+std::vector<StreamData> CameraPrivate::GetStreamDatas(const ImageType& type) {
+  return streams_->GetStreamDatas(type);
+}
+
 void CameraPrivate::EnableMotionDatas(std::size_t max_size) {
   motions_->EnableMotionDatas(std::move(max_size));
   StartDataTracking();
@@ -211,11 +235,9 @@ std::vector<MotionData> CameraPrivate::GetMotionDatas() {
 }
 
 void CameraPrivate::Close() {
-  if (device_->IsOpened()) {
-    StopCaptureImage();
-    StopSyntheticImage();
-    StopDataTracking();
-  }
+  if (!IsOpened()) return;
+  StopDataTracking();
+  streams_->OnCameraClose();
   device_->Close();
 }
 
@@ -228,8 +250,6 @@ void CameraPrivate::GetCameraCalibrationFile(
     const StreamMode& stream_mode, const std::string& filename) {
   return device_->GetCameraCalibrationFile(stream_mode, filename);
 }
-
-// ...
 
 void CameraPrivate::ReadDeviceFlash() {
   if (!channels_->IsAvaliable()) {
@@ -285,15 +305,20 @@ void CameraPrivate::SetMotionExtrinsics(const MotionExtrinsics &ex) {
 
 bool CameraPrivate::StartDataTracking() {
   // if (!IsOpened()) return false;  // ensure start after opened
-  // if (!motions_->IsMotionDatasEnabled() && ..) return false;
+  if (!motions_->IsMotionDatasEnabled() && !streams_->IsImageInfoEnabled()) {
+    // Not tracking when data & info both disabled.
+    return false;
+  }
 
   if (motions_->IsMotionDatasEnabled()) {
-    channels_->SetImuDataCallback(std::bind(&Motions::ImuDataCallback,
+    channels_->SetImuDataCallback(std::bind(&Motions::OnImuDataCallback,
         motions_, std::placeholders::_1));
   }
 
-  channels_->SetImgInfoCallback(std::bind(&CameraPrivate::ImageInfoCallback,
-        this, std::placeholders::_1));
+  if (streams_->IsImageInfoEnabled()) {
+    channels_->SetImgInfoCallback(std::bind(&Streams::OnImageInfoCallback,
+          streams_, std::placeholders::_1));
+  }
 
   if (channels_->IsHidTracking()) return true;
 
@@ -309,306 +334,4 @@ void CameraPrivate::StopDataTracking() {
   if (channels_->IsHidTracking()) {
     channels_->StopHidTracking();
   }
-}
-
-// todo
-
-std::vector<StreamData> CameraPrivate::RetrieveImage(const ImageType& type,
-    ErrorCode* code) {
-  if (!IsOpened()) {
-    *code = ErrorCode::ERROR_CAMERA_NOT_OPENED;
-    return {};
-  }
-
-  switch (type) {
-    case ImageType::IMAGE_LEFT_COLOR: {
-      std::lock_guard<std::mutex> _(cap_color_mtx_);
-      stream_datas_t data = left_color_data_;
-      left_color_data_.clear();
-      return data;
-    } break;
-    case ImageType::IMAGE_RIGHT_COLOR: {
-      if (!is_enable_image_[ImageType::IMAGE_RIGHT_COLOR]) {
-        LOGE("RetrieveImage: Right color is disable.");
-        throw new std::runtime_error("RetrieveImage: Right color is disable.");
-      }
-      std::lock_guard<std::mutex> _(cap_color_mtx_);
-      stream_datas_t data = right_color_data_;
-      right_color_data_.clear();
-      return data;
-    } break;
-    case ImageType::IMAGE_DEPTH: {
-      std::lock_guard<std::mutex> _(cap_depth_mtx_);
-      stream_datas_t data = depth_data_;
-      depth_data_.clear();
-      return data;
-    } break;
-    default:
-      throw new std::runtime_error("RetrieveImage: ImageType is unknown");
-  }
-}
-
-CameraPrivate::stream_data_t CameraPrivate::RetrieveLatestImage(const ImageType& type,
-    ErrorCode* code) {
-  if (!IsOpened()) {
-    *code = ErrorCode::ERROR_CAMERA_NOT_OPENED;
-    return {};
-  }
-
-  switch (type) {
-    case ImageType::IMAGE_LEFT_COLOR: {
-      std::lock_guard<std::mutex> _(cap_color_mtx_);
-      if (left_color_data_.empty()) { return {}; }
-      auto data = left_color_data_.back();
-      left_color_data_.clear();
-      return data;
-    } break;
-    case ImageType::IMAGE_RIGHT_COLOR: {
-      std::lock_guard<std::mutex> _(cap_color_mtx_);
-      if (right_color_data_.empty()) { return {}; }
-      auto data = right_color_data_.back();
-      right_color_data_.clear();
-      return data;
-    } break;
-    case ImageType::IMAGE_DEPTH: {
-      std::lock_guard<std::mutex> _(cap_depth_mtx_);
-      if (depth_data_.empty()) { return {}; }
-      auto data = depth_data_.back();
-      depth_data_.clear();
-      return data;
-    } break;
-    default:
-      throw new std::runtime_error("RetrieveImage: ImageType is unknown");
-  }
-}
-
-void CameraPrivate::CaptureImageColor(ErrorCode* code) {
-  std::unique_lock<std::mutex> _(cap_color_mtx_);
-  auto p = RetrieveImageColor(code);
-  if (p) {
-    auto color = p->Clone();
-    image_color_.push_back(color);
-    image_color_wait_.notify_one();
-  }
-}
-
-void CameraPrivate::CaptureImageDepth(ErrorCode* code) {
-  std::unique_lock<std::mutex> _(cap_depth_mtx_);
-  auto p = RetrieveImageDepth(code);
-  if (p) {
-    auto depth = p->Clone();
-    image_depth_.push_back(depth);
-    image_depth_wait_.notify_one();
-  }
-}
-
-void CameraPrivate::SyntheticImageColor() {
-  std::unique_lock<std::mutex> _(cap_color_mtx_);
-  image_color_wait_.wait_for(_, std::chrono::seconds(1));
-
-  if (image_color_.empty() || img_info_.empty()) { return; }
-
-  if (image_color_.front()->frame_id() >
-      img_info_.back().img_info->frame_id) {
-    if (image_color_.size() > 5) { image_color_.clear(); }
-    img_info_.clear();
-    return;
-  } else if (image_color_.back()->frame_id() <
-      img_info_.front().img_info->frame_id) {
-    if (img_info_.size() > 5) { img_info_.clear(); }
-    image_color_.clear();
-    return;
-  }
-
-  for (auto color : image_color_) {
-    for (auto info : img_info_) {
-      if (color->frame_id() == info.img_info->frame_id) {
-        TransferColor(color, info);
-        if (left_color_data_.size() > 30) { left_color_data_.clear(); }
-        if (right_color_data_.size() > 30) { right_color_data_.clear(); }
-        if (img_info_.size() > 30) { img_info_.clear(); }
-      }
-    }
-  }
-  image_color_.clear();
-  img_info_.clear();
-}
-
-void CameraPrivate::OldSyntheticImageColor() {
-  std::unique_lock<std::mutex> _(cap_color_mtx_);
-  image_color_wait_.wait_for(_, std::chrono::seconds(1));
-  if (image_color_.empty()) { return; }
-
-  for (auto color : image_color_) {
-    OldTransferColor(color);
-    if (left_color_data_.size() > 30) { left_color_data_.clear(); }
-    if (right_color_data_.size() > 30) { right_color_data_.clear(); }
-  }
-  image_color_.clear();
-}
-
-void CameraPrivate::TransferColor(Image::pointer color, img_info_data_t info) {
-  if (!is_enable_image_[ImageType::IMAGE_RIGHT_COLOR]) {
-    stream_data_t data;
-    data.img_info = std::make_shared<ImgInfo>();
-    *data.img_info = *info.img_info;
-    data.img = color->Clone();
-    left_color_data_.push_back(data);
-  } else {
-    CutPart(ImageType::IMAGE_LEFT_COLOR, color, info);
-    CutPart(ImageType::IMAGE_RIGHT_COLOR, color, info);
-  }
-}
-
-void CameraPrivate::OldTransferColor(Image::pointer color) {
-  if (!is_enable_image_[ImageType::IMAGE_RIGHT_COLOR]) {
-    stream_data_t data;
-    data.img_info = nullptr;
-    data.img = color->Clone();
-    left_color_data_.push_back(data);
-  } else {
-    OldCutPart(ImageType::IMAGE_LEFT_COLOR, color);
-    OldCutPart(ImageType::IMAGE_RIGHT_COLOR, color);
-  }
-}
-
-void CameraPrivate::CutPart(ImageType type,
-    Image::pointer color, img_info_data_t info) {
-  stream_data_t data;
-  data.img_info = std::make_shared<ImgInfo>();
-  *data.img_info = *info.img_info;
-  if (type == ImageType::IMAGE_LEFT_COLOR) {
-    data.img = images::split_left_color(color);
-    left_color_data_.push_back(data);
-  } else if (type == ImageType::IMAGE_RIGHT_COLOR) {
-    data.img = images::split_right_color(color);
-    right_color_data_.push_back(data);
-  }
-}
-
-void CameraPrivate::OldCutPart(ImageType type, Image::pointer color) {
-  stream_data_t data;
-  data.img_info = nullptr;
-  if (type == ImageType::IMAGE_LEFT_COLOR) {
-    data.img = images::split_left_color(color);
-    left_color_data_.push_back(data);
-  } else if (type == ImageType::IMAGE_RIGHT_COLOR) {
-    data.img = images::split_right_color(color);
-    right_color_data_.push_back(data);
-  }
-}
-
-void CameraPrivate::SyntheticImageDepth() {
-  std::unique_lock<std::mutex> _(cap_depth_mtx_);
-  image_depth_wait_.wait_for(_, std::chrono::seconds(1));
-  for (auto depth : image_depth_) {
-    stream_data_t data;
-    data.img_info = nullptr;
-    data.img = depth->Clone();
-    depth_data_.push_back(data);
-    if (depth_data_.size() > 30) { depth_data_.clear(); }
-  }
-  image_depth_.clear();
-}
-
-void CameraPrivate::StartCaptureImage() {
-  is_capture_image_ = true;
-  cap_image_thread_ = std::thread([this]() {
-    ErrorCode code = ErrorCode::SUCCESS;
-    while (is_capture_image_) {
-      if (is_enable_image_[ImageType::IMAGE_LEFT_COLOR] ||
-          is_enable_image_[ImageType::IMAGE_RIGHT_COLOR]) {
-        CaptureImageColor(&code);
-      }
-      if (is_enable_image_[ImageType::IMAGE_DEPTH]) {
-        CaptureImageDepth(&code);
-      }
-      std::this_thread::sleep_for(
-          std::chrono::milliseconds(1));
-    }
-  });
-}
-
-void CameraPrivate::StopCaptureImage() {
-  is_capture_image_ = false;
-  cap_image_thread_.join();
-  image_color_wait_.notify_all();
-  image_depth_wait_.notify_all();
-}
-
-void CameraPrivate::StartSyntheticImage() {
-  is_synthetic_image_ = true;
-  sync_thread_ = std::thread([this]() {
-    while (is_capture_image_) {
-      if (is_enable_image_[ImageType::IMAGE_LEFT_COLOR] ||
-          is_enable_image_[ImageType::IMAGE_RIGHT_COLOR]) {
-        if (channels_->IsAvaliable()) {
-          SyntheticImageColor();
-        } else {
-          OldSyntheticImageColor();
-        }
-      }
-      if (is_enable_image_[ImageType::IMAGE_DEPTH]) {
-        SyntheticImageDepth();
-      }
-      std::this_thread::sleep_for(
-          std::chrono::milliseconds(1));
-    }
-  });
-}
-
-void CameraPrivate::StopSyntheticImage() {
-  is_synthetic_image_ = false;
-  sync_thread_.join();
-}
-
-void CameraPrivate::ImageInfoCallback(const ImgInfoPacket &packet) {
-  auto &&img_info = std::make_shared<ImgInfo>();
-
-  img_info->frame_id = packet.frame_id;
-  img_info->timestamp = packet.timestamp;
-  img_info->exposure_time = packet.exposure_time;
-
-  img_info_data_t tmp = {img_info};
-  cache_image_info_.push_back(tmp);
-
-  std::lock_guard<std::mutex> _(mtx_img_info_);
-  img_info_.insert(img_info_.end(), cache_image_info_.begin(), cache_image_info_.end());
-  cache_image_info_.clear();
-}
-
-void CameraPrivate::EnableImageType(const ImageType& type) {
-  switch (type) {
-    case ImageType::IMAGE_LEFT_COLOR:
-      is_enable_image_[type] = true;
-      break;
-    case ImageType::IMAGE_RIGHT_COLOR:
-      is_enable_image_[type] = true;
-      stream_mode_ = StreamMode::STREAM_2560x720;
-      break;
-    case ImageType::IMAGE_DEPTH:
-      is_enable_image_[type] = true;
-      break;
-    case ImageType::ALL:
-      EnableImageType(ImageType::IMAGE_LEFT_COLOR);
-      EnableImageType(ImageType::IMAGE_RIGHT_COLOR);
-      EnableImageType(ImageType::IMAGE_DEPTH);
-      break;
-    default:
-      LOGE("EnableImageType:: ImageType is unknown.");
-  }
-}
-
-Image::pointer CameraPrivate::RetrieveImageColor(ErrorCode* code) {
-  auto image_ptr = device_->GetImageColor();
-  *code = (image_ptr == nullptr) ? ErrorCode::ERROR_CAMERA_RETRIEVE_FAILED
-      : ErrorCode::SUCCESS;
-  return image_ptr;
-}
-
-Image::pointer CameraPrivate::RetrieveImageDepth(ErrorCode* code) {
-  auto image_ptr = device_->GetImageDepth();
-  *code = (image_ptr == nullptr) ? ErrorCode::ERROR_CAMERA_RETRIEVE_FAILED
-      : ErrorCode::SUCCESS;
-  return image_ptr;
 }

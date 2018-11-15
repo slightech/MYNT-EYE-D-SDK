@@ -81,6 +81,11 @@ void print_stream_infos(const Camera& cam, const std::int32_t& dev_index) {
   std::cout << dashes << std::endl;
 }
 
+bool is_right_color_supported(const StreamMode& mode) {
+  return mode == StreamMode::STREAM_1280x480
+      || mode == StreamMode::STREAM_2560x720;
+}
+
 }  // namespace util
 
 MYNTEYE_END_NAMESPACE

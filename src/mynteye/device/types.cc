@@ -33,4 +33,25 @@ std::ostream& operator<<(std::ostream& os, const StreamFormat& code) {
   return os;
 }
 
+std::ostream& operator<<(std::ostream& os, const ImageType& code) {
+  switch (code) {
+    case ImageType::IMAGE_LEFT_COLOR: {
+      os << "IMAGE_LEFT_COLOR";
+    } break;
+    case ImageType::IMAGE_RIGHT_COLOR: {
+      os << "IMAGE_RIGHT_COLOR";
+    } break;
+    case ImageType::IMAGE_DEPTH: {
+      os << "IMAGE_DEPTH";
+    } break;
+    case ImageType::IMAGE_ALL: {
+      os << "IMAGE_ALL";
+    } break;
+    default: {
+      os << "IMAGE_UNKNOWN";
+    } break;
+  }
+  return os;
+}
+
 MYNTEYE_END_NAMESPACE

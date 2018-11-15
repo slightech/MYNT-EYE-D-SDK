@@ -22,29 +22,53 @@
 #include "util/counter.h"
 #include "util/cv_painter.h"
 
+MYNTEYE_USE_NAMESPACE
+
 int main(int argc, char const* argv[]) {
-  mynteye::Camera cam;
-  mynteye::DeviceInfo dev_info;
-  if (!mynteye::util::select(cam, &dev_info)) {
+  Camera cam;
+  DeviceInfo dev_info;
+  if (!util::select(cam, &dev_info)) {
     return 1;
   }
-  mynteye::util::print_stream_infos(cam, dev_info.index);
+  util::print_stream_infos(cam, dev_info.index);
 
   std::cout << "Open device: " << dev_info.index << ", "
       << dev_info.name << std::endl << std::endl;
 
-  // Warning: Color stream format MJPG doesn't work.
-  mynteye::OpenParams params(dev_info.index);
-  // params.color_mode = mynteye::ColorMode::COLOR_RECTIFIED;
-  // params.depth_mode = mynteye::DepthMode::DEPTH_GRAY;
-  params.depth_mode = mynteye::DepthMode::DEPTH_COLORFUL;
-  // params.stream_mode = mynteye::StreamMode::STREAM_640x480;
-  params.stream_mode = mynteye::StreamMode::STREAM_2560x720;
-  params.ir_intensity = 4;
-  params.framerate = 30;
+  OpenParams params(dev_info.index);
+  {
+    // Framerate: 10(default), [0,60], [0,30](STREAM_2560x720)
+    params.framerate = 30;
 
-  cam.EnableImageType(mynteye::ImageType::ALL);
-  // cam.EnableImuProcessMode(mynteye::ProcessMode::ALL);
+    // Color mode: raw(default), rectified
+    // params.color_mode = ColorMode::COLOR_RECTIFIED;
+
+    // Depth mode: colorful(default), gray, raw
+    // params.depth_mode = DepthMode::DEPTH_GRAY;
+
+    // Stream mode: left color only
+    // params.stream_mode = StreamMode::STREAM_640x480;  // vga
+    // params.stream_mode = StreamMode::STREAM_1280x720;  // hd
+    // Stream mode: left+right color
+    // params.stream_mode = StreamMode::STREAM_1280x480;  // vga
+    params.stream_mode = StreamMode::STREAM_2560x720;  // hd
+
+    // Auto-exposure: true(default), false
+    // params.state_ae = false;
+
+    // Auto-white balance: true(default), false
+    // params.state_awb = false;
+
+    // Infrared intensity: 0(default), [0,6]
+    params.ir_intensity = 4;
+  }
+
+  // Enable what process logics
+  // cam.EnableProcessMode(ProcessMode::PROC_IMU_ALL);
+
+  // Enable what stream datas: left_color, right_color, depth
+  cam.EnableStreamData(ImageType::IMAGE_ALL);
+
   cam.Open(params);
 
   std::cout << std::endl;
@@ -60,24 +84,36 @@ int main(int argc, char const* argv[]) {
   cv::namedWindow("right color");
   cv::namedWindow("depth");
 
-  mynteye::util::Counter counter;
+  util::Counter counter;
   for (;;) {
     counter.Update();
 
-    auto left_color = cam.RetrieveImage(mynteye::ImageType::IMAGE_LEFT_COLOR);
-    auto right_color = cam.RetrieveImage(mynteye::ImageType::IMAGE_RIGHT_COLOR);
-    auto image_depth = cam.RetrieveImage(mynteye::ImageType::IMAGE_DEPTH);
-    if (left_color.img && right_color.img) {
-      cv::Mat left = left_color.img->To(mynteye::ImageFormat::COLOR_BGR)->ToMat();
-      cv::Mat right = right_color.img->To(mynteye::ImageFormat::COLOR_BGR)->ToMat();
-      mynteye::util::draw(left, mynteye::util::to_string(counter.fps(), 5, 1),
-          mynteye::util::TOP_RIGHT);
+    auto left_color = cam.RetrieveImage(ImageType::IMAGE_LEFT_COLOR);
+    if (left_color.img) {
+      cv::Mat left = left_color.img->To(ImageFormat::COLOR_BGR)->ToMat();
+      util::draw(left, util::to_string(counter.fps(), 5, 1),
+          util::TOP_RIGHT);
       cv::imshow("left color", left);
-	  cv::imshow("right color", right);
+      // std::cout << "left frame id: " << left_color.img->frame_id()
+      //     << std::endl;
     }
+
+    if (util::is_right_color_supported(params.stream_mode)) {
+      auto right_color = cam.RetrieveImage(ImageType::IMAGE_RIGHT_COLOR);
+      if (right_color.img) {
+        cv::Mat right = right_color.img->To(ImageFormat::COLOR_BGR)->ToMat();
+        cv::imshow("right color", right);
+        // std::cout << "right frame id: " << right_color.img->frame_id()
+        //     << std::endl;
+      }
+    }
+
+    auto image_depth = cam.RetrieveImage(ImageType::IMAGE_DEPTH);
     if (image_depth.img) {
-      cv::Mat depth = image_depth.img->To(mynteye::ImageFormat::DEPTH_BGR)->ToMat();
+      cv::Mat depth = image_depth.img->To(ImageFormat::DEPTH_BGR)->ToMat();
       cv::imshow("depth", depth);
+      // std::cout << "depth frame id: " << image_depth.img->frame_id()
+      //     << std::endl;
     }
 
     char key = static_cast<char>(cv::waitKey(1));

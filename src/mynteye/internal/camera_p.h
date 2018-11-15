@@ -33,17 +33,10 @@ MYNTEYE_BEGIN_NAMESPACE
 class Device;
 class Channels;
 class Motions;
+class Streams;
 
 class MYNTEYE_API CameraPrivate {
  public:
-  using stream_data_t = StreamData;
-  using stream_datas_t = std::vector<stream_data_t>;
-  using motion_data_t = MotionData;
-  using motion_datas_t = std::vector<motion_data_t>;
-
-  using img_info_data_t = ImgInfoData;
-  using img_info_datas_t = std::vector<img_info_data_t>;
-
   CameraPrivate();
   ~CameraPrivate();
 
@@ -93,6 +86,26 @@ class MYNTEYE_API CameraPrivate {
   void EnableProcessMode(const std::int32_t& mode);
 
   /**
+   * Enable image infos.
+   *
+   * If sync is false, indicates only can get infos from callback.
+   * If sync is true, indicates can get infos from callback or access it from StreamData.
+   */
+  void EnableImageInfo(bool sync);
+
+  /** Enable stream data of certain image type */
+  void EnableStreamData(const ImageType& type);
+  /** Whethor stream data of certain image type enabled or not */
+  bool IsStreamDataEnabled(const ImageType& type);
+  /** Has any stream data enabled */
+  bool HasStreamDataEnabled();
+
+  /** Get latest stream data */
+  StreamData GetStreamData(const ImageType& type);
+  /** Get cached stream datas */
+  std::vector<StreamData> GetStreamDatas(const ImageType& type);
+
+  /**
    * Enable motion datas.
    *
    * If max_size <= 0, indicates only can get datas from callback.
@@ -112,24 +125,6 @@ class MYNTEYE_API CameraPrivate {
   /** @deprecated Get camera calibration file */
   void GetCameraCalibrationFile(const StreamMode& stream_mode,
                                 const std::string& filename);
-
-  // todo
-
-  void EnableImageType(const ImageType& type);
-
-  /** Get datas of stream and status */
-  stream_datas_t RetrieveImage(const ImageType& type, ErrorCode* code);
-  /** Get the latest data of stream and status */
-  stream_data_t RetrieveLatestImage(const ImageType& type, ErrorCode* code);
-
-  /** Start capture image */
-  void StartCaptureImage();
-  /** Stop capture image */
-  void StopCaptureImage();
-  /** Start synthetic image */
-  void StartSyntheticImage();
-  /** Stop synthetic image */
-  void StopSyntheticImage();
 
  protected:
   std::shared_ptr<Channels> channels() const {
@@ -151,14 +146,10 @@ class MYNTEYE_API CameraPrivate {
   /** Stop data tracking */
   void StopDataTracking();
 
-  /** Callback of imu data */
-  void ImuDataCallback(const ImuDataPacket &packet);
-  /** Callback of image info */
-  void ImageInfoCallback(const ImgInfoPacket &packet);
-
   std::shared_ptr<Device> device_;
   std::shared_ptr<Channels> channels_;
   std::shared_ptr<Motions> motions_;
+  std::shared_ptr<Streams> streams_;
 
   std::shared_ptr<device::Descriptors> descriptors_;
   std::shared_ptr<MotionIntrinsics> motion_intrinsics_;
@@ -166,48 +157,6 @@ class MYNTEYE_API CameraPrivate {
 
   std::shared_ptr<StreamIntrinsics> stream_intrinsics_;
   std::shared_ptr<StreamExtrinsics> stream_extrinsics_;
-
- private:
-  void SyntheticImageColor();
-  void SyntheticImageDepth();
-  void OldSyntheticImageColor();
-  void CaptureImageColor(ErrorCode *code);
-  void CaptureImageDepth(ErrorCode *code);
-
-  void TransferColor(Image::pointer color, img_info_data_t info);
-  void CutPart(ImageType type, Image::pointer color, img_info_data_t info);
-  void OldTransferColor(Image::pointer color);
-  void OldCutPart(ImageType type, Image::pointer color);
-
-  Image::pointer RetrieveImageColor(ErrorCode* code);
-  Image::pointer RetrieveImageDepth(ErrorCode* code);
-
-  std::mutex mtx_img_info_;
-  img_info_datas_t img_info_;
-  img_info_datas_t cache_image_info_;
-
-  std::mutex cap_color_mtx_;
-  std::mutex cap_depth_mtx_;
-
-  std::thread cap_image_thread_;
-  std::thread sync_thread_;
-
-  std::condition_variable image_color_wait_;
-  std::condition_variable image_depth_wait_;
-
-  std::vector<Image::pointer> image_color_;
-  std::vector<Image::pointer> image_depth_;
-  stream_datas_t color_data_;
-  stream_datas_t left_color_data_;
-  stream_datas_t right_color_data_;
-  stream_datas_t depth_data_;
-  bool is_capture_image_ = false;
-  bool is_synthetic_image_ = false;
-
-  bool is_start_ = false;
-
-  std::map<ImageType, bool> is_enable_image_;
-  StreamMode stream_mode_;
 };
 
 MYNTEYE_END_NAMESPACE

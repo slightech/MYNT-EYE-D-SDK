@@ -95,6 +95,26 @@ class MYNTEYE_API Camera {
   void EnableProcessMode(const std::int32_t& mode);
 
   /**
+   * Enable image infos.
+   *
+   * If sync is false, indicates only can get infos from callback.
+   * If sync is true, indicates can get infos from callback or access it from StreamData.
+   */
+  void EnableImageInfo(bool sync);
+
+  /** Enable stream data of certain image type */
+  void EnableStreamData(const ImageType& type);
+  /** Whethor stream data of certain image type enabled or not */
+  bool IsStreamDataEnabled(const ImageType& type);
+  /** Has any stream data enabled */
+  bool HasStreamDataEnabled();
+
+  /** Get latest stream data */
+  StreamData GetStreamData(const ImageType& type);
+  /** Get cached stream datas */
+  std::vector<StreamData> GetStreamDatas(const ImageType& type);
+
+  /**
    * Enable motion datas.
    *
    * If max_size <= 0, indicates only can get datas from callback.
@@ -109,22 +129,6 @@ class MYNTEYE_API Camera {
 
   /** Close the camera */
   void Close();
-
-  // todo
-
-  /** Enable image of type */
-  void EnableImageType(const ImageType& type);
-
-  /** Get datas of stream */
-  std::vector<mynteye::StreamData> RetrieveImages(const ImageType& type);
-  /** Get datas of stream and status */
-  std::vector<mynteye::StreamData> RetrieveImages(
-    const ImageType& type, ErrorCode* code);
-
-  /** Get the latest data of stream. */
-  mynteye::StreamData RetrieveImage(const ImageType& type);
-  /** Get the latest data of stream and status */
-  mynteye::StreamData RetrieveImage(const ImageType& type, ErrorCode* code);
 
 #ifdef MYNTEYE_DEPRECATED_COMPAT
   // @Deprecated
@@ -166,6 +170,20 @@ class MYNTEYE_API Camera {
 
   /** @deprecated Replaced by EnableProcessMode() */
   void EnableImuProcessMode(const ProcessMode &mode);
+
+  /** @deprecated Replaced by EnableStreamData() */
+  void EnableImageType(const ImageType& type);
+
+  /** @deprecated Replaced by GetStreamData() */
+  mynteye::StreamData RetrieveImage(const ImageType& type);
+  /** @deprecated Replaced by GetStreamData() */
+  mynteye::StreamData RetrieveImage(const ImageType& type, ErrorCode* code);
+
+  /** @deprecated Replaced by GetStreamDatas() */
+  std::vector<mynteye::StreamData> RetrieveImages(const ImageType& type);
+  /** @deprecated Replaced by GetStreamDatas() */
+  std::vector<mynteye::StreamData> RetrieveImages(
+    const ImageType& type, ErrorCode* code);
 
   /** @deprecated Replaced by GetMotionDatas() */
   std::vector<MotionData> RetrieveMotions();

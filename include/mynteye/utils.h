@@ -27,6 +27,9 @@ bool select(const Camera& cam, DeviceInfo* info);
 MYNTEYE_API
 void print_stream_infos(const Camera& cam, const std::int32_t& dev_index);
 
+MYNTEYE_API
+bool is_right_color_supported(const StreamMode& mode);
+
 }  // namespace util
 
 MYNTEYE_END_NAMESPACE

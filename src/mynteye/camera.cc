@@ -105,6 +105,30 @@ void Camera::EnableProcessMode(const std::int32_t& mode) {
   p_->EnableProcessMode(mode);
 }
 
+void Camera::EnableImageInfo(bool sync) {
+  p_->EnableImageInfo(sync);
+}
+
+void Camera::EnableStreamData(const ImageType& type) {
+  p_->EnableStreamData(type);
+}
+
+bool Camera::IsStreamDataEnabled(const ImageType& type) {
+  return p_->IsStreamDataEnabled(type);
+}
+
+bool Camera::HasStreamDataEnabled() {
+  return p_->HasStreamDataEnabled();
+}
+
+StreamData Camera::GetStreamData(const ImageType& type) {
+  return std::move(p_->GetStreamData(type));
+}
+
+std::vector<StreamData> Camera::GetStreamDatas(const ImageType& type) {
+  return std::move(p_->GetStreamDatas(type));
+}
+
 void Camera::EnableMotionDatas(std::size_t max_size) {
   p_->EnableMotionDatas(std::move(max_size));
 }
@@ -115,32 +139,6 @@ std::vector<MotionData> Camera::GetMotionDatas() {
 
 void Camera::Close() {
   p_->Close();
-}
-
-// todo
-
-void Camera::EnableImageType(const ImageType& type) {
-  p_->EnableImageType(type);
-}
-
-std::vector<mynteye::StreamData> Camera::RetrieveImages(const ImageType& type) {
-  ErrorCode code = ErrorCode::SUCCESS;
-  return RetrieveImages(type, &code);
-}
-
-std::vector<mynteye::StreamData> Camera::RetrieveImages(
-    const ImageType& type, ErrorCode* code) {
-  return p_->RetrieveImage(type, code);
-}
-
-mynteye::StreamData Camera::RetrieveImage(const ImageType& type) {
-  ErrorCode code = ErrorCode::SUCCESS;
-  return RetrieveImage(type, &code);
-}
-
-mynteye::StreamData Camera::RetrieveImage(const ImageType& type,
-    ErrorCode* code) {
-  return p_->RetrieveLatestImage(type, code);
 }
 
 #ifdef MYNTEYE_DEPRECATED_COMPAT
@@ -192,6 +190,40 @@ void Camera::SetCalibrationWithFile(const std::string &file_name) {
 
 void Camera::EnableImuProcessMode(const ProcessMode &mode) {
   EnableProcessMode(mode);
+}
+
+void Camera::EnableImageType(const ImageType& type) {
+  EnableStreamData(type);
+}
+
+StreamData Camera::RetrieveImage(const ImageType& type) {
+  ErrorCode code = ErrorCode::SUCCESS;
+  return RetrieveImage(type, &code);
+}
+
+StreamData Camera::RetrieveImage(const ImageType& type,
+    ErrorCode* code) {
+  if (!IsOpened()) {
+    *code = ErrorCode::ERROR_CAMERA_NOT_OPENED;
+    return {};
+  }
+  *code = ErrorCode::SUCCESS;
+  return GetStreamData(type);
+}
+
+std::vector<StreamData> Camera::RetrieveImages(const ImageType& type) {
+  ErrorCode code = ErrorCode::SUCCESS;
+  return RetrieveImages(type, &code);
+}
+
+std::vector<StreamData> Camera::RetrieveImages(
+    const ImageType& type, ErrorCode* code) {
+  if (!IsOpened()) {
+    *code = ErrorCode::ERROR_CAMERA_NOT_OPENED;
+    return {};
+  }
+  *code = ErrorCode::SUCCESS;
+  return GetStreamDatas(type);
 }
 
 std::vector<MotionData> Camera::RetrieveMotions() {
