@@ -11,47 +11,21 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#include <string.h>
-#include <fstream>
+#include "mynteye/internal/camera_p.h"
 
 #include <stdexcept>
 #include <string>
 #include <chrono>
+#include <utility>
 
 #include "mynteye/data/channels.h"
 #include "mynteye/device/device.h"
-#include "mynteye/internal/camera_p.h"
+#include "mynteye/internal/motions.h"
 #include "mynteye/util/log.h"
 #include "mynteye/util/rate.h"
 #include "mynteye/util/times.h"
 
 MYNTEYE_USE_NAMESPACE
-
-namespace {
-
-void matrix_3x1(const double (*src1)[3], const double (*src2)[1],
-    double (*dst)[1]) {
-  for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 1; j++) {
-      for (int k = 0; k < 3; k++) {
-        dst[i][j] += src1[i][k] * src2[k][j];
-      }
-    }
-  }
-}
-
-void matrix_3x3(const double (*src1)[3], const double (*src2)[3],
-    double (*dst)[3]) {
-  for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 3; j++) {
-      for (int k = 0; k < 3; k++) {
-        dst[i][j] += src1[i][k] * src2[k][j];
-      }
-    }
-  }
-}
-
-}  // namespace
 
 CameraPrivate::CameraPrivate() : device_(std::make_shared<Device>()) {
   DBG_LOGD(__func__);
@@ -63,14 +37,11 @@ void CameraPrivate::Init() {
                       {ImageType::IMAGE_RIGHT_COLOR, false},
                       {ImageType::IMAGE_DEPTH, false}};
 
-  is_process_mode_ = {{ProcessMode::ASSEMBLY, false},
-                      {ProcessMode::WARM_DRIFT, false},
-                      {ProcessMode::ALL, false}};
-
   channels_ = std::make_shared<Channels>();
   if (channels_->IsAvaliable()) {
     ReadDeviceFlash();
   }
+  motions_ = std::make_shared<Motions>();
 }
 
 CameraPrivate::~CameraPrivate() {
@@ -145,38 +116,6 @@ std::string CameraPrivate::GetDescriptor(const Descriptor &desc) const {
   }
 }
 
-CameraCalibration CameraPrivate::GetCameraCalibration(
-    const StreamMode& stream_mode) {
-  return device_->GetCameraCalibration(stream_mode);
-}
-
-void CameraPrivate::GetCameraCalibrationFile(
-    const StreamMode& stream_mode, const std::string& filename) {
-  return device_->GetCameraCalibrationFile(stream_mode, filename);
-}
-
-bool CameraPrivate::WriteCameraCalibrationBinFile(const std::string& filename) {
-  return device_->SetCameraCalibrationBinFile(filename);
-}
-
-MotionIntrinsics CameraPrivate::GetMotionIntrinsics() const {
-  if (motion_intrinsics_) {
-    return *motion_intrinsics_;
-  } else {
-    LOGE("Error: Motion intrinsics not found");
-    return {};
-  }
-}
-
-MotionExtrinsics CameraPrivate::GetMotionExtrinsics() const {
-  if (motion_extrinsics_) {
-    return *motion_extrinsics_;
-  } else {
-    LOGE("Error: Motion extrinsics not found");
-    return {};
-  }
-}
-
 StreamIntrinsics CameraPrivate::GetStreamIntrinsics(
     const StreamMode& stream_mode) {
   if (!stream_intrinsics_) {
@@ -220,6 +159,28 @@ StreamExtrinsics CameraPrivate::GetStreamExtrinsics(
   return *stream_extrinsics_;
 }
 
+bool CameraPrivate::WriteCameraCalibrationBinFile(const std::string& filename) {
+  return device_->SetCameraCalibrationBinFile(filename);
+}
+
+MotionIntrinsics CameraPrivate::GetMotionIntrinsics() const {
+  if (motion_intrinsics_) {
+    return *motion_intrinsics_;
+  } else {
+    LOGE("Error: Motion intrinsics not found");
+    return {};
+  }
+}
+
+MotionExtrinsics CameraPrivate::GetMotionExtrinsics() const {
+  if (motion_extrinsics_) {
+    return *motion_extrinsics_;
+  } else {
+    LOGE("Error: Motion extrinsics not found");
+    return {};
+  }
+}
+
 bool CameraPrivate::WriteDeviceFlash(
     device::Descriptors *desc,
     device::ImuParams *imu_params,
@@ -231,6 +192,23 @@ bool CameraPrivate::WriteDeviceFlash(
   return channels_->SetFiles(desc, imu_params, spec_version);
 }
 
+void CameraPrivate::EnableProcessMode(const ProcessMode& mode) {
+  EnableProcessMode(static_cast<std::int32_t>(mode));
+}
+
+void CameraPrivate::EnableProcessMode(const std::int32_t& mode) {
+  motions_->EnableProcessMode(mode);
+}
+
+void CameraPrivate::EnableMotionDatas(std::size_t max_size) {
+  motions_->EnableMotionDatas(std::move(max_size));
+  StartDataTracking();
+}
+
+std::vector<MotionData> CameraPrivate::GetMotionDatas() {
+  return std::move(motions_->GetMotionDatas());
+}
+
 void CameraPrivate::Close() {
   if (device_->IsOpened()) {
     StopCaptureImage();
@@ -238,6 +216,16 @@ void CameraPrivate::Close() {
     StopDataTracking();
   }
   device_->Close();
+}
+
+CameraCalibration CameraPrivate::GetCameraCalibration(
+    const StreamMode& stream_mode) {
+  return device_->GetCameraCalibration(stream_mode);
+}
+
+void CameraPrivate::GetCameraCalibrationFile(
+    const StreamMode& stream_mode, const std::string& filename) {
+  return device_->GetCameraCalibrationFile(stream_mode, filename);
 }
 
 // ...
@@ -284,6 +272,7 @@ void CameraPrivate::SetMotionIntrinsics(const MotionIntrinsics &in) {
     motion_intrinsics_ = std::make_shared<MotionIntrinsics>();
   }
   *motion_intrinsics_ = in;
+  motions_->SetMotionIntrinsics(motion_intrinsics_);
 }
 
 void CameraPrivate::SetMotionExtrinsics(const MotionExtrinsics &ex) {
@@ -294,17 +283,21 @@ void CameraPrivate::SetMotionExtrinsics(const MotionExtrinsics &ex) {
 }
 
 bool CameraPrivate::StartDataTracking() {
-  if (!channels_->IsAvaliable()) {
+  // if (!IsOpened()) return false;  // ensure start after opened
+  // if (!motions_->IsMotionDatasEnabled() && ..) return false;
+  if (channels_->IsHidTracking()) return true;
+
+  if (!channels_->IsHidAvaliable()) {
     LOGW("Data channel is unavaliable, could not track device datas.");
     return false;
   }
-  channels_->SetImuDataCallback(std::bind(&CameraPrivate::ImuDataCallback,
-        this, std::placeholders::_1));
+
+  channels_->SetImuDataCallback(std::bind(&Motions::ImuDataCallback,
+        motions_, std::placeholders::_1));
   channels_->SetImgInfoCallback(std::bind(&CameraPrivate::ImageInfoCallback,
         this, std::placeholders::_1));
-  bool hid_tracking = channels_->StartHidTracking();
-  if (hid_tracking) is_imu_open_ = true;
-  return hid_tracking;
+
+  return channels_->StartHidTracking();
 }
 
 void CameraPrivate::StopDataTracking() {
@@ -564,51 +557,6 @@ void CameraPrivate::StopSyntheticImage() {
   sync_thread_.join();
 }
 
-void CameraPrivate::ImuDataCallback(const ImuDataPacket &packet) {
-  auto &&imu = std::make_shared<ImuData>();
-  imu->flag = packet.flag;
-  imu->temperature = static_cast<double>(packet.temperature * 0.125 + 23);
-  imu->timestamp = packet.timestamp;
-
-  if (imu->flag == 1) {
-    imu->accel[0] = packet.accel_or_gyro[0] * 12.f / 0x10000;
-    imu->accel[1] = packet.accel_or_gyro[1] * 12.f / 0x10000;
-    imu->accel[2] = packet.accel_or_gyro[2] * 12.f / 0x10000;
-    imu->gyro[0] = 0;
-    imu->gyro[1] = 0;
-    imu->gyro[2] = 0;
-  } else if (imu->flag == 2) {
-    imu->accel[0] = 0;
-    imu->accel[1] = 0;
-    imu->accel[2] = 0;
-    imu->gyro[0] = packet.accel_or_gyro[0] * 2000.f / 0x10000;
-    imu->gyro[1] = packet.accel_or_gyro[1] * 2000.f / 0x10000;
-    imu->gyro[2] = packet.accel_or_gyro[2] * 2000.f / 0x10000;
-  } else {
-    LOGW("Unaccpected imu, flag=%d is wrong", imu->flag);
-    return;
-  }
-
-  if (is_process_mode_[ProcessMode::ASSEMBLY]) {
-    ScaleAssemCompensate(imu);
-  } else if (is_process_mode_[ProcessMode::WARM_DRIFT]) {
-    TempCompensate(imu);
-  } else if (is_process_mode_[ProcessMode::ALL]) {
-    TempCompensate(imu);
-    ScaleAssemCompensate(imu);
-  }
-
-  ++motion_count_;
-  if (motion_count_ > 20) {
-    motion_data_t tmp = {imu};
-    cache_imu_data_.push_back(tmp);
-    std::lock_guard<std::mutex> _(mtx_imu_);
-    imu_data_.insert(imu_data_.end(), cache_imu_data_.begin(),
-        cache_imu_data_.end());
-    cache_imu_data_.clear();
-  }
-}
-
 void CameraPrivate::ImageInfoCallback(const ImgInfoPacket &packet) {
   auto &&img_info = std::make_shared<ImgInfo>();
 
@@ -622,16 +570,6 @@ void CameraPrivate::ImageInfoCallback(const ImgInfoPacket &packet) {
   std::lock_guard<std::mutex> _(mtx_img_info_);
   img_info_.insert(img_info_.end(), cache_image_info_.begin(), cache_image_info_.end());
   cache_image_info_.clear();
-}
-
-std::vector<MotionData> CameraPrivate::GetImuDatas() {
-  if (!is_imu_open_)
-    LOGE("Imu is not opened !");
-
-  std::lock_guard<std::mutex> _(mtx_imu_);
-  motion_datas_t tmp = imu_data_;
-  imu_data_.clear();
-  return tmp;
 }
 
 void CameraPrivate::EnableImageType(const ImageType& type) {
@@ -653,78 +591,6 @@ void CameraPrivate::EnableImageType(const ImageType& type) {
       break;
     default:
       LOGE("EnableImageType:: ImageType is unknown.");
-  }
-}
-
-void CameraPrivate::EnableImuProcessMode(const ProcessMode &mode) {
-  switch (mode) {
-    case ProcessMode::ASSEMBLY:
-      is_process_mode_[mode] = true;
-      break;
-    case ProcessMode::WARM_DRIFT:
-      is_process_mode_[mode] = true;
-      break;
-    case ProcessMode::ALL:
-      is_process_mode_[mode] = true;
-      break;
-    default:
-      break;
-  }
-}
-
-void CameraPrivate::TempCompensate(std::shared_ptr<ImuData> data) {
-  if (nullptr == motion_intrinsics_) {
-    return;
-  }
-
-  double temp = data->temperature;
-  if (data->flag == 1) {
-    data->accel[0] -= motion_intrinsics_->accel.x[1] * temp
-      + motion_intrinsics_->accel.x[0];
-    data->accel[1] -= motion_intrinsics_->accel.y[1] * temp
-      + motion_intrinsics_->accel.y[0];
-    data->accel[2] -= motion_intrinsics_->accel.z[1] * temp
-      + motion_intrinsics_->accel.z[0];
-  } else if (data->flag == 2) {
-    data->gyro[0] -= motion_intrinsics_->gyro.x[1] * temp
-      + motion_intrinsics_->gyro.x[0];
-    data->gyro[1] -= motion_intrinsics_->gyro.y[1] * temp
-      + motion_intrinsics_->gyro.y[0];
-    data->gyro[2] -= motion_intrinsics_->gyro.z[1] * temp
-      + motion_intrinsics_->gyro.z[0];
-  }
-}
-
-void CameraPrivate::ScaleAssemCompensate(std::shared_ptr<ImuData> data) {
-  if (nullptr == motion_intrinsics_) {
-    return;
-  }
-
-  double dst[3][3] = {0};
-  if (data->flag == 1) {
-    matrix_3x3(motion_intrinsics_->accel.scale,
-        motion_intrinsics_->accel.assembly, dst);
-    double s[3][1] = {0};
-    double d[3][1] = {0};
-    for (int i = 0; i < 3; i++) {
-      s[i][0] = data->accel[i];
-    }
-    matrix_3x1(dst, s, d);
-    for (int i = 0; i < 3; i++) {
-      data->accel[i] = d[i][0];
-    }
-  } else if (data->flag == 2) {
-    matrix_3x3(motion_intrinsics_->gyro.scale,
-        motion_intrinsics_->gyro.assembly, dst);
-    double s[3][1] = {0};
-    double d[3][1] = {0};
-    for (int i = 0; i < 3; i++) {
-      s[i][0] = data->gyro[i];
-    }
-    matrix_3x1(dst, s, d);
-    for (int i = 0; i < 3; i++) {
-      data->gyro[i] = d[i][0];
-    }
   }
 }
 

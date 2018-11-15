@@ -37,6 +37,9 @@ int main(int argc, char const* argv[]) {
   mynteye::OpenParams params(dev_info.index);
   cam.Open(params);
 
+  // Enable this will cache the motion datas until you get them
+  cam.EnableMotionDatas();
+
   std::cout << std::endl;
   if (!cam.IsOpened()) {
     std::cerr << "Error: Open camera failed" << std::endl;
@@ -50,7 +53,7 @@ int main(int argc, char const* argv[]) {
   for (;;) {
     counter.Update();
 
-    auto motion_datas = cam.RetrieveMotions();
+    auto motion_datas = cam.GetMotionDatas();
     if (motion_datas.size() > 0) {
       std::cout << "Imu count: " << motion_datas.size() << std::endl;
       for (auto data : motion_datas) {
@@ -78,8 +81,6 @@ int main(int argc, char const* argv[]) {
       }
       std::cout << std::endl;
     }
-
-    cam.Wait();  // keep frequency
   }
 
   cam.Close();

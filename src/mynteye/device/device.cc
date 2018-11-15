@@ -417,9 +417,6 @@ bool Device::SetCameraCalibrationBinFile(const std::string& filename) {
   return ok;
 }
 
-void Device::Wait() {
-}
-
 void Device::Close() {
   if (dev_sel_info_.index != -1) {
     EtronDI_CloseDevice(etron_di_, &dev_sel_info_);

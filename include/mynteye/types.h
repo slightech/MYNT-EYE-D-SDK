@@ -15,6 +15,8 @@
 #define MYNTEYE_TYPES_H_
 #pragma once
 
+#include <cstdint>
+
 #include "mynteye/device/types.h"
 #include "mynteye/types_data.h"
 
@@ -58,7 +60,7 @@ enum class ErrorCode : std::int32_t {
  * @ingroup enumerations
  * @brief The descriptor fields.
  */
-enum class Descriptor : std::uint8_t {
+enum class Descriptor : std::int32_t {
   /** Device name */
   DEVICE_NAME,
   /** Serial number */
@@ -76,18 +78,32 @@ enum class Descriptor : std::uint8_t {
   /** Nominal baseline */
   NOMINAL_BASELINE,
   /** Last guard */
-  LAST
+  DESC_LAST
 };
 
 /**
  * @ingroup enumerations
- * @brief IMU process modes.
+ * @brief Process modes.
  */
-enum class ProcessMode : std::uint8_t {
-  ASSEMBLY,
-  WARM_DRIFT,
-  ALL
+enum class ProcessMode : std::int32_t {
+  PROC_NONE           = 0,
+  PROC_IMU_ASSEMBLY   = 1,
+  PROC_IMU_WARM_DRIFT = 2,
+  PROC_IMU_ALL        = PROC_IMU_ASSEMBLY | PROC_IMU_WARM_DRIFT
 };
+
+inline
+std::int32_t operator&(const std::int32_t& lhs, const ProcessMode& rhs) {
+  return lhs & static_cast<std::int32_t>(rhs);
+}
+inline
+std::int32_t operator&(const ProcessMode& lhs, const std::int32_t& rhs) {
+  return static_cast<std::int32_t>(lhs) & rhs;
+}
+inline
+std::int32_t operator&(const ProcessMode& lhs, const ProcessMode& rhs) {
+  return static_cast<std::int32_t>(lhs) & static_cast<std::int32_t>(rhs);
+}
 
 MYNTEYE_END_NAMESPACE
 

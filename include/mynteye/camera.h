@@ -16,6 +16,7 @@
 #pragma once
 
 #include <cstdint>
+#include <limits>
 #include <memory>
 #include <vector>
 #include <string>
@@ -88,8 +89,16 @@ class MYNTEYE_API Camera {
       device::ImuParams *imu_params,
       Version *spec_version = nullptr);
 
-  /** Wait according to framerate */
-  void Wait() const;
+  /** Enable process mode, e.g. imu assembly, warm_drift */
+  void EnableProcessMode(const ProcessMode& mode);
+  /** Enable process mode, e.g. imu assembly, warm_drift */
+  void EnableProcessMode(const std::int32_t& mode);
+
+  /** Enable cache motion datas, then get them using GetMotionDatas() */
+  void EnableMotionDatas(
+      std::size_t max_size = std::numeric_limits<std::size_t>::max());
+  /** Get cached motion datas. Besides, you can also get them from callback */
+  std::vector<MotionData> GetMotionDatas();
 
   /** Close the camera */
   void Close();
@@ -110,12 +119,6 @@ class MYNTEYE_API Camera {
   /** Get the latest data of stream and status */
   mynteye::StreamData RetrieveImage(const ImageType& type, ErrorCode* code);
 
-  /** Get Motion Data */
-  std::vector<mynteye::MotionData> RetrieveMotions();
-
-  /** Set imu data process mode */
-  void EnableImuProcessMode(const ProcessMode &mode);
-
 #ifdef MYNTEYE_DEPRECATED_COMPAT
   // @Deprecated
 
@@ -132,6 +135,9 @@ class MYNTEYE_API Camera {
 
   /** @deprecated Useless */
   // StreamMode GetStreamMode();
+
+  /** @deprecated Useless */
+  void Wait() const;
 
   /** @deprecated Replaced by GetDescriptor() */
   std::string GetInfo(const Info &info) const;
@@ -150,6 +156,12 @@ class MYNTEYE_API Camera {
 
   /** @deprecated Replaced by WriteCameraCalibrationBinFile() */
   void SetCalibrationWithFile(const std::string& file_name);
+
+  /** @deprecated Replaced by EnableProcessMode() */
+  void EnableImuProcessMode(const ProcessMode &mode);
+
+  /** @deprecated Replaced by GetMotionDatas() */
+  std::vector<MotionData> RetrieveMotions();
 #endif
 
  private:

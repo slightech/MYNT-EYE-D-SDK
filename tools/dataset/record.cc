@@ -87,7 +87,7 @@ int main(int argc, char const *argv[]) {
     }
 
     t = static_cast<double>(cv::getTickCount());
-    auto &&motion_data = cam.RetrieveMotions();
+    auto &&motion_data = cam.GetMotionDatas();
     imu_count += motion_data.size();
 
     {
