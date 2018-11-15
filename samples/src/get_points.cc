@@ -96,31 +96,14 @@ int main(int argc, char const* argv[]) {
 
   mynteye::StreamMode streamMode = params.stream_mode;
 
-  if (streamMode == mynteye::StreamMode::STREAM_1280x720
-      || streamMode == mynteye::StreamMode::STREAM_2560x720) {
-    camera_cy = 254.9 * 2;
-  } else if (streamMode == mynteye::StreamMode::STREAM_1280x480
-      || streamMode == mynteye::StreamMode::STREAM_640x480) {
-    camera_cy = 254.9;
-  } else {
-    camera_cy = 0;
-  }
-
-  if (streamMode == mynteye::StreamMode::STREAM_1280x720
-      || streamMode == mynteye::StreamMode::STREAM_1280x480) {
-    camera_cx = 682.3;
-  } else if (streamMode == mynteye::StreamMode::STREAM_2560x720) {
-    camera_cx = 682.3 * 2;
-  } else if (streamMode == mynteye::StreamMode::STREAM_640x480) {
-    camera_cx = 682.3 / 2;
-  } else {
-    camera_cx = 0;
-  }
-
-  camera_fx = 979.8;
-  camera_fy = 942.8;
-
   cam.Open(params);
+
+  auto streamIntrinsics = cam.GetStreamIntrinsics(streamMode);
+
+  camera_cx = streamIntrinsics.left.cx;
+  camera_cy = streamIntrinsics.left.cy;
+  camera_fx = streamIntrinsics.left.fx;
+  camera_fy = streamIntrinsics.left.fy;
 
   std::cout << std::endl;
   if (!cam.IsOpened()) {
