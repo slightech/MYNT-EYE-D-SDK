@@ -125,7 +125,7 @@ void Streams::StartImageCapturing() {
 
   is_image_capturing_ = true;
   image_capture_thread_ = std::thread([this]() {
-    Rate rate(100);
+    Rate rate(device_->GetOpenParams().framerate);
     while (is_image_capturing_) {
       if (IsStreamDataEnabled(ImageType::IMAGE_LEFT_COLOR)
           || IsStreamDataEnabled(ImageType::IMAGE_RIGHT_COLOR)) {
