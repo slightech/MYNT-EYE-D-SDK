@@ -195,10 +195,12 @@ void Channels::DoHidTrack() {
     return;
   }
 
-  if (imu_callback_ && img_callback_) {
+  if (imu_callback_) {
     for (auto &&imu_packet : imu_packets) {
       imu_callback_(imu_packet);
     }
+  }
+  if (img_callback_) {
     for (auto &&img_packet : img_packets) {
       img_callback_(img_packet);
     }

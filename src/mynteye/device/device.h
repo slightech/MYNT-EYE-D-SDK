@@ -80,9 +80,6 @@ class Device {
   /** Set camera calibration bin file. */
   bool SetCameraCalibrationBinFile(const std::string& filename);
 
-  /** Wait according to framerate */
-  void Wait();
-
   /** Close device */
   void Close();
 
