@@ -286,17 +286,21 @@ void CameraPrivate::SetMotionExtrinsics(const MotionExtrinsics &ex) {
 bool CameraPrivate::StartDataTracking() {
   // if (!IsOpened()) return false;  // ensure start after opened
   // if (!motions_->IsMotionDatasEnabled() && ..) return false;
+
+  if (motions_->IsMotionDatasEnabled()) {
+    channels_->SetImuDataCallback(std::bind(&Motions::ImuDataCallback,
+        motions_, std::placeholders::_1));
+  }
+
+  channels_->SetImgInfoCallback(std::bind(&CameraPrivate::ImageInfoCallback,
+        this, std::placeholders::_1));
+
   if (channels_->IsHidTracking()) return true;
 
   if (!channels_->IsHidAvaliable()) {
     LOGW("Data channel is unavaliable, could not track device datas.");
     return false;
   }
-
-  channels_->SetImuDataCallback(std::bind(&Motions::ImuDataCallback,
-        motions_, std::placeholders::_1));
-  channels_->SetImgInfoCallback(std::bind(&CameraPrivate::ImageInfoCallback,
-        this, std::placeholders::_1));
 
   return channels_->StartHidTracking();
 }

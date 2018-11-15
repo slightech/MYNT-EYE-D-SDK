@@ -94,7 +94,14 @@ class MYNTEYE_API Camera {
   /** Enable process mode, e.g. imu assembly, warm_drift */
   void EnableProcessMode(const std::int32_t& mode);
 
-  /** Enable cache motion datas, then get them using GetMotionDatas() */
+  /**
+   * Enable motion datas.
+   *
+   * If max_size <= 0, indicates only can get datas from callback.
+   * If max_size > 0, indicates can get datas from callback or using GetMotionDatas().
+   *
+   * Note: if max_size > 0, the motion datas will be cached until you call GetMotionDatas().
+   */
   void EnableMotionDatas(
       std::size_t max_size = std::numeric_limits<std::size_t>::max());
   /** Get cached motion datas. Besides, you can also get them from callback */

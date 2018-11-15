@@ -122,14 +122,17 @@ void Motions::ImuDataCallback(const ImuDataPacket &packet) {
 
   std::lock_guard<std::mutex> _(mtx_datas_);
 
-  if (motion_datas_.size() > motion_datas_max_size_) {
-    motion_datas_.erase(motion_datas_.begin());
-  }
-
   data_t data = {imu};
-  if (is_motion_datas_enabled_) {
+
+  if (motion_datas_max_size_ > 0) {
+    // remove the first one if data is full
+    if (motion_datas_.size() > motion_datas_max_size_) {
+      motion_datas_.erase(motion_datas_.begin());
+    }
     motion_datas_.push_back(data);
   }
+
+  // callback
 }
 
 void Motions::ProcImuAssembly(std::shared_ptr<ImuData> data) const {
