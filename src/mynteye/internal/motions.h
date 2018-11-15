@@ -36,6 +36,14 @@ class Motions {
 
   void EnableProcessMode(const std::int32_t& mode);
 
+  /**
+   * Enable motion datas.
+   *
+   * If max_size <= 0, indicates only can get datas from callback.
+   * If max_size > 0, indicates can get datas from callback or using GetMotionDatas().
+   *
+   * Note: if max_size > 0, the motion datas will be cached until you call GetMotionDatas().
+   */
   void EnableMotionDatas(std::size_t max_size);
   bool IsMotionDatasEnabled();
 

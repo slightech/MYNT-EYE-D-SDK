@@ -29,6 +29,7 @@ int get_image_bpp(const ImageFormat& format) {
     case ImageFormat::IMAGE_GRAY_16: return 2;
     case ImageFormat::IMAGE_GRAY_24: return 3;
     case ImageFormat::IMAGE_YUYV: return 2;
+    // The valid size of MJPG will much smaller.
     case ImageFormat::IMAGE_MJPG: return 2;
     default: throw new std::runtime_error("ImageFormat not supported");
   }
@@ -53,22 +54,6 @@ int get_mat_type(const ImageFormat& format) {
 }
 #endif
 
-inline void copyLeft(const std::uint8_t *in, std::uint8_t *out,
-    int width, int height) {
-  for (int i = 0; i < height; i++) {
-    std::copy(in + i * width * 2,
-        in + (width - 1) + i * width * 2, out + i * width);
-  }
-}
-
-inline void copyRight(const std::uint8_t *in, std::uint8_t *out,
-    int width, int height) {
-  for (int i = 0; i < height; i++) {
-    std::copy(in + i * width * 2 + width,
-        in + (i + 1) * width * 2 - 1, out + i * width);
-  }
-}
-
 }  // namespace
 
 Image::Image(ImageType type, ImageFormat format, int width, int height,
@@ -78,11 +63,11 @@ Image::Image(ImageType type, ImageFormat format, int width, int height,
     width_(width),
     height_(height),
     is_buffer_(is_buffer),
+    frame_id_(0),
     raw_format_(format) {
   auto n = get_image_size(format, width, height);
   data_.assign(n, 0);
   set_valid_size(n);
-  set_frame_id(0);
 }
 
 Image::~Image() {
@@ -93,12 +78,20 @@ Image::pointer Image::Create(ImageType type, ImageFormat format, int width,
   switch (type) {
     case ImageType::IMAGE_LEFT_COLOR:
     case ImageType::IMAGE_RIGHT_COLOR:
-      return ImageColor::Create(format, width, height, is_buffer);
+      return ImageColor::Create(type, format, width, height, is_buffer);
     case ImageType::IMAGE_DEPTH:
       return ImageDepth::Create(format, width, height, is_buffer);
     default:
       throw new std::runtime_error("ImageType must be color or depth");
   }
+}
+
+void Image::set_valid_size(std::size_t valid_size) {
+  if (valid_size > data_size()) {
+    // resize data to valid size
+    data_.assign(valid_size, 0);
+  }
+  valid_size_ = valid_size;
 }
 
 #ifdef WITH_OPENCV
@@ -109,33 +102,11 @@ cv::Mat Image::ToMat() {
 
 Image::pointer Image::Clone() const {
   auto image = Create(type_, format_, width_, height_, false);
+  image->set_frame_id(frame_id_);
   image->set_valid_size(valid_size_);
-  image->set_frame_id(frame_id_);
-  image->resize();
-  std::copy(data_.begin(), data_.end(), image->data_.begin());
-  return image;
-}
-
-Image::pointer Image::CutPart(ImageType type) const {
-  auto image = Create(type_, format_, width_ / 2, height_, false);
-  image->set_valid_size(valid_size_ / 2);
-  image->set_frame_id(frame_id_);
-  image->resize();
-  switch (type) {
-    case ImageType::IMAGE_LEFT_COLOR:
-      // std::copy(data_.begin(), data_.begin() + (valid_size_ / 2 - 1),
-      //     image->data_.begin());
-      copyLeft(data_.data(), image->data(), width_, height_);
-      break;
-    case ImageType::IMAGE_RIGHT_COLOR:
-      // std::copy(data_.begin() + (valid_size_ / 2), data_.end(),
-      //     image->data_.begin());
-      copyRight(data_.data(), image->data(), width_, height_);
-      break;
-    default:
-      throw new std::runtime_error("Image:: ImageType is unknow.");
-  }
-
+  // The valid size of some compress format will much smaller, e.g. MJPG.
+  // Therefore, we could only copy valid data to another.
+  std::copy(data_.begin(), data_.begin() + valid_size_, image->data_.begin());
   return image;
 }
 
@@ -160,12 +131,22 @@ bool Image::ResetBuffer() {
 
 // ImageColor
 
-ImageColor::ImageColor(ImageFormat format, int width, int height,
-    bool is_buffer)
-  : Image(ImageType::IMAGE_LEFT_COLOR, format, width, height, is_buffer) {
+ImageColor::ImageColor(ImageType type, ImageFormat format, int width,
+    int height, bool is_buffer)
+  : Image(type, format, width, height, is_buffer) {
 }
 
 ImageColor::~ImageColor() {
+}
+
+ImageColor::pointer ImageColor::Create(ImageType type, ImageFormat format,
+    int width, int height, bool is_buffer) {
+  if (type == ImageType::IMAGE_LEFT_COLOR
+      || type == ImageType::IMAGE_RIGHT_COLOR) {
+    return pointer(new ImageColor(type, format, width, height, is_buffer));
+  } else {
+    throw new std::runtime_error("ImageType must be color");
+  }
 }
 
 Image::pointer ImageColor::To(ImageFormat format) {
