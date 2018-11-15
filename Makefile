@@ -40,7 +40,7 @@ submodules:
 
 # init
 
-init: submodules
+init:
 	@$(call echo,Make $@)
 	@$(SH) ./scripts/init.sh $(INIT_OPTIONS)
 
