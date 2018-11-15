@@ -84,7 +84,7 @@ Motions::datas_t Motions::GetMotionDatas() {
   return std::move(motion_datas_);
 }
 
-void Motions::ImuDataCallback(const ImuDataPacket &packet) {
+void Motions::OnImuDataCallback(const ImuDataPacket &packet) {
   auto &&imu = std::make_shared<ImuData>();
   imu->flag = packet.flag;
   imu->temperature = static_cast<double>(packet.temperature * 0.125 + 23);

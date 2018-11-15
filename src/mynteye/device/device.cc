@@ -286,9 +286,9 @@ bool Device::Open(const OpenParams& params) {
 
   if (params.ir_intensity >= 0) {
     if (SetInfraredIntensity(params.ir_intensity)) {
-      LOGI("-- IR intensity: %d", params.ir_intensity);
+      LOGI("\n-- IR intensity: %d", params.ir_intensity);
     } else {
-      LOGI("-- IR intensity: %d (failed)", params.ir_intensity);
+      LOGI("\n-- IR intensity: %d (failed)", params.ir_intensity);
     }
   }
 
@@ -335,6 +335,7 @@ bool Device::Open(const OpenParams& params) {
 #endif
 
   if (ETronDI_OK == ret) {
+    open_params_ = params;
     SyncCameraCalibrations();
     /*
     unsigned char pdata[100] = {};
@@ -353,8 +354,15 @@ bool Device::IsOpened() const {
   return dev_sel_info_.index != -1;
 }
 
-void Device::CheckOpened() const {
-  if (!IsOpened()) throw std::runtime_error("Error: Camera not opened.");
+void Device::CheckOpened(const std::string& event) const {
+  if (!IsOpened()) {
+    std::stringstream s;
+    s << "Error: Camera must be opened";
+    if (!event.empty()) {
+      s << ", before " << event;
+    }
+    throw_error(s.str());
+  }
 }
 
 bool Device::ExpectOpened(const std::string& event) const {
@@ -364,6 +372,10 @@ bool Device::ExpectOpened(const std::string& event) const {
     LOGW("Warning: Camera should be opened, before %s", event);
     return false;
   }
+}
+
+OpenParams Device::GetOpenParams() const {
+  return open_params_;
 }
 
 CameraCalibration Device::GetCameraCalibration(const StreamMode& stream_mode) {

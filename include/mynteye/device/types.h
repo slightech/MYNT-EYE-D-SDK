@@ -48,8 +48,8 @@ enum class DepthMode : std::int32_t {
  * @brief List stream modes.
  */
 enum class StreamMode : std::int32_t {
-  STREAM_640x480  = 0,  // 480p, vga, left+right
-  STREAM_1280x480 = 1,  // 480p, vga, left
+  STREAM_640x480  = 0,  // 480p, vga, left
+  STREAM_1280x480 = 1,  // 480p, vga, left+right
   STREAM_1280x720 = 2,  // 720p, hd, left
   STREAM_2560x720 = 3,  // 720p, hd, left+right
   STREAM_MODE_LAST
@@ -80,8 +80,13 @@ enum class ImageType : std::int32_t {
   /** Depth. */
   IMAGE_DEPTH,
   /** All. */
-  ALL,
+  IMAGE_ALL,
+  /** @deprecated */
+  ALL = IMAGE_ALL,
 };
+
+MYNTEYE_API
+std::ostream& operator<<(std::ostream& os, const ImageType& code);
 
 /**
  * @ingroup enumerations

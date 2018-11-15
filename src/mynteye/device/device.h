@@ -64,8 +64,10 @@ class Device {
   bool Open(const OpenParams& params);
 
   bool IsOpened() const;
-  void CheckOpened() const;
+  void CheckOpened(const std::string& event = "") const;
   bool ExpectOpened(const std::string& event) const;
+
+  OpenParams GetOpenParams() const;
 
   /** Get color image, nullptr if failed */
   Image::pointer GetImageColor();  // cross
@@ -161,6 +163,8 @@ class Device {
   DepthMode depth_mode_;
 
   std::vector<CameraCalibration> camera_calibrations_;
+
+  OpenParams open_params_;
 };
 
 MYNTEYE_END_NAMESPACE

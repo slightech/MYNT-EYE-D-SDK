@@ -128,6 +128,7 @@ set(MYNTEYE_DEPTH_SRCS
   src/mynteye/internal/camera_p.cc
   src/mynteye/internal/image_utils.cc
   src/mynteye/internal/motions.cc
+  src/mynteye/internal/streams.cc
 )
 if(OS_WIN)
   list(APPEND MYNTEYE_DEPTH_SRCS "src/mynteye/data/hid/hid_win.cc")

@@ -32,7 +32,7 @@ struct MYNTEYE_API OpenParams {
   std::int32_t dev_index;
 
   /**
-   * Framerate, default 10.
+   * Framerate, range [0,60], [0,30](STREAM_2560x720), default 10.
    */
   std::int32_t framerate;
 
@@ -72,7 +72,7 @@ struct MYNTEYE_API OpenParams {
   bool state_awb;
 
   /**
-   * IR (Infrared), default 0.
+   * IR (Infrared), range [0,6], default 0.
    */
   std::uint8_t ir_intensity;
 
