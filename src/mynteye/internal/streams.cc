@@ -16,6 +16,7 @@
 #include "mynteye/device/device.h"
 #include "mynteye/internal/image_utils.h"
 #include "mynteye/util/log.h"
+#include "mynteye/util/rate.h"
 #include "mynteye/util/strings.h"
 
 MYNTEYE_USE_NAMESPACE
@@ -124,6 +125,7 @@ void Streams::StartImageCapturing() {
 
   is_image_capturing_ = true;
   image_capture_thread_ = std::thread([this]() {
+    Rate rate(100);
     while (is_image_capturing_) {
       if (IsStreamDataEnabled(ImageType::IMAGE_LEFT_COLOR)
           || IsStreamDataEnabled(ImageType::IMAGE_RIGHT_COLOR)) {
@@ -134,6 +136,7 @@ void Streams::StartImageCapturing() {
         auto depth = device_->GetImageDepth();
         if (depth) OnDepthCaptured(depth);
       }
+      rate.Sleep();
     }
   });
 }
@@ -156,14 +159,17 @@ void Streams::OnColorCaptured(const Image::pointer& color) {
 }
 
 void Streams::OnLeftColorCaptured(const Image::pointer& color) {
+  // LOGI("%s: %d", __func__, color->frame_id());
   PushImage(color);
 }
 
 void Streams::OnRightColorCaptured(const Image::pointer& color) {
+  // LOGI("%s: %d", __func__, color->frame_id());
   PushImage(color);
 }
 
 void Streams::OnDepthCaptured(const Image::pointer& depth) {
+  // LOGI("%s: %d", __func__, depth->frame_id());
   PushImage(depth);
 }
 
