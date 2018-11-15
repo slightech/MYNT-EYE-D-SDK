@@ -67,7 +67,12 @@ int main(int argc, char const* argv[]) {
   // cam.EnableProcessMode(ProcessMode::PROC_IMU_ALL);
 
   // Enable what stream datas: left_color, right_color, depth
-  cam.EnableStreamData(ImageType::IMAGE_ALL);
+  if (util::is_right_color_supported(params.stream_mode)) {
+    cam.EnableStreamData(ImageType::IMAGE_ALL);
+  } else {
+    cam.EnableStreamData(ImageType::IMAGE_LEFT_COLOR);
+    cam.EnableStreamData(ImageType::IMAGE_DEPTH);
+  }
 
   cam.Open(params);
 
