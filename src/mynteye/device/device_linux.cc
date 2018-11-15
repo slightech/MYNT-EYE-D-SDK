@@ -102,13 +102,13 @@ Image::pointer Device::GetImageDepth() {
     return nullptr;
   }
 
-  depth_image_buf_->set_valid_size(depth_image_size_);
   depth_image_buf_->set_frame_id(depth_serial_number_);
 
   if (depth_raw) {
     return depth_image_buf_;
   } else {
-    depth_image_buf_->resize();
+    depth_image_buf_->set_valid_size(depth_image_size_);
+
     std::copy(depth_buf_, depth_buf_ + depth_image_size_,
         depth_image_buf_->data());
     // EtronDI_Convert_Depth_Y_To_Buffer(etron_di_, &dev_sel_info_,

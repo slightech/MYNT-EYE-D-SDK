@@ -20,6 +20,7 @@
 
 #include "mynteye/data/channels.h"
 #include "mynteye/device/device.h"
+#include "mynteye/internal/image_utils.h"
 #include "mynteye/internal/motions.h"
 #include "mynteye/util/log.h"
 #include "mynteye/util/rate.h"
@@ -473,10 +474,10 @@ void CameraPrivate::CutPart(ImageType type,
   data.img_info = std::make_shared<ImgInfo>();
   *data.img_info = *info.img_info;
   if (type == ImageType::IMAGE_LEFT_COLOR) {
-    data.img = color->CutPart(ImageType::IMAGE_LEFT_COLOR);
+    data.img = images::split_left_color(color);
     left_color_data_.push_back(data);
   } else if (type == ImageType::IMAGE_RIGHT_COLOR) {
-    data.img = color->CutPart(ImageType::IMAGE_RIGHT_COLOR);
+    data.img = images::split_right_color(color);
     right_color_data_.push_back(data);
   }
 }
@@ -485,10 +486,10 @@ void CameraPrivate::OldCutPart(ImageType type, Image::pointer color) {
   stream_data_t data;
   data.img_info = nullptr;
   if (type == ImageType::IMAGE_LEFT_COLOR) {
-    data.img = color->CutPart(ImageType::IMAGE_LEFT_COLOR);
+    data.img = images::split_left_color(color);
     left_color_data_.push_back(data);
   } else if (type == ImageType::IMAGE_RIGHT_COLOR) {
-    data.img = color->CutPart(ImageType::IMAGE_RIGHT_COLOR);
+    data.img = images::split_right_color(color);
     right_color_data_.push_back(data);
   }
 }
