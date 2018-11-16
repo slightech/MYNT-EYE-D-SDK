@@ -17,15 +17,14 @@
 
 #include "mynteye/camera.h"
 
+#include <functional>
 #include <string>
-#include <memory>
-#include <mutex>
-#include <vector>
-#include <thread>
-#include <condition_variable>
 #include <map>
+#include <memory>
+#include <vector>
 
 #include "mynteye/data/types_internal.h"
+#include "mynteye/internal/async_callback.h"
 #include "mynteye/types.h"
 
 MYNTEYE_BEGIN_NAMESPACE
@@ -41,6 +40,10 @@ class MYNTEYE_API CameraPrivate {
         std::function<void(const std::shared_ptr<ImgInfo>& info)>;
   using stream_callback_t = std::function<void(const StreamData& data)>;
   using motion_callback_t = std::function<void(const MotionData& data)>;
+
+  using img_info_async_callback_t = AsyncCallback<std::shared_ptr<ImgInfo>>;
+  using stream_async_callback_t = AsyncCallback<StreamData>;
+  using motion_async_callback_t = AsyncCallback<MotionData>;
 
   CameraPrivate();
   ~CameraPrivate();
@@ -123,13 +126,14 @@ class MYNTEYE_API CameraPrivate {
   std::vector<MotionData> GetMotionDatas();
 
   /** Set image info callback. */
-  void SetImgInfoCallback(img_info_callback_t callback);
+  void SetImgInfoCallback(img_info_callback_t callback, bool async);
 
   /** Set stream data callback. */
-  void SetStreamCallback(const ImageType& type, stream_callback_t callback);
+  void SetStreamCallback(const ImageType& type, stream_callback_t callback,
+        bool async);
 
   /** Set motion data callback. */
-  void SetMotionCallback(motion_callback_t callback);
+  void SetMotionCallback(motion_callback_t callback, bool async);
 
   /** Close the camera */
   void Close();
@@ -171,6 +175,10 @@ class MYNTEYE_API CameraPrivate {
 
   std::shared_ptr<StreamIntrinsics> stream_intrinsics_;
   std::shared_ptr<StreamExtrinsics> stream_extrinsics_;
+
+  img_info_async_callback_t::pointer img_info_async_callback_;
+  std::map<ImageType, stream_async_callback_t::pointer> stream_async_callbacks_;
+  motion_async_callback_t::pointer motion_async_callback_;
 };
 
 MYNTEYE_END_NAMESPACE

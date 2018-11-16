@@ -16,6 +16,7 @@
 #pragma once
 
 #include <cstdint>
+#include <functional>
 #include <limits>
 #include <memory>
 #include <vector>
@@ -131,13 +132,14 @@ class MYNTEYE_API Camera {
   std::vector<MotionData> GetMotionDatas();
 
   /** Set image info callback. */
-  void SetImgInfoCallback(img_info_callback_t callback);
+  void SetImgInfoCallback(img_info_callback_t callback, bool async = true);
 
   /** Set stream data callback. */
-  void SetStreamCallback(const ImageType& type, stream_callback_t callback);
+  void SetStreamCallback(const ImageType& type, stream_callback_t callback,
+        bool async = true);
 
   /** Set motion data callback. */
-  void SetMotionCallback(motion_callback_t callback);
+  void SetMotionCallback(motion_callback_t callback, bool async = true);
 
   /** Close the camera */
   void Close();
