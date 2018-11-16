@@ -126,8 +126,8 @@ int main(int argc, char const* argv[]) {
   }
 
   cv::namedWindow("color");
-  cv::namedWindow("depth");
 
+  CVPainter painter;
   util::Counter counter;
   for (;;) {
     counter.Update();
@@ -137,12 +137,16 @@ int main(int argc, char const* argv[]) {
     if (image_color.img && image_depth.img) {
       cv::Mat color = image_color.img->To(ImageFormat::COLOR_BGR)
           ->ToMat();
+      painter.DrawSize(color, CVPainter::TOP_LEFT);
+      painter.DrawStreamData(color, image_color, CVPainter::TOP_RIGHT);
+      painter.DrawText(color, util::to_string(counter.fps()),
+          CVPainter::BOTTOM_RIGHT);
+
       cv::Mat depth = image_depth.img->To(ImageFormat::DEPTH_RAW)
           ->ToMat();
-      util::draw(color, util::to_string(counter.fps(), 5, 1),
-          util::TOP_RIGHT);
+
       cv::imshow("color", color);
-      cv::imshow("depth", depth);
+
       show_points(color, depth);
     }
 

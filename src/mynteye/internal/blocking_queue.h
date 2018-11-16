@@ -16,9 +16,9 @@
 #pragma once
 
 #include <condition_variable>
+#include <deque>
 #include <memory>
 #include <mutex>
-#include <queue>
 #include <string>
 #include <utility>
 
@@ -26,10 +26,16 @@
 
 MYNTEYE_BEGIN_NAMESPACE
 
-template <typename T, typename Container = std::queue<T>>
+template <typename T, typename Container = std::deque<T>>
 class BlockingQueue {
  public:
-  explicit BlockingQueue(std::size_t max_size = 0);
+  using size_type = typename Container::size_type;
+  using iterator = typename Container::iterator;
+  using const_iterator = typename Container::const_iterator;
+
+  explicit BlockingQueue(size_type max_size = 0);
+
+  // With lock
 
   void Put(const T& t);
   void Put(T&& t);
@@ -43,24 +49,54 @@ class BlockingQueue {
   bool TryPeek(T* t);
 
   bool Empty() const;
-  std::size_t Size() const;
+  size_type Size() const;
+
+  // Without lock
+
+  std::mutex& mutex() const {
+    return mutex_;
+  }
+
+  bool empty() const { return queue_.empty(); }
+  size_type size() const { return queue_.size(); }
+
+  iterator begin() { return queue_.begin(); }
+  const_iterator begin() const { return queue_.begin(); }
+  const_iterator cbegin() const { return queue_.cbegin(); }
+
+  iterator end() { return queue_.end(); }
+  const_iterator end() const { return queue_.end(); }
+  const_iterator cend() const { return queue_.cend(); }
+
+  iterator rbegin() { return queue_.rbegin(); }
+  const_iterator rbegin() const { return queue_.rbegin(); }
+  const_iterator crbegin() const { return queue_.crbegin(); }
+
+  iterator rend() { return queue_.rend(); }
+  const_iterator rend() const { return queue_.rend(); }
+  const_iterator crend() const { return queue_.crend(); }
+
+  iterator erase(const_iterator pos) { return queue_.erase(pos); }
+  iterator erase(const_iterator first, const_iterator last) {
+    return queue_.erase(first, last);
+  }
 
  protected:
   void FixMaxSize();
 
-  std::size_t max_size_;
+  size_type max_size_;
+
+  Container queue_;
 
   mutable std::mutex mutex_;
   std::condition_variable condition_;
-
-  Container queue_;
 
   MYNTEYE_DISABLE_COPY(BlockingQueue)
   MYNTEYE_DISABLE_MOVE(BlockingQueue)
 };
 
 template <typename T, typename C>
-BlockingQueue<T, C>::BlockingQueue(std::size_t max_size)
+BlockingQueue<T, C>::BlockingQueue(size_type max_size)
   : max_size_(std::move(max_size)) {
 }
 
@@ -68,7 +104,7 @@ template <typename T, typename C>
 void BlockingQueue<T, C>::Put(const T& t) {
   {
     std::lock_guard<std::mutex> _(mutex_);
-    queue_.push(t);
+    queue_.push_back(t);
     FixMaxSize();
   }
   condition_.notify_one();
@@ -78,7 +114,7 @@ template <typename T, typename C>
 void BlockingQueue<T, C>::Put(T&& t) {
   {
     std::lock_guard<std::mutex> _(mutex_);
-    queue_.push(std::move(t));
+    queue_.push_back(std::move(t));
     FixMaxSize();
   }
   condition_.notify_one();
@@ -90,7 +126,7 @@ T BlockingQueue<T, C>::Take() {
   condition_.wait(lock, [this] { return !queue_.empty(); });
 
   T t(std::move(queue_.front()));
-  queue_.pop();
+  queue_.pop_front();
   return t;
 }
 
@@ -103,15 +139,13 @@ bool BlockingQueue<T, C>::TryTake(T* t) {
   }
 
   *t = std::move(queue_.front());
-  queue_.pop();
+  queue_.pop_front();
   return true;
 }
 
 template <typename T, typename C>
 C BlockingQueue<T, C>::TakeAll() {
   std::unique_lock<std::mutex> lock(mutex_);
-  condition_.wait(lock, [this] { return !queue_.empty(); });
-
   return std::move(queue_);
 }
 
@@ -142,7 +176,7 @@ bool BlockingQueue<T, C>::Empty() const {
 }
 
 template <typename T, typename C>
-std::size_t BlockingQueue<T, C>::Size() const {
+typename BlockingQueue<T, C>::size_type BlockingQueue<T, C>::Size() const {
   std::lock_guard<std::mutex> _(mutex_);
   return queue_.size();
 }
@@ -150,7 +184,7 @@ std::size_t BlockingQueue<T, C>::Size() const {
 template <typename T, typename C>
 void BlockingQueue<T, C>::FixMaxSize() {
   if (max_size_ > 0 && queue_.size() > max_size_) {
-    queue_.pop();  // drop first
+    queue_.pop_front();  // drop first
   }
 }
 

@@ -11,30 +11,43 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#ifndef MYNTEYE_SAMPLES_UTIL_CV_PAINTER_H_
-#define MYNTEYE_SAMPLES_UTIL_CV_PAINTER_H_
+#ifndef MYNTEYE_TUTORIALS_CV_PAINTER_H_  // NOLINT
+#define MYNTEYE_TUTORIALS_CV_PAINTER_H_
 #pragma once
 
 #include <string>
 
 #include <opencv2/core/core.hpp>
 
-namespace mynteye {
-namespace util {
+#include "mynteye/types.h"
 
-typedef enum Gravity {
-  TOP_LEFT,
-  TOP_RIGHT,
-  BOTTOM_LEFT,
-  BOTTOM_RIGHT
-} gravity_t;
+class CVPainter {
+ public:
+  typedef enum Gravity {
+    TOP_LEFT,
+    TOP_RIGHT,
+    BOTTOM_LEFT,
+    BOTTOM_RIGHT
+  } gravity_t;
 
-cv::Rect draw(
-    const cv::Mat &img, const std::string &text,
-    const gravity_t &gravity = TOP_LEFT, const int &margin = 5,
-    const int &offset_x = 0, const int &offset_y = 0);
+  explicit CVPainter(std::int32_t frame_rate = 0);
+  ~CVPainter();
 
-}  // namespace util
-}  // namespace mynteye
+  cv::Rect DrawSize(const cv::Mat &img, const gravity_t &gravity = TOP_LEFT);
+  cv::Rect DrawStreamData(
+      const cv::Mat &img, const mynteye::StreamData &data,
+      const gravity_t &gravity = TOP_LEFT);
+  cv::Rect DrawMotionData(
+      const cv::Mat &img, const mynteye::MotionData &data,
+      const gravity_t &gravity = TOP_RIGHT);
 
-#endif  // MYNTEYE_SAMPLES_UTIL_CV_PAINTER_H_
+  cv::Rect DrawText(
+      const cv::Mat &img, const std::string &text,
+      const gravity_t &gravity = TOP_LEFT, const int &margin = 5,
+      const int &offset_x = 0, const int &offset_y = 0);
+
+ private:
+  std::int32_t frame_rate_;
+};
+
+#endif  // MYNTEYE_TUTORIALS_CV_PAINTER_H_ NOLINT

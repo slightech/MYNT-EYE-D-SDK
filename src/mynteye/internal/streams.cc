@@ -19,10 +19,18 @@
 #include "mynteye/util/rate.h"
 #include "mynteye/util/strings.h"
 
+#define IMAGE_QUEUE_MAX_SIZE 4
+#define IMAGE_QUEUE_WITH_INFO_MAX_SIZE 4
+#define IMAGE_INFO_QUEUE_MAX_SIZE 120  // 60fps, 2s
+
 MYNTEYE_USE_NAMESPACE
 
 Streams::Streams(std::shared_ptr<Device> device)
   : device_(device),
+    all_image_types_({
+      ImageType::IMAGE_LEFT_COLOR,
+      ImageType::IMAGE_RIGHT_COLOR,
+      ImageType::IMAGE_DEPTH}),
     is_image_info_enabled_(false),
     is_image_info_sync_(false),
     is_right_color_supported_(false),
@@ -35,6 +43,7 @@ Streams::~Streams() {
 void Streams::EnableImageInfo(bool sync) {
   is_image_info_enabled_ = true;
   is_image_info_sync_ = sync;
+  InitImageWithInfoQueue();
 }
 
 bool Streams::IsImageInfoEnabled() {
@@ -47,7 +56,8 @@ void Streams::EnableStreamData(const ImageType& type) {
     case ImageType::IMAGE_RIGHT_COLOR:
     case ImageType::IMAGE_DEPTH:
       if (image_queue_map_.find(type) == image_queue_map_.end()) {
-        image_queue_map_[type] = std::make_shared<image_queue_t>(4);
+        image_queue_map_[type] =
+            std::make_shared<image_queue_t>(IMAGE_QUEUE_MAX_SIZE);
       }
       break;
     case ImageType::IMAGE_ALL:
@@ -56,6 +66,7 @@ void Streams::EnableStreamData(const ImageType& type) {
       EnableStreamData(ImageType::IMAGE_DEPTH);
       break;
   }
+  InitImageWithInfoQueue();
   StartImageCapturing();
 }
 
@@ -69,6 +80,7 @@ bool Streams::HasStreamDataEnabled() {
 
 Streams::data_t Streams::GetStreamData(const ImageType& type) {
   auto&& datas = GetStreamDatas(type);
+  if (datas.empty()) return {};
   return std::move(datas.back());
 }
 
@@ -83,13 +95,19 @@ Streams::datas_t Streams::GetStreamDatas(const ImageType& type) {
     return {};
   }
 
-  auto&& images = image_queue_map_[type]->TakeAll();
-  datas_t datas;
-  while (!images.empty()) {
-    datas.push_back({images.front(), nullptr});
-    images.pop();
+  if (is_image_info_sync_) {
+    auto&& datas = image_with_info_datas_map_[type]->TakeAll();
+    return {datas.begin(), datas.end()};
+  } else {
+    auto&& images = image_queue_map_[type]->TakeAll();
+
+    datas_t datas;
+    while (!images.empty()) {
+      datas.push_back({images.front(), nullptr});
+      images.pop_front();
+    }
+    return std::move(datas);
   }
-  return std::move(datas);
 }
 
 void Streams::OnCameraOpen() {
@@ -102,6 +120,20 @@ void Streams::OnCameraClose() {
 }
 
 void Streams::OnImageInfoCallback(const ImgInfoPacket &packet) {
+  auto&& img_info = std::make_shared<ImgInfo>();
+
+  img_info->frame_id = packet.frame_id;
+  img_info->timestamp = packet.timestamp;
+  img_info->exposure_time = packet.exposure_time;
+
+  // push info
+  for (auto&& info : image_info_queue_map_) {
+    info.second->Put(img_info);
+  }
+
+  SyncImageWithInfo();
+
+  // callback
 }
 
 bool Streams::IsRightColorSupported() {
@@ -136,6 +168,7 @@ void Streams::StartImageCapturing() {
         auto depth = device_->GetImageDepth();
         if (depth) OnDepthCaptured(depth);
       }
+      SyncImageWithInfo();
       rate.Sleep();
     }
   });
@@ -146,6 +179,71 @@ void Streams::StopImageCapturing() {
   is_image_capturing_ = false;
   if (image_capture_thread_.joinable()) {
     image_capture_thread_.join();
+  }
+}
+
+void Streams::InitImageWithInfoQueue() {
+  if (!is_image_info_sync_) return;
+
+  // init queue for enabled image type
+  auto&& img_datas_map = image_with_info_datas_map_;
+  auto&& img_info_queue_map = image_info_queue_map_;
+  for (auto&& type : all_image_types_) {
+    if (!IsStreamDataEnabled(type)) continue;
+
+    // init image with info vector
+    if (img_datas_map.find(type) == img_datas_map.end()) {
+      img_datas_map[type] =
+          std::make_shared<img_datas_t>(IMAGE_QUEUE_WITH_INFO_MAX_SIZE);
+    }
+
+    // init image info queue
+    if (img_info_queue_map.find(type) == img_info_queue_map.end()) {
+      img_info_queue_map[type] =
+          std::make_shared<img_info_queue_t>(IMAGE_INFO_QUEUE_MAX_SIZE);
+    }
+  }
+}
+
+void Streams::SyncImageWithInfo() {
+  if (!is_image_info_sync_) return;
+
+  // ...
+
+  for (auto&& type : all_image_types_) {
+    if (!IsStreamDataEnabled(type)) continue;
+
+    auto&& imgs = image_queue_map_[type];
+    if (imgs->empty()) continue;
+
+    auto&& img_infos = image_info_queue_map_[type];
+    if (img_infos->empty()) continue;
+
+    std::lock_guard<std::mutex> _(imgs->mutex());
+    std::lock_guard<std::mutex> _i(img_infos->mutex());
+
+    if (imgs->empty() || img_infos->empty()) continue;
+
+    bool next = false;
+    for (auto img_it = imgs->begin(); img_it != imgs->end();) {
+      next = true;
+      auto frame_id = (*img_it)->frame_id();
+
+      for (auto img_info_it = img_infos->begin();
+          img_info_it != img_infos->end();) {
+        if (frame_id == (*img_info_it)->frame_id) {
+          PushImageWithInfo(*img_it, *img_info_it);
+
+          img_it = imgs->erase(img_it);
+          img_info_it = img_infos->erase(img_info_it);
+          next = false;
+          break;
+        }
+
+        ++img_info_it;
+      }
+      if (next) ++img_it;
+    }
   }
 }
 
@@ -173,11 +271,22 @@ void Streams::OnDepthCaptured(const Image::pointer& depth) {
   PushImage(depth);
 }
 
-void Streams::PushImage(const Image::pointer& color) {
-  auto type = color->type();
-  if (color->is_buffer()) {
-    image_queue_map_[type]->Put(color->Clone());
+void Streams::PushImage(const Image::pointer& image) {
+  auto type = image->type();
+  if (image->is_buffer()) {
+    image_queue_map_[type]->Put(image->Clone());
   } else {
-    image_queue_map_[type]->Put(color);
+    image_queue_map_[type]->Put(image);
+  }
+}
+
+void Streams::PushImageWithInfo(const Image::pointer& image,
+    const img_info_ptr_t& info) {
+  auto type = image->type();
+  auto&& images = image_with_info_datas_map_[type];
+  if (image->is_buffer()) {
+    images->Put({image->Clone(), info});
+  } else {
+    images->Put({image, info});
   }
 }

@@ -15,6 +15,7 @@
 #define MYNTEYE_INTERNAL_STREAMS_H_
 #pragma once
 
+#include <deque>
 #include <map>
 #include <thread>
 #include <vector>
@@ -31,8 +32,19 @@ class Streams {
  public:
   using data_t = StreamData;
   using datas_t = std::vector<data_t>;
-  using image_queue_t = BlockingQueue<Image::pointer>;
+
+  template <typename T>
+  using queue_t = BlockingQueue<T, std::deque<T>>;
+
+  using image_queue_t = queue_t<Image::pointer>;
   using image_queue_ptr_t = std::shared_ptr<image_queue_t>;
+
+  using img_info_ptr_t = std::shared_ptr<ImgInfo>;
+  using img_info_queue_t = queue_t<img_info_ptr_t>;
+  using img_info_queue_ptr_t = std::shared_ptr<img_info_queue_t>;
+
+  using img_datas_t = queue_t<data_t>;
+  using img_datas_ptr_t = std::shared_ptr<img_datas_t>;
 
   explicit Streams(std::shared_ptr<Device> device);
   ~Streams();
@@ -64,25 +76,35 @@ class Streams {
   void StartImageCapturing();
   void StopImageCapturing();
 
+  void InitImageWithInfoQueue();
+  void SyncImageWithInfo();
+
   void OnColorCaptured(const Image::pointer& color);
   void OnLeftColorCaptured(const Image::pointer& color);
   void OnRightColorCaptured(const Image::pointer& color);
   void OnDepthCaptured(const Image::pointer& depth);
 
-  void PushImage(const Image::pointer& color);
+  void PushImage(const Image::pointer& image);
+
+  void PushImageWithInfo(const Image::pointer& image,
+                         const img_info_ptr_t& info);
 
   std::shared_ptr<Device> device_;
+
+  std::vector<ImageType> all_image_types_;
 
   bool is_image_info_enabled_;
   bool is_image_info_sync_;
 
   bool is_right_color_supported_;
 
-  // std::set<ImageType> image_enabled_set_;
   std::map<ImageType, image_queue_ptr_t> image_queue_map_;
 
   bool is_image_capturing_;
   std::thread image_capture_thread_;
+
+  std::map<ImageType, img_info_queue_ptr_t> image_info_queue_map_;
+  std::map<ImageType, img_datas_ptr_t> image_with_info_datas_map_;
 };
 
 MYNTEYE_END_NAMESPACE

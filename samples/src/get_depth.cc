@@ -228,6 +228,7 @@ int main(int argc, char const* argv[]) {
     return os.str();
   };
 
+  CVPainter painter;
   util::Counter counter;
   for (;;) {
     counter.Update();
@@ -235,7 +236,10 @@ int main(int argc, char const* argv[]) {
     auto image_color = cam.GetStreamData(ImageType::IMAGE_LEFT_COLOR);
     if (image_color.img) {
       cv::Mat color = image_color.img->To(ImageFormat::COLOR_BGR)->ToMat();
-      util::draw(color, util::to_string(counter.fps(), 5, 1), util::TOP_RIGHT);
+      painter.DrawSize(color, CVPainter::TOP_LEFT);
+      painter.DrawStreamData(color, image_color, CVPainter::TOP_RIGHT);
+      painter.DrawText(color, util::to_string(counter.fps()),
+          CVPainter::BOTTOM_RIGHT);
 
       cv::setMouseCallback("color", OnDepthMouseCallback, &depth_region);
       depth_region.DrawRect(color);

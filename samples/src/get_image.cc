@@ -66,6 +66,9 @@ int main(int argc, char const* argv[]) {
   // Enable what process logics
   // cam.EnableProcessMode(ProcessMode::PROC_IMU_ALL);
 
+  // Enable image infos
+  cam.EnableImageInfo(true);
+
   // Enable what stream datas: left_color, right_color, depth
   if (util::is_right_color_supported(params.stream_mode)) {
     cam.EnableStreamData(ImageType::IMAGE_ALL);
@@ -89,6 +92,7 @@ int main(int argc, char const* argv[]) {
   cv::namedWindow("right color");
   cv::namedWindow("depth");
 
+  CVPainter painter;
   util::Counter counter;
   for (;;) {
     counter.Update();
@@ -96,29 +100,29 @@ int main(int argc, char const* argv[]) {
     auto left_color = cam.GetStreamData(ImageType::IMAGE_LEFT_COLOR);
     if (left_color.img) {
       cv::Mat left = left_color.img->To(ImageFormat::COLOR_BGR)->ToMat();
-      util::draw(left, util::to_string(counter.fps(), 5, 1),
-          util::TOP_RIGHT);
+      painter.DrawSize(left, CVPainter::TOP_LEFT);
+      painter.DrawStreamData(left, left_color, CVPainter::TOP_RIGHT);
+      painter.DrawText(left, util::to_string(counter.fps()),
+          CVPainter::BOTTOM_RIGHT);
       cv::imshow("left color", left);
-      // std::cout << "left frame id: " << left_color.img->frame_id()
-      //     << std::endl;
     }
 
     if (util::is_right_color_supported(params.stream_mode)) {
       auto right_color = cam.GetStreamData(ImageType::IMAGE_RIGHT_COLOR);
       if (right_color.img) {
         cv::Mat right = right_color.img->To(ImageFormat::COLOR_BGR)->ToMat();
+        painter.DrawSize(right, CVPainter::TOP_LEFT);
+        painter.DrawStreamData(right, right_color, CVPainter::TOP_RIGHT);
         cv::imshow("right color", right);
-        // std::cout << "right frame id: " << right_color.img->frame_id()
-        //     << std::endl;
       }
     }
 
     auto image_depth = cam.GetStreamData(ImageType::IMAGE_DEPTH);
     if (image_depth.img) {
       cv::Mat depth = image_depth.img->To(ImageFormat::DEPTH_BGR)->ToMat();
+      painter.DrawSize(depth, CVPainter::TOP_LEFT);
+      painter.DrawStreamData(depth, image_depth, CVPainter::TOP_RIGHT);
       cv::imshow("depth", depth);
-      // std::cout << "depth frame id: " << image_depth.img->frame_id()
-      //     << std::endl;
     }
 
     char key = static_cast<char>(cv::waitKey(1));
