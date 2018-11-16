@@ -15,8 +15,11 @@
 #define MYNTEYE_INTERNAL_ASYNC_CALLBACK_H_
 #pragma once
 
+#include <condition_variable>
 #include <functional>
 #include <memory>
+#include <mutex>
+#include <queue>
 #include <thread>
 #include <utility>
 
@@ -31,6 +34,9 @@ class AsyncCallback : public std::enable_shared_from_this<AsyncCallback<T>> {
   using pointer = std::shared_ptr<AsyncCallback<T>>;
 
  private:
+  /**
+   * max_size > 0, cache size limit; otherwise, without limit.
+   */
   AsyncCallback(callback_t callback, std::size_t max_size);
 
  public:
@@ -49,23 +55,74 @@ class AsyncCallback : public std::enable_shared_from_this<AsyncCallback<T>> {
   void OnCallback(const T& data);
 
  private:
+  void Run();
+
   callback_t callback_;
   std::size_t max_size_;
+
+  bool running_;
+  std::thread thread_;
+
+  std::queue<T> queue_;
+  std::size_t count_;
+
+  std::mutex mutex_;
+  std::condition_variable condition_;
 };
 
 template <typename T>
 AsyncCallback<T>::AsyncCallback(callback_t callback, std::size_t max_size)
-  : callback_(callback), max_size_(max_size) {
+  : callback_(callback), max_size_(max_size), running_(false), count_(0) {
+  running_ = true;
+  thread_ = std::thread(&AsyncCallback<T>::Run, this);
 }
 
 template <typename T>
 AsyncCallback<T>::~AsyncCallback() {
+  {
+    std::lock_guard<std::mutex> _(mutex_);
+    running_ = false;
+    ++count_;
+  }
+  condition_.notify_one();
+  if (thread_.joinable()) {
+    thread_.join();
+  }
 }
 
 template <typename T>
 void AsyncCallback<T>::OnCallback(const T& data) {
   if (callback_ == nullptr) return;
-  callback_(data);
+  {
+    std::lock_guard<std::mutex> _(mutex_);
+    if (max_size_ > 0 && queue_.size() == max_size_) {
+      queue_.pop();
+    } else {
+      ++count_;
+    }
+    queue_.push(data);
+  }
+  condition_.notify_one();
+}
+
+template <typename T>
+void AsyncCallback<T>::Run() {
+  while (running_) {
+    std::unique_lock<std::mutex> lock(mutex_);
+    condition_.wait(lock, [this] { return count_ > 0; });
+
+    if (!running_) break;
+
+    // callback_ != nullptr
+
+    while (!queue_.empty()) {
+      if (!running_) break;
+      callback_(std::move(queue_.front()));
+      queue_.pop();
+    }
+
+    count_ = 0;
+  }
 }
 
 MYNTEYE_END_NAMESPACE
