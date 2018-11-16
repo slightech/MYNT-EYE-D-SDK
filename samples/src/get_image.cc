@@ -102,7 +102,7 @@ int main(int argc, char const* argv[]) {
       cv::Mat left = left_color.img->To(ImageFormat::COLOR_BGR)->ToMat();
       painter.DrawSize(left, CVPainter::TOP_LEFT);
       painter.DrawStreamData(left, left_color, CVPainter::TOP_RIGHT);
-      painter.DrawText(left, util::to_string(counter.fps()),
+      painter.DrawInformation(left, util::to_string(counter.fps()),
           CVPainter::BOTTOM_RIGHT);
       cv::imshow("left color", left);
     }

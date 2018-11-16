@@ -41,7 +41,7 @@ class CVPainter {
       const cv::Mat &img, const mynteye::MotionData &data,
       const gravity_t &gravity = TOP_RIGHT);
 
-  cv::Rect DrawText(
+  cv::Rect DrawInformation(
       const cv::Mat &img, const std::string &text,
       const gravity_t &gravity = TOP_LEFT, const int &margin = 5,
       const int &offset_x = 0, const int &offset_y = 0);

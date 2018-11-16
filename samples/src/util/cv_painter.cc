@@ -63,7 +63,7 @@ CVPainter::~CVPainter() {
 cv::Rect CVPainter::DrawSize(const cv::Mat &img, const gravity_t &gravity) {
   std::ostringstream ss;
   ss << img.cols << "x" << img.rows;
-  return DrawText(img, ss.str(), gravity, 5);
+  return DrawInformation(img, ss.str(), gravity, 5);
 }
 
 cv::Rect CVPainter::DrawStreamData(
@@ -83,13 +83,13 @@ cv::Rect CVPainter::DrawStreamData(
   ss << ", stamp: " << fmt_time << (0.01f * info->timestamp);  // ms
   ss << ", expo: " << info->exposure_time;
 
-  return DrawText(img, ss.str(), gravity, 5);
+  return DrawInformation(img, ss.str(), gravity, 5);
 
-  // cv::Rect rect_i = DrawText(img, ss.str(), gravity, 5);
+  // cv::Rect rect_i = DrawInformation(img, ss.str(), gravity, 5);
 
   // Clear(ss) << "size: " << img.cols << "x" << img.rows;
   // cv::Rect rect_s =
-  //     DrawText(img, ss.str(), gravity, 5, 0, sign * (5 + rect_i.height));
+  //     DrawInformation(img, ss.str(), gravity, 5, 0, sign * (5 + rect_i.height));
 
   // // rect_i.width is the max one
   // if (sign > 0) {
@@ -117,16 +117,16 @@ cv::Rect CVPainter::DrawMotionData(
 
   Clear(ss) << "flag: " << imu->flag << ", stamp: " << imu->timestamp
             << ", temp: " << fmt_temp << imu->temperature;
-  cv::Rect rect_i = DrawText(img, ss.str(), gravity, 5);
+  cv::Rect rect_i = DrawInformation(img, ss.str(), gravity, 5);
 
   Clear(ss) << "accel(x,y,z): " << fmt_imu << imu->accel[0] << "," << fmt_imu
             << imu->accel[1] << "," << fmt_imu << imu->accel[2];
   cv::Rect rect_a =
-      DrawText(img, ss.str(), gravity, 5, 0, sign * (5 + rect_i.height));
+      DrawInformation(img, ss.str(), gravity, 5, 0, sign * (5 + rect_i.height));
 
   Clear(ss) << "gyro(x,y,z): " << fmt_imu << imu->gyro[0] << "," << fmt_imu
             << imu->gyro[1] << "," << fmt_imu << imu->gyro[2];
-  cv::Rect rect_g = DrawText(
+  cv::Rect rect_g = DrawInformation(
       img, ss.str(), gravity, 5, 0,
       sign * (10 + rect_i.height + rect_a.height));
 
@@ -140,7 +140,7 @@ cv::Rect CVPainter::DrawMotionData(
   }
 }
 
-cv::Rect CVPainter::DrawText(
+cv::Rect CVPainter::DrawInformation(
     const cv::Mat &img, const std::string &text, const gravity_t &gravity,
     const int &margin, const int &offset_x, const int &offset_y) {
   int w = img.cols, h = img.rows;

@@ -139,7 +139,7 @@ int main(int argc, char const* argv[]) {
           ->ToMat();
       painter.DrawSize(color, CVPainter::TOP_LEFT);
       painter.DrawStreamData(color, image_color, CVPainter::TOP_RIGHT);
-      painter.DrawText(color, util::to_string(counter.fps()),
+      painter.DrawInformation(color, util::to_string(counter.fps()),
           CVPainter::BOTTOM_RIGHT);
 
       cv::Mat depth = image_depth.img->To(ImageFormat::DEPTH_RAW)

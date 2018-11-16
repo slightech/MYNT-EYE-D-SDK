@@ -238,7 +238,7 @@ int main(int argc, char const* argv[]) {
       cv::Mat color = image_color.img->To(ImageFormat::COLOR_BGR)->ToMat();
       painter.DrawSize(color, CVPainter::TOP_LEFT);
       painter.DrawStreamData(color, image_color, CVPainter::TOP_RIGHT);
-      painter.DrawText(color, util::to_string(counter.fps()),
+      painter.DrawInformation(color, util::to_string(counter.fps()),
           CVPainter::BOTTOM_RIGHT);
 
       cv::setMouseCallback("color", OnDepthMouseCallback, &depth_region);
