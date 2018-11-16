@@ -16,6 +16,7 @@
 #pragma once
 
 #include <deque>
+#include <functional>
 #include <map>
 #include <thread>
 #include <vector>

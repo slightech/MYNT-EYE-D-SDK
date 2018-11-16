@@ -103,10 +103,10 @@ Streams::datas_t Streams::GetStreamDatas(const ImageType& type) {
   }
 
   if (is_image_info_sync_) {
-    auto&& datas = image_with_info_datas_map_[type]->TakeAll();
+    auto&& datas = image_with_info_datas_map_[type]->MoveAll();
     return {datas.begin(), datas.end()};
   } else {
-    auto&& images = image_queue_map_[type]->TakeAll();
+    auto&& images = image_queue_map_[type]->MoveAll();
 
     datas_t datas;
     while (!images.empty()) {

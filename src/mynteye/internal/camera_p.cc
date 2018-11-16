@@ -25,6 +25,10 @@
 #include "mynteye/internal/streams.h"
 #include "mynteye/util/log.h"
 
+#define IMG_INFO_ASYNC_MAX_SIZE 120  // 60fps, 2s
+#define STREAM_ASYNC_MAX_SIZE 1  // latest
+#define MOTION_ASYNC_MAX_SIZE 800  // 400hz, 2s
+
 MYNTEYE_USE_NAMESPACE
 
 CameraPrivate::CameraPrivate() : device_(std::make_shared<Device>()) {
@@ -235,17 +239,36 @@ std::vector<MotionData> CameraPrivate::GetMotionDatas() {
   return std::move(motions_->GetMotionDatas());
 }
 
-void CameraPrivate::SetImgInfoCallback(img_info_callback_t callback) {
-  streams_->SetImgInfoCallback(callback);
+void CameraPrivate::SetImgInfoCallback(img_info_callback_t callback,
+    bool async) {
+  if (async) {
+    img_info_async_callback_ =
+        img_info_async_callback_t::Create(callback, IMG_INFO_ASYNC_MAX_SIZE);
+    streams_->SetImgInfoCallback((*img_info_async_callback_)());
+  } else {
+    streams_->SetImgInfoCallback(callback);
+  }
 }
 
 void CameraPrivate::SetStreamCallback(const ImageType& type,
-    stream_callback_t callback) {
-  streams_->SetStreamCallback(type, callback);
+    stream_callback_t callback, bool async) {
+  if (async) {
+    stream_async_callbacks_[type] =
+        stream_async_callback_t::Create(callback, STREAM_ASYNC_MAX_SIZE);
+    streams_->SetStreamCallback(type, (*stream_async_callbacks_[type])());
+  } else {
+    streams_->SetStreamCallback(type, callback);
+  }
 }
 
-void CameraPrivate::SetMotionCallback(motion_callback_t callback) {
-  motions_->SetMotionCallback(callback);
+void CameraPrivate::SetMotionCallback(motion_callback_t callback, bool async) {
+  if (async) {
+    motion_async_callback_ =
+        motion_async_callback_t::Create(callback, MOTION_ASYNC_MAX_SIZE);
+    motions_->SetMotionCallback((*motion_async_callback_)());
+  } else {
+    motions_->SetMotionCallback(callback);
+  }
 }
 
 void CameraPrivate::Close() {
