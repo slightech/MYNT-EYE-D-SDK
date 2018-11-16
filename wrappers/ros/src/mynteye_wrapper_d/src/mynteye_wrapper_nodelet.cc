@@ -561,6 +561,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     NODELET_INFO_STREAM("Advertized on topic " << temp_topic);
 
     // open the device
+    mynteye->EnableImageInfo(true);
     mynteye->EnableStreamData(ImageType::IMAGE_ALL);
     mynteye->EnableMotionDatas();
     mynteye->Open(params);

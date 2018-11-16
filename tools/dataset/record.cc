@@ -50,6 +50,9 @@ int main(int argc, char const *argv[]) {
   params.ir_intensity = 4;
   params.framerate = 30;
 
+  // Enable image infos
+  cam.EnableImageInfo(true);
+
   // Enable what stream datas: left_color, right_color, depth
   cam.EnableStreamData(ImageType::IMAGE_ALL);
 
