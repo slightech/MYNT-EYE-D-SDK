@@ -46,8 +46,8 @@ class Streams {
   using img_datas_t = queue_t<data_t>;
   using img_datas_ptr_t = std::shared_ptr<img_datas_t>;
 
-  using img_info_callback_t = std::function<void(const img_info_ptr_t &info)>;
-  using stream_callback_t = std::function<void(const StreamData &data)>;
+  using img_info_callback_t = std::function<void(const img_info_ptr_t& info)>;
+  using stream_callback_t = std::function<void(const StreamData& data)>;
 
   explicit Streams(std::shared_ptr<Device> device);
   ~Streams();
@@ -75,7 +75,7 @@ class Streams {
   void OnCameraOpen();
   void OnCameraClose();
 
-  void OnImageInfoCallback(const ImgInfoPacket &packet);
+  void OnImageInfoCallback(const ImgInfoPacket& packet);
 
  private:
   bool IsRightColorSupported();

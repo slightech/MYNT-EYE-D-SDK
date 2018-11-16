@@ -53,7 +53,7 @@ class Motions {
 
   void SetMotionCallback(motion_callback_t callback);
 
-  void OnImuDataCallback(const ImuDataPacket &packet);
+  void OnImuDataCallback(const ImuDataPacket& packet);
 
  private:
   void ProcImuAssembly(std::shared_ptr<ImuData> data) const;

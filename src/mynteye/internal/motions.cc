@@ -65,9 +65,6 @@ void Motions::EnableProcessMode(const std::int32_t& mode) {
 }
 
 void Motions::EnableMotionDatas(std::size_t max_size) {
-  if (max_size <= 0) {
-    throw_error("Could not enable motion datas with max_size <= 0");
-  }
   is_motion_datas_enabled_ = true;
   motion_datas_max_size_ = max_size;
 }
@@ -89,7 +86,7 @@ void Motions::SetMotionCallback(motion_callback_t callback) {
   motion_callback_ = callback;
 }
 
-void Motions::OnImuDataCallback(const ImuDataPacket &packet) {
+void Motions::OnImuDataCallback(const ImuDataPacket& packet) {
   auto &&imu = std::make_shared<ImuData>();
   imu->flag = packet.flag;
   imu->temperature = static_cast<double>(packet.temperature * 0.125 + 23);
