@@ -77,7 +77,7 @@ class Streams {
   void StopImageCapturing();
 
   void InitImageWithInfoQueue();
-  void SyncImageWithInfo();
+  void SyncImageWithInfo(bool force);
 
   void OnColorCaptured(const Image::pointer& color);
   void OnLeftColorCaptured(const Image::pointer& color);

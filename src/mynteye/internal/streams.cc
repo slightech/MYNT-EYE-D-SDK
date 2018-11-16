@@ -18,10 +18,12 @@
 #include "mynteye/util/log.h"
 #include "mynteye/util/rate.h"
 #include "mynteye/util/strings.h"
+#include "mynteye/util/times.h"
 
 #define IMAGE_QUEUE_MAX_SIZE 4
 #define IMAGE_QUEUE_WITH_INFO_MAX_SIZE 4
 #define IMAGE_INFO_QUEUE_MAX_SIZE 120  // 60fps, 2s
+#define IMAGE_INFO_SYNC_FREQUENCY 100  // 100hz
 
 MYNTEYE_USE_NAMESPACE
 
@@ -131,7 +133,7 @@ void Streams::OnImageInfoCallback(const ImgInfoPacket &packet) {
     info.second->Put(img_info);
   }
 
-  SyncImageWithInfo();
+  SyncImageWithInfo(false);
 
   // callback
 }
@@ -168,7 +170,7 @@ void Streams::StartImageCapturing() {
         auto depth = device_->GetImageDepth();
         if (depth) OnDepthCaptured(depth);
       }
-      SyncImageWithInfo();
+      SyncImageWithInfo(true);
       rate.Sleep();
     }
   });
@@ -205,10 +207,28 @@ void Streams::InitImageWithInfoQueue() {
   }
 }
 
-void Streams::SyncImageWithInfo() {
+void Streams::SyncImageWithInfo(bool force) {
   if (!is_image_info_sync_) return;
 
-  // ...
+  // keep sync frequency
+  {
+    using clock = times::clock;
+    static clock::duration time_dist{clock::period::den / clock::period::num \
+        / IMAGE_INFO_SYNC_FREQUENCY};
+    static clock::time_point time_prev = times::now();
+
+    if (force) {
+      time_prev = times::now();
+    } else {
+      auto time_now = times::now();
+      if (time_now - time_prev < time_dist) {
+        time_prev = time_now;
+        // LOGI("Skip sync image info");
+        return;
+      }
+      time_prev = time_now;
+    }
+  }
 
   for (auto&& type : all_image_types_) {
     if (!IsStreamDataEnabled(type)) continue;
