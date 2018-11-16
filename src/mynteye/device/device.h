@@ -120,6 +120,8 @@ class Device {
 
   void SyncCameraCalibrations();
 
+  void CompatibleUSB2();
+
  private:
   void Init();
   void OnInit();  // cross

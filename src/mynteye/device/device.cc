@@ -239,14 +239,8 @@ bool Device::Open(const OpenParams& params) {
       break;
   }
 
-  EtronDI_SetDepthDataType(etron_di_, &dev_sel_info_, depth_data_type_);
-  DBG_LOGI("SetDepthDataType: %d", depth_data_type_);
-
   SetAutoExposureEnabled(params.state_ae);
   SetAutoWhiteBalanceEnabled(params.state_awb);
-
-  if (params.framerate > 0) framerate_ = params.framerate;
-  LOGI("-- Framerate: %d", framerate_);
 
 #ifdef MYNTEYE_OS_LINUX
   std::string dtc_name = "Unknown";
@@ -275,6 +269,12 @@ bool Device::Open(const OpenParams& params) {
   }
 
   GetStreamIndex(params, &color_res_index_, &depth_res_index_);
+
+  CompatibleUSB2();
+
+  EtronDI_SetDepthDataType(etron_di_, &dev_sel_info_, depth_data_type_);
+  DBG_LOGI("SetDepthDataType: %d", depth_data_type_);
+
   LOGI("-- Color Stream: %dx%d %s",
       stream_color_info_ptr_[color_res_index_].nWidth,
       stream_color_info_ptr_[color_res_index_].nHeight,
@@ -337,12 +337,6 @@ bool Device::Open(const OpenParams& params) {
   if (ETronDI_OK == ret) {
     open_params_ = params;
     SyncCameraCalibrations();
-    /*
-    unsigned char pdata[100] = {};
-    int plen, nbufferSize = 9;
-    EtronDI_GetSerialNumber(etron_di_, &dev_sel_info_, pdata, nbufferSize, &plen);
-    printf ("pdata = %s, nbufferSize = %d, plen = %d\n", pdata, nbufferSize, plen);
-    */
     return true;
   } else {
     dev_sel_info_.index = -1;  // reset flag
@@ -767,5 +761,18 @@ void Device::ReleaseBuf() {
   if (!depth_buf_) {
     delete depth_buf_;
     depth_buf_ = nullptr;
+  }
+}
+
+void Device::CompatibleUSB2() {
+  if (stream_depth_info_ptr_ == nullptr) {
+    return;
+  }
+
+  if (stream_depth_info_ptr_[1].nWidth == 320) {
+    color_res_index_ = 0;
+    depth_res_index_ = 0;
+    framerate_ = 5;
+    depth_data_type_ = depth_data_type_ == 7 ? 6 : 1;
   }
 }
