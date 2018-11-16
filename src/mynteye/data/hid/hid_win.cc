@@ -18,7 +18,7 @@ MYNTEYE_BEGIN_NAMESPACE
 
 namespace {
 
-void throw_error() {
+void print_error() {
   char buf[256];
 
   DWORD error_no = GetLastError();
@@ -94,7 +94,7 @@ return_timeout:
   LeaveCriticalSection(&rx_mutex_);
   return 0;
 return_error:
-  throw_error();
+  print_error();
   LeaveCriticalSection(&rx_mutex_);
   return -1;
 }
@@ -143,7 +143,7 @@ return_timeout:
   LeaveCriticalSection(&tx_mutex_);
   return 0;
 return_error:
-  throw_error();
+  print_error();
   LeaveCriticalSection(&tx_mutex_);
   return -1;
 }
