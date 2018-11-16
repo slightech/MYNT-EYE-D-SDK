@@ -16,10 +16,10 @@
 #pragma once
 
 #include <condition_variable>
+#include <deque>
 #include <functional>
 #include <memory>
 #include <mutex>
-#include <queue>
 #include <thread>
 #include <utility>
 
@@ -63,7 +63,7 @@ class AsyncCallback : public std::enable_shared_from_this<AsyncCallback<T>> {
   bool running_;
   std::thread thread_;
 
-  std::queue<T> queue_;
+  std::deque<T> datas_;
   std::size_t count_;
 
   std::mutex mutex_;
@@ -95,34 +95,37 @@ void AsyncCallback<T>::OnCallback(const T& data) {
   if (callback_ == nullptr) return;
   {
     std::lock_guard<std::mutex> _(mutex_);
-    if (max_size_ > 0 && queue_.size() == max_size_) {
-      queue_.pop();
+    if (max_size_ > 0 && datas_.size() == max_size_) {
+      datas_.pop_front();
     } else {
       ++count_;
     }
-    queue_.push(data);
+    datas_.push_back(data);
   }
   condition_.notify_one();
 }
 
 template <typename T>
 void AsyncCallback<T>::Run() {
+  std::deque<T> datas;
   while (running_) {
-    std::unique_lock<std::mutex> lock(mutex_);
-    condition_.wait(lock, [this] { return count_ > 0; });
-
-    if (!running_) break;
-
-    // callback_ != nullptr
-
-    while (!queue_.empty()) {
+    {
+      std::unique_lock<std::mutex> lock(mutex_);
+      condition_.wait(lock, [this] { return count_ > 0; });
       if (!running_) break;
-      callback_(std::move(queue_.front()));
-      queue_.pop();
+      datas = std::move(datas_);
+      count_ = 0;
     }
 
-    count_ = 0;
+    // callback_ != nullptr
+    while (!datas.empty()) {
+      // allow cost long time
+      callback_(std::move(datas.front()));
+      if (!running_) break;
+      datas.pop_front();
+    }
   }
+  datas.clear();
 }
 
 MYNTEYE_END_NAMESPACE

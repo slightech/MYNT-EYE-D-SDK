@@ -84,9 +84,10 @@ int main(int argc, char const* argv[]) {
   {
     // Set image info callback
     cam.SetImgInfoCallback([](const std::shared_ptr<ImgInfo>& info) {
-      std::cout << "[img_info] fid: " << info->frame_id
+      std::cout << "  [img_info] fid: " << info->frame_id
           << ", stamp: " << info->timestamp
-          << ", expos: " << info->exposure_time << std::endl;
+          << ", expos: " << info->exposure_time << std::endl
+          << std::flush;
     });
 
     std::vector<ImageType> types{
@@ -98,7 +99,8 @@ int main(int argc, char const* argv[]) {
       // Set stream data callback
       cam.SetStreamCallback(type, [](const StreamData& data) {
         std::cout << "  [" << data.img->type() << "] fid: "
-            << data.img->frame_id() << std::endl;
+            << data.img->frame_id() << std::endl
+            << std::flush;
       });
     }
 
@@ -119,6 +121,7 @@ int main(int argc, char const* argv[]) {
             << ", temp: " << data.imu->temperature
             << std::endl;
         }
+        std::cout << std::flush;
     });
   }
 
