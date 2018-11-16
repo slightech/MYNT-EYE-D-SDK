@@ -46,6 +46,9 @@ class Streams {
   using img_datas_t = queue_t<data_t>;
   using img_datas_ptr_t = std::shared_ptr<img_datas_t>;
 
+  using img_info_callback_t = std::function<void(const img_info_ptr_t &info)>;
+  using stream_callback_t = std::function<void(const StreamData &data)>;
+
   explicit Streams(std::shared_ptr<Device> device);
   ~Streams();
 
@@ -64,6 +67,10 @@ class Streams {
 
   data_t GetStreamData(const ImageType& type);
   datas_t GetStreamDatas(const ImageType& type);
+
+  void SetImgInfoCallback(img_info_callback_t callback);
+
+  void SetStreamCallback(const ImageType& type, stream_callback_t callback);
 
   void OnCameraOpen();
   void OnCameraClose();
@@ -89,6 +96,9 @@ class Streams {
   void PushImageWithInfo(const Image::pointer& image,
                          const img_info_ptr_t& info);
 
+  void DoDirectStreamCallback(const Image::pointer& image);
+  void DoSyncInfoStreamCallback(const StreamData& data);
+
   std::shared_ptr<Device> device_;
 
   std::vector<ImageType> all_image_types_;
@@ -105,6 +115,9 @@ class Streams {
 
   std::map<ImageType, img_info_queue_ptr_t> image_info_queue_map_;
   std::map<ImageType, img_datas_ptr_t> image_with_info_datas_map_;
+
+  img_info_callback_t img_info_callback_;
+  std::map<ImageType, stream_callback_t> stream_callbacks_;
 };
 
 MYNTEYE_END_NAMESPACE

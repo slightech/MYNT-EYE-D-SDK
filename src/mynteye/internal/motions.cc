@@ -49,7 +49,8 @@ Motions::Motions()
   : motion_intrinsics_(nullptr),
     proc_mode_(static_cast<const std::int32_t>(ProcessMode::PROC_NONE)),
     is_motion_datas_enabled_(false),
-    motion_datas_max_size_(1000) {
+    motion_datas_max_size_(1000),
+    motion_callback_(nullptr) {
 }
 
 Motions::~Motions() {
@@ -82,6 +83,10 @@ Motions::datas_t Motions::GetMotionDatas() {
   }
   std::lock_guard<std::mutex> _(mtx_datas_);
   return std::move(motion_datas_);
+}
+
+void Motions::SetMotionCallback(motion_callback_t callback) {
+  motion_callback_ = callback;
 }
 
 void Motions::OnImuDataCallback(const ImuDataPacket &packet) {
@@ -133,6 +138,9 @@ void Motions::OnImuDataCallback(const ImuDataPacket &packet) {
   }
 
   // callback
+  if (motion_callback_) {
+    motion_callback_(data);
+  }
 }
 
 void Motions::ProcImuAssembly(std::shared_ptr<ImuData> data) const {
