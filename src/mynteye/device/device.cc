@@ -81,7 +81,7 @@ void Device::Init() {
   stream_depth_info_ptr_ =
       (PETRONDI_STREAM_INFO)malloc(sizeof(ETRONDI_STREAM_INFO)*64);
   // default image type
-  depth_data_type_ = 9;
+  depth_data_type_ = 7;
   // default frame rate
   framerate_ = 10;
 
@@ -231,11 +231,11 @@ bool Device::Open(const OpenParams& params) {
 
   switch (params.color_mode) {
     case ColorMode::COLOR_RECTIFIED:
-      depth_data_type_ = 4;  // ETronDI_DEPTH_DATA_11_BITS
+      depth_data_type_ = 2;  // ETronDI_DEPTH_DATA_14_BITS
       break;
     case ColorMode::COLOR_RAW:
     default:
-      depth_data_type_ = 9;  // ETronDI_DEPTH_DATA_11_BITS_RAW
+      depth_data_type_ = 7;  // ETronDI_DEPTH_DATA_14_BITS_RAW
       break;
   }
 
