@@ -34,11 +34,12 @@ CameraPrivate::CameraPrivate() : device_(std::make_shared<Device>()) {
 
 void CameraPrivate::Init() {
   channels_ = std::make_shared<Channels>();
+  motions_ = std::make_shared<Motions>();
+  streams_ = std::make_shared<Streams>(device_);
+
   if (channels_->IsAvaliable()) {
     ReadDeviceFlash();
   }
-  motions_ = std::make_shared<Motions>();
-  streams_ = std::make_shared<Streams>(device_);
 }
 
 CameraPrivate::~CameraPrivate() {
