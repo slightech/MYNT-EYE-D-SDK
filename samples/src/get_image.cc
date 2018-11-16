@@ -44,7 +44,7 @@ int main(int argc, char const* argv[]) {
     // params.color_mode = ColorMode::COLOR_RECTIFIED;
 
     // Depth mode: colorful(default), gray, raw
-    params.depth_mode = DepthMode::DEPTH_RAW;
+    // params.depth_mode = DepthMode::DEPTH_GRAY;
 
     // Stream mode: left color only
     // params.stream_mode = StreamMode::STREAM_640x480;  // vga
@@ -119,7 +119,7 @@ int main(int argc, char const* argv[]) {
 
     auto image_depth = cam.GetStreamData(ImageType::IMAGE_DEPTH);
     if (image_depth.img) {
-      cv::Mat depth = image_depth.img->To(ImageFormat::DEPTH_RAW)->ToMat();
+      cv::Mat depth = image_depth.img->To(ImageFormat::DEPTH_BGR)->ToMat();
       painter.DrawSize(depth, CVPainter::TOP_LEFT);
       painter.DrawStreamData(depth, image_depth, CVPainter::TOP_RIGHT);
       cv::imshow("depth", depth);
