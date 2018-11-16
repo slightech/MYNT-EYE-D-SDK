@@ -137,6 +137,19 @@ std::vector<MotionData> Camera::GetMotionDatas() {
   return std::move(p_->GetMotionDatas());
 }
 
+void Camera::SetImgInfoCallback(img_info_callback_t callback) {
+  p_->SetImgInfoCallback(callback);
+}
+
+void Camera::SetStreamCallback(const ImageType& type,
+    stream_callback_t callback) {
+  p_->SetStreamCallback(type, callback);
+}
+
+void Camera::SetMotionCallback(motion_callback_t callback) {
+  p_->SetMotionCallback(callback);
+}
+
 void Camera::Close() {
   p_->Close();
 }

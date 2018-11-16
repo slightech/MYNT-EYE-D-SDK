@@ -235,6 +235,19 @@ std::vector<MotionData> CameraPrivate::GetMotionDatas() {
   return std::move(motions_->GetMotionDatas());
 }
 
+void CameraPrivate::SetImgInfoCallback(img_info_callback_t callback) {
+  streams_->SetImgInfoCallback(callback);
+}
+
+void CameraPrivate::SetStreamCallback(const ImageType& type,
+    stream_callback_t callback) {
+  streams_->SetStreamCallback(type, callback);
+}
+
+void CameraPrivate::SetMotionCallback(motion_callback_t callback) {
+  motions_->SetMotionCallback(callback);
+}
+
 void CameraPrivate::Close() {
   if (!IsOpened()) return;
   StopDataTracking();

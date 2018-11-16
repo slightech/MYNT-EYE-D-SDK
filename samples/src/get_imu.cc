@@ -58,19 +58,19 @@ int main(int argc, char const* argv[]) {
       std::cout << "Imu count: " << motion_datas.size() << std::endl;
       for (auto data : motion_datas) {
         if (data.imu) {
-          if (data.imu->flag == 1) {  // accelerometer
-            std::cout << "accel timestamp: " << data.imu->timestamp
-              << ", accel_x: " << data.imu->accel[0]
-              << ", accel_y: " << data.imu->accel[1]
-              << ", accel_z: " << data.imu->accel[2]
-              << ", temperature: " << data.imu->temperature
+          if (data.imu->flag == MYNTEYE_IMU_ACCEL) {
+            std::cout << "[accel] stamp: " << data.imu->timestamp
+              << ", x: " << data.imu->accel[0]
+              << ", y: " << data.imu->accel[1]
+              << ", z: " << data.imu->accel[2]
+              << ", temp: " << data.imu->temperature
               << std::endl;
-          } else if (data.imu->flag == 2) {  // gyroscope
-            std::cout << "gyro timestamp: " << data.imu->timestamp
-              << ", gyro_x: " << data.imu->gyro[0]
-              << ", gyro_y: " << data.imu->gyro[1]
-              << ", gyro_z: " << data.imu->gyro[2]
-              << ", temperature: " << data.imu->temperature
+          } else if (data.imu->flag == MYNTEYE_IMU_GYRO) {
+            std::cout << "[gyro] stamp: " << data.imu->timestamp
+              << ", x: " << data.imu->gyro[0]
+              << ", y: " << data.imu->gyro[1]
+              << ", z: " << data.imu->gyro[2]
+              << ", temp: " << data.imu->temperature
               << std::endl;
           } else {
             std::cerr << "Imu type is unknown" << std::endl;

@@ -63,6 +63,9 @@ struct MYNTEYE_API ImgInfo {
   }
 };
 
+#define MYNTEYE_IMU_ACCEL 1
+#define MYNTEYE_IMU_GYRO 2
+
 /**
  * @ingroup datatypes
  * @brief Imu data
@@ -70,8 +73,8 @@ struct MYNTEYE_API ImgInfo {
 struct MYNTEYE_API ImuData {
   /**
    * Data type
-   * 1: accelerometer
-   * 2: gyroscope
+   *   MYNTEYE_IMU_ACCEL: accelerometer
+   *   MYNTEYE_IMU_GYRO: gyroscope
    * */
   std::uint8_t flag;
 

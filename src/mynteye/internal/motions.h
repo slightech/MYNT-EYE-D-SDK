@@ -29,6 +29,8 @@ class Motions {
   using data_t = MotionData;
   using datas_t = std::vector<data_t>;
 
+  using motion_callback_t = std::function<void(const MotionData& data)>;
+
   Motions();
   ~Motions();
 
@@ -49,7 +51,9 @@ class Motions {
 
   datas_t GetMotionDatas();
 
-  void OnImuDataCallback(const ImuDataPacket &packet);
+  void SetMotionCallback(motion_callback_t callback);
+
+  void OnImuDataCallback(const ImuDataPacket& packet);
 
  private:
   void ProcImuAssembly(std::shared_ptr<ImuData> data) const;
@@ -65,6 +69,8 @@ class Motions {
   datas_t motion_datas_;
 
   std::mutex mtx_datas_;
+
+  motion_callback_t motion_callback_;
 };
 
 MYNTEYE_END_NAMESPACE

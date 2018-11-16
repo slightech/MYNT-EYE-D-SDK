@@ -18,10 +18,12 @@
 #include "mynteye/util/log.h"
 #include "mynteye/util/rate.h"
 #include "mynteye/util/strings.h"
+#include "mynteye/util/times.h"
 
 #define IMAGE_QUEUE_MAX_SIZE 4
 #define IMAGE_QUEUE_WITH_INFO_MAX_SIZE 4
 #define IMAGE_INFO_QUEUE_MAX_SIZE 120  // 60fps, 2s
+#define IMAGE_INFO_SYNC_FREQUENCY 100  // 100hz
 
 MYNTEYE_USE_NAMESPACE
 
@@ -34,7 +36,12 @@ Streams::Streams(std::shared_ptr<Device> device)
     is_image_info_enabled_(false),
     is_image_info_sync_(false),
     is_right_color_supported_(false),
-    is_image_capturing_(false) {
+    is_image_capturing_(false),
+    img_info_callback_(nullptr),
+    stream_callbacks_({
+      {ImageType::IMAGE_LEFT_COLOR, nullptr},
+      {ImageType::IMAGE_RIGHT_COLOR, nullptr},
+      {ImageType::IMAGE_DEPTH, nullptr}}) {
 }
 
 Streams::~Streams() {
@@ -110,6 +117,15 @@ Streams::datas_t Streams::GetStreamDatas(const ImageType& type) {
   }
 }
 
+void Streams::SetImgInfoCallback(img_info_callback_t callback) {
+  img_info_callback_ = callback;
+}
+
+void Streams::SetStreamCallback(const ImageType& type,
+    stream_callback_t callback) {
+  stream_callbacks_[type] = callback;
+}
+
 void Streams::OnCameraOpen() {
   is_right_color_supported_ = IsRightColorSupported();
   StartImageCapturing();
@@ -119,7 +135,7 @@ void Streams::OnCameraClose() {
   StopImageCapturing();
 }
 
-void Streams::OnImageInfoCallback(const ImgInfoPacket &packet) {
+void Streams::OnImageInfoCallback(const ImgInfoPacket& packet) {
   auto&& img_info = std::make_shared<ImgInfo>();
 
   img_info->frame_id = packet.frame_id;
@@ -131,9 +147,12 @@ void Streams::OnImageInfoCallback(const ImgInfoPacket &packet) {
     info.second->Put(img_info);
   }
 
-  SyncImageWithInfo();
+  SyncImageWithInfo(false);
 
   // callback
+  if (img_info_callback_) {
+    img_info_callback_(img_info);
+  }
 }
 
 bool Streams::IsRightColorSupported() {
@@ -168,7 +187,7 @@ void Streams::StartImageCapturing() {
         auto depth = device_->GetImageDepth();
         if (depth) OnDepthCaptured(depth);
       }
-      SyncImageWithInfo();
+      SyncImageWithInfo(true);
       rate.Sleep();
     }
   });
@@ -205,10 +224,28 @@ void Streams::InitImageWithInfoQueue() {
   }
 }
 
-void Streams::SyncImageWithInfo() {
+void Streams::SyncImageWithInfo(bool force) {
   if (!is_image_info_sync_) return;
 
-  // ...
+  // keep sync frequency
+  {
+    using clock = times::clock;
+    static clock::duration time_dist{clock::period::den / clock::period::num \
+        / IMAGE_INFO_SYNC_FREQUENCY};
+    static clock::time_point time_prev = times::now();
+
+    if (force) {
+      time_prev = times::now();
+    } else {
+      auto time_now = times::now();
+      if (time_now - time_prev < time_dist) {
+        time_prev = time_now;
+        // LOGI("Skip sync image info");
+        return;
+      }
+      time_prev = time_now;
+    }
+  }
 
   for (auto&& type : all_image_types_) {
     if (!IsStreamDataEnabled(type)) continue;
@@ -259,16 +296,19 @@ void Streams::OnColorCaptured(const Image::pointer& color) {
 void Streams::OnLeftColorCaptured(const Image::pointer& color) {
   // LOGI("%s: %d", __func__, color->frame_id());
   PushImage(color);
+  DoDirectStreamCallback(color);
 }
 
 void Streams::OnRightColorCaptured(const Image::pointer& color) {
   // LOGI("%s: %d", __func__, color->frame_id());
   PushImage(color);
+  DoDirectStreamCallback(color);
 }
 
 void Streams::OnDepthCaptured(const Image::pointer& depth) {
   // LOGI("%s: %d", __func__, depth->frame_id());
   PushImage(depth);
+  DoDirectStreamCallback(depth);
 }
 
 void Streams::PushImage(const Image::pointer& image) {
@@ -284,9 +324,27 @@ void Streams::PushImageWithInfo(const Image::pointer& image,
     const img_info_ptr_t& info) {
   auto type = image->type();
   auto&& images = image_with_info_datas_map_[type];
+  StreamData data;
   if (image->is_buffer()) {
-    images->Put({image->Clone(), info});
+    data = {image->Clone(), info};
   } else {
-    images->Put({image, info});
+    data = {image, info};
+  }
+  images->Put(data);
+  DoSyncInfoStreamCallback(data);
+}
+
+void Streams::DoDirectStreamCallback(const Image::pointer& image) {
+  if (!is_image_info_sync_ && stream_callbacks_[image->type()]) {
+    stream_callbacks_[image->type()]({image, nullptr});
+  }
+}
+
+void Streams::DoSyncInfoStreamCallback(const StreamData& data) {
+  if (is_image_info_sync_) {
+    auto type = data.img->type();
+    if (stream_callbacks_[type]) {
+      stream_callbacks_[type](data);
+    }
   }
 }

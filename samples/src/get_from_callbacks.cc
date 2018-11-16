@@ -67,7 +67,10 @@ int main(int argc, char const* argv[]) {
   // cam.EnableProcessMode(ProcessMode::PROC_IMU_ALL);
 
   // Enable image infos
-  cam.EnableImageInfo(true);
+  cam.EnableImageInfo(false);
+
+  // Enable motion datas
+  cam.EnableMotionDatas(0);
 
   // Enable what stream datas: left_color, right_color, depth
   if (util::is_right_color_supported(params.stream_mode)) {
@@ -75,6 +78,48 @@ int main(int argc, char const* argv[]) {
   } else {
     cam.EnableStreamData(ImageType::IMAGE_LEFT_COLOR);
     cam.EnableStreamData(ImageType::IMAGE_DEPTH);
+  }
+
+  // Callbacks
+  {
+    // Set image info callback
+    cam.SetImgInfoCallback([](const std::shared_ptr<ImgInfo>& info) {
+      std::cout << "[img_info] fid: " << info->frame_id
+          << ", stamp: " << info->timestamp
+          << ", expos: " << info->exposure_time << std::endl;
+    });
+
+    std::vector<ImageType> types{
+      ImageType::IMAGE_LEFT_COLOR,
+      ImageType::IMAGE_RIGHT_COLOR,
+      ImageType::IMAGE_DEPTH,
+    };
+    for (auto&& type : types) {
+      // Set stream data callback
+      cam.SetStreamCallback(type, [](const StreamData& data) {
+        std::cout << "  [" << data.img->type() << "] fid: "
+            << data.img->frame_id() << std::endl;
+      });
+    }
+
+    // Set motion data callback
+    cam.SetMotionCallback([](const MotionData& data) {
+        if (data.imu->flag == MYNTEYE_IMU_ACCEL) {
+          std::cout << "[accel] stamp: " << data.imu->timestamp
+            << ", x: " << data.imu->accel[0]
+            << ", y: " << data.imu->accel[1]
+            << ", z: " << data.imu->accel[2]
+            << ", temp: " << data.imu->temperature
+            << std::endl;
+        } else if (data.imu->flag == MYNTEYE_IMU_GYRO) {
+          std::cout << "[gyro] stamp: " << data.imu->timestamp
+            << ", x: " << data.imu->gyro[0]
+            << ", y: " << data.imu->gyro[1]
+            << ", z: " << data.imu->gyro[2]
+            << ", temp: " << data.imu->temperature
+            << std::endl;
+        }
+    });
   }
 
   cam.Open(params);
@@ -102,7 +147,7 @@ int main(int argc, char const* argv[]) {
       cv::Mat left = left_color.img->To(ImageFormat::COLOR_BGR)->ToMat();
       painter.DrawSize(left, CVPainter::TOP_LEFT);
       painter.DrawStreamData(left, left_color, CVPainter::TOP_RIGHT);
-      painter.DrawInformation(left, util::to_string(counter.fps()),
+      painter.DrawText(left, util::to_string(counter.fps()),
           CVPainter::BOTTOM_RIGHT);
       cv::imshow("left color", left);
     }

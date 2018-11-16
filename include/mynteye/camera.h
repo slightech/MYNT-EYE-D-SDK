@@ -42,6 +42,11 @@ class CameraPrivate;
 
 class MYNTEYE_API Camera {
  public:
+  using img_info_callback_t =
+        std::function<void(const std::shared_ptr<ImgInfo>& info)>;
+  using stream_callback_t = std::function<void(const StreamData& data)>;
+  using motion_callback_t = std::function<void(const MotionData& data)>;
+
   Camera();
   ~Camera();
 
@@ -124,6 +129,15 @@ class MYNTEYE_API Camera {
       std::size_t max_size = std::numeric_limits<std::size_t>::max());
   /** Get cached motion datas. Besides, you can also get them from callback */
   std::vector<MotionData> GetMotionDatas();
+
+  /** Set image info callback. */
+  void SetImgInfoCallback(img_info_callback_t callback);
+
+  /** Set stream data callback. */
+  void SetStreamCallback(const ImageType& type, stream_callback_t callback);
+
+  /** Set motion data callback. */
+  void SetMotionCallback(motion_callback_t callback);
 
   /** Close the camera */
   void Close();
