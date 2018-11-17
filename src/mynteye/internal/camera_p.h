@@ -177,6 +177,8 @@ class MYNTEYE_API CameraPrivate {
   /** Stop data tracking */
   void StopDataTracking();
 
+  void NotifyDataTrackStateChanged();
+
   std::shared_ptr<Device> device_;
   std::shared_ptr<Channels> channels_;
   std::shared_ptr<Motions> motions_;

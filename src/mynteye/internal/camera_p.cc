@@ -73,7 +73,7 @@ ErrorCode CameraPrivate::Open(const OpenParams& params) {
   }
 
   if (ok) {
-    StartDataTracking();
+    NotifyDataTrackStateChanged();
     streams_->OnCameraOpen();
     return ErrorCode::SUCCESS;
   } else {
@@ -206,12 +206,17 @@ void CameraPrivate::EnableProcessMode(const std::int32_t& mode) {
 }
 
 void CameraPrivate::EnableImageInfo(bool sync) {
+  if (!channels_->IsAvaliable()) {
+    LOGW("Data channel is unavaliable, could not track image info.");
+    return;
+  }
   streams_->EnableImageInfo(sync);
-  StartDataTracking();
+  NotifyDataTrackStateChanged();
 }
 
 void CameraPrivate::DisableImageInfo() {
   streams_->DisableImageInfo();
+  NotifyDataTrackStateChanged();
 }
 
 bool CameraPrivate::IsImageInfoEnabled() const {
@@ -247,12 +252,17 @@ std::vector<StreamData> CameraPrivate::GetStreamDatas(const ImageType& type) {
 }
 
 void CameraPrivate::EnableMotionDatas(std::size_t max_size) {
+  if (!channels_->IsAvaliable()) {
+    LOGW("Data channel is unavaliable, could not track motion datas.");
+    return;
+  }
   motions_->EnableMotionDatas(std::move(max_size));
-  StartDataTracking();
+  NotifyDataTrackStateChanged();
 }
 
 void CameraPrivate::DisableMotionDatas() {
   motions_->DisableMotionDatas();
+  NotifyDataTrackStateChanged();
 }
 
 bool CameraPrivate::IsMotionDatasEnabled() const {
@@ -365,9 +375,16 @@ void CameraPrivate::SetMotionExtrinsics(const MotionExtrinsics &ex) {
 }
 
 bool CameraPrivate::StartDataTracking() {
-  // if (!IsOpened()) return false;  // ensure start after opened
+  if (!IsOpened()) {
+    // ensure start after opened
+    return false;
+  }
   if (!motions_->IsMotionDatasEnabled() && !streams_->IsImageInfoEnabled()) {
-    // Not tracking when data & info both disabled.
+    // Not tracking if data & info both disabled
+    return false;
+  }
+  if (!channels_->IsHidAvaliable()) {
+    // Not tracking if hid is unavaliable
     return false;
   }
 
@@ -383,16 +400,22 @@ bool CameraPrivate::StartDataTracking() {
 
   if (channels_->IsHidTracking()) return true;
 
-  if (!channels_->IsHidAvaliable()) {
-    LOGW("Data channel is unavaliable, could not track device datas.");
-    return false;
-  }
-
+  // Start hid tracking will callback imu data & image info
   return channels_->StartHidTracking();
 }
 
 void CameraPrivate::StopDataTracking() {
   if (channels_->IsHidTracking()) {
     channels_->StopHidTracking();
+  }
+}
+
+void CameraPrivate::NotifyDataTrackStateChanged() {
+  bool expect_track = motions_->IsMotionDatasEnabled()
+      || streams_->IsImageInfoEnabled();
+  if (expect_track) {
+    StartDataTracking();
+  } else {
+    StopDataTracking();
   }
 }
