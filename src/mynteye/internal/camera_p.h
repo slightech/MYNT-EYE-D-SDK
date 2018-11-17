@@ -78,9 +78,9 @@ class MYNTEYE_API CameraPrivate {
   bool WriteCameraCalibrationBinFile(const std::string& filename);
 
   /** Get the intrinsics of motion */
-  MotionIntrinsics GetMotionIntrinsics() const;
+  MotionIntrinsics GetMotionIntrinsics(bool* ok) const;
   /** Get the extrinsics from left to motion */
-  MotionExtrinsics GetMotionExtrinsics() const;
+  MotionExtrinsics GetMotionExtrinsics(bool* ok) const;
 
   /** Write device flash */
   bool WriteDeviceFlash(

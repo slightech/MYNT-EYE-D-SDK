@@ -82,12 +82,12 @@ bool Camera::WriteCameraCalibrationBinFile(const std::string& filename) {
   return p_->WriteCameraCalibrationBinFile(filename);
 }
 
-MotionIntrinsics Camera::GetMotionIntrinsics() const {
-  return p_->GetMotionIntrinsics();
+MotionIntrinsics Camera::GetMotionIntrinsics(bool* ok) const {
+  return p_->GetMotionIntrinsics(ok);
 }
 
-MotionExtrinsics Camera::GetMotionExtrinsics() const {
-  return p_->GetMotionExtrinsics();
+MotionExtrinsics Camera::GetMotionExtrinsics(bool* ok) const {
+  return p_->GetMotionExtrinsics(ok);
 }
 
 bool Camera::WriteDeviceFlash(

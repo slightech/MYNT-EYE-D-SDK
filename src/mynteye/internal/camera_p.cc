@@ -168,19 +168,23 @@ bool CameraPrivate::WriteCameraCalibrationBinFile(const std::string& filename) {
   return device_->SetCameraCalibrationBinFile(filename);
 }
 
-MotionIntrinsics CameraPrivate::GetMotionIntrinsics() const {
+MotionIntrinsics CameraPrivate::GetMotionIntrinsics(bool* ok) const {
   if (motion_intrinsics_) {
+    *ok = true;
     return *motion_intrinsics_;
   } else {
+    *ok = false;
     LOGE("Error: Motion intrinsics not found");
     return {};
   }
 }
 
-MotionExtrinsics CameraPrivate::GetMotionExtrinsics() const {
+MotionExtrinsics CameraPrivate::GetMotionExtrinsics(bool* ok) const {
   if (motion_extrinsics_) {
+    *ok = true;
     return *motion_extrinsics_;
   } else {
+    *ok = false;
     LOGE("Error: Motion extrinsics not found");
     return {};
   }
