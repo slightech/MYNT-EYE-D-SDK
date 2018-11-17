@@ -25,19 +25,22 @@
 #include "util/counter.h"
 #include "util/cv_painter.h"
 
-typedef pcl::PointXYZRGBA PointT;
-typedef pcl::PointCloud<PointT> PointCloud;
+// camera params
 
-PointCloud::Ptr cloud ( new PointCloud );
-pcl::visualization::PCLVisualizer viewer("point cloud viewer");
-
-// TODO replace the real camera param
 const float camera_factor = 1000.0;
 
 double camera_cx = 682.3;
 double camera_cy = 254.9;
 double camera_fx = 979.8;
 double camera_fy = 942.8;
+
+// pcl viewer
+
+typedef pcl::PointXYZRGBA PointT;
+typedef pcl::PointCloud<PointT> PointCloud;
+
+PointCloud::Ptr cloud ( new PointCloud );
+pcl::visualization::PCLVisualizer viewer("point cloud viewer");
 
 // show point cloud
 void show_points(cv::Mat rgb, cv::Mat depth) {
@@ -76,6 +79,8 @@ void show_points(cv::Mat rgb, cv::Mat depth) {
 
 MYNTEYE_USE_NAMESPACE
 
+CameraIntrinsics get_default_camera_intrinsics(const StreamMode& mode);
+
 int main(int argc, char const* argv[]) {
   Camera cam;
   DeviceInfo dev_info;
@@ -100,12 +105,17 @@ int main(int argc, char const* argv[]) {
 
   cam.Open(params);
 
-  auto streamIntrinsics = cam.GetStreamIntrinsics(stream_mode);
-
-  camera_cx = streamIntrinsics.left.cx;
-  camera_cy = streamIntrinsics.left.cy;
-  camera_fx = streamIntrinsics.left.fx;
-  camera_fy = streamIntrinsics.left.fy;
+  {
+    bool ok;
+    auto stream_intrinsics = cam.GetStreamIntrinsics(stream_mode, &ok);
+    CameraIntrinsics in = ok ? stream_intrinsics.left
+        : get_default_camera_intrinsics(stream_mode);
+    // TODO(yourself): replace the real camera params, if get failed
+    camera_cx = in.cx;
+    camera_cy = in.cy;
+    camera_fx = in.fx;
+    camera_fy = in.fy;
+  }
 
   std::cout << std::endl;
   if (!cam.IsOpened()) {
@@ -159,4 +169,20 @@ int main(int argc, char const* argv[]) {
   cam.Close();
   cv::destroyAllWindows();
   return 0;
+}
+
+CameraIntrinsics get_default_camera_intrinsics(const StreamMode& mode) {
+  // {w, h, fx, fy, cx, cy, coeffs[5]{k1,k2,p1,p2,k3}}
+  switch (mode) {
+    case StreamMode::STREAM_640x480:
+      return {640, 480, 979.8, 942.8, 682.3 / 2, 254.9, {0, 0, 0, 0, 0}};
+    case StreamMode::STREAM_1280x480:
+      return {640, 480, 979.8, 942.8, 682.3, 254.9, {0, 0, 0, 0, 0}};
+    case StreamMode::STREAM_1280x720:
+      return {640, 480, 979.8, 942.8, 682.3, 254.9 * 2, {0, 0, 0, 0, 0}};
+    case StreamMode::STREAM_2560x720:
+      return {640, 480, 979.8, 942.8, 682.3 * 2, 254.9 * 2, {0, 0, 0, 0, 0}};
+    default:
+      return {640, 480, 979.8, 942.8, 682.3, 254.9, {0, 0, 0, 0, 0}};
+  }
 }
