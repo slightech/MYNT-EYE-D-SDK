@@ -56,6 +56,9 @@ int main(int argc, char const *argv[]) {
   // Enable what stream datas: left_color, right_color, depth
   cam.EnableStreamData(ImageType::IMAGE_ALL);
 
+  // Enable motion datas until you get them
+  cam.EnableMotionDatas();
+
   cam.Open(params);
 
   std::cout << std::endl;
