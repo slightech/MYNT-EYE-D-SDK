@@ -48,6 +48,8 @@ class BlockingQueue {
 
   Container MoveAll();
 
+  void Clear();
+
   bool Empty() const;
   size_type Size() const;
 
@@ -167,6 +169,12 @@ template <typename T, typename C>
 C BlockingQueue<T, C>::MoveAll() {
   std::unique_lock<std::mutex> lock(mutex_);
   return std::move(queue_);
+}
+
+template <typename T, typename C>
+void BlockingQueue<T, C>::Clear() {
+  std::lock_guard<std::mutex> _(mutex_);
+  return queue_.clear();
 }
 
 template <typename T, typename C>

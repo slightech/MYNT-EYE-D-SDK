@@ -48,9 +48,11 @@ Streams::~Streams() {
 }
 
 void Streams::EnableImageInfo(bool sync) {
-  is_image_info_enabled_ = true;
-  is_image_info_sync_ = sync;
-  InitImageWithInfoQueue();
+  OnImageInfoStateChanged(true, sync);
+}
+
+void Streams::DisableImageInfo() {
+  OnImageInfoStateChanged(false, false);
 }
 
 bool Streams::IsImageInfoEnabled() {
@@ -62,10 +64,7 @@ void Streams::EnableStreamData(const ImageType& type) {
     case ImageType::IMAGE_LEFT_COLOR:
     case ImageType::IMAGE_RIGHT_COLOR:
     case ImageType::IMAGE_DEPTH:
-      if (image_queue_map_.find(type) == image_queue_map_.end()) {
-        image_queue_map_[type] =
-            std::make_shared<image_queue_t>(IMAGE_QUEUE_MAX_SIZE);
-      }
+      OnStreamDataStateChanged(type, true);
       break;
     case ImageType::IMAGE_ALL:
       EnableStreamData(ImageType::IMAGE_LEFT_COLOR);
@@ -73,16 +72,18 @@ void Streams::EnableStreamData(const ImageType& type) {
       EnableStreamData(ImageType::IMAGE_DEPTH);
       break;
   }
-  InitImageWithInfoQueue();
-  StartImageCapturing();
+}
+
+void Streams::DisableStreamData(const ImageType& type) {
+  OnStreamDataStateChanged(type, false);
 }
 
 bool Streams::IsStreamDataEnabled(const ImageType& type) {
-  return image_queue_map_.find(type) != image_queue_map_.end();
+  return is_image_enabled_set_.find(type) != is_image_enabled_set_.end();
 }
 
 bool Streams::HasStreamDataEnabled() {
-  return !image_queue_map_.empty();
+  return !is_image_enabled_set_.empty();
 }
 
 Streams::data_t Streams::GetStreamData(const ImageType& type) {
@@ -201,6 +202,7 @@ void Streams::StopImageCapturing() {
   }
 }
 
+// lazy init the queues about image info
 void Streams::InitImageWithInfoQueue() {
   if (!is_image_info_sync_) return;
 
@@ -220,6 +222,46 @@ void Streams::InitImageWithInfoQueue() {
     if (img_info_queue_map.find(type) == img_info_queue_map.end()) {
       img_info_queue_map[type] =
           std::make_shared<img_info_queue_t>(IMAGE_INFO_QUEUE_MAX_SIZE);
+    }
+  }
+}
+
+void Streams::OnImageInfoStateChanged(bool enabled, bool sync) {
+  is_image_info_enabled_ = enabled;
+  is_image_info_sync_ = sync;
+  if (sync) {
+    InitImageWithInfoQueue();
+  } else {
+    // not remove their keys, as may access in thread but no lock
+    for (auto&& datas : image_with_info_datas_map_) {
+      datas.second->Clear();
+    }
+    for (auto&& infos : image_info_queue_map_) {
+      infos.second->Clear();
+    }
+  }
+}
+
+void Streams::OnStreamDataStateChanged(const ImageType& type, bool enabled) {
+  if (enabled) {
+    is_image_enabled_set_.insert(type);
+    // lazy init queue about image
+    if (image_queue_map_.find(type) == image_queue_map_.end()) {
+      image_queue_map_[type] =
+          std::make_shared<image_queue_t>(IMAGE_QUEUE_MAX_SIZE);
+    }
+    InitImageWithInfoQueue();
+    StartImageCapturing();
+  } else {
+    is_image_enabled_set_.erase(type);
+    // not remove the key, as will access in thread but no lock
+    if (image_queue_map_.find(type) == image_queue_map_.end()) {
+      image_queue_map_[type]->Clear();
+      image_with_info_datas_map_[type]->Clear();
+      image_info_queue_map_[type]->Clear();
+    }
+    if (!HasStreamDataEnabled()) {
+      StopImageCapturing();
     }
   }
 }

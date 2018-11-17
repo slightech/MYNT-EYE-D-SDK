@@ -18,6 +18,7 @@
 #include <deque>
 #include <functional>
 #include <map>
+#include <set>
 #include <thread>
 #include <vector>
 
@@ -60,9 +61,11 @@ class Streams {
    * If sync is true, indicates can get infos from callback or access it from StreamData.
    */
   void EnableImageInfo(bool sync);
+  void DisableImageInfo();
   bool IsImageInfoEnabled();
 
   void EnableStreamData(const ImageType& type);
+  void DisableStreamData(const ImageType& type);
   bool IsStreamDataEnabled(const ImageType& type);
   bool HasStreamDataEnabled();
 
@@ -85,6 +88,10 @@ class Streams {
   void StopImageCapturing();
 
   void InitImageWithInfoQueue();
+
+  void OnImageInfoStateChanged(bool enabled, bool sync);
+  void OnStreamDataStateChanged(const ImageType& type, bool enabled);
+
   void SyncImageWithInfo(bool force);
 
   void OnColorCaptured(const Image::pointer& color);
@@ -109,6 +116,7 @@ class Streams {
 
   bool is_right_color_supported_;
 
+  std::set<ImageType> is_image_enabled_set_;
   std::map<ImageType, image_queue_ptr_t> image_queue_map_;
 
   bool is_image_capturing_;
