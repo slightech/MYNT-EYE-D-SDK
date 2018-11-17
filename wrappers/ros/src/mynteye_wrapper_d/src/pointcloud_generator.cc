@@ -24,7 +24,7 @@ PointCloudGenerator::PointCloudGenerator(CameraIntrinsics in, Callback callback,
     rate_(nullptr),
     running_(false),
     generating_(false),
-    _factor(factor) {
+    factor_(factor) {
   if (frequency > 0) {
     rate_.reset(new mynteye::Rate(frequency));
   }
@@ -44,8 +44,8 @@ bool PointCloudGenerator::Push(cv::Mat color, cv::Mat depth, ros::Time stamp) {
     std::lock_guard<std::mutex> _(mutex_);
     if (generating_) return false;
     generating_ = true;
-    color_ = color.clone();
-    depth_ = depth.clone();
+    color_ = color/*.clone()*/;
+    depth_ = depth/*.clone()*/;
     stamp_ = stamp;
   }
   condition_.notify_one();
@@ -115,7 +115,7 @@ void PointCloudGenerator::Run() {
         if (d == 0 || d == 4096)
           continue;
 
-        *iter_z = d / _factor;
+        *iter_z = d / factor_;
         *iter_x = (n - in_.cx) * *iter_z / in_.fx;
         *iter_y = (m - in_.cy) * *iter_z / in_.fy;
 

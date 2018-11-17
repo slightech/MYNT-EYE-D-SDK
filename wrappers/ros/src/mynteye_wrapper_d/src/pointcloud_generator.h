@@ -45,9 +45,8 @@ class PointCloudGenerator {
 
   bool Push(cv::Mat color, cv::Mat depth, ros::Time stamp);
 
-  inline void setFactor(double factor) {_factor = factor;}
-
-  inline double getFactor() { return _factor;}
+  double factor() { return factor_; }
+  void set_factor(double factor) { factor_ = factor; }
 
  private:
   void Start();
@@ -70,7 +69,7 @@ class PointCloudGenerator {
   cv::Mat depth_;
   ros::Time stamp_;
 
-  double _factor;
+  double factor_;
 
   bool generating_;
 };

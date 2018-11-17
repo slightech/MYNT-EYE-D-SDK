@@ -80,10 +80,13 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
   // Others
 
-  // std::unique_ptr<PointCloudGenerator> pointcloud_generator;
+  std::unique_ptr<PointCloudGenerator> pointcloud_generator;
 
   std::shared_ptr<ImuData> imu_accel;
   std::shared_ptr<ImuData> imu_gyro;
+
+  cv::Mat points_color;
+  cv::Mat points_depth;
 
   typedef struct SubResult {
     bool left_mono;
@@ -275,6 +278,16 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       right_info_ptr_ = nullptr;
     }
 
+    // pointcloud generator
+    pointcloud_generator.reset(new PointCloudGenerator(
+      in_ok ? in.left : getDefaultCameraIntrinsics(params.stream_mode),
+      [this](sensor_msgs::PointCloud2 msg) {
+        // msg.header.seq = 0;
+        // msg.header.stamp = ros::Time::now();
+        msg.header.frame_id = points_frame_id;
+        pub_points.publish(msg);
+      }, factor, points_frequency));
+
     // loop
     ros::Rate loop_rate(framerate);
     while (nh_ns.ok()) {
@@ -348,9 +361,6 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
             if (sub_result.left) {
               publishLeft(data, sub_result.left_color, sub_result.left_mono);
             }
-            if (sub_result.points) {
-              // ...
-            }
           } break;
           case ImageType::IMAGE_RIGHT_COLOR: {
             if (sub_result.right) {
@@ -360,9 +370,6 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
           case ImageType::IMAGE_DEPTH: {
             if (sub_result.depth) {
               publishDepth(data);
-            }
-            if (sub_result.points) {
-              // ...
             }
           } break;
         }
@@ -401,13 +408,13 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   void publishLeft(const StreamData& data, bool color_sub, bool mono_sub) {
     publishColor(data, left_info_ptr_,
         pub_left_color, color_sub, left_color_frame_id,
-        pub_left_mono, mono_sub, left_mono_frame_id);
+        pub_left_mono, mono_sub, left_mono_frame_id, true);
   }
 
   void publishRight(const StreamData& data, bool color_sub, bool mono_sub) {
     publishColor(data, right_info_ptr_,
         pub_right_color, color_sub, right_color_frame_id,
-        pub_right_mono, mono_sub, right_mono_frame_id);
+        pub_right_mono, mono_sub, right_mono_frame_id, false);
   }
 
   void publishColor(const StreamData& data,
@@ -415,7 +422,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       const image_transport::CameraPublisher& pub_color, bool color_sub,
       const std::string color_frame_id,
       const image_transport::CameraPublisher& pub_mono, bool mono_sub,
-      const std::string mono_frame_id) {
+      const std::string mono_frame_id, bool is_left) {
     auto timestamp = hardTimeToSoftTime(data.img_info->timestamp);
     auto&& mat = data.img->To(ImageFormat::COLOR_RGB)->ToMat();
 
@@ -437,9 +444,14 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
       cv::Mat dst;
       cv::cvtColor(mat, dst, CV_RGB2GRAY);
-      auto &&msg = cv_bridge::CvImage(header, enc::MONO8, dst).toImageMsg();
+      auto&& msg = cv_bridge::CvImage(header, enc::MONO8, dst).toImageMsg();
       if (info) info->header.stamp = msg->header.stamp;
       pub_mono.publish(msg, info);
+    }
+
+    if (is_left && sub_result.points) {
+      points_color = mat;
+      publishPoints(timestamp);
     }
   }
 
@@ -455,6 +467,11 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       auto&& mat = data.img->To(ImageFormat::DEPTH_RAW)->ToMat();
       pub_depth.publish(
           cv_bridge::CvImage(header, enc::MONO16, mat).toImageMsg(), info);
+
+      if (sub_result.points) {
+        points_depth = mat;
+        publishPoints(header.stamp);
+      }
     } else if (params.depth_mode == DepthMode::DEPTH_GRAY) {
       auto&& mat = data.img->To(ImageFormat::DEPTH_GRAY_24)->ToMat();
       pub_depth.publish(
@@ -466,6 +483,17 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     } else {
       NODELET_ERROR_STREAM("Depth mode unsupported");
     }
+  }
+
+  void publishPoints(ros::Time stamp) {
+    // NODELET_INFO_STREAM("publishPoints ..");
+    if (points_color.empty() || points_depth.empty()) {
+      // NODELET_INFO_STREAM("publishPoints skipped ..");
+      return;
+    }
+    pointcloud_generator->Push(points_color, points_depth, stamp);
+    points_color.release();
+    points_depth.release();
   }
 
   void publishImu(ros::Time stamp, bool temp_sub) {
@@ -590,6 +618,22 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
     return ros::Time(
         soft_time_begin + (_hard_time - hard_time_begin) * 0.00001f);
+  }
+
+  CameraIntrinsics getDefaultCameraIntrinsics(const StreamMode& mode) {
+    // {w, h, fx, fy, cx, cy, coeffs[5]{k1,k2,p1,p2,k3}}
+    switch (mode) {
+      case StreamMode::STREAM_640x480:
+        return {640, 480, 979.8, 942.8, 682.3 / 2, 254.9, {0, 0, 0, 0, 0}};
+      case StreamMode::STREAM_1280x480:
+        return {640, 480, 979.8, 942.8, 682.3, 254.9, {0, 0, 0, 0, 0}};
+      case StreamMode::STREAM_1280x720:
+        return {640, 480, 979.8, 942.8, 682.3, 254.9 * 2, {0, 0, 0, 0, 0}};
+      case StreamMode::STREAM_2560x720:
+        return {640, 480, 979.8, 942.8, 682.3 * 2, 254.9 * 2, {0, 0, 0, 0, 0}};
+      default:
+        return {640, 480, 979.8, 942.8, 682.3, 254.9, {0, 0, 0, 0, 0}};
+    }
   }
 };
 
