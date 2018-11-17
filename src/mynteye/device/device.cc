@@ -59,7 +59,8 @@ std::string get_stream_format_string(const StreamFormat& stream_format) {
 }  // namespace
 
 Device::Device()
-  : etron_di_(nullptr), dev_sel_info_({-1}) {
+  : etron_di_(nullptr), dev_sel_info_({-1}),
+    camera_calibrations_({nullptr, nullptr}) {
   DBG_LOGD(__func__);
   Init();
 }
@@ -372,7 +373,8 @@ OpenParams Device::GetOpenParams() const {
   return open_params_;
 }
 
-CameraCalibration Device::GetCameraCalibration(const StreamMode& stream_mode) {
+std::shared_ptr<CameraCalibration> Device::GetCameraCalibration(
+    const StreamMode& stream_mode) {
   switch (stream_mode) {
     case StreamMode::STREAM_640x480:
     case StreamMode::STREAM_1280x480:  // 480p, vga
@@ -385,17 +387,15 @@ CameraCalibration Device::GetCameraCalibration(const StreamMode& stream_mode) {
   }
 }
 
-void Device::GetCameraCalibrationFile(const StreamMode& stream_mode,
+bool Device::GetCameraCalibrationFile(const StreamMode& stream_mode,
                                       const std::string& filename) {
   switch (stream_mode) {
     case StreamMode::STREAM_640x480:
     case StreamMode::STREAM_1280x480:  // 480p, vga
-      GetCameraCalibrationFile(1, filename);
-      break;
+      return GetCameraCalibrationFile(1, filename);
     case StreamMode::STREAM_1280x720:
     case StreamMode::STREAM_2560x720:  // 720p, hd
-      GetCameraCalibrationFile(0, filename);
-      break;
+      return GetCameraCalibrationFile(0, filename);
     default:
       throw new std::runtime_error("StreamMode is unknown");
   }
@@ -572,12 +572,12 @@ bool Device::SetFWRegister(std::uint16_t address, std::uint16_t value,
       value, flag);
 }
 
-CameraCalibration Device::GetCameraCalibration(int index) {
+std::shared_ptr<CameraCalibration> Device::GetCameraCalibration(int index) {
   return camera_calibrations_[index];
 }
 
-void Device::GetCameraCalibrationFile(int index, const std::string& filename) {
-  if (!ExpectOpened(__func__)) return;
+bool Device::GetCameraCalibrationFile(int index, const std::string& filename) {
+  if (!ExpectOpened(__func__)) return false;
   int nRet;
 
   // for parse log test
@@ -586,7 +586,10 @@ void Device::GetCameraCalibrationFile(int index, const std::string& filename) {
   // EtronDI_GetRectifyMatLogData
   nRet = EtronDI_GetRectifyMatLogData(etron_di_,
     &dev_sel_info_, &eSPRectLogData, index);
-  printf("nRet = %d", nRet);
+  // printf("nRet = %d", nRet);
+  if (nRet != ETronDI_OK) {
+    return false;
+  }
 
   FILE *pfile;
   // char buf[128];
@@ -691,65 +694,69 @@ void Device::GetCameraCalibrationFile(int index, const std::string& filename) {
     fprintf(pfile, "\n");
   }
   fclose(pfile);
+  return true;
 }
 
 void Device::SyncCameraCalibrations() {
   if (!ExpectOpened(__func__)) return;
   camera_calibrations_.clear();
   for (int index = 0; index < 2; index++) {
-    struct CameraCalibration camera_calib;
     eSPCtrl_RectLogData eSPRectLogData;
-    EtronDI_GetRectifyMatLogData(etron_di_,
-      &dev_sel_info_, &eSPRectLogData, index);
+    int ret = EtronDI_GetRectifyMatLogData(etron_di_, &dev_sel_info_,
+        &eSPRectLogData, index);
+    if (ret != ETronDI_OK) {
+      return;
+    }
     int i;
-    camera_calib.InImgWidth = eSPRectLogData.InImgWidth;
-    camera_calib.InImgHeight = eSPRectLogData.InImgHeight;
-    camera_calib.OutImgWidth = eSPRectLogData.OutImgWidth;
-    camera_calib.OutImgHeight = eSPRectLogData.OutImgHeight;
-    camera_calib.RECT_ScaleWidth = eSPRectLogData.RECT_ScaleWidth;
-    camera_calib.RECT_ScaleHeight = eSPRectLogData.RECT_ScaleHeight;
+    auto camera_calib = std::make_shared<CameraCalibration>();
+    camera_calib->InImgWidth = eSPRectLogData.InImgWidth;
+    camera_calib->InImgHeight = eSPRectLogData.InImgHeight;
+    camera_calib->OutImgWidth = eSPRectLogData.OutImgWidth;
+    camera_calib->OutImgHeight = eSPRectLogData.OutImgHeight;
+    camera_calib->RECT_ScaleWidth = eSPRectLogData.RECT_ScaleWidth;
+    camera_calib->RECT_ScaleHeight = eSPRectLogData.RECT_ScaleHeight;
     for (i=0; i < 9; i++) {
-      camera_calib.CamMat1[i] = eSPRectLogData.CamMat1[i];
+      camera_calib->CamMat1[i] = eSPRectLogData.CamMat1[i];
     }
     for (i=0; i < 8; i++) {
-      camera_calib.CamDist1[i] = eSPRectLogData.CamDist1[i];
+      camera_calib->CamDist1[i] = eSPRectLogData.CamDist1[i];
     }
     for (i=0; i < 9; i++) {
-      camera_calib.CamMat2[i] = eSPRectLogData.CamMat2[i];
+      camera_calib->CamMat2[i] = eSPRectLogData.CamMat2[i];
     }
     for (i=0; i < 8; i++) {
-      camera_calib.CamDist2[i] = eSPRectLogData.CamDist2[i];
+      camera_calib->CamDist2[i] = eSPRectLogData.CamDist2[i];
     }
     for (i=0; i < 9; i++) {
-      camera_calib.RotaMat[i] = eSPRectLogData.RotaMat[i];
+      camera_calib->RotaMat[i] = eSPRectLogData.RotaMat[i];
     }
     for (i=0; i < 3; i++) {
-      camera_calib.TranMat[i] = eSPRectLogData.TranMat[i];
+      camera_calib->TranMat[i] = eSPRectLogData.TranMat[i];
     }
     for (i=0; i < 9; i++) {
-      camera_calib.LRotaMat[i] = eSPRectLogData.LRotaMat[i];
+      camera_calib->LRotaMat[i] = eSPRectLogData.LRotaMat[i];
     }
     for (i=0; i < 9; i++) {
-      camera_calib.RRotaMat[i] = eSPRectLogData.RRotaMat[i];
+      camera_calib->RRotaMat[i] = eSPRectLogData.RRotaMat[i];
     }
     for (i=0; i < 12; i++) {
-      camera_calib.NewCamMat1[i] = eSPRectLogData.NewCamMat1[i];
+      camera_calib->NewCamMat1[i] = eSPRectLogData.NewCamMat1[i];
     }
     for (i=0; i < 12; i++) {
-      camera_calib.NewCamMat2[i] = eSPRectLogData.NewCamMat2[i];
+      camera_calib->NewCamMat2[i] = eSPRectLogData.NewCamMat2[i];
     }
-    camera_calib.RECT_Crop_Row_BG = eSPRectLogData.RECT_Crop_Row_BG;
-    camera_calib.RECT_Crop_Row_ED = eSPRectLogData.RECT_Crop_Row_ED;
-    camera_calib.RECT_Crop_Col_BG_L = eSPRectLogData.RECT_Crop_Col_BG_L;
-    camera_calib.RECT_Crop_Col_ED_L = eSPRectLogData.RECT_Crop_Col_ED_L;
-    camera_calib.RECT_Scale_Col_M = eSPRectLogData.RECT_Scale_Col_M;
-    camera_calib.RECT_Scale_Col_N = eSPRectLogData.RECT_Scale_Col_N;
-    camera_calib.RECT_Scale_Row_M = eSPRectLogData.RECT_Scale_Row_M;
-    camera_calib.RECT_Scale_Row_N = eSPRectLogData.RECT_Scale_Row_N;
-    camera_calib.RECT_AvgErr = eSPRectLogData.RECT_AvgErr;
-    camera_calib.nLineBuffers = eSPRectLogData.nLineBuffers;
+    camera_calib->RECT_Crop_Row_BG = eSPRectLogData.RECT_Crop_Row_BG;
+    camera_calib->RECT_Crop_Row_ED = eSPRectLogData.RECT_Crop_Row_ED;
+    camera_calib->RECT_Crop_Col_BG_L = eSPRectLogData.RECT_Crop_Col_BG_L;
+    camera_calib->RECT_Crop_Col_ED_L = eSPRectLogData.RECT_Crop_Col_ED_L;
+    camera_calib->RECT_Scale_Col_M = eSPRectLogData.RECT_Scale_Col_M;
+    camera_calib->RECT_Scale_Col_N = eSPRectLogData.RECT_Scale_Col_N;
+    camera_calib->RECT_Scale_Row_M = eSPRectLogData.RECT_Scale_Row_M;
+    camera_calib->RECT_Scale_Row_N = eSPRectLogData.RECT_Scale_Row_N;
+    camera_calib->RECT_AvgErr = eSPRectLogData.RECT_AvgErr;
+    camera_calib->nLineBuffers = eSPRectLogData.nLineBuffers;
     for (i = 0; i < 16; i++) {
-      camera_calib.ReProjectMat[i] = eSPRectLogData.ReProjectMat[i];
+      camera_calib->ReProjectMat[i] = eSPRectLogData.ReProjectMat[i];
     }
     camera_calibrations_.push_back(camera_calib);
   }

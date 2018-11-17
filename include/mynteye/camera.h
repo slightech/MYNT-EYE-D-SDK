@@ -75,9 +75,21 @@ class MYNTEYE_API Camera {
   std::string GetDescriptor(const Descriptor &desc) const;
 
   /** Get the intrinsics of camera */
-  StreamIntrinsics GetStreamIntrinsics(const StreamMode& stream_mode) const;
+  StreamIntrinsics GetStreamIntrinsics(const StreamMode& stream_mode) const {
+    bool ok = true;
+    return GetStreamIntrinsics(stream_mode, &ok);
+  }
+  /** Get the intrinsics of camera */
+  StreamIntrinsics GetStreamIntrinsics(const StreamMode& stream_mode,
+      bool* ok) const;
   /** Get the extrinsics of camera */
-  StreamExtrinsics GetStreamExtrinsics(const StreamMode& stream_mode) const;
+  StreamExtrinsics GetStreamExtrinsics(const StreamMode& stream_mode) const {
+    bool ok = true;
+    return GetStreamExtrinsics(stream_mode, &ok);
+  }
+  /** Get the extrinsics of camera */
+  StreamExtrinsics GetStreamExtrinsics(const StreamMode& stream_mode,
+      bool* ok) const;
 
   /** Write camera calibration bin file */
   bool WriteCameraCalibrationBinFile(const std::string& filename);

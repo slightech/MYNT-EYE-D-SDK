@@ -70,9 +70,9 @@ class MYNTEYE_API CameraPrivate {
   std::string GetDescriptor(const Descriptor &desc) const;
 
   /** Get the intrinsics of camera */
-  StreamIntrinsics GetStreamIntrinsics(const StreamMode& stream_mode);
+  StreamIntrinsics GetStreamIntrinsics(const StreamMode& stream_mode, bool* ok);
   /** Get the extrinsics from left to right */
-  StreamExtrinsics GetStreamExtrinsics(const StreamMode& stream_mode);
+  StreamExtrinsics GetStreamExtrinsics(const StreamMode& stream_mode, bool* ok);
 
   /** Write camera calibration bin file */
   bool WriteCameraCalibrationBinFile(const std::string& filename);
@@ -152,9 +152,10 @@ class MYNTEYE_API CameraPrivate {
   void Close();
 
   /** @deprecated Get camera calibration */
-  CameraCalibration GetCameraCalibration(const StreamMode& stream_mode);
+  std::shared_ptr<CameraCalibration> GetCameraCalibration(
+      const StreamMode& stream_mode);
   /** @deprecated Get camera calibration file */
-  void GetCameraCalibrationFile(const StreamMode& stream_mode,
+  bool GetCameraCalibrationFile(const StreamMode& stream_mode,
                                 const std::string& filename);
 
  protected:
@@ -187,9 +188,6 @@ class MYNTEYE_API CameraPrivate {
   std::shared_ptr<device::Descriptors> descriptors_;
   std::shared_ptr<MotionIntrinsics> motion_intrinsics_;
   std::shared_ptr<MotionExtrinsics> motion_extrinsics_;
-
-  std::shared_ptr<StreamIntrinsics> stream_intrinsics_;
-  std::shared_ptr<StreamExtrinsics> stream_extrinsics_;
 
   img_info_async_callback_t::pointer img_info_async_callback_;
   std::map<ImageType, stream_async_callback_t::pointer> stream_async_callbacks_;

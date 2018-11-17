@@ -18,6 +18,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <memory>
 #include <mutex>
 #include <thread>
 
@@ -75,9 +76,10 @@ class Device {
   Image::pointer GetImageDepth();  // cross
 
   /** Get camera calibration. */
-  CameraCalibration GetCameraCalibration(const StreamMode& stream_mode);
+  std::shared_ptr<CameraCalibration> GetCameraCalibration(
+      const StreamMode& stream_mode);
   /** Get camera calibration file. */
-  void GetCameraCalibrationFile(const StreamMode& stream_mode,
+  bool GetCameraCalibrationFile(const StreamMode& stream_mode,
                                 const std::string& filename);
   /** Set camera calibration bin file. */
   bool SetCameraCalibrationBinFile(const std::string& filename);
@@ -115,8 +117,8 @@ class Device {
   bool SetFWRegister(std::uint16_t address, std::uint16_t value,
       int flag = FG_Address_1Byte);
 
-  CameraCalibration GetCameraCalibration(int index);
-  void GetCameraCalibrationFile(int index, const std::string& filename);
+  std::shared_ptr<CameraCalibration> GetCameraCalibration(int index);
+  bool GetCameraCalibrationFile(int index, const std::string& filename);
 
   void SyncCameraCalibrations();
 
@@ -164,7 +166,7 @@ class Device {
 
   DepthMode depth_mode_;
 
-  std::vector<CameraCalibration> camera_calibrations_;
+  std::vector<std::shared_ptr<CameraCalibration>> camera_calibrations_;
 
   OpenParams open_params_;
 };

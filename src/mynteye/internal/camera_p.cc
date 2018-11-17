@@ -122,46 +122,51 @@ std::string CameraPrivate::GetDescriptor(const Descriptor &desc) const {
 }
 
 StreamIntrinsics CameraPrivate::GetStreamIntrinsics(
-    const StreamMode& stream_mode) {
-  if (!stream_intrinsics_) {
-    stream_intrinsics_ = std::make_shared<StreamIntrinsics>();
+    const StreamMode& stream_mode, bool* ok) {
+  StreamIntrinsics in;
+  auto calib = GetCameraCalibration(stream_mode);
+  if (calib == nullptr) {
+    *ok = false;
+    return std::move(in);
   }
-  auto streamData = GetCameraCalibration(stream_mode);
-  stream_intrinsics_->left.width = streamData.InImgWidth/2;
-  stream_intrinsics_->left.height = streamData.InImgHeight;
-  stream_intrinsics_->left.fx = streamData.CamMat1[0];
-  stream_intrinsics_->left.fy = streamData.CamMat1[4];
-  stream_intrinsics_->left.cx = streamData.CamMat1[2];
-  stream_intrinsics_->left.cy = streamData.CamMat1[5];
+  in.left.width = calib->InImgWidth/2;
+  in.left.height = calib->InImgHeight;
+  in.left.fx = calib->CamMat1[0];
+  in.left.fy = calib->CamMat1[4];
+  in.left.cx = calib->CamMat1[2];
+  in.left.cy = calib->CamMat1[5];
   for (int i = 0; i < 5; i++) {
-    stream_intrinsics_->left.coeffs[i] = streamData.CamDist1[i];
+    in.left.coeffs[i] = calib->CamDist1[i];
   }
-
-  stream_intrinsics_->right.width = streamData.InImgWidth/2;
-  stream_intrinsics_->right.height = streamData.InImgHeight;
-  stream_intrinsics_->right.fx = streamData.CamMat2[0];
-  stream_intrinsics_->right.fy = streamData.CamMat2[4];
-  stream_intrinsics_->right.cx = streamData.CamMat2[2];
-  stream_intrinsics_->right.cy = streamData.CamMat2[5];
+  in.right.width = calib->InImgWidth/2;
+  in.right.height = calib->InImgHeight;
+  in.right.fx = calib->CamMat2[0];
+  in.right.fy = calib->CamMat2[4];
+  in.right.cx = calib->CamMat2[2];
+  in.right.cy = calib->CamMat2[5];
   for (int i = 0; i < 5; i++) {
-    stream_intrinsics_->right.coeffs[i] = streamData.CamDist2[i];
+    in.right.coeffs[i] = calib->CamDist2[i];
   }
-  return *stream_intrinsics_;
+  *ok = true;
+  return std::move(in);
 }
 
 StreamExtrinsics CameraPrivate::GetStreamExtrinsics(
-  const StreamMode& stream_mode) {
-  if (!stream_extrinsics_) {
-    stream_extrinsics_ = std::make_shared<StreamExtrinsics>();
+    const StreamMode& stream_mode, bool* ok) {
+  StreamExtrinsics ex;
+  auto calib = GetCameraCalibration(stream_mode);
+  if (calib == nullptr) {
+    *ok = false;
+    return std::move(ex);
   }
-  auto streamData = GetCameraCalibration(stream_mode);
   for (int i = 0; i < 9; i++) {
-    stream_extrinsics_->rotation[i/3][i%3] = streamData.RotaMat[i];
+    ex.rotation[i/3][i%3] = calib->RotaMat[i];
   }
   for (int j = 0; j < 3; j++) {
-    stream_extrinsics_->translation[j] = streamData.TranMat[j];
+    ex.translation[j] = calib->TranMat[j];
   }
-  return *stream_extrinsics_;
+  *ok = true;
+  return std::move(ex);
 }
 
 bool CameraPrivate::WriteCameraCalibrationBinFile(const std::string& filename) {
@@ -316,12 +321,12 @@ void CameraPrivate::Close() {
   device_->Close();
 }
 
-CameraCalibration CameraPrivate::GetCameraCalibration(
+std::shared_ptr<CameraCalibration> CameraPrivate::GetCameraCalibration(
     const StreamMode& stream_mode) {
   return device_->GetCameraCalibration(stream_mode);
 }
 
-void CameraPrivate::GetCameraCalibrationFile(
+bool CameraPrivate::GetCameraCalibrationFile(
     const StreamMode& stream_mode, const std::string& filename) {
   return device_->GetCameraCalibrationFile(stream_mode, filename);
 }

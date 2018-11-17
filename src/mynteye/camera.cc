@@ -69,13 +69,13 @@ std::string Camera::GetDescriptor(const Descriptor &desc) const {
 }
 
 StreamIntrinsics Camera::GetStreamIntrinsics(
-    const StreamMode& stream_mode) const {
-  return p_->GetStreamIntrinsics(stream_mode);
+    const StreamMode& stream_mode, bool* ok) const {
+  return p_->GetStreamIntrinsics(stream_mode, ok);
 }
 
 StreamExtrinsics Camera::GetStreamExtrinsics(
-    const StreamMode& stream_mode) const {
-  return p_->GetStreamExtrinsics(stream_mode);
+    const StreamMode& stream_mode, bool* ok) const {
+  return p_->GetStreamExtrinsics(stream_mode, ok);
 }
 
 bool Camera::WriteCameraCalibrationBinFile(const std::string& filename) {
@@ -204,11 +204,13 @@ std::string Camera::GetInfo(const Info &info) const {
 }
 
 CameraCtrlRectLogData Camera::GetHDCameraCtrlData() {
-  return p_->GetCameraCalibration(StreamMode::STREAM_1280x720);
+  auto calib = p_->GetCameraCalibration(StreamMode::STREAM_1280x720);
+  return (calib == nullptr) ? CameraCalibration() : (*calib);
 }
 
 CameraCtrlRectLogData Camera::GetVGACameraCtrlData() {
-  return p_->GetCameraCalibration(StreamMode::STREAM_640x480);
+  auto calib = p_->GetCameraCalibration(StreamMode::STREAM_640x480);
+  return (calib == nullptr) ? CameraCalibration() : (*calib);
 }
 
 void Camera::GetHDCameraLogDataFile() {
