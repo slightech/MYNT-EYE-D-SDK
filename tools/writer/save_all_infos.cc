@@ -9,9 +9,14 @@ int main(int argc, char *argv[]) {
   }
 
   auto &&device = std::make_shared<Camera>();
+  auto &&descs = device->GetDescriptors();
+  if (!descs) {
+    std::cerr << "\nDevice was not supported to get infos." << std::endl;
+    return 1;
+  }
 
   dir.append(MYNTEYE_OS_SEP "SN")
-     .append(device->GetDescriptors()->serial_number);
+     .append(descs->serial_number);
 
   tools::DeviceWriter writer(device);
   writer.SaveAllDatas(dir);

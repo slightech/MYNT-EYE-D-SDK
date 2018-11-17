@@ -20,7 +20,7 @@ DeviceWriter::~DeviceWriter() {
 bool DeviceWriter::WriteDescriptors(const device_desc_t &desc) {
   auto &&dev_desc = device_->GetDescriptors();
   if (nullptr == dev_desc) {
-    std::cerr << "Device was not initialization." << std::endl;
+    std::cerr << "\nDevice was not supported to write." << std::endl;
     return false;
   }
   dev_desc->lens_type = Type(desc.lens_type);
@@ -53,7 +53,7 @@ bool DeviceWriter::WriteDescriptors(const std::string &filepath) {
 bool DeviceWriter::WriteImuParams(const imu_params_t &params) {
   auto &&dev_desc = device_->GetDescriptors();
   if (nullptr == dev_desc) {
-    std::cerr << "Device was not initialization." << std::endl;
+    std::cerr << "\nDevice was not supported to write." << std::endl;
     return false;
   }
   if (device_->WriteDeviceFlash(dev_desc.get(),
@@ -152,15 +152,25 @@ bool DeviceWriter::SaveImuParams(
 
 void DeviceWriter::SaveAllDatas(const std::string &dir) {
   if (!files::mkdir(dir)) {
-    std::cout << "Create directory failed: " << std::endl;
+    std::cout << "Create directory failed" << std::endl;
   }
-  SaveDescriptors(*device_->GetDescriptors(),
-      dir + MYNTEYE_OS_SEP "device.info");
-  auto &&m_in = device_->GetMotionIntrinsics();
-  SaveImuParams({
-    false, m_in.accel, m_in.gyro,
-    device_->GetMotionExtrinsics(),
-  }, dir + MYNTEYE_OS_SEP "imu.params");
+  auto descs = device_->GetDescriptors();
+  if (descs) {
+    SaveDescriptors(*descs, dir + MYNTEYE_OS_SEP "device.info");
+  } else {
+    std::cerr << "Get Descriptors failed" << std::endl;
+  }
+
+  bool ok;
+  auto &&m_in = device_->GetMotionIntrinsics(&ok);
+  if (ok) {
+    SaveImuParams({
+      false, m_in.accel, m_in.gyro,
+      device_->GetMotionExtrinsics(),
+    }, dir + MYNTEYE_OS_SEP "imu.params");
+  } else {
+    std::cerr << "Get imu params failed" << std::endl;
+  }
 }
 
 namespace {

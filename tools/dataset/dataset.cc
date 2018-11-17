@@ -27,9 +27,8 @@
 
 #define FULL_PRECISION \
   std::fixed << std::setprecision(std::numeric_limits<double>::max_digits10)
-/*
-#define OS_SEP "/"
-*/
+
+#define IMAGE_FILENAME_WIDTH 6
 
 MYNTEYE_BEGIN_NAMESPACE
 
@@ -72,10 +71,20 @@ void Dataset::SaveStreamData(const ImageType &type,
   auto &&writer = GetStreamWriter(type);
   auto seq = stream_count_[type];
 
-  writer->ofs << seq << ", " << data.img_info->frame_id << ", "
-    << data.img_info->timestamp << ", "
-    << data.img_info->exposure_time << std::endl;
-  ++stream_count_[type];
+  if (data.img_info) {
+    writer->ofs << seq << ", " << data.img_info->frame_id << ", "
+      << data.img_info->timestamp << ", "
+      << data.img_info->exposure_time << std::endl;
+    ++stream_count_[type];
+  }
+  /*
+  if (data.img) {
+    std::stringstream ss;
+    ss << writer->outdir << MYNTEYE_OS_SEP << std::dec
+       << std::setw(IMAGE_FILENAME_WIDTH) << std::setfill('0') << seq << ".png";
+    cv::imwrite(ss.str(), data.img->To(ImageFormat::COLOR_BGR)->ToMat());
+  }
+  */
 }
 
 Dataset::writer_t Dataset::GetMotionWriter() {

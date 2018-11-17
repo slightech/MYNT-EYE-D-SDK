@@ -56,8 +56,9 @@ int main(int argc, char const *argv[]) {
   // Enable what stream datas: left_color, right_color, depth
   cam.EnableStreamData(ImageType::IMAGE_ALL);
 
+  bool is_imu_ok = cam.IsMotionDatasSupported();
   // Enable motion datas until you get them
-  cam.EnableMotionDatas();
+  if (is_imu_ok) cam.EnableMotionDatas();
 
   cam.Open(params);
 
@@ -72,7 +73,6 @@ int main(int argc, char const *argv[]) {
 
   cv::namedWindow("color", cv::WINDOW_AUTOSIZE);
 
-  double t, fps = 0;
   std::size_t imu_count = 0;
   std::size_t img_count = 0;
   auto &&time_beg = times::now();
@@ -93,40 +93,37 @@ int main(int argc, char const *argv[]) {
       cv::imshow("color", color);
     }
 
-    t = static_cast<double>(cv::getTickCount());
-    auto &&motion_data = cam.GetMotionDatas();
-    imu_count += motion_data.size();
-
     {
       for (auto &&left : left_color) {
-        dataset.SaveStreamData(
-            ImageType::IMAGE_LEFT_COLOR, left);
+        dataset.SaveStreamData(ImageType::IMAGE_LEFT_COLOR, left);
       }
-
       for (auto &&right : right_color) {
-        dataset.SaveStreamData(
-            ImageType::IMAGE_RIGHT_COLOR, right);
+        dataset.SaveStreamData(ImageType::IMAGE_RIGHT_COLOR, right);
       }
+    }
+
+    if (is_imu_ok) {
+      auto &&motion_data = cam.GetMotionDatas();
+      imu_count += motion_data.size();
 
       for (auto &&motion : motion_data) {
         dataset.SaveMotionData(motion);
       }
-
-      std::cout << "\rSaved " << img_count << " imgs" <<
-        ", " << imu_count << " imus" << std::flush;
     }
+
+    std::cout << "\rSaved " << img_count << " imgs";
+    if (is_imu_ok) {
+      std::cout << ", " << imu_count << " imus";
+    }
+    std::cout << std::flush;
 
     char key = static_cast<char>(cv::waitKey(10));
     if (key == 27 || key == 'q' || key == 'Q') {  // ESC/Q
       break;
     }
-
-    t = static_cast<double>(cv::getTickCount()) - t;
-    fps = cv::getTickFrequency() / t;
   }
   std::cout << " to " << outdir << std::endl;
   auto &&time_end = times::now();
-  (void)(fps);
 
   cam.Close();
 
@@ -138,8 +135,10 @@ int main(int argc, char const *argv[]) {
     << ", cost: " << elapsed_ms << "ms" << std::endl;
   std::cout << "Img count: " << img_count
     << ", fps: " << (1000.f * img_count / elapsed_ms) << std::endl;
-  std::cout << "Imu count: " << imu_count
-    << ", hz: " << (1000.f * imu_count / elapsed_ms) << std::endl;
+  if (is_imu_ok) {
+    std::cout << "Imu count: " << imu_count
+      << ", hz: " << (1000.f * imu_count / elapsed_ms) << std::endl;
+  }
 
   cv::destroyAllWindows();
   return 0;
