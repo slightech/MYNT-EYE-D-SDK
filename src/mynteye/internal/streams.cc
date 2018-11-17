@@ -87,7 +87,18 @@ void Streams::EnableStreamData(const ImageType& type) {
 
 void Streams::DisableStreamData(const ImageType& type) {
   if (!IsStreamDataEnabled(type)) return;
-  OnStreamDataStateChanged(type, false);
+  switch (type) {
+    case ImageType::IMAGE_LEFT_COLOR:
+    case ImageType::IMAGE_RIGHT_COLOR:
+    case ImageType::IMAGE_DEPTH:
+      OnStreamDataStateChanged(type, false);
+      break;
+    case ImageType::IMAGE_ALL:
+      DisableStreamData(ImageType::IMAGE_LEFT_COLOR);
+      DisableStreamData(ImageType::IMAGE_RIGHT_COLOR);
+      DisableStreamData(ImageType::IMAGE_DEPTH);
+      break;
+  }
 }
 
 bool Streams::IsStreamDataEnabled(const ImageType& type) const {
