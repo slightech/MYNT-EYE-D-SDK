@@ -315,7 +315,9 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     bool right_sub = right_mono_sub || right_color_sub;
 
     if (left_sub || right_sub || depth_sub || points_sub) {
-      mynteye->EnableImageInfo(true);
+      if (mynteye->IsImageInfoSupported()) {
+        mynteye->EnableImageInfo(true);
+      }
       if (left_sub || points_sub) {
         mynteye->EnableStreamData(ImageType::IMAGE_LEFT_COLOR);
       }
@@ -331,7 +333,9 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     }
 
     if (imu_sub || temp_sub) {
-      mynteye->EnableMotionDatas(0);
+      if (mynteye->IsMotionDatasSupported()) {
+        mynteye->EnableMotionDatas(0);
+      }
     } else {
       mynteye->DisableMotionDatas();
     }
@@ -423,7 +427,9 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       const std::string color_frame_id,
       const image_transport::CameraPublisher& pub_mono, bool mono_sub,
       const std::string mono_frame_id, bool is_left) {
-    auto timestamp = hardTimeToSoftTime(data.img_info->timestamp);
+    auto timestamp = data.img_info
+        ? hardTimeToSoftTime(data.img_info->timestamp)
+        : ros::Time().now();
     auto&& mat = data.img->To(ImageFormat::COLOR_RGB)->ToMat();
 
     if (color_sub) {
@@ -458,7 +464,9 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   void publishDepth(const StreamData& data) {
     std_msgs::Header header;
     // header.seq = 0;
-    header.stamp = hardTimeToSoftTime(data.img_info->timestamp);
+    header.stamp = data.img_info
+        ? hardTimeToSoftTime(data.img_info->timestamp)
+        : ros::Time().now();
     header.frame_id = depth_frame_id;
 
     auto&& info = left_info_ptr_;

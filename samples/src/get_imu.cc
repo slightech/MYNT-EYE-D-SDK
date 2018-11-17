@@ -33,6 +33,11 @@ int main(int argc, char const* argv[]) {
   std::cout << "Open device: " << dev_info.index << ", "
       << dev_info.name << std::endl << std::endl;
 
+  if (!cam.IsMotionDatasEnabled()) {
+    std::cerr << "Error: IMU is not supported on your device." << std::endl;
+    return 1;
+  }
+
   // Warning: Color stream format MJPG doesn't work.
   mynteye::OpenParams params(dev_info.index);
   cam.Open(params);
