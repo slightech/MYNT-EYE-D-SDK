@@ -195,6 +195,10 @@ MotionExtrinsics CameraPrivate::GetMotionExtrinsics(bool* ok) const {
   }
 }
 
+bool CameraPrivate::IsWriteDeviceSupported() const {
+  return channels_->IsAvaliable();
+}
+
 bool CameraPrivate::WriteDeviceFlash(
     device::Descriptors *desc,
     device::ImuParams *imu_params,

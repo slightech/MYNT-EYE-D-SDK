@@ -90,6 +90,10 @@ MotionExtrinsics Camera::GetMotionExtrinsics(bool* ok) const {
   return p_->GetMotionExtrinsics(ok);
 }
 
+bool Camera::IsWriteDeviceSupported() const {
+  return p_->IsWriteDeviceSupported();
+}
+
 bool Camera::WriteDeviceFlash(
     device::Descriptors *desc,
     device::ImuParams *imu_params,

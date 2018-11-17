@@ -109,6 +109,8 @@ class MYNTEYE_API Camera {
   /** Get the extrinsics from left to motion */
   MotionExtrinsics GetMotionExtrinsics(bool* ok) const;
 
+  /** Whethor write device supported or not */
+  bool IsWriteDeviceSupported() const;
   /** Write device flash */
   bool WriteDeviceFlash(
       device::Descriptors *desc,
