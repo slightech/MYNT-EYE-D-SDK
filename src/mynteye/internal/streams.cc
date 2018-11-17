@@ -48,10 +48,16 @@ Streams::~Streams() {
 }
 
 void Streams::EnableImageInfo(bool sync) {
+  if (is_image_info_enabled_ && is_image_info_sync_ == sync) {
+    return;
+  }
   OnImageInfoStateChanged(true, sync);
 }
 
 void Streams::DisableImageInfo() {
+  if (!is_image_info_enabled_ && !is_image_info_sync_) {
+    return;
+  }
   OnImageInfoStateChanged(false, false);
 }
 
@@ -64,6 +70,7 @@ bool Streams::IsImageInfoSynced() const {
 }
 
 void Streams::EnableStreamData(const ImageType& type) {
+  if (IsStreamDataEnabled(type)) return;
   switch (type) {
     case ImageType::IMAGE_LEFT_COLOR:
     case ImageType::IMAGE_RIGHT_COLOR:
@@ -79,6 +86,7 @@ void Streams::EnableStreamData(const ImageType& type) {
 }
 
 void Streams::DisableStreamData(const ImageType& type) {
+  if (!IsStreamDataEnabled(type)) return;
   OnStreamDataStateChanged(type, false);
 }
 

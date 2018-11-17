@@ -65,12 +65,16 @@ void Motions::EnableProcessMode(const std::int32_t& mode) {
 }
 
 void Motions::EnableMotionDatas(std::size_t max_size) {
+  if (is_motion_datas_enabled_ && motion_datas_max_size_ == max_size) {
+    return;
+  }
   std::lock_guard<std::mutex> _(metux_);
   is_motion_datas_enabled_ = true;
   motion_datas_max_size_ = max_size;
 }
 
 void Motions::DisableMotionDatas() {
+  if (!is_motion_datas_enabled_) return;
   std::lock_guard<std::mutex> _(metux_);
   is_motion_datas_enabled_ = false;
   motion_datas_max_size_ = 0;
