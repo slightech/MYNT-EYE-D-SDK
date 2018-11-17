@@ -55,8 +55,12 @@ void Streams::DisableImageInfo() {
   OnImageInfoStateChanged(false, false);
 }
 
-bool Streams::IsImageInfoEnabled() {
+bool Streams::IsImageInfoEnabled() const {
   return is_image_info_enabled_;
+}
+
+bool Streams::IsImageInfoSynced() const {
+  return is_image_info_sync_;
 }
 
 void Streams::EnableStreamData(const ImageType& type) {
@@ -78,11 +82,11 @@ void Streams::DisableStreamData(const ImageType& type) {
   OnStreamDataStateChanged(type, false);
 }
 
-bool Streams::IsStreamDataEnabled(const ImageType& type) {
+bool Streams::IsStreamDataEnabled(const ImageType& type) const {
   return is_image_enabled_set_.find(type) != is_image_enabled_set_.end();
 }
 
-bool Streams::HasStreamDataEnabled() {
+bool Streams::HasStreamDataEnabled() const {
   return !is_image_enabled_set_.empty();
 }
 

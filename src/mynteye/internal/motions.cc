@@ -77,7 +77,7 @@ void Motions::DisableMotionDatas() {
   motion_datas_.clear();
 }
 
-bool Motions::IsMotionDatasEnabled() {
+bool Motions::IsMotionDatasEnabled() const {
   return is_motion_datas_enabled_;
 }
 

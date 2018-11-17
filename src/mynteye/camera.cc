@@ -109,15 +109,31 @@ void Camera::EnableImageInfo(bool sync) {
   p_->EnableImageInfo(sync);
 }
 
+void Camera::DisableImageInfo() {
+  p_->DisableImageInfo();
+}
+
+bool Camera::IsImageInfoEnabled() const {
+  return p_->IsImageInfoEnabled();
+}
+
+bool Camera::IsImageInfoSynced() const {
+  return p_->IsImageInfoSynced();
+}
+
 void Camera::EnableStreamData(const ImageType& type) {
   p_->EnableStreamData(type);
 }
 
-bool Camera::IsStreamDataEnabled(const ImageType& type) {
+void Camera::DisableStreamData(const ImageType& type) {
+  p_->DisableStreamData(type);
+}
+
+bool Camera::IsStreamDataEnabled(const ImageType& type) const {
   return p_->IsStreamDataEnabled(type);
 }
 
-bool Camera::HasStreamDataEnabled() {
+bool Camera::HasStreamDataEnabled() const {
   return p_->HasStreamDataEnabled();
 }
 
@@ -131,6 +147,14 @@ std::vector<StreamData> Camera::GetStreamDatas(const ImageType& type) {
 
 void Camera::EnableMotionDatas(std::size_t max_size) {
   p_->EnableMotionDatas(std::move(max_size));
+}
+
+void Camera::DisableMotionDatas() {
+  p_->DisableMotionDatas();
+}
+
+bool Camera::IsMotionDatasEnabled() const {
+  return p_->IsMotionDatasEnabled();
 }
 
 std::vector<MotionData> Camera::GetMotionDatas() {

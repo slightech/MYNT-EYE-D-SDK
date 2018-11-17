@@ -49,7 +49,7 @@ class Motions {
    */
   void EnableMotionDatas(std::size_t max_size);
   void DisableMotionDatas();
-  bool IsMotionDatasEnabled();
+  bool IsMotionDatasEnabled() const;
 
   datas_t GetMotionDatas();
 

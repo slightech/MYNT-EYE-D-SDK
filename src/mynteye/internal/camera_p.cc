@@ -210,15 +210,31 @@ void CameraPrivate::EnableImageInfo(bool sync) {
   StartDataTracking();
 }
 
+void CameraPrivate::DisableImageInfo() {
+  streams_->DisableImageInfo();
+}
+
+bool CameraPrivate::IsImageInfoEnabled() const {
+  return streams_->IsImageInfoEnabled();
+}
+
+bool CameraPrivate::IsImageInfoSynced() const {
+  return streams_->IsImageInfoSynced();
+}
+
 void CameraPrivate::EnableStreamData(const ImageType& type) {
   streams_->EnableStreamData(type);
 }
 
-bool CameraPrivate::IsStreamDataEnabled(const ImageType& type) {
+void CameraPrivate::DisableStreamData(const ImageType& type) {
+  streams_->DisableStreamData(type);
+}
+
+bool CameraPrivate::IsStreamDataEnabled(const ImageType& type) const {
   return streams_->IsStreamDataEnabled(type);
 }
 
-bool CameraPrivate::HasStreamDataEnabled() {
+bool CameraPrivate::HasStreamDataEnabled() const {
   return streams_->HasStreamDataEnabled();
 }
 
@@ -233,6 +249,14 @@ std::vector<StreamData> CameraPrivate::GetStreamDatas(const ImageType& type) {
 void CameraPrivate::EnableMotionDatas(std::size_t max_size) {
   motions_->EnableMotionDatas(std::move(max_size));
   StartDataTracking();
+}
+
+void CameraPrivate::DisableMotionDatas() {
+  motions_->DisableMotionDatas();
+}
+
+bool CameraPrivate::IsMotionDatasEnabled() const {
+  return motions_->IsMotionDatasEnabled();
 }
 
 std::vector<MotionData> CameraPrivate::GetMotionDatas() {

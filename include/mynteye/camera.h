@@ -105,13 +105,21 @@ class MYNTEYE_API Camera {
    * If sync is true, indicates can get infos from callback or access it from StreamData.
    */
   void EnableImageInfo(bool sync);
+  /** Disable image info. */
+  void DisableImageInfo();
+  /** Whethor image info enabled or not */
+  bool IsImageInfoEnabled() const;
+  /** Whethor image info synced or not */
+  bool IsImageInfoSynced() const;
 
   /** Enable stream data of certain image type */
   void EnableStreamData(const ImageType& type);
+  /** Disable stream data of certain image type */
+  void DisableStreamData(const ImageType& type);
   /** Whethor stream data of certain image type enabled or not */
-  bool IsStreamDataEnabled(const ImageType& type);
+  bool IsStreamDataEnabled(const ImageType& type) const;
   /** Has any stream data enabled */
-  bool HasStreamDataEnabled();
+  bool HasStreamDataEnabled() const;
 
   /** Get latest stream data */
   StreamData GetStreamData(const ImageType& type);
@@ -128,6 +136,11 @@ class MYNTEYE_API Camera {
    */
   void EnableMotionDatas(
       std::size_t max_size = std::numeric_limits<std::size_t>::max());
+  /** Disable motion datas. */
+  void DisableMotionDatas();
+  /** Whethor motion datas enabled or not */
+  bool IsMotionDatasEnabled() const;
+
   /** Get cached motion datas. Besides, you can also get them from callback */
   std::vector<MotionData> GetMotionDatas();
 

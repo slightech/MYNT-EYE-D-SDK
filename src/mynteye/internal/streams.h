@@ -62,12 +62,13 @@ class Streams {
    */
   void EnableImageInfo(bool sync);
   void DisableImageInfo();
-  bool IsImageInfoEnabled();
+  bool IsImageInfoEnabled() const;
+  bool IsImageInfoSynced() const;
 
   void EnableStreamData(const ImageType& type);
   void DisableStreamData(const ImageType& type);
-  bool IsStreamDataEnabled(const ImageType& type);
-  bool HasStreamDataEnabled();
+  bool IsStreamDataEnabled(const ImageType& type) const;
+  bool HasStreamDataEnabled() const;
 
   data_t GetStreamData(const ImageType& type);
   datas_t GetStreamDatas(const ImageType& type);
