@@ -158,12 +158,12 @@ Visualization Manager:
     - Alpha: 1
       Class: rviz_plugin_tutorials/Imu
       Color: 204; 51; 204
-      Enabled: false
+      Enabled: true
       History Length: 1
       Name: Imu
       Topic: /mynteye/imu/data_raw
       Unreliable: false
-      Value: false
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48

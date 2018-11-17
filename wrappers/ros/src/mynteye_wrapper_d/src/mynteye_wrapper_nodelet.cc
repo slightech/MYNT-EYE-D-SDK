@@ -35,6 +35,8 @@
 #include <mynteye_wrapper_d/Temp.h>
 
 #include "mynteye/camera.h"
+#include "mynteye/utils.h"
+
 #include "pointcloud_generator.h" // NOLINT
 
 MYNTEYE_BEGIN_NAMESPACE
@@ -42,9 +44,9 @@ MYNTEYE_BEGIN_NAMESPACE
 namespace enc = sensor_msgs::image_encodings;
 
 class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
+ public:
   ros::NodeHandle nh;
   ros::NodeHandle nh_ns;
-  boost::shared_ptr<boost::thread> device_poll_thread;
 
   image_transport::CameraPublisher pub_left_mono;
   image_transport::CameraPublisher pub_left_color;
@@ -55,11 +57,11 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   ros::Publisher pub_imu;
   ros::Publisher pub_temp;
 
-  // tf2_ros::StaticTransformBroadcaster static_tf_broadcaster;
-
-  sensor_msgs::CameraInfoPtr camera_info_ptr_;
+  sensor_msgs::CameraInfoPtr left_info_ptr_;
+  sensor_msgs::CameraInfoPtr right_info_ptr_;
 
   // Launch params
+
   int gravity;
 
   std::string base_frame_id;
@@ -76,337 +78,39 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   OpenParams params;
   std::unique_ptr<Camera> mynteye;
 
-  std::unique_ptr<PointCloudGenerator> pointcloud_generator;
+  // Others
+
+  // std::unique_ptr<PointCloudGenerator> pointcloud_generator;
 
   std::shared_ptr<ImuData> imu_accel;
   std::shared_ptr<ImuData> imu_gyro;
 
-  std::string dashes;
+  typedef struct SubResult {
+    bool left_mono;
+    bool left_color;
+    bool right_mono;
+    bool right_color;
+    bool depth;
+    bool points;
+    bool imu;
+    bool temp;
+    bool left;
+    bool right;
+  } sub_result_t;
 
- public:
-  MYNTEYEWrapperNodelet() : dashes(std::string(30, '-')) {
+  sub_result_t sub_result;
+
+  MYNTEYEWrapperNodelet() {
   }
 
-  void publishColor(const std::string& frame_id, image_transport::CameraPublisher& pub,  // NOLINT
-    Image::pointer img, ros::Time stamp,
-      cv::Mat* mat, std::uint32_t seq) {
-    if (pub.getNumSubscribers() == 0)
-      return;
-    std_msgs::Header header;
-    // header.seq = 0;
-    header.stamp = stamp;
-    header.frame_id = frame_id;
-    *mat = img->To(ImageFormat::COLOR_RGB)->ToMat();
-
-    auto &&msg =
-        cv_bridge::CvImage(header, enc::RGB8, *mat).toImageMsg();
-    auto &&info = getCameraInfo();
-    info->header.stamp = msg->header.stamp;
-    pub.publish(msg, info);
+  ~MYNTEYEWrapperNodelet() {
+    closeDevice();
+    mynteye.reset(nullptr);
   }
 
-  void publishMono(const std::string& frame_id, image_transport::CameraPublisher& pub, // NOLINT
-    Image::pointer img, ros::Time stamp,
-      cv::Mat* mat, std::uint32_t seq) {
-    if (pub.getNumSubscribers() == 0)
-      return;
-    std_msgs::Header header;
-    // header.seq = 0;
-    header.stamp = stamp;
-    header.frame_id = frame_id;
-    *mat = img->To(ImageFormat::COLOR_RGB)->ToMat();
-    cv::Mat dst;
-    cv::cvtColor(*mat, dst, CV_RGB2GRAY);
-    auto &&msg =
-        cv_bridge::CvImage(header, enc::MONO8, dst).toImageMsg();
-    auto &&info = getCameraInfo();
-    info->header.stamp = msg->header.stamp;
+  void onInit() override {
+    std::string dashes(30, '-');
 
-    pub.publish(msg, info);
-  }
-
-  sensor_msgs::CameraInfoPtr getCameraInfo() {
-    // http://docs.ros.org/kinetic/api/sensor_msgs/html/msg/CameraInfo.html
-    sensor_msgs::CameraInfo *camera_info = new sensor_msgs::CameraInfo();
-    camera_info_ptr_ = sensor_msgs::CameraInfoPtr(camera_info);
-
-    // todo: right
-    auto calib = (mynteye->GetStreamIntrinsics(params.stream_mode)).left;
-
-    // camera_info->header.frame_id = color_frame_id;
-    camera_info->width = calib.width;
-    camera_info->height = calib.height;
-
-    //     [fx  0 cx]
-    // K = [ 0 fy cy]
-    //     [ 0  0  1]
-    camera_info->K.at(0) = calib.fx;
-    camera_info->K.at(2) = calib.cx;
-    camera_info->K.at(4) = calib.fy;
-    camera_info->K.at(5) = calib.cy;
-    camera_info->K.at(8) = 1;
-
-    //     [fx'  0  cx' Tx]
-    // P = [ 0  fy' cy' Ty]
-    //     [ 0   0   1   0]
-    // for (int i = 0; i < 12; i++) {
-    //     camera_info->P.at(i) = calib.NewCamMat1[i];
-    // }
-
-    camera_info->distortion_model = "plumb_bob";
-
-    // D of plumb_bob: (k1, k2, t1, t2, k3)
-    for (int i = 0; i < 5; i++) {
-      camera_info->D.push_back(calib.coeffs[i]);
-    }
-
-    // R to identity matrix
-    camera_info->R.at(0) = 1.0;
-    camera_info->R.at(1) = 0.0;
-    camera_info->R.at(2) = 0.0;
-    camera_info->R.at(3) = 0.0;
-    camera_info->R.at(4) = 1.0;
-    camera_info->R.at(5) = 0.0;
-    camera_info->R.at(6) = 0.0;
-    camera_info->R.at(7) = 0.0;
-    camera_info->R.at(8) = 1.0;
-
-    return camera_info_ptr_;
-  }
-
-  void publishDepth(Image::pointer img, ros::Time stamp,
-      cv::Mat* mat) {
-    std_msgs::Header header;
-    // header.seq = 0;
-    header.stamp = stamp;
-    header.frame_id = depth_frame_id;
-
-    auto &&info = getCameraInfo();
-    if (params.depth_mode == DepthMode::DEPTH_RAW) {
-      *mat = img->To(ImageFormat::DEPTH_RAW)->ToMat();
-      pub_depth.publish(
-          cv_bridge::CvImage(header, enc::MONO16, *mat).toImageMsg(), info);
-    } else if (params.depth_mode == DepthMode::DEPTH_GRAY) {
-      *mat = img->To(ImageFormat::DEPTH_GRAY_24)->ToMat();
-      pub_depth.publish(
-          cv_bridge::CvImage(header, enc::RGB8, *mat).toImageMsg(), info);
-    } else if (params.depth_mode == DepthMode::DEPTH_COLORFUL) {
-      *mat = img->To(ImageFormat::DEPTH_RGB)->ToMat();
-      pub_depth.publish(
-          cv_bridge::CvImage(header, enc::RGB8, *mat).toImageMsg(), info);
-    } else {
-      NODELET_ERROR_STREAM("Depth mode unsupported");
-      return;
-    }
-    // NODELET_INFO_STREAM("Publish depth");
-  }
-
-  void publishImu(ros::Time stamp, bool pub_temp) {
-    if (imu_accel == nullptr || imu_gyro == nullptr) {
-      return;
-    }
-    sensor_msgs::Imu msg;
-
-    // msg.header.seq = seq;
-    msg.header.stamp = stamp;
-    msg.header.frame_id = imu_frame_id;
-
-    // acceleration should be in m/s^2 (not in g's)
-    msg.linear_acceleration.x = imu_accel->accel[0] * gravity;
-    msg.linear_acceleration.y = imu_accel->accel[1] * gravity;
-    msg.linear_acceleration.z = imu_accel->accel[2] * gravity;
-
-    msg.linear_acceleration_covariance[0] = 0;
-    msg.linear_acceleration_covariance[1] = 0;
-    msg.linear_acceleration_covariance[2] = 0;
-
-    msg.linear_acceleration_covariance[3] = 0;
-    msg.linear_acceleration_covariance[4] = 0;
-    msg.linear_acceleration_covariance[5] = 0;
-
-    msg.linear_acceleration_covariance[6] = 0;
-    msg.linear_acceleration_covariance[7] = 0;
-    msg.linear_acceleration_covariance[8] = 0;
-
-    // velocity should be in rad/sec
-    msg.angular_velocity.x = imu_gyro->gyro[0] * M_PI / 180;
-    msg.angular_velocity.y = imu_gyro->gyro[1] * M_PI / 180;
-    msg.angular_velocity.z = imu_gyro->gyro[2] * M_PI / 180;
-
-    msg.angular_velocity_covariance[0] = 0;
-    msg.angular_velocity_covariance[1] = 0;
-    msg.angular_velocity_covariance[2] = 0;
-
-    msg.angular_velocity_covariance[3] = 0;
-    msg.angular_velocity_covariance[4] = 0;
-    msg.angular_velocity_covariance[5] = 0;
-
-    msg.angular_velocity_covariance[6] = 0;
-    msg.angular_velocity_covariance[7] = 0;
-    msg.angular_velocity_covariance[8] = 0;
-
-    pub_imu.publish(msg);
-
-    if (pub_temp) {
-      publishTemp(imu_accel->temperature, stamp);
-    }
-
-    imu_accel = nullptr;
-    imu_gyro = nullptr;
-    ros::Duration(0.001).sleep();
-  }
-
-  void publishTemp(float temperature, ros::Time stamp) {
-    mynteye_wrapper_d::Temp msg;
-    msg.header.stamp = stamp;
-    msg.header.frame_id = temp_frame_id;
-    msg.data = temperature;
-    pub_temp.publish(msg);
-  }
-
-  ros::Time hardTimeToSoftTime(double _hard_time) {
-    static bool isInited = false;
-    static double soft_time_begin(0), hard_time_begin(0);
-
-    if (false == isInited) {
-      soft_time_begin = ros::Time::now().toSec();
-      hard_time_begin = _hard_time;
-      isInited = true;
-    }
-
-    return ros::Time(
-        soft_time_begin + (_hard_time - hard_time_begin) * 0.00001f);
-  }
-
-  void device_poll() {
-    std::size_t imu_count = 0;
-    std::size_t img_count = 0;
-    cv::Mat color_left, mono_left, color_right, mono_right, depth_mat;
-    while (nh_ns.ok()) {
-      // Check for subscribers
-      int left_mono_SubNumber = pub_left_mono.getNumSubscribers();
-      int left_color_SubNumber = pub_left_color.getNumSubscribers();
-      int right_mono_SubNumber = pub_right_mono.getNumSubscribers();
-      int right_color_SubNumber = pub_right_color.getNumSubscribers();
-      int depth_SubNumber = pub_depth.getNumSubscribers();
-      int points_SubNumber = pub_points.getNumSubscribers();
-      int imu_SubNumber = pub_imu.getNumSubscribers();
-      int temp_SubNumber = pub_temp.getNumSubscribers();
-
-      bool img_Sub = (left_mono_SubNumber + right_mono_SubNumber +
-        left_color_SubNumber + right_color_SubNumber +
-        depth_SubNumber + points_SubNumber) > 0;
-      bool imu_Sub = (imu_SubNumber + temp_SubNumber) > 0;
-      // publish points, the depth mode must be DEPTH_RAW.
-      bool points_subscribed = (points_SubNumber > 0) \
-          && (params.depth_mode == DepthMode::DEPTH_RAW);
-
-      auto &&left_color = mynteye->GetStreamDatas(
-        ImageType::IMAGE_LEFT_COLOR);
-      auto &&right_color = mynteye->GetStreamDatas(
-        ImageType::IMAGE_RIGHT_COLOR);
-      auto &&image_depth = mynteye->GetStreamDatas(
-        ImageType::IMAGE_DEPTH);
-      img_count += left_color.size();
-
-      auto &&motion_datas = mynteye->GetMotionDatas();
-      imu_count += motion_datas.size();
-
-      {
-        bool left_color_ok = false;
-        ros::Time leftTimeStamp;
-        if (left_color_SubNumber > 0
-            || points_subscribed
-            || left_mono_SubNumber > 0
-            || depth_SubNumber > 0) {
-          for (auto &&left : left_color) {
-            if (left.img) {
-              left_color_ok = true;
-              leftTimeStamp = hardTimeToSoftTime(left.img_info -> timestamp);
-
-              static std::size_t count = 0;
-              ++count;
-              if (left_color_SubNumber > 0) {
-                publishColor(left_color_frame_id, pub_left_color,
-                  left.img, leftTimeStamp, &color_left, count);
-              }
-              if (left_mono_SubNumber > 0) {
-                publishMono(left_mono_frame_id, pub_left_mono,
-                  left.img, leftTimeStamp, &mono_left, count);
-              }
-            } else {
-              static int k_l = 0;
-              std:: cout << "left.img == nullptr count: "
-                        << k_l++ << std::endl;
-            }
-          }
-        }
-
-        bool depth_ok = false;
-        if (depth_SubNumber > 0 ||
-            points_subscribed && left_color_ok) {
-          for (auto &&depth : image_depth) {
-            depth_ok = true;
-            publishDepth(depth.img, leftTimeStamp, &depth_mat);
-          }
-        }
-
-        if (points_subscribed && left_color_ok && depth_ok) {
-          pointcloud_generator->Push(color_left, depth_mat, leftTimeStamp);
-        }
-
-        for (auto &&right : right_color) {
-          ros::Time rightTimeStamp;
-          if (right_color_SubNumber > 0
-              || points_subscribed
-              || right_mono_SubNumber > 0) {
-            if (right.img) {
-              rightTimeStamp = hardTimeToSoftTime(right.img_info -> timestamp);
-
-              static std::size_t count = 0;
-              ++count;
-              if (right_color_SubNumber > 0) {
-                publishColor(right_color_frame_id, pub_right_color,
-                  right.img, rightTimeStamp, &color_right, count);
-              }
-              if (right_mono_SubNumber > 0) {
-                publishMono(right_mono_frame_id, pub_right_mono,
-                  right.img, rightTimeStamp, &mono_right, count);
-              }
-            } else {
-              static int k_r = 0;
-              std:: cout << "right.img == nullptr count: "
-                        << k_r++ << std::endl;
-            }
-          }
-        }
-        if (imu_Sub) {
-          if (motion_datas.size() > 0) {
-            for (auto data : motion_datas) {
-              ros::Time stamp = hardTimeToSoftTime(data.imu->timestamp);
-              if (data.imu) {
-                if (data.imu->flag == 1) {  // accelerometer
-                  imu_accel = data.imu;
-                  publishImu(stamp, temp_SubNumber > 0);
-                } else if (data.imu->flag == 2) {  // gyroscope
-                  imu_gyro = data.imu;
-                  publishImu(stamp, temp_SubNumber > 0);
-                } else {
-                  NODELET_WARN_STREAM("Imu type is unknown");
-                }
-              } else {
-                NODELET_WARN_STREAM("Motion data is empty");
-              }
-            }
-          }
-        }
-      }
-    }
-
-    mynteye.reset();
-  }
-
-  void onInit() {
     nh = getMTNodeHandle();
     nh_ns = getMTPrivateNodeHandle();
 
@@ -434,6 +138,8 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     nh_ns.getParam("state_ae", state_ae);
     nh_ns.getParam("state_awb", state_awb);
     nh_ns.getParam("ir_intensity", ir_intensity);
+    nh_ns.getParam("factor", factor);
+    nh_ns.getParam("points_frequency", points_frequency);
     nh_ns.getParam("gravity", gravity);
 
     base_frame_id = "mynteye_link";
@@ -480,8 +186,6 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     nh_ns.getParam("points_topic", points_topic);
     nh_ns.getParam("imu_topic", imu_topic);
     nh_ns.getParam("temp_topic", temp_topic);
-    nh_ns.getParam("points_frequency", points_frequency);
-    nh_ns.getParam("factor", factor);
 
     // MYNTEYE objects
     mynteye.reset(new Camera);
@@ -560,33 +264,332 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     pub_temp = nh.advertise<mynteye_wrapper_d::Temp>(temp_topic, 1);
     NODELET_INFO_STREAM("Advertized on topic " << temp_topic);
 
-    // open the device
-    mynteye->EnableImageInfo(true);
-    mynteye->EnableStreamData(ImageType::IMAGE_ALL);
-    mynteye->EnableMotionDatas();
+    // camera infos
+    bool in_ok;
+    auto&& in = mynteye->GetStreamIntrinsics(params.stream_mode, &in_ok);
+    if (in_ok) {
+      left_info_ptr_ = createCameraInfo(in.left);
+      right_info_ptr_ = createCameraInfo(in.right);
+    } else {
+      left_info_ptr_ = nullptr;
+      right_info_ptr_ = nullptr;
+    }
+
+    // loop
+    ros::Rate loop_rate(framerate);
+    while (nh_ns.ok()) {
+      onLoopEvent();
+      loop_rate.sleep();
+    }
+  }
+
+  void onLoopEvent() {
+    detectSubscribers();
+    openDevice();
+  }
+
+  void detectSubscribers() {
+    bool left_mono_sub = pub_left_mono.getNumSubscribers() > 0;
+    bool left_color_sub = pub_left_color.getNumSubscribers() > 0;
+    bool right_mono_sub = pub_right_mono.getNumSubscribers() > 0;
+    bool right_color_sub = pub_right_color.getNumSubscribers() > 0;
+    bool depth_sub = pub_depth.getNumSubscribers() > 0;
+    bool points_sub = pub_points.getNumSubscribers() > 0;
+    bool imu_sub = pub_imu.getNumSubscribers() > 0;
+    bool temp_sub = pub_temp.getNumSubscribers() > 0;
+
+    bool left_sub = left_mono_sub || left_color_sub;
+    bool right_sub = right_mono_sub || right_color_sub;
+
+    if (left_sub || right_sub || depth_sub || points_sub) {
+      mynteye->EnableImageInfo(true);
+      if (left_sub || points_sub) {
+        mynteye->EnableStreamData(ImageType::IMAGE_LEFT_COLOR);
+      }
+      if (right_sub && util::is_right_color_supported(params.stream_mode)) {
+        mynteye->EnableStreamData(ImageType::IMAGE_RIGHT_COLOR);
+      }
+      if (depth_sub || points_sub) {
+        mynteye->EnableStreamData(ImageType::IMAGE_DEPTH);
+      }
+    } else {
+      mynteye->DisableImageInfo();
+      mynteye->DisableStreamData(ImageType::IMAGE_ALL);
+    }
+
+    if (imu_sub || temp_sub) {
+      mynteye->EnableMotionDatas(0);
+    } else {
+      mynteye->DisableMotionDatas();
+    }
+
+    sub_result = {
+      left_mono_sub, left_color_sub, right_mono_sub, right_color_sub,
+      depth_sub, points_sub, imu_sub, temp_sub, left_sub, right_sub,
+    };
+  }
+
+  void openDevice() {
+    // if (!mynteye) {
+    //   NODELET_ERROR_STREAM("Init firstly");
+    // }
+    if (mynteye->IsOpened()) return;
+
+    // Set stream data callbacks
+    std::vector<ImageType> types{
+      ImageType::IMAGE_LEFT_COLOR,
+      ImageType::IMAGE_RIGHT_COLOR,
+      ImageType::IMAGE_DEPTH,
+    };
+    for (auto&& type : types) {
+      mynteye->SetStreamCallback(type, [this](const StreamData& data) {
+        switch (data.img->type()) {
+          case ImageType::IMAGE_LEFT_COLOR: {
+            if (sub_result.left) {
+              publishLeft(data, sub_result.left_color, sub_result.left_mono);
+            }
+            if (sub_result.points) {
+              // ...
+            }
+          } break;
+          case ImageType::IMAGE_RIGHT_COLOR: {
+            if (sub_result.right) {
+              publishRight(data, sub_result.right_color, sub_result.right_mono);
+            }
+          } break;
+          case ImageType::IMAGE_DEPTH: {
+            if (sub_result.depth) {
+              publishDepth(data);
+            }
+            if (sub_result.points) {
+              // ...
+            }
+          } break;
+        }
+      });
+    }
+
+    // Set motion data callback
+    mynteye->SetMotionCallback([this](const MotionData& data) {
+      if (sub_result.imu && data.imu) {
+        ros::Time stamp = ros::Time().now();
+        // ros::Time stamp = hardTimeToSoftTime(data.imu->timestamp);
+        if (data.imu->flag == MYNTEYE_IMU_ACCEL) {
+          imu_accel = data.imu;
+          publishImu(stamp, sub_result.temp);
+        } else if (data.imu->flag == MYNTEYE_IMU_GYRO) {
+          imu_gyro = data.imu;
+          publishImu(stamp, sub_result.temp);
+        }
+      }
+    });
+
     mynteye->Open(params);
     if (!mynteye->IsOpened()) {
       NODELET_ERROR_STREAM("Open camera failed");
       return;
     }
     NODELET_INFO_STREAM("Open camera success");
+  }
 
-    auto streamIntrinsics = mynteye->GetStreamIntrinsics(params.stream_mode);
-    // std::cout << streamIntrinsics.left.fx << "  " << streamIntrinsics.left.fy
-    //  << "  " <<  streamIntrinsics.left.cx << "  " << streamIntrinsics.left.cy
-    //  << std::endl;
-    pointcloud_generator.reset(new PointCloudGenerator(
-      streamIntrinsics.left,
-      [this](sensor_msgs::PointCloud2 msg) {
-        // msg.header.seq = 0;
-        // msg.header.stamp = ros::Time::now();
-        msg.header.frame_id = points_frame_id;
-        pub_points.publish(msg);
-        // NODELET_INFO_STREAM("Publish points");
-      }, factor, points_frequency));
+  void closeDevice() {
+    if (mynteye) {
+      mynteye->Close();
+    }
+  }
 
-    device_poll_thread = boost::shared_ptr<boost::thread>(new boost::thread(
-        boost::bind(&MYNTEYEWrapperNodelet::device_poll, this)));
+  void publishLeft(const StreamData& data, bool color_sub, bool mono_sub) {
+    publishColor(data, left_info_ptr_,
+        pub_left_color, color_sub, left_color_frame_id,
+        pub_left_mono, mono_sub, left_mono_frame_id);
+  }
+
+  void publishRight(const StreamData& data, bool color_sub, bool mono_sub) {
+    publishColor(data, right_info_ptr_,
+        pub_right_color, color_sub, right_color_frame_id,
+        pub_right_mono, mono_sub, right_mono_frame_id);
+  }
+
+  void publishColor(const StreamData& data,
+      const sensor_msgs::CameraInfoPtr& info,
+      const image_transport::CameraPublisher& pub_color, bool color_sub,
+      const std::string color_frame_id,
+      const image_transport::CameraPublisher& pub_mono, bool mono_sub,
+      const std::string mono_frame_id) {
+    auto timestamp = hardTimeToSoftTime(data.img_info->timestamp);
+    auto&& mat = data.img->To(ImageFormat::COLOR_RGB)->ToMat();
+
+    if (color_sub) {
+      std_msgs::Header header;
+      // header.seq = 0;
+      header.stamp = timestamp;
+      header.frame_id = color_frame_id;
+
+      auto&& msg = cv_bridge::CvImage(header, enc::RGB8, mat).toImageMsg();
+      if (info) info->header.stamp = msg->header.stamp;
+      pub_color.publish(msg, info);
+    }
+    if (mono_sub) {
+      std_msgs::Header header;
+      // header.seq = 0;
+      header.stamp = timestamp;
+      header.frame_id = mono_frame_id;
+
+      cv::Mat dst;
+      cv::cvtColor(mat, dst, CV_RGB2GRAY);
+      auto &&msg = cv_bridge::CvImage(header, enc::MONO8, dst).toImageMsg();
+      if (info) info->header.stamp = msg->header.stamp;
+      pub_mono.publish(msg, info);
+    }
+  }
+
+  void publishDepth(const StreamData& data) {
+    std_msgs::Header header;
+    // header.seq = 0;
+    header.stamp = hardTimeToSoftTime(data.img_info->timestamp);
+    header.frame_id = depth_frame_id;
+
+    auto&& info = left_info_ptr_;
+    if (info) info->header.stamp = header.stamp;
+    if (params.depth_mode == DepthMode::DEPTH_RAW) {
+      auto&& mat = data.img->To(ImageFormat::DEPTH_RAW)->ToMat();
+      pub_depth.publish(
+          cv_bridge::CvImage(header, enc::MONO16, mat).toImageMsg(), info);
+    } else if (params.depth_mode == DepthMode::DEPTH_GRAY) {
+      auto&& mat = data.img->To(ImageFormat::DEPTH_GRAY_24)->ToMat();
+      pub_depth.publish(
+          cv_bridge::CvImage(header, enc::RGB8, mat).toImageMsg(), info);
+    } else if (params.depth_mode == DepthMode::DEPTH_COLORFUL) {
+      auto&& mat = data.img->To(ImageFormat::DEPTH_RGB)->ToMat();
+      pub_depth.publish(
+          cv_bridge::CvImage(header, enc::RGB8, mat).toImageMsg(), info);
+    } else {
+      NODELET_ERROR_STREAM("Depth mode unsupported");
+    }
+  }
+
+  void publishImu(ros::Time stamp, bool temp_sub) {
+    if (imu_accel == nullptr || imu_gyro == nullptr) {
+      return;
+    }
+    sensor_msgs::Imu msg;
+
+    // msg.header.seq = seq;
+    msg.header.stamp = stamp;
+    msg.header.frame_id = imu_frame_id;
+
+    // acceleration should be in m/s^2 (not in g's)
+    msg.linear_acceleration.x = imu_accel->accel[0] * gravity;
+    msg.linear_acceleration.y = imu_accel->accel[1] * gravity;
+    msg.linear_acceleration.z = imu_accel->accel[2] * gravity;
+
+    msg.linear_acceleration_covariance[0] = 0;
+    msg.linear_acceleration_covariance[1] = 0;
+    msg.linear_acceleration_covariance[2] = 0;
+
+    msg.linear_acceleration_covariance[3] = 0;
+    msg.linear_acceleration_covariance[4] = 0;
+    msg.linear_acceleration_covariance[5] = 0;
+
+    msg.linear_acceleration_covariance[6] = 0;
+    msg.linear_acceleration_covariance[7] = 0;
+    msg.linear_acceleration_covariance[8] = 0;
+
+    // velocity should be in rad/sec
+    msg.angular_velocity.x = imu_gyro->gyro[0] * M_PI / 180;
+    msg.angular_velocity.y = imu_gyro->gyro[1] * M_PI / 180;
+    msg.angular_velocity.z = imu_gyro->gyro[2] * M_PI / 180;
+
+    msg.angular_velocity_covariance[0] = 0;
+    msg.angular_velocity_covariance[1] = 0;
+    msg.angular_velocity_covariance[2] = 0;
+
+    msg.angular_velocity_covariance[3] = 0;
+    msg.angular_velocity_covariance[4] = 0;
+    msg.angular_velocity_covariance[5] = 0;
+
+    msg.angular_velocity_covariance[6] = 0;
+    msg.angular_velocity_covariance[7] = 0;
+    msg.angular_velocity_covariance[8] = 0;
+
+    pub_imu.publish(msg);
+
+    if (temp_sub) {
+      publishTemp(imu_accel->temperature, stamp);
+    }
+
+    imu_accel = nullptr;
+    imu_gyro = nullptr;
+
+    ros::Duration(0.001).sleep();
+  }
+
+  void publishTemp(float temperature, ros::Time stamp) {
+    mynteye_wrapper_d::Temp msg;
+    msg.header.stamp = stamp;
+    msg.header.frame_id = temp_frame_id;
+    msg.data = temperature;
+    pub_temp.publish(msg);
+  }
+
+  sensor_msgs::CameraInfoPtr createCameraInfo(const CameraIntrinsics& in) {
+    // http://docs.ros.org/kinetic/api/sensor_msgs/html/msg/CameraInfo.html
+    sensor_msgs::CameraInfo *camera_info = new sensor_msgs::CameraInfo();
+    auto camera_info_ptr = sensor_msgs::CameraInfoPtr(camera_info);
+
+    // camera_info->header.frame_id = color_frame_id;
+    camera_info->width = in.width;
+    camera_info->height = in.height;
+
+    //     [fx  0 cx]
+    // K = [ 0 fy cy]
+    //     [ 0  0  1]
+    camera_info->K.at(0) = in.fx;
+    camera_info->K.at(2) = in.cx;
+    camera_info->K.at(4) = in.fy;
+    camera_info->K.at(5) = in.cy;
+    camera_info->K.at(8) = 1;
+
+    //     [fx'  0  cx' Tx]
+    // P = [ 0  fy' cy' Ty]
+    //     [ 0   0   1   0]
+    // for (int i = 0; i < 12; i++) {
+    //     camera_info->P.at(i) = in.NewCamMat1[i];
+    // }
+
+    camera_info->distortion_model = "plumb_bob";
+
+    // D of plumb_bob: (k1, k2, t1, t2, k3)
+    for (int i = 0; i < 5; i++) {
+      camera_info->D.push_back(in.coeffs[i]);
+    }
+
+    // R to identity matrix
+    camera_info->R.at(0) = 1.0;
+    camera_info->R.at(1) = 0.0;
+    camera_info->R.at(2) = 0.0;
+    camera_info->R.at(3) = 0.0;
+    camera_info->R.at(4) = 1.0;
+    camera_info->R.at(5) = 0.0;
+    camera_info->R.at(6) = 0.0;
+    camera_info->R.at(7) = 0.0;
+    camera_info->R.at(8) = 1.0;
+
+    return camera_info_ptr;
+  }
+
+  ros::Time hardTimeToSoftTime(double _hard_time) {
+    static bool isInited = false;
+    static double soft_time_begin(0), hard_time_begin(0);
+
+    if (false == isInited) {
+      soft_time_begin = ros::Time::now().toSec();
+      hard_time_begin = _hard_time;
+      isInited = true;
+    }
+
+    return ros::Time(
+        soft_time_begin + (_hard_time - hard_time_begin) * 0.00001f);
   }
 };
 
