@@ -105,6 +105,10 @@ void Camera::EnableProcessMode(const std::int32_t& mode) {
   p_->EnableProcessMode(mode);
 }
 
+bool Camera::IsImageInfoSupported() const {
+  return p_->IsImageInfoSupported();
+}
+
 void Camera::EnableImageInfo(bool sync) {
   p_->EnableImageInfo(sync);
 }
@@ -143,6 +147,10 @@ StreamData Camera::GetStreamData(const ImageType& type) {
 
 std::vector<StreamData> Camera::GetStreamDatas(const ImageType& type) {
   return std::move(p_->GetStreamDatas(type));
+}
+
+bool Camera::IsMotionDatasSupported() const {
+  return p_->IsMotionDatasSupported();
 }
 
 void Camera::EnableMotionDatas(std::size_t max_size) {

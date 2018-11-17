@@ -214,6 +214,10 @@ void CameraPrivate::EnableProcessMode(const std::int32_t& mode) {
   motions_->EnableProcessMode(mode);
 }
 
+bool CameraPrivate::IsImageInfoSupported() const {
+  return channels_->IsAvaliable();
+}
+
 void CameraPrivate::EnableImageInfo(bool sync) {
   if (!channels_->IsAvaliable()) {
     LOGW("Data channel is unavaliable, could not track image info.");
@@ -258,6 +262,10 @@ StreamData CameraPrivate::GetStreamData(const ImageType& type) {
 
 std::vector<StreamData> CameraPrivate::GetStreamDatas(const ImageType& type) {
   return streams_->GetStreamDatas(type);
+}
+
+bool CameraPrivate::IsMotionDatasSupported() const {
+  return channels_->IsAvaliable();
 }
 
 void CameraPrivate::EnableMotionDatas(std::size_t max_size) {

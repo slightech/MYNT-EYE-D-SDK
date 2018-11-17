@@ -93,6 +93,8 @@ class MYNTEYE_API CameraPrivate {
   /** Enable process mode, e.g. imu assembly, warm_drift */
   void EnableProcessMode(const std::int32_t& mode);
 
+  /** Whethor image info supported or not */
+  bool IsImageInfoSupported() const;
   /**
    * Enable image info.
    *
@@ -121,6 +123,8 @@ class MYNTEYE_API CameraPrivate {
   /** Get cached stream datas */
   std::vector<StreamData> GetStreamDatas(const ImageType& type);
 
+  /** Whethor motion datas supported or not */
+  bool IsMotionDatasSupported() const;
   /**
    * Enable motion datas.
    *
