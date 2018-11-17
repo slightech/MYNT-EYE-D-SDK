@@ -65,8 +65,16 @@ void Motions::EnableProcessMode(const std::int32_t& mode) {
 }
 
 void Motions::EnableMotionDatas(std::size_t max_size) {
+  std::lock_guard<std::mutex> _(metux_);
   is_motion_datas_enabled_ = true;
   motion_datas_max_size_ = max_size;
+}
+
+void Motions::DisableMotionDatas() {
+  std::lock_guard<std::mutex> _(metux_);
+  is_motion_datas_enabled_ = false;
+  motion_datas_max_size_ = 0;
+  motion_datas_.clear();
 }
 
 bool Motions::IsMotionDatasEnabled() {
@@ -78,14 +86,16 @@ Motions::datas_t Motions::GetMotionDatas() {
     throw_error("Must enable motion datas before getting them, or you set "
                 "motion callback instead");
   }
-  std::lock_guard<std::mutex> _(mtx_datas_);
+  std::lock_guard<std::mutex> _(metux_);
   return std::move(motion_datas_);
 }
 
 void Motions::SetMotionCallback(motion_callback_t callback) {
+  std::lock_guard<std::mutex> _(metux_);
   motion_callback_ = callback;
 }
 
+// call in thread of channels
 void Motions::OnImuDataCallback(const ImuDataPacket& packet) {
   auto &&imu = std::make_shared<ImuData>();
   imu->flag = packet.flag;
@@ -122,7 +132,7 @@ void Motions::OnImuDataCallback(const ImuDataPacket& packet) {
     ProcImuWarmDrift(imu);
   }
 
-  std::lock_guard<std::mutex> _(mtx_datas_);
+  std::lock_guard<std::mutex> _(metux_);
 
   data_t data = {imu};
 

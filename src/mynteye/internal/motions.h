@@ -48,6 +48,7 @@ class Motions {
    * Note: if max_size > 0, the motion datas will be cached until you call GetMotionDatas().
    */
   void EnableMotionDatas(std::size_t max_size);
+  void DisableMotionDatas();
   bool IsMotionDatasEnabled();
 
   datas_t GetMotionDatas();
@@ -69,7 +70,7 @@ class Motions {
 
   datas_t motion_datas_;
 
-  std::mutex mtx_datas_;
+  std::mutex metux_;
 
   motion_callback_t motion_callback_;
 };
