@@ -230,14 +230,28 @@ bool Device::Open(const OpenParams& params) {
 
   dev_sel_info_.index = params.dev_index;
 
-  switch (params.color_mode) {
-    case ColorMode::COLOR_RECTIFIED:
-      depth_data_type_ = 2;  // ETronDI_DEPTH_DATA_14_BITS
-      break;
-    case ColorMode::COLOR_RAW:
-    default:
-      depth_data_type_ = 7;  // ETronDI_DEPTH_DATA_14_BITS_RAW
-      break;
+  if (params.depth_mode == DepthMode::DEPTH_RAW) {
+    // depth_raw ✓ depth_colorful x
+    switch (params.color_mode) {
+      case ColorMode::COLOR_RECTIFIED:
+        depth_data_type_ = 2;  // ETronDI_DEPTH_DATA_14_BITS
+        break;
+      case ColorMode::COLOR_RAW:
+      default:
+        depth_data_type_ = 7;  // ETronDI_DEPTH_DATA_14_BITS_RAW
+        break;
+    }
+  } else {
+    // depth_raw x depth_colorful ✓
+    switch (params.color_mode) {
+      case ColorMode::COLOR_RECTIFIED:
+        depth_data_type_ = 4;  // ETronDI_DEPTH_DATA_11_BITS
+        break;
+      case ColorMode::COLOR_RAW:
+      default:
+        depth_data_type_ = 9;  // ETronDI_DEPTH_DATA_11_BITS_RAW
+        break;
+    }
   }
 
   SetAutoExposureEnabled(params.state_ae);
