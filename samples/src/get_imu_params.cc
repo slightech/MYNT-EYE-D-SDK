@@ -30,18 +30,28 @@ int main(int argc, char *argv[]) {
 
   std::ofstream out("imu_params.params");
 
-  auto intrinsics = cam.GetMotionIntrinsics();
-  auto extrinsics = cam.GetMotionExtrinsics();
-  std::cout << "Motion Intrinsics: {" << intrinsics << "}" << std::endl;
-  std::cout << "Motion Extrinsics left to imu: {" << extrinsics << "}" << std::endl;
-
-  out << "Motion Intrinsics: {" << intrinsics << "}" << std::endl;
-  out << "Motion Extrinsics left to imu: {" << extrinsics << "}" << std::endl;
+  bool in_ok, ex_ok;
+  auto intrinsics = cam.GetMotionIntrinsics(&in_ok);
+  if (in_ok) {
+    std::cout << "Motion Intrinsics: {" << intrinsics << "}" << std::endl;
+    out << "Motion Intrinsics: {" << intrinsics << "}" << std::endl;
+  } else {
+    std::cout << "This device not supported to get motion intrinsics." << std::endl;
+  }
+  auto extrinsics = cam.GetMotionExtrinsics(&ex_ok);
+  if (ex_ok) {
+    std::cout << "Motion Extrinsics left to imu: {" << extrinsics << "}" << std::endl;
+    out << "Motion Extrinsics left to imu: {" << extrinsics << "}" << std::endl;
+  } else {
+    std::cout << "This device not supported to get motion extrinsics." << std::endl;
+  }
 
   cam.Close();
   out.close();
 
   std::cout << std::endl;
-  std::cout << "Imu params saved to image_params.params in current folder." << std::endl;
+  if (in_ok || ex_ok) {
+    std::cout << "Imu params saved to image_params.params in current folder." << std::endl;
+  }
   return 0;
 }

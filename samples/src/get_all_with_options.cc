@@ -80,7 +80,7 @@ int main(int argc, char const* argv[]) {
       .metavar("MODE").help("Enable process mode, e.g. imu assembly, temp_drift"
           "\n  0: PROC_NONE"
           "\n  1: PROC_IMU_ASSEMBLY"
-          "\n  2: PROC_IMU_WARM_DRIFT"
+          "\n  2: PROC_IMU_TEMP_DRIFT"
           "\n  3: PROC_IMU_ALL");
   ft_group.add_option("--img-info").dest("img_info")
       .action("store_true").help("Enable image info, and sync with image");

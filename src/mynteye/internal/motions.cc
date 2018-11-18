@@ -126,7 +126,7 @@ void Motions::OnImuDataCallback(const ImuDataPacket& packet) {
   }
 
   bool proc_assembly = ((proc_mode_ & ProcessMode::PROC_IMU_ASSEMBLY) > 0);
-  bool proc_temp_drift = ((proc_mode_ & ProcessMode::PROC_IMU_WARM_DRIFT) > 0);
+  bool proc_temp_drift = ((proc_mode_ & ProcessMode::PROC_IMU_TEMP_DRIFT) > 0);
   if (proc_assembly && proc_temp_drift) {
     ProcImuTempDrift(imu);
     ProcImuAssembly(imu);
