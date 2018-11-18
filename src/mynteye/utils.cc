@@ -40,9 +40,9 @@ bool select(const Camera& cam, DeviceInfo* info) {
   }
   std::cout << dashes << std::endl;
 
-  if (n <= 2) {
+  if (n == 1) {
     *info = dev_infos[0];
-    std::cout << "Auto select a device to open, index: 0"<< std::endl;
+    std::cout << "Auto select a device to open, index: 0" << std::endl;
   } else {
     size_t i;
     std::cout << "Please select a device to open, index: ";
