@@ -82,7 +82,7 @@ void Device::Init() {
   stream_depth_info_ptr_ =
       (PETRONDI_STREAM_INFO)malloc(sizeof(ETRONDI_STREAM_INFO)*64);
   // default image type
-  depth_data_type_ = 7;
+  depth_data_type_ = 2;
   // default frame rate
   framerate_ = 10;
 

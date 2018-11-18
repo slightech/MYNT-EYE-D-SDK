@@ -50,7 +50,8 @@ Motions::Motions()
     proc_mode_(static_cast<const std::int32_t>(ProcessMode::PROC_NONE)),
     is_motion_datas_enabled_(false),
     motion_datas_max_size_(1000),
-    motion_callback_(nullptr) {
+    motion_callback_(nullptr),
+    motion_count_(0) {
 }
 
 Motions::~Motions() {
@@ -122,6 +123,11 @@ void Motions::OnImuDataCallback(const ImuDataPacket& packet) {
     imu->gyro[2] = packet.accel_or_gyro[2] * 2000.f / 0x10000;
   } else {
     LOGW("Unaccpected imu, flag=%d is wrong", imu->flag);
+    return;
+  }
+
+  if (motion_count_ < 20) {
+    ++motion_count_;
     return;
   }
 
