@@ -38,7 +38,7 @@ int main(int argc, char const* argv[]) {
   OpenParams params(dev_info.index);
   {
     // Framerate: 10(default), [0,60], [0,30](STREAM_2560x720)
-    params.framerate = 30;
+    params.framerate = 10;
 
     // Color mode: raw(default), rectified
     // params.color_mode = ColorMode::COLOR_RECTIFIED;
@@ -70,7 +70,8 @@ int main(int argc, char const* argv[]) {
   cam.EnableImageInfo(true);
 
   // Enable what stream datas: left_color, right_color, depth
-  if (util::is_right_color_supported(params.stream_mode)) {
+  bool is_right_ok = util::is_right_color_supported(params.stream_mode);
+  if (is_right_ok) {
     cam.EnableStreamData(ImageType::IMAGE_ALL);
   } else {
     cam.EnableStreamData(ImageType::IMAGE_LEFT_COLOR);
@@ -89,7 +90,7 @@ int main(int argc, char const* argv[]) {
   std::cout << "Press ESC/Q on Windows to terminate" << std::endl;
 
   cv::namedWindow("left color");
-  cv::namedWindow("right color");
+  if (is_right_ok) cv::namedWindow("right color");
   cv::namedWindow("depth");
 
   CVPainter painter;
@@ -107,7 +108,7 @@ int main(int argc, char const* argv[]) {
       cv::imshow("left color", left);
     }
 
-    if (util::is_right_color_supported(params.stream_mode)) {
+    if (is_right_ok) {
       auto right_color = cam.GetStreamData(ImageType::IMAGE_RIGHT_COLOR);
       if (right_color.img) {
         cv::Mat right = right_color.img->To(ImageFormat::COLOR_BGR)->ToMat();
