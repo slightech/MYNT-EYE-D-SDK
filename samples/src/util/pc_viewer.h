@@ -15,7 +15,10 @@
 #define MYNTEYE_SAMPLES_PC_VIEWER_H_
 #pragma once
 
+#include <condition_variable>
 #include <memory>
+#include <mutex>
+#include <thread>
 
 #include <opencv2/core/core.hpp>
 
@@ -31,21 +34,36 @@ class PCViewer {
   PCViewer(const mynteye::CameraIntrinsics& cam_in, float cam_factor);
   ~PCViewer();
 
-  void Update(const cv::Mat &rgb, const cv::Mat& depth);
-
-  void Update(pointcloud_t::ConstPtr cloud);
+  bool Update(const cv::Mat &rgb, const cv::Mat& depth);
 
   bool WasVisual() const;
   bool WasStopped() const;
 
  private:
+  void Update(pointcloud_t::ConstPtr cloud);
+
   void ConvertToPointCloud(const cv::Mat &rgb, const cv::Mat& depth,
       pointcloud_t::Ptr cloud);
+
+  void Start();
+  void Stop();
+
+  void Run();
 
   std::shared_ptr<pcl::visualization::PCLVisualizer> viewer_;
 
   mynteye::CameraIntrinsics cam_in_;
   float cam_factor_;
+
+  std::mutex mutex_;
+  std::condition_variable condition_;
+  bool generating_;
+
+  std::thread thread_;
+  bool running_;
+
+  cv::Mat rgb_;
+  cv::Mat depth_;
 };
 
 #endif  // MYNTEYE_SAMPLES_PC_VIEWER_H_ NOLINT

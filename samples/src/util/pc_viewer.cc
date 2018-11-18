@@ -34,10 +34,13 @@ std::shared_ptr<pcl::visualization::PCLVisualizer> CustomColorVis(
 }
 
 PCViewer::PCViewer(const mynteye::CameraIntrinsics& cam_in, float cam_factor)
-  : viewer_(nullptr), cam_in_(cam_in), cam_factor_(cam_factor) {
+  : viewer_(nullptr), cam_in_(cam_in), cam_factor_(cam_factor),
+    generating_(false), running_(false) {
+  Start();
 }
 
 PCViewer::~PCViewer() {
+  Stop();
   if (viewer_) {
     // viewer_->saveCameraParameters("pcl_camera_params.txt");
     viewer_->close();
@@ -45,10 +48,17 @@ PCViewer::~PCViewer() {
   }
 }
 
-void PCViewer::Update(const cv::Mat &rgb, const cv::Mat& depth) {
-  pointcloud_t::Ptr cloud(new pointcloud_t);
-  ConvertToPointCloud(rgb, depth, cloud);
-  Update(cloud);
+bool PCViewer::Update(const cv::Mat &rgb, const cv::Mat& depth) {
+  if (generating_) return false;
+  {
+    std::lock_guard<std::mutex> _(mutex_);
+    if (generating_) return false;
+    generating_ = true;
+    rgb_ = rgb/*.clone()*/;
+    depth_ = depth/*.clone()*/;
+  }
+  condition_.notify_one();
+  return true;
 }
 
 void PCViewer::Update(pointcloud_t::ConstPtr cloud) {
@@ -93,6 +103,49 @@ void PCViewer::ConvertToPointCloud(
 
       // add point to cloud
       cloud->points.push_back(p);
+    }
+  }
+}
+
+void PCViewer::Start() {
+  if (running_) return;
+  {
+    std::lock_guard<std::mutex> _(mutex_);
+    if (running_) return;
+    running_ = true;
+  }
+  thread_ = std::thread(&PCViewer::Run, this);
+}
+
+void PCViewer::Stop() {
+  if (!running_) return;
+  {
+    std::lock_guard<std::mutex> _(mutex_);
+    if (!running_) return;
+    running_ = false;
+    generating_ = true;
+  }
+  condition_.notify_one();
+  if (thread_.joinable()) {
+    thread_.join();
+  }
+}
+
+void PCViewer::Run() {
+  while (running_) {
+    {
+      std::unique_lock<std::mutex> lock(mutex_);
+      condition_.wait(lock, [this] { return generating_; });
+      if (!running_) break;
+    }
+
+    pointcloud_t::Ptr cloud(new pointcloud_t);
+    ConvertToPointCloud(rgb_, depth_, cloud);
+    Update(cloud);
+
+    {
+      std::lock_guard<std::mutex> _(mutex_);
+      generating_ = false;
     }
   }
 }
