@@ -11,227 +11,245 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#include <limits.h>
-#include <stdlib.h>
 #include <iostream>
-#include <functional>
 
 #include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
 
 #include "mynteye/camera.h"
 #include "mynteye/utils.h"
-#include "mynteye/types.h"
 
 #include "util/cam_utils.h"
 #include "util/counter.h"
 #include "util/cv_painter.h"
+#include "util/optparse.h"
 
-using namespace std;
-using namespace mynteye;
-
-typedef struct prams {
-  int default_val;
-  string description;
-  int min;
-  int max;
-  vector<string> options_description;
-}PRAM;
-
-PRAM config[] = {
-  {0,   "device index",       0,  INT_MAX,
-    {
-      "0 device0",
-      "1 device1",
-      "..."
-    }
-  },
-  {10,  "framerate",          1,  60,
-    {
-      "StreamMode STREAM_2560x720: <30",
-      "StreamMode STREAM_640x480/STREAM_1280x480/STREAM_1280x720 <60"
-    }
-  },
-  {0,   "color mode",         0,  static_cast<int>(ColorMode::COLOR_MODE_LAST),
-    {
-      "0 COLOR_RAW (color raw)",
-      "1 COLOR_RECTIFIED (color rectified)"
-    }
-  },
-  {2,   "depth mode",         0,  static_cast<int>(DepthMode::DEPTH_MODE_LAST),
-    {
-      "0 DEPTH_RAW (ImageFormat::DEPTH_RAW)",
-      "1 DEPTH_GRAY (ImageFormat::DEPTH_GRAY_24)",
-      "2 DEPTH_COLORFUL (ImageFormat::DEPTH_RGB)"
-    }
-  },
-  {2,   "stream mode",        0,  static_cast<int>(StreamMode::STREAM_MODE_LAST), // NOLINT
-    {
-      "0 STREAM_640x480 (480p, vga, left+right)",
-      "1 STREAM_1280x480 (480p, vga, left)",
-      "2 STREAM_1280x720 (720p, hd, left)",
-      "3 STREAM_2560x720 (720p, hd, left+right)"
-    }
-  },
-  {1,   "color stream format", 0,  static_cast<int>(StreamFormat::STREAM_FORMAT_LAST),  // NOLINT
-    {
-      "0 STREAM_MJPG",
-      "1 STREAM_YUYV"
-    }
-  },
-  {1,   "depth stream format", 0,  static_cast<int>(StreamFormat::STREAM_FORMAT_LAST),  // NOLINT
-    {
-      "0 STREAM_MJPG",
-      "1 STREAM_YUYV"
-    }
-  },
-  {1,   "Auto-exposure",       0,  1,
-    {
-      "0 off",
-      "1 on"
-    }
-  },
-  {1,   "Auto-white balance",  0,  1,
-    {
-      "0 off",
-      "1 on"
-    }
-  }
-};
+MYNTEYE_USE_NAMESPACE
 
 int main(int argc, char const* argv[]) {
-  string dashes(std::string(30, '-'));
-  mynteye::Camera cam;
-  mynteye::OpenParams params;
-  for (unsigned int i=0; i < sizeof(config)/sizeof(PRAM); i++) {
-    cout << dashes << endl;
-    bool use_default_tag = false;
-    cout << config[i].description << endl;
-    for (unsigned int j = 0; j < config[i].options_description.size(); j++) {
-      cout << config[i].options_description[j] << endl;
-    }
-    if ((unsigned int)argc-1 <= i) {
-      use_default_tag = true;
-      cout << "use default value:"<< config[i].default_val << endl;
+  optparse::OptionParser parser = optparse::OptionParser()
+      .usage("usage: %prog [options]"
+      "\n  help: %prog -h"
+      "\n  left+depth: %prog"
+      "\n  imu only: %prog -r -m"
+      "\n            -r for right, but default stream mode not support right"
+      )
+      .description("Open device with different options.");
+
+  // OpenParams
+  optparse::OptionGroup op_group = optparse::OptionGroup(
+      "Open Params", "The open params");
+  op_group.add_option("-i", "--index").dest("index")
+      .type("int").metavar("INDEX").help("Device index");
+  op_group.add_option("-f", "--rate").dest("framerate")
+      .type("int").set_default(10)
+      .metavar("RATE").help("Framerate, range [0,60], [0,30](STREAM_2560x720), "
+          "\ndefault: %default");
+  op_group.add_option("--cm").dest("color_mode")
+      .type("int").set_default(0)
+      .metavar("MODE").help("Color mode, default %default (COLOR_RAW)"
+          "\n  0: COLOR_RAW, color raw"
+          "\n  1: COLOR_RECTIFIED, color rectified");
+  op_group.add_option("--dm").dest("depth_mode")
+      .type("int").set_default(2)
+      .metavar("MODE").help("Depth mode, default %default (DEPTH_COLORFUL)"
+          "\n  0: DEPTH_RAW"
+          "\n  1: DEPTH_GRAY"
+          "\n  2: DEPTH_COLORFUL");
+  op_group.add_option("--sm").dest("stream_mode")
+      .type("int").set_default(2)
+      .metavar("MODE").help("Stream mode of color & depth, "
+          "\ndefault %default (STREAM_1280x720)"
+          "\n  0: STREAM_640x480, 480p, vga, left"
+          "\n  1: STREAM_1280x480, 480p, vga, left+right"
+          "\n  2: STREAM_1280x720, 720p, hd, left"
+          "\n  3: STREAM_2560x720, 720p, hd, left+right");
+  op_group.add_option("--ae").dest("state_ae")
+      .action("store_true").help("Enable auto-exposure");
+  op_group.add_option("--awb").dest("state_awb")
+      .action("store_true").help("Enable auto-white balance");
+  op_group.add_option("--ir").dest("ir_intensity")
+      .type("int").set_default(0)
+      .metavar("VALUE").help("IR intensity, range [0,6], default %default");
+  parser.add_option_group(op_group);
+
+  // FeatureToggles
+  optparse::OptionGroup ft_group = optparse::OptionGroup(
+      "Feature Toggles", "The feature toggles");
+  ft_group.add_option("--proc").dest("proc_mode")
+      .type("int").set_default(0)
+      .metavar("MODE").help("Enable process mode, e.g. imu assembly, warm_drift"
+          "\n  0: PROC_NONE"
+          "\n  1: PROC_IMU_ASSEMBLY"
+          "\n  2: PROC_IMU_WARM_DRIFT"
+          "\n  3: PROC_IMU_ALL");
+  ft_group.add_option("--img-info").dest("img_info")
+      .action("store_true").help("Enable image info, and sync with image");
+  parser.add_option_group(ft_group);
+
+  // Streams & motions
+  parser.add_option("-l", "--left").dest("left")
+      .action("store_true").help("Enable left color stream");
+  parser.add_option("-r", "--right").dest("right")
+      .action("store_true").help("Enable right color stream");
+  parser.add_option("-d", "--depth").dest("depth")
+      .action("store_true").help("Enable depth stream");
+  parser.add_option("-m", "--imu").dest("imu")
+      .action("store_true").help("Enable imu datas");
+
+  auto&& options = parser.parse_args(argc, argv);
+  // auto&& args = parser.args();
+
+  std::string dashes(80, '-');
+
+  Camera cam;
+  OpenParams params;
+
+  DeviceInfo dev_info;
+  {
+    std::vector<DeviceInfo> dev_infos = cam.GetDeviceInfos();
+    int n = dev_infos.size();
+    if (n <= 0) {
+      std::cerr << "Error: Device not found" << std::endl;
+      return 1;
     }
 
-    if (use_default_tag == false) {
-      if (atoi(argv[i+1]) < config[i].min || atoi(argv[i+1]) > config[i].max) {
-        use_default_tag = true;
-        cout << "out of range and use default value:"
-                << config[i].default_val << endl;
+    std::cout << dashes << std::endl;
+    std::cout << "Index | Device Information" << std::endl;
+    std::cout << dashes << std::endl;
+    for (auto &&info : dev_infos) {
+      std::cout << std::setw(5) << info.index << " | " << info << std::endl;
+    }
+    std::cout << dashes << std::endl;
+
+    if (!options["index"].empty()) {
+      int i = options.get("index");
+      if (i < 0 || i >= n) {
+        std::cerr << "Error: Device index (" << i << ") out of range"
+            << std::endl;
+        return 2;
+      }
+      dev_info = dev_infos[i];
+    } else {  // auto select
+      if (n == 1) {
+        dev_info = dev_infos[0];
+        std::cout << "Auto select a device to open, index: 0" << std::endl;
+      } else {
+        int i;
+        while (true) {
+          std::cout << "Please select a device to open, index: ";
+          std::cin >> i;
+          std::cout << std::endl;
+          if (i >= 0 && i < n) {
+            dev_info = dev_infos[i];
+            break;
+          }
+          std::cerr << "Error: Device index (" << i << ") out of range"
+              << std::endl;
+        }
       }
     }
+  }
 
-    switch (i) {
-      case 0:
-      {
-        int dev_index = config[i].default_val;
-        if (use_default_tag) {
-          params = OpenParams(dev_index);
-        } else {
-          dev_index = atoi(argv[i+1]);
-          params = OpenParams(dev_index);
-        }
-        {
-          vector<mynteye::DeviceInfo> dev_infos = cam.GetDeviceInfos();
-          size_t n = dev_infos.size();
-          if (n <= 0 || dev_index < 0 || (unsigned int)dev_index >= n) {
-            cout << "Device not found, index: " << dev_index << endl;
-            return 1;
-          }
-          cout << "Device Information" << endl;
-          int i = 0;
-          for (auto &&info : dev_infos) {
-            if (dev_index == i) {
-              cout << "*";
-            } else {
-              cout << " ";
-            }
-            cout << info.index << " | " << info << endl;
-            i++;
-          }
-        }
-        break;
+  util::print_stream_infos(cam, dev_info.index);
+
+  std::cout << "Open device: " << dev_info.index << ", "
+      << dev_info.name << std::endl << std::endl;
+
+  auto in_range = [&options](const std::string& name, int min, int max,
+      int* val) {
+    *val = static_cast<int>(options.get(name));
+    if (*val < min || *val > max) {
+      std::cerr << "Error: " << name << " out of range [" << min << "," << max
+          << "]" << std::endl;
+      return false;
+    }
+    return true;
+  };
+  {
+    int val;
+    params.dev_index = dev_info.index;
+
+    if (!in_range("color_mode", 0, 1, &val)) return 2;
+    params.color_mode = static_cast<ColorMode>(val);
+    if (!in_range("depth_mode", 0, 2, &val)) return 2;
+    params.depth_mode = static_cast<DepthMode>(val);
+    if (!in_range("stream_mode", 0, 3, &val)) return 2;
+    params.stream_mode = static_cast<StreamMode>(val);
+    params.state_ae = options.get("state_ae");
+    params.state_awb = options.get("state_awb");
+    if (!in_range("ir_intensity", 0, 6, &val)) return 2;
+    params.ir_intensity = val;
+
+    if (params.stream_mode == StreamMode::STREAM_2560x720) {
+      if (!in_range("framerate", 0, 30, &val)) return 2;
+    } else {
+      if (!in_range("framerate", 0, 60, &val)) return 2;
+    }
+    params.framerate = val;
+  }
+  bool is_right_ok = util::is_right_color_supported(params.stream_mode);
+  bool left = options.get("left");
+  bool right = options.get("right");
+  bool depth = options.get("depth");
+  {
+    int val;
+
+    if (!in_range("proc_mode", 0, 3, &val)) return 2;
+    // Enable what process logics
+    cam.EnableProcessMode(val);
+
+    if (options.get("img_info")) {
+      // Enable image infos
+      cam.EnableImageInfo(true);
+    }
+
+    // Enable what stream datas: left_color, right_color, depth
+    if (!left && !right && !depth) {
+      if (is_right_ok) {
+        left = right = depth = true;
+        cam.EnableStreamData(ImageType::IMAGE_ALL);
+      } else {
+        left = depth = true;
+        cam.EnableStreamData(ImageType::IMAGE_LEFT_COLOR);
+        cam.EnableStreamData(ImageType::IMAGE_DEPTH);
       }
-      case 1:
-      {
-        if (use_default_tag) {
-          params.framerate = config[i].default_val;
-        } else {
-          params.framerate = atoi(argv[i+1]);
+    } else {
+      if (left) cam.EnableStreamData(ImageType::IMAGE_LEFT_COLOR);
+      if (right && is_right_ok) {
+        cam.EnableStreamData(ImageType::IMAGE_RIGHT_COLOR);
+      } else {
+        right = false;
+        if (!left && !depth) {
+          std::cout << "Warning: there is no stream datas wanted?" << std::endl;
         }
-        break;
       }
-      case 2:
-      {
-        if (use_default_tag) {
-          params.color_mode = static_cast<ColorMode>(config[i].default_val);
-        } else {
-          params.color_mode = static_cast<ColorMode>(atoi(argv[i+1]));
+      if (depth) cam.EnableStreamData(ImageType::IMAGE_DEPTH);
+    }
+
+    bool imu = options.get("imu");
+    if (imu) {
+      // Enable motion datas
+      cam.EnableMotionDatas(0);
+
+      // Set motion data callback
+      cam.SetMotionCallback([](const MotionData& data) {
+        if (data.imu->flag == MYNTEYE_IMU_ACCEL) {
+          std::cout << "[accel] stamp: " << data.imu->timestamp
+            << ", x: " << data.imu->accel[0]
+            << ", y: " << data.imu->accel[1]
+            << ", z: " << data.imu->accel[2]
+            << ", temp: " << data.imu->temperature
+            << std::endl;
+        } else if (data.imu->flag == MYNTEYE_IMU_GYRO) {
+          std::cout << "[gyro] stamp: " << data.imu->timestamp
+            << ", x: " << data.imu->gyro[0]
+            << ", y: " << data.imu->gyro[1]
+            << ", z: " << data.imu->gyro[2]
+            << ", temp: " << data.imu->temperature
+            << std::endl;
         }
-        break;
-      }
-      case 3:
-      {
-        if (use_default_tag) {
-          params.depth_mode = static_cast<DepthMode>(config[i].default_val);
-        } else {
-          params.depth_mode = static_cast<DepthMode>(atoi(argv[i+1]));
-        }
-        break;
-      }
-      case 4:
-      {
-        if (use_default_tag) {
-          params.stream_mode = static_cast<StreamMode>(config[i].default_val);
-        } else {
-          params.stream_mode = static_cast<StreamMode>(atoi(argv[i+1]));
-        }
-        break;
-      }
-      case 5:
-      {
-        if (use_default_tag) {
-          params.color_stream_format =
-            static_cast<StreamFormat>(config[i].default_val);
-        } else {
-          params.color_stream_format =
-            static_cast<StreamFormat>(atoi(argv[i+1]));
-        }
-        break;
-      }
-      case 6:
-      {
-        if (use_default_tag) {
-          params.depth_stream_format =
-            static_cast<StreamFormat>(config[i].default_val);
-        } else {
-          params.depth_stream_format =
-            static_cast<StreamFormat>(atoi(argv[i+1]));
-        }
-        break;
-      }
-      case 7:
-      {
-        if (use_default_tag) {
-          params.state_ae = static_cast<bool>(config[i].default_val);
-        } else {
-          params.state_ae = static_cast<bool>(atoi(argv[i+1]));
-        }
-        break;
-      }
-      case 8:
-      {
-        if (use_default_tag) {
-          params.state_awb = static_cast<bool>(config[i].default_val);
-        } else {
-          params.state_awb = static_cast<bool>(atoi(argv[i+1]));
-        }
-        break;
-      }
-      default:
-        break;
+        std::cout << std::flush;
+      });
     }
   }
 
@@ -244,9 +262,53 @@ int main(int argc, char const* argv[]) {
   }
   std::cout << "Open device success" << std::endl << std::endl;
 
+  std::cout << "Press ESC/Q on Windows to terminate" << std::endl;
+
+  if (left) cv::namedWindow("left color");
+  if (right) cv::namedWindow("right color");
+  if (depth) cv::namedWindow("depth");
+
+  CVPainter painter;
   util::Counter counter;
   for (;;) {
     counter.Update();
+
+    if (left) {
+      auto left_color = cam.GetStreamData(ImageType::IMAGE_LEFT_COLOR);
+      if (left_color.img) {
+        cv::Mat mat = left_color.img->To(ImageFormat::COLOR_BGR)->ToMat();
+        painter.DrawSize(mat, CVPainter::TOP_LEFT);
+        painter.DrawStreamData(mat, left_color, CVPainter::TOP_RIGHT);
+        painter.DrawInformation(mat, util::to_string(counter.fps()),
+            CVPainter::BOTTOM_RIGHT);
+        cv::imshow("left color", left);
+      }
+    }
+
+    if (right) {
+      auto right_color = cam.GetStreamData(ImageType::IMAGE_RIGHT_COLOR);
+      if (right_color.img) {
+        cv::Mat mat = right_color.img->To(ImageFormat::COLOR_BGR)->ToMat();
+        painter.DrawSize(mat, CVPainter::TOP_LEFT);
+        painter.DrawStreamData(mat, right_color, CVPainter::TOP_RIGHT);
+        cv::imshow("right color", mat);
+      }
+    }
+
+    if (depth) {
+      auto image_depth = cam.GetStreamData(ImageType::IMAGE_DEPTH);
+      if (image_depth.img) {
+        cv::Mat depth = image_depth.img->To(ImageFormat::DEPTH_BGR)->ToMat();
+        painter.DrawSize(depth, CVPainter::TOP_LEFT);
+        painter.DrawStreamData(depth, image_depth, CVPainter::TOP_RIGHT);
+        cv::imshow("depth", depth);
+      }
+    }
+
+    char key = static_cast<char>(cv::waitKey(1));
+    if (key == 27 || key == 'q' || key == 'Q') {  // ESC/Q
+      break;
+    }
   }
 
   cam.Close();

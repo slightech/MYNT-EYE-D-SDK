@@ -19,7 +19,7 @@
 
 MYNTEYE_USE_NAMESPACE
 
-OpenParams::OpenParams() {
+OpenParams::OpenParams() : OpenParams(0) {
 }
 
 OpenParams::OpenParams(const std::int32_t& dev_index)
