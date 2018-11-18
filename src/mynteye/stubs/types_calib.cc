@@ -21,6 +21,22 @@
 
 MYNTEYE_BEGIN_NAMESPACE
 
+std::ostream &operator<<(std::ostream &os, const CameraIntrinsics &in) {
+  os << FULL_PRECISION << "width: [" << in.width << "]";
+  os << ", height: [" << in.height << "]";
+  os << ", fx: [" << in.fx << "]";
+  os << ", fy: [" << in.fy << "]";
+  os << ", cx: [" << in.cx << "]";
+  os << ", cy: [" << in.cy << "]";
+
+  os << "coeffs: [";
+  for (int i = 0; i < 4; i++)
+    os << in.coeffs[i] << ", ";
+  os << in.coeffs[4] << "]";
+
+  return os;
+}
+
 std::ostream &operator<<(std::ostream &os, const ImuIntrinsics &in) {
   os << FULL_PRECISION << "scale: [";
   for (int i = 0; i <= 2; i++)

@@ -42,6 +42,9 @@ struct MYNTEYE_API CameraIntrinsics {
   double coeffs[5];
 };
 
+MYNTEYE_API
+std::ostream &operator<<(std::ostream &os, const CameraIntrinsics &in);
+
 /**
  * @ingroup calibration
  * Camera intrinsics: size, coeffs and camera matrix.
