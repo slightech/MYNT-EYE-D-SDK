@@ -297,9 +297,10 @@ std::vector<MotionData> CameraPrivate::GetMotionDatas() {
 void CameraPrivate::SetImgInfoCallback(img_info_callback_t callback,
     bool async) {
   if (async) {
-    img_info_async_callback_ =
-        img_info_async_callback_t::Create(callback, IMG_INFO_ASYNC_MAX_SIZE);
-    streams_->SetImgInfoCallback((*img_info_async_callback_)());
+    auto img_info_async_callback =
+        AsyncCallback<std::shared_ptr<ImgInfo>>::Create(
+            callback, IMG_INFO_ASYNC_MAX_SIZE);
+    streams_->SetImgInfoCallback((*img_info_async_callback)());
   } else {
     streams_->SetImgInfoCallback(callback);
   }
@@ -308,9 +309,9 @@ void CameraPrivate::SetImgInfoCallback(img_info_callback_t callback,
 void CameraPrivate::SetStreamCallback(const ImageType& type,
     stream_callback_t callback, bool async) {
   if (async) {
-    stream_async_callbacks_[type] =
-        stream_async_callback_t::Create(callback, STREAM_ASYNC_MAX_SIZE);
-    streams_->SetStreamCallback(type, (*stream_async_callbacks_[type])());
+    auto stream_async_callback =
+        AsyncCallback<StreamData>::Create(callback, STREAM_ASYNC_MAX_SIZE);
+    streams_->SetStreamCallback(type, (*stream_async_callback)());
   } else {
     streams_->SetStreamCallback(type, callback);
   }
@@ -318,9 +319,9 @@ void CameraPrivate::SetStreamCallback(const ImageType& type,
 
 void CameraPrivate::SetMotionCallback(motion_callback_t callback, bool async) {
   if (async) {
-    motion_async_callback_ =
-        motion_async_callback_t::Create(callback, MOTION_ASYNC_MAX_SIZE);
-    motions_->SetMotionCallback((*motion_async_callback_)());
+    auto motion_async_callback =
+        AsyncCallback<MotionData>::Create(callback, MOTION_ASYNC_MAX_SIZE);
+    motions_->SetMotionCallback((*motion_async_callback)());
   } else {
     motions_->SetMotionCallback(callback);
   }

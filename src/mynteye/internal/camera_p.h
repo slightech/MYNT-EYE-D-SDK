@@ -41,10 +41,6 @@ class MYNTEYE_API CameraPrivate {
   using stream_callback_t = std::function<void(const StreamData& data)>;
   using motion_callback_t = std::function<void(const MotionData& data)>;
 
-  using img_info_async_callback_t = AsyncCallback<std::shared_ptr<ImgInfo>>;
-  using stream_async_callback_t = AsyncCallback<StreamData>;
-  using motion_async_callback_t = AsyncCallback<MotionData>;
-
   CameraPrivate();
   ~CameraPrivate();
 
@@ -194,10 +190,6 @@ class MYNTEYE_API CameraPrivate {
   std::shared_ptr<device::Descriptors> descriptors_;
   std::shared_ptr<MotionIntrinsics> motion_intrinsics_;
   std::shared_ptr<MotionExtrinsics> motion_extrinsics_;
-
-  img_info_async_callback_t::pointer img_info_async_callback_;
-  std::map<ImageType, stream_async_callback_t::pointer> stream_async_callbacks_;
-  motion_async_callback_t::pointer motion_async_callback_;
 };
 
 MYNTEYE_END_NAMESPACE
