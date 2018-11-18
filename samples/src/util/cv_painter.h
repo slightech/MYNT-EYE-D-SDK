@@ -11,8 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#ifndef MYNTEYE_TUTORIALS_CV_PAINTER_H_  // NOLINT
-#define MYNTEYE_TUTORIALS_CV_PAINTER_H_
+#ifndef MYNTEYE_SAMPLES_CV_PAINTER_H_  // NOLINT
+#define MYNTEYE_SAMPLES_CV_PAINTER_H_
 #pragma once
 
 #include <string>
@@ -50,4 +50,4 @@ class CVPainter {
   std::int32_t frame_rate_;
 };
 
-#endif  // MYNTEYE_TUTORIALS_CV_PAINTER_H_ NOLINT
+#endif  // MYNTEYE_SAMPLES_CV_PAINTER_H_ NOLINT

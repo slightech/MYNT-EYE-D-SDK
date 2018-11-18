@@ -24,58 +24,9 @@
 #include "util/cam_utils.h"
 #include "util/counter.h"
 #include "util/cv_painter.h"
+#include "util/pc_viewer.h"
 
-// camera params
-
-const float camera_factor = 1000.0;
-
-double camera_cx = 682.3;
-double camera_cy = 254.9;
-double camera_fx = 979.8;
-double camera_fy = 942.8;
-
-// pcl viewer
-
-typedef pcl::PointXYZRGBA PointT;
-typedef pcl::PointCloud<PointT> PointCloud;
-
-PointCloud::Ptr cloud ( new PointCloud );
-pcl::visualization::PCLVisualizer viewer("point cloud viewer");
-
-// show point cloud
-void show_points(cv::Mat rgb, cv::Mat depth) {
-  // loop the mat
-  for (int m = 0; m < depth.rows; m++) {
-    for (int n = 0; n < depth.cols; n++) {
-      // get depth value at (m, n)
-      std::uint16_t d = depth.ptr<std::uint16_t>(m)[n];
-      // when d is equal 0 or 4096 means no depth
-      if (d == 0 || d == 4096)
-        continue;
-
-      PointT p;
-
-      // get point x y z
-      p.z = static_cast<float>(d) / camera_factor;
-      p.x = (n - camera_cx) * p.z / camera_fx;
-      p.y = (m - camera_cy) * p.z / camera_fy;
-
-      // get colors
-      p.b = rgb.ptr<uchar>(m)[n * 3];
-      p.g = rgb.ptr<uchar>(m)[n * 3 + 1];
-      p.r = rgb.ptr<uchar>(m)[n * 3 + 2];
-
-      // add point to cloud
-      cloud->points.push_back(p);
-    }
-  }
-
-  pcl::visualization::PointCloudColorHandlerRGBField<PointT>color(cloud);
-  viewer.updatePointCloud<PointT>(cloud, color, "sample cloud");
-  viewer.spinOnce();
-  // clear points
-  cloud->points.clear();
-}
+#define CAMERA_FACTOR 1000.0
 
 MYNTEYE_USE_NAMESPACE
 
@@ -93,6 +44,7 @@ int main(int argc, char const* argv[]) {
       << dev_info.name << std::endl << std::endl;
 
   OpenParams params(dev_info.index);
+  params.color_mode = ColorMode::COLOR_RECTIFIED;
   params.depth_mode = DepthMode::DEPTH_RAW;
   params.stream_mode = StreamMode::STREAM_1280x720;
   params.ir_intensity = 4;
@@ -105,18 +57,6 @@ int main(int argc, char const* argv[]) {
 
   cam.Open(params);
 
-  {
-    bool ok;
-    auto stream_intrinsics = cam.GetStreamIntrinsics(stream_mode, &ok);
-    CameraIntrinsics in = ok ? stream_intrinsics.left
-        : get_default_camera_intrinsics(stream_mode);
-    // TODO(yourself): replace the real camera params, if get failed
-    camera_cx = in.cx;
-    camera_cy = in.cy;
-    camera_fx = in.fx;
-    camera_fy = in.fy;
-  }
-
   std::cout << std::endl;
   if (!cam.IsOpened()) {
     std::cerr << "Error: Open camera failed" << std::endl;
@@ -126,18 +66,15 @@ int main(int argc, char const* argv[]) {
 
   std::cout << "Press ESC/Q on Windows to terminate" << std::endl;
 
-  {
-    viewer.setBackgroundColor(0, 0, 0);
-    viewer.addCoordinateSystem(1.0);
-    viewer.initCameraParameters();
-    viewer.addPointCloud<PointT>(cloud, "sample cloud");
-    viewer.setCameraPosition(0, 0, -2, 0, -1, 0, 0);
-    viewer.setSize(1280, 720);
-  }
-
   cv::namedWindow("color");
 
+  bool ok;
+  auto stream_intrinsics = cam.GetStreamIntrinsics(stream_mode, &ok);
+  CameraIntrinsics in = ok ? stream_intrinsics.left
+      : get_default_camera_intrinsics(stream_mode);
+
   CVPainter painter;
+  PCViewer viewer(in, CAMERA_FACTOR);
   util::Counter counter;
   for (;;) {
     counter.Update();
@@ -157,11 +94,14 @@ int main(int argc, char const* argv[]) {
 
       cv::imshow("color", color);
 
-      show_points(color, depth);
+      viewer.Update(color, depth);
     }
 
     char key = static_cast<char>(cv::waitKey(1));
     if (key == 27 || key == 'q' || key == 'Q') {  // ESC/Q
+      break;
+    }
+    if (viewer.WasStopped()) {
       break;
     }
   }
