@@ -338,7 +338,7 @@ std::size_t from_data(ImuIntrinsics *in,
   }
   i += 24;
   i += 100;
-  // warm drift
+  // temperature drift
   // x
   for (std::size_t j = 0; j < 2; j++) {
     in->x[j] = _from_data<double>(data + i + j * 8);
@@ -643,7 +643,7 @@ std::size_t to_data(const ImuIntrinsics *in,
   }
   i += 24;
   i += 100;
-  // warm drift
+  // temperature drift
   // x
   for (std::size_t j = 0; j < 2; j++) {
     _to_data<double>(in->x[j], data + i + j * 8);

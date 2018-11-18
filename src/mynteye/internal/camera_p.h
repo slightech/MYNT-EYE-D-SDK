@@ -86,9 +86,9 @@ class MYNTEYE_API CameraPrivate {
       device::ImuParams *imu_params,
       Version *spec_version = nullptr);
 
-  /** Enable process mode, e.g. imu assembly, warm_drift */
+  /** Enable process mode, e.g. imu assembly, temp_drift */
   void EnableProcessMode(const ProcessMode& mode);
-  /** Enable process mode, e.g. imu assembly, warm_drift */
+  /** Enable process mode, e.g. imu assembly, temp_drift */
   void EnableProcessMode(const std::int32_t& mode);
 
   /** Whethor image info supported or not */

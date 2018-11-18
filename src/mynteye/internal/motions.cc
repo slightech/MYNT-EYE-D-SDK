@@ -126,14 +126,14 @@ void Motions::OnImuDataCallback(const ImuDataPacket& packet) {
   }
 
   bool proc_assembly = ((proc_mode_ & ProcessMode::PROC_IMU_ASSEMBLY) > 0);
-  bool proc_warm_drift = ((proc_mode_ & ProcessMode::PROC_IMU_WARM_DRIFT) > 0);
-  if (proc_assembly && proc_warm_drift) {
-    ProcImuWarmDrift(imu);
+  bool proc_temp_drift = ((proc_mode_ & ProcessMode::PROC_IMU_WARM_DRIFT) > 0);
+  if (proc_assembly && proc_temp_drift) {
+    ProcImuTempDrift(imu);
     ProcImuAssembly(imu);
   } else if (proc_assembly) {
     ProcImuAssembly(imu);
-  } else if (proc_warm_drift) {
-    ProcImuWarmDrift(imu);
+  } else if (proc_temp_drift) {
+    ProcImuTempDrift(imu);
   }
 
   std::lock_guard<std::mutex> _(metux_);
@@ -185,7 +185,7 @@ void Motions::ProcImuAssembly(std::shared_ptr<ImuData> data) const {
   }
 }
 
-void Motions::ProcImuWarmDrift(std::shared_ptr<ImuData> data) const {
+void Motions::ProcImuTempDrift(std::shared_ptr<ImuData> data) const {
   if (nullptr == motion_intrinsics_) return;
 
   double temp = data->temperature;

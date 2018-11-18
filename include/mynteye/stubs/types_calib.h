@@ -81,7 +81,7 @@ struct MYNTEYE_API ImuIntrinsics {
 
   // std::uint8_t reserve[100];
 
-  /** Warm drift
+  /** Temperature drift
    *  \code
    *    0 - Constant value
    *    1 - Slope

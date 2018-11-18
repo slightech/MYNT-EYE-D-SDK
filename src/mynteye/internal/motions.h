@@ -59,7 +59,7 @@ class Motions {
 
  private:
   void ProcImuAssembly(std::shared_ptr<ImuData> data) const;
-  void ProcImuWarmDrift(std::shared_ptr<ImuData> data) const;
+  void ProcImuTempDrift(std::shared_ptr<ImuData> data) const;
 
   std::shared_ptr<MotionIntrinsics> motion_intrinsics_;
 

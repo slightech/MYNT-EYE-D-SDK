@@ -77,7 +77,7 @@ int main(int argc, char const* argv[]) {
       "Feature Toggles", "The feature toggles");
   ft_group.add_option("--proc").dest("proc_mode")
       .type("int").set_default(0)
-      .metavar("MODE").help("Enable process mode, e.g. imu assembly, warm_drift"
+      .metavar("MODE").help("Enable process mode, e.g. imu assembly, temp_drift"
           "\n  0: PROC_NONE"
           "\n  1: PROC_IMU_ASSEMBLY"
           "\n  2: PROC_IMU_WARM_DRIFT"
