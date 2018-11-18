@@ -73,6 +73,8 @@ class Motions {
   std::mutex metux_;
 
   motion_callback_t motion_callback_;
+
+  std::uint32_t motion_count_;
 };
 
 MYNTEYE_END_NAMESPACE

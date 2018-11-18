@@ -50,7 +50,8 @@ Motions::Motions()
     proc_mode_(static_cast<const std::int32_t>(ProcessMode::PROC_NONE)),
     is_motion_datas_enabled_(false),
     motion_datas_max_size_(1000),
-    motion_callback_(nullptr) {
+    motion_callback_(nullptr),
+    motion_count_(0) {
 }
 
 Motions::~Motions() {
@@ -125,8 +126,13 @@ void Motions::OnImuDataCallback(const ImuDataPacket& packet) {
     return;
   }
 
+  if (motion_count_ < 20) {
+    ++motion_count_;
+    return;
+  }
+
   bool proc_assembly = ((proc_mode_ & ProcessMode::PROC_IMU_ASSEMBLY) > 0);
-  bool proc_temp_drift = ((proc_mode_ & ProcessMode::PROC_IMU_WARM_DRIFT) > 0);
+  bool proc_temp_drift = ((proc_mode_ & ProcessMode::PROC_IMU_TEMP_DRIFT) > 0);
   if (proc_assembly && proc_temp_drift) {
     ProcImuTempDrift(imu);
     ProcImuAssembly(imu);

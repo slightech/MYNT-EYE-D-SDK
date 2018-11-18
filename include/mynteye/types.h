@@ -84,8 +84,8 @@ enum class Descriptor : std::int32_t {
 enum class ProcessMode : std::int32_t {
   PROC_NONE           = 0,
   PROC_IMU_ASSEMBLY   = 1,
-  PROC_IMU_WARM_DRIFT = 2,
-  PROC_IMU_ALL        = PROC_IMU_ASSEMBLY | PROC_IMU_WARM_DRIFT
+  PROC_IMU_TEMP_DRIFT = 2,
+  PROC_IMU_ALL        = PROC_IMU_ASSEMBLY | PROC_IMU_TEMP_DRIFT
 };
 
 inline
