@@ -243,6 +243,8 @@ bool Device::Open(const OpenParams& params) {
   SetAutoExposureEnabled(params.state_ae);
   SetAutoWhiteBalanceEnabled(params.state_awb);
 
+  if (params.framerate > 0) framerate_ = params.framerate;
+
 #ifdef MYNTEYE_OS_LINUX
   std::string dtc_name = "Unknown";
   switch (params.depth_mode) {
@@ -272,6 +274,7 @@ bool Device::Open(const OpenParams& params) {
   GetStreamIndex(params, &color_res_index_, &depth_res_index_);
 
   CompatibleUSB2();
+  LOGI("-- Framerate: %d", framerate_);
 
   EtronDI_SetDepthDataType(etron_di_, &dev_sel_info_, depth_data_type_);
   DBG_LOGI("SetDepthDataType: %d", depth_data_type_);
