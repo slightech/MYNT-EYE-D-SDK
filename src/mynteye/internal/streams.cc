@@ -42,6 +42,11 @@ Streams::Streams(std::shared_ptr<Device> device)
       {ImageType::IMAGE_LEFT_COLOR, nullptr},
       {ImageType::IMAGE_RIGHT_COLOR, nullptr},
       {ImageType::IMAGE_DEPTH, nullptr}}) {
+#ifdef MYNTEYE_OS_WIN
+  is_win = true;
+#else
+  is_win = false;
+#endif
 }
 
 Streams::~Streams() {
@@ -126,7 +131,7 @@ Streams::datas_t Streams::GetStreamDatas(const ImageType& type) {
     return {};
   }
 
-  if (is_image_info_sync_) {
+  if (is_image_info_sync_ && !IsSyncIgnored(type)) {
     auto&& datas = image_with_info_datas_map_[type]->MoveAll();
     return {datas.begin(), datas.end()};
   } else {
@@ -315,6 +320,8 @@ void Streams::SyncImageWithInfo(bool force) {
   for (auto&& type : all_image_types_) {
     if (!IsStreamDataEnabled(type)) continue;
 
+    if (IsSyncIgnored(type)) continue;
+
     auto&& imgs = image_queue_map_[type];
     if (imgs->empty()) continue;
 
@@ -400,7 +407,8 @@ void Streams::PushImageWithInfo(const Image::pointer& image,
 }
 
 void Streams::DoDirectStreamCallback(const Image::pointer& image) {
-  if (!is_image_info_sync_ && stream_callbacks_[image->type()]) {
+  if ((!is_image_info_sync_ || IsSyncIgnored(image->type()))
+      && stream_callbacks_[image->type()]) {
     stream_callbacks_[image->type()]({image, nullptr});
   }
 }
@@ -412,4 +420,9 @@ void Streams::DoSyncInfoStreamCallback(const StreamData& data) {
       stream_callbacks_[type](data);
     }
   }
+}
+
+bool Streams::IsSyncIgnored(const ImageType& type) const {
+  // On win, could not sync image info for depth
+  return is_win && type == ImageType::IMAGE_DEPTH;
 }

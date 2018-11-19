@@ -128,6 +128,9 @@ class Streams {
 
   img_info_callback_t img_info_callback_;
   std::map<ImageType, stream_callback_t> stream_callbacks_;
+
+  bool is_win;
+  bool IsSyncIgnored(const ImageType& type) const;
 };
 
 MYNTEYE_END_NAMESPACE
