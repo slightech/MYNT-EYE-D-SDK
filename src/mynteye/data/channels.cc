@@ -26,6 +26,8 @@
 #include "mynteye/util/log.h"
 #include "mynteye/util/strings.h"
 
+// #define PACKET_PRINT
+
 #define PACKET_SIZE 64
 #define DATA_SIZE 15
 
@@ -207,6 +209,34 @@ void Channels::DoHidTrack() {
   }
 }
 
+#ifdef PACKET_PRINT
+void print_imu_data(const ImuDataPacket& imu_data) {
+  std::cout << std::dec;
+  if (imu_data.flag == MYNTEYE_IMU_ACCEL) {
+    std::cout << "    [accel] stamp: " << imu_data.timestamp
+      << ", x: " << imu_data.accel_or_gyro[0] * 12.f / 0x10000
+      << ", y: " << imu_data.accel_or_gyro[1] * 12.f / 0x10000
+      << ", z: " << imu_data.accel_or_gyro[2] * 12.f / 0x10000
+      << ", temp: " << imu_data.temperature * 0.125 + 23
+      << std::endl;
+  } else if (imu_data.flag == MYNTEYE_IMU_GYRO) {
+    std::cout << "    [gyro] stamp: " << imu_data.timestamp
+      << ", x: " << imu_data.accel_or_gyro[0] * 2000.f / 0x10000
+      << ", y: " << imu_data.accel_or_gyro[1] * 2000.f / 0x10000
+      << ", z: " << imu_data.accel_or_gyro[2] * 2000.f / 0x10000
+      << ", temp: " << imu_data.temperature * 0.125 + 23
+      << std::endl;
+  }
+}
+
+void print_img_info(const ImgInfoPacket& img_info) {
+  std::cout << std::dec;
+  std::cout << "    [img_info] fid: " << img_info.frame_id
+      << ", stamp: " << img_info.timestamp
+      << ", expos: " << img_info.exposure_time << std::endl;
+}
+#endif
+
 bool Channels::DoHidDataExtract(imu_packets_t &imu, img_packets_t &img) {
   std::uint8_t data[PACKET_SIZE * 2]{};
   std::fill(data, data + PACKET_SIZE * 2, 0);
@@ -230,13 +260,36 @@ bool Channels::DoHidDataExtract(imu_packets_t &imu, img_packets_t &img) {
     if (package_sn_ == sn) { continue; }
     package_sn_ = sn;
 
+#ifdef PACKET_PRINT
+    std::cout << std::endl;
+    std::cout << "package[" << std::dec << sn << "]: ";
+    std::copy(packet, packet + PACKET_SIZE, std::ostream_iterator<int>(
+        std::cout << std::hex, " "));
+    std::cout << std::endl;
+#endif
+
     for (int offset = 3; offset <= PACKET_SIZE - DATA_SIZE;
         offset += DATA_SIZE) {
-      if (*(packet + offset) == 2) {
-        img.push_back(ImgInfoPacket(packet + offset));
-      } else if (*(packet + offset) == 0 ||
-          *(packet + offset) == 1) {
-        imu.push_back(ImuDataPacket(packet + offset));
+#ifdef PACKET_PRINT
+      std::cout << "  data[" << static_cast<int>(*(packet + offset)) << "]: ";
+      std::copy(packet + offset, packet + offset + DATA_SIZE,
+          std::ostream_iterator<int>(std::cout << std::hex, " "));
+      std::cout << std::endl;
+#endif
+
+      std::uint8_t header = *(packet + offset);
+      if (header == 0 || header == 1) {
+        auto&& imu_data = ImuDataPacket(packet + offset);
+        imu.push_back(imu_data);
+#ifdef PACKET_PRINT
+        print_imu_data(imu_data);
+#endif
+      } else if (header == 2) {
+        auto&& img_info = ImgInfoPacket(packet + offset);
+        img.push_back(img_info);
+#ifdef PACKET_PRINT
+        print_img_info(img_info);
+#endif
       }
     }
   }

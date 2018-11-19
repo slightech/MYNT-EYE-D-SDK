@@ -54,8 +54,8 @@ bool PCViewer::Update(const cv::Mat &rgb, const cv::Mat& depth) {
     std::lock_guard<std::mutex> _(mutex_);
     if (generating_) return false;
     generating_ = true;
-    rgb_ = rgb/*.clone()*/;
-    depth_ = depth/*.clone()*/;
+    rgb_ = rgb.clone();
+    depth_ = depth.clone();
   }
   condition_.notify_one();
   return true;

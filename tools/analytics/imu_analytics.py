@@ -45,6 +45,15 @@ BIN_IMU_NAME = 'imu_analytics_imu.bin'
 BIN_TEMP_NAME = 'imu_analytics_temp.bin'
 
 
+IMU_ALL = 0
+IMU_ACCEL = 1
+IMU_GYRO = 2
+
+IMU_ALL_S = str(IMU_ALL)
+IMU_ACCEL_S = str(IMU_ACCEL)
+IMU_GYRO_S = str(IMU_GYRO)
+
+
 class RawDataset(Dataset):
 
   def __init__(self, path, dataset_creator):
@@ -73,25 +82,40 @@ class RawDataset(Dataset):
     results = self._results
 
     if self._has_imu:
-      imu_t_beg = results[What.imu][0].timestamp
-      imu_ts = [(imu.timestamp - imu_t_beg) * t_scale_factor
-                for imu in results[What.imu]]
+      # accel
+      accels = [imu for imu in results[What.imu] \
+          if imu.flag == IMU_ALL_S or imu.flag == IMU_ACCEL_S]
+      if accels:
+        print('accels: {}'.format(len(accels)))
+        accel_t_beg = accels[0].timestamp
+        accel_ts = [(accel.timestamp - accel_t_beg) * t_scale_factor
+            for accel in accels]
 
-      ax_accel_x.plot(imu_ts, [imu.accel_x for imu in results[What.imu]])
-      ax_accel_y.plot(imu_ts, [imu.accel_y for imu in results[What.imu]])
-      ax_accel_z.plot(imu_ts, [imu.accel_z for imu in results[What.imu]])
-      import math
-      my_gryo_converter = \
-          lambda x: gryo_converter(x, math.degrees, math.radians)
-      ax_gyro_x.plot(imu_ts, [my_gryo_converter(imu.gyro_x)
-                              for imu in results[What.imu]])
-      ax_gyro_y.plot(imu_ts, [my_gryo_converter(imu.gyro_y)
-                              for imu in results[What.imu]])
-      ax_gyro_z.plot(imu_ts, [my_gryo_converter(imu.gyro_z)
-                              for imu in results[What.imu]])
+        ax_accel_x.plot(accel_ts, [v.accel_x for v in accels])
+        ax_accel_y.plot(accel_ts, [v.accel_y for v in accels])
+        ax_accel_z.plot(accel_ts, [v.accel_z for v in accels])
 
-      ax_accel.plot(imu_ts, [self._hypot(imu.accel_x, imu.accel_y, imu.accel_z)
-                             for imu in results[What.imu]])
+        ax_accel.plot(accel_ts, [self._hypot(v.accel_x, v.accel_y, v.accel_z)
+                              for v in accels])
+
+      # gyro
+      gyros = [imu for imu in results[What.imu] \
+          if imu.flag == IMU_ALL_S or imu.flag == IMU_GYRO_S]
+      if gyros:
+        print('gyros: {}'.format(len(gyros)))
+        gyro_t_beg = gyros[0].timestamp
+        gyro_ts = [(gyro.timestamp - gyro_t_beg) * t_scale_factor
+            for gyro in gyros]
+
+        import math
+        my_gryo_converter = \
+            lambda x: gryo_converter(x, math.degrees, math.radians)
+        ax_gyro_x.plot(gyro_ts, [my_gryo_converter(v.gyro_x)
+                                for v in gyros])
+        ax_gyro_y.plot(gyro_ts, [my_gryo_converter(v.gyro_y)
+                                for v in gyros])
+        ax_gyro_z.plot(gyro_ts, [my_gryo_converter(v.gyro_z)
+                                for v in gyros])
 
     if self._has_temp:
       temp_t_beg = results[What.temp][0].timestamp
@@ -198,11 +222,11 @@ class BinDataset(RawDataset):
           if imu_t_beg == -1:
             imu_t_beg = imu.timestamp
           np.array([(
-              (imu.timestamp - imu_t_beg),
+              (imu.timestamp - imu_t_beg), imu.flag,
               imu.accel_x, imu.accel_y, imu.accel_z,
               self._hypot(imu.accel_x, imu.accel_y, imu.accel_z),
               imu.gyro_x, imu.gyro_y, imu.gyro_z
-          )], dtype="f8, f8, f8, f8, f8, f8, f8, f8").tofile(f_imu)
+          )], dtype="f8, i4, f8, f8, f8, f8, f8, f8, f8").tofile(f_imu)
           imu_count = imu_count + 1
           has_imu = True
         if What.temp in result:
@@ -242,22 +266,26 @@ class BinDataset(RawDataset):
     import numpy as np
     if self.has_imu:
       imus = np.memmap(self._binimu, dtype=[
-          ('t', 'f8'),
+          ('t', 'f8'), ('flag', 'i4'),
           ('accel_x', 'f8'), ('accel_y', 'f8'), ('accel_z', 'f8'),
           ('accel', 'f8'),
           ('gyro_x', 'f8'), ('gyro_y', 'f8'), ('gyro_z', 'f8'),
       ], mode='r')
-      imus_t = imus['t'] * t_scale_factor
-      ax_accel_x.plot(imus_t, imus['accel_x'])
-      ax_accel_y.plot(imus_t, imus['accel_y'])
-      ax_accel_z.plot(imus_t, imus['accel_z'])
-      ax_accel.plot(imus_t, imus['accel'])
 
+      accels = imus[(imus['flag'] == IMU_ALL) | (imus['flag'] == IMU_ACCEL)]
+      accels_t = accels['t'] * t_scale_factor
+      ax_accel_x.plot(accels_t, accels['accel_x'])
+      ax_accel_y.plot(accels_t, accels['accel_y'])
+      ax_accel_z.plot(accels_t, accels['accel_z'])
+      ax_accel.plot(accels_t, accels['accel'])
+
+      gyros = imus[(imus['flag'] == IMU_ALL) | (imus['flag'] == IMU_GYRO)]
+      gyros_t = gyros['t'] * t_scale_factor
       my_gryo_converter = \
           lambda x: gryo_converter(x, np.degrees, np.radians)
-      ax_gyro_x.plot(imus_t, my_gryo_converter(imus['gyro_x']))
-      ax_gyro_y.plot(imus_t, my_gryo_converter(imus['gyro_y']))
-      ax_gyro_z.plot(imus_t, my_gryo_converter(imus['gyro_z']))
+      ax_gyro_x.plot(gyros_t, my_gryo_converter(gyros['gyro_x']))
+      ax_gyro_y.plot(gyros_t, my_gryo_converter(gyros['gyro_y']))
+      ax_gyro_z.plot(gyros_t, my_gryo_converter(gyros['gyro_z']))
     if self.has_temp:
       temps = np.memmap(self._bintemp, dtype=[
           ('t', 'f8'), ('value', 'f8')

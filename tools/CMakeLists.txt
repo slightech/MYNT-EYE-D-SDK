@@ -72,6 +72,12 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+set(MYNTEYE_DLL_SEARCH_PATHS
+  ${PRO_DIR}/_install/bin
+  ${PRO_DIR}/_install/bin/3rdparty
+  ${OpenCV_LIB_SEARCH_PATH}
+)
+
 # dataset
 
 add_subdirectory(dataset)

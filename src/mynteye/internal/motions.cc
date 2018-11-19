@@ -107,14 +107,14 @@ void Motions::OnImuDataCallback(const ImuDataPacket& packet) {
   imu->temperature = static_cast<double>(packet.temperature * 0.125 + 23);
   imu->timestamp = packet.timestamp;
 
-  if (imu->flag == 1) {
+  if (imu->flag == MYNTEYE_IMU_ACCEL) {
     imu->accel[0] = packet.accel_or_gyro[0] * 12.f / 0x10000;
     imu->accel[1] = packet.accel_or_gyro[1] * 12.f / 0x10000;
     imu->accel[2] = packet.accel_or_gyro[2] * 12.f / 0x10000;
     imu->gyro[0] = 0;
     imu->gyro[1] = 0;
     imu->gyro[2] = 0;
-  } else if (imu->flag == 2) {
+  } else if (imu->flag == MYNTEYE_IMU_GYRO) {
     imu->accel[0] = 0;
     imu->accel[1] = 0;
     imu->accel[2] = 0;

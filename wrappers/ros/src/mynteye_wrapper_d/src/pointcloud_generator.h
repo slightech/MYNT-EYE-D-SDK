@@ -43,7 +43,7 @@ class PointCloudGenerator {
       std::int32_t frequency = DEFAULT_POINTS_FREQUENCE);
   ~PointCloudGenerator();
 
-  bool Push(cv::Mat color, cv::Mat depth, ros::Time stamp);
+  bool Push(const cv::Mat& color, const cv::Mat& depth, ros::Time stamp);
 
   double factor() { return factor_; }
   void set_factor(double factor) { factor_ = factor; }
