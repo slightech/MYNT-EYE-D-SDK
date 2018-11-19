@@ -64,6 +64,7 @@ Image::Image(ImageType type, ImageFormat format, int width, int height,
     height_(height),
     is_buffer_(is_buffer),
     frame_id_(0),
+    is_dual_(false),
     raw_format_(format) {
   auto n = get_image_size(format, width, height);
   data_.assign(n, 0);
