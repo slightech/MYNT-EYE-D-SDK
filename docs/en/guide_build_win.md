@@ -86,6 +86,31 @@ Note:: Open the rectified image by default (Run vio need to raw image, run depth
 .\samples\_output\bin\get_points.bat
 ```
 
+4) get_imu shows motion datas
+```
+.\samples\_output\bin\get_imu
+```
+
+5) get_img_params show camera intrinsics and save in file
+```
+.\samples\_output\bin\get_img_params
+```
+
+6) get_imu_params show imu intrinsics and save in file
+```
+.\samples\_output\bin\get_imu_params
+```
+
+7) get_from_callbacks show image and imu data by callback
+```
+.\samples\_output\bin\get_from_callbacks
+```
+
+8) get_all_with_options open device with different options
+```
+.\samples\_output\bin\get_all_with_options
+```
+
 ## 4. Clean
 
 ```

@@ -78,6 +78,31 @@ Note:: 默认打开矫正后的图像。(跑vio时需要使用原图，跑深度
 ./samples/_output/bin/get_points
 ```
 
+4) get_imu 打印 imu 数据 
+```
+./samples/_output/bin/get_imu
+```
+
+5) get_img_params 打印相机参数并保存在文件中
+```
+./samples/_output/bin/get_img_params
+```
+
+6) get_imu_params 打印 imu 参数并保存在文件中
+```
+./samples/_output/bin/get_imu_params
+```
+
+7) get_from_callbacks 使用回调方式获取图像和 imu 数据
+```
+./samples/_output/bin/get_from_callbacks
+```
+
+8) get_all_with_options 使用不同参数打开设备
+```
+./samples/_output/bin/get_all_with_options
+```
+
 ## 4 安装带有 OpenCV 的 ROS
 
 如果您不使用 ROS(The Robot Operation System), 您可以跳过此部分.
