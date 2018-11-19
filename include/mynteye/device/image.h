@@ -76,6 +76,14 @@ class MYNTEYE_API Image {
     frame_id_ = frame_id;
   }
 
+  bool is_dual() const {
+    return is_dual_;
+  }
+
+  void set_is_dual(bool is_dual) {
+    is_dual_ = is_dual;
+  }
+
   std::uint8_t* data() {
     return data_.data();
   }
@@ -114,6 +122,7 @@ class MYNTEYE_API Image {
   int height_;
   bool is_buffer_;
   int frame_id_;
+  bool is_dual_;
 
   ImageFormat raw_format_;
 

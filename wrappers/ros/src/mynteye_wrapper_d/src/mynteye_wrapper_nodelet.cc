@@ -383,8 +383,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     // Set motion data callback
     mynteye->SetMotionCallback([this](const MotionData& data) {
       if (sub_result.imu && data.imu) {
-        ros::Time stamp = ros::Time().now();
-        // ros::Time stamp = hardTimeToSoftTime(data.imu->timestamp);
+        ros::Time stamp = hardTimeToSoftTime(data.imu->timestamp);
         if (data.imu->flag == MYNTEYE_IMU_ACCEL) {
           imu_accel = data.imu;
           publishImu(stamp, sub_result.temp);
