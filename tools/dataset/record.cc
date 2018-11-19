@@ -71,10 +71,11 @@ int main(int argc, char const *argv[]) {
 
   std::cout << "Press ESC/Q on Windows to terminate" << std::endl;
 
-  cv::namedWindow("color", cv::WINDOW_AUTOSIZE);
+  cv::namedWindow("left");
+  cv::namedWindow("right");
 
-  std::size_t imu_count = 0;
   std::size_t img_count = 0;
+  std::size_t accel_count = 0, gyro_count = 0;
   auto &&time_beg = times::now();
   for (;;) {
     auto &&left_color = cam.GetStreamDatas(ImageType::IMAGE_LEFT_COLOR);
@@ -88,9 +89,8 @@ int main(int argc, char const *argv[]) {
       cv::Mat image_right =
         right.img->To(ImageFormat::COLOR_BGR)->ToMat();
 
-      cv::Mat color;
-      cv::hconcat(image_left, image_right, color);
-      cv::imshow("color", color);
+      cv::imshow("left", image_left);
+      cv::imshow("right", image_right);
     }
 
     {
@@ -104,16 +104,24 @@ int main(int argc, char const *argv[]) {
 
     if (is_imu_ok) {
       auto &&motion_data = cam.GetMotionDatas();
-      imu_count += motion_data.size();
 
       for (auto &&motion : motion_data) {
+        if (!motion.imu) continue;
+        if (motion.imu->flag == MYNTEYE_IMU_ACCEL) {
+          ++accel_count;
+        } else if (motion.imu->flag == MYNTEYE_IMU_GYRO) {
+          ++gyro_count;
+        } else {
+          continue;
+        }
         dataset.SaveMotionData(motion);
       }
     }
 
     std::cout << "\rSaved " << img_count << " imgs";
     if (is_imu_ok) {
-      std::cout << ", " << imu_count << " imus";
+      std::cout << ", " << accel_count << " accels"
+          << ", " << gyro_count << " gyros";
     }
     std::cout << std::flush;
 
@@ -136,8 +144,10 @@ int main(int argc, char const *argv[]) {
   std::cout << "Img count: " << img_count
     << ", fps: " << (1000.f * img_count / elapsed_ms) << std::endl;
   if (is_imu_ok) {
-    std::cout << "Imu count: " << imu_count
-      << ", hz: " << (1000.f * imu_count / elapsed_ms) << std::endl;
+    std::cout << "Accel count: " << accel_count
+      << ", hz: " << (1000.f * accel_count / elapsed_ms) << std::endl;
+    std::cout << "Gryo count: " << gyro_count
+      << ", hz: " << (1000.f * gyro_count / elapsed_ms) << std::endl;
   }
 
   cv::destroyAllWindows();
