@@ -68,8 +68,9 @@ make all
 ```
 
 ## 3. Run Samples
+Note:: Open the rectified image by default (Run vio need to raw image, run depth or points cloud need to rectified image.)
 
-1) get_image shows the left camera image and colorful depthmap
+1) get_image shows the left and right camera image and colorful depthmap
 
 ```
 .\samples\_output\bin\get_image.bat
