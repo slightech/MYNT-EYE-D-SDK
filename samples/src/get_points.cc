@@ -33,6 +33,11 @@ MYNTEYE_USE_NAMESPACE
 CameraIntrinsics get_default_camera_intrinsics(const StreamMode& mode);
 
 int main(int argc, char const* argv[]) {
+  // About warning in vtkOutputWindow with prebuilt version PCL on Windows.
+  // Please see: Ugrade vtk api to 8.1 for 1.9,
+  //   https://github.com/PointCloudLibrary/pcl/issues/2619
+  // vtkObject::GlobalWarningDisplayOff();
+
   Camera cam;
   DeviceInfo dev_info;
   if (!util::select(cam, &dev_info)) {
