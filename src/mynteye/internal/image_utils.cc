@@ -26,7 +26,7 @@ inline void _copy_left_yuyv(const std::uint8_t *in, std::uint8_t *out,
     int width, int height) {
   for (int i = 0; i < height; i++) {
     std::copy(in + i * width * 2,
-        in + (width - 1) + i * width * 2, out + i * width);
+        in + (width) + i * width * 2, out + i * width);
   }
 }
 
@@ -34,7 +34,7 @@ inline void _copy_right_yuyv(const std::uint8_t *in, std::uint8_t *out,
     int width, int height) {
   for (int i = 0; i < height; i++) {
     std::copy(in + i * width * 2 + width,
-        in + (i + 1) * width * 2 - 1, out + i * width);
+        in + (i + 1) * width * 2, out + i * width);
   }
 }
 
