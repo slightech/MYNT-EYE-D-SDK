@@ -36,6 +36,11 @@ BIN_IMU_NAME = 'stamp_analytics_imu.bin'
 RESULT_FIGURE = 'stamp_analytics.png'
 
 
+IMU_ALL = 0
+IMU_ACCEL = 1
+IMU_GYRO = 2
+
+
 class BinDataset(object):
 
   def __init__(self, path, dataset_creator):
@@ -145,9 +150,9 @@ class BinDataset(object):
     imgs_t_diff = np.diff(imgs['t'])
     # imus_t_diff = np.diff(imus['t'])
 
-    accel = imus[(imus['flag'] == 0) | (imus['flag'] == 1)]
+    accel = imus[(imus['flag'] == IMU_ALL) | (imus['flag'] == IMU_ACCEL)]
     accel_t_diff = np.diff(accel['t'])
-    gyro = imus[(imus['flag'] == 0) | (imus['flag'] == 2)]
+    gyro = imus[(imus['flag'] == IMU_ALL) | (imus['flag'] == IMU_GYRO)]
     gyro_t_diff = np.diff(gyro['t'])
 
     print('\ncount')
