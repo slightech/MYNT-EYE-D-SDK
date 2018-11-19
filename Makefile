@@ -16,7 +16,7 @@ MKFILE_DIR := $(patsubst %/,%,$(dir $(MKFILE_PATH)))
 
 include CommonDefs.mk
 
-.DEFAULT_GOAL := help
+.DEFAULT_GOAL := all
 
 .PHONY: help
 help:
@@ -32,6 +32,12 @@ help:
 	@echo "  make pkg       package sdk"
 	@echo "  make clean     clean"
 	@echo "  make cleanall  cleanall"
+
+# all
+
+all: init samples tools ros
+
+.PHONY: all
 
 # deps
 
@@ -61,12 +67,6 @@ install: build
 	@$(call make_install,./_build)
 
 .PHONY: install
-
-# all
-
-all: init samples tools ros
-
-.PHONY: all
 
 # samples
 
