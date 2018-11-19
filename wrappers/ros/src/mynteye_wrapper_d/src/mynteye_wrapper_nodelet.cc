@@ -128,6 +128,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     bool state_ae = true;
     bool state_awb = true;
     int ir_intensity = 0;
+    int proc_mode = 0;
     double factor = DEFAULT_POINTS_FACTOR;
     std::int32_t points_frequency = DEFAULT_POINTS_FREQUENCE;
     gravity = 9.8;
@@ -141,6 +142,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     nh_ns.getParam("state_ae", state_ae);
     nh_ns.getParam("state_awb", state_awb);
     nh_ns.getParam("ir_intensity", ir_intensity);
+    nh_ns.getParam("proc_mode", proc_mode);
     nh_ns.getParam("factor", factor);
     nh_ns.getParam("points_frequency", points_frequency);
     nh_ns.getParam("gravity", gravity);
@@ -240,6 +242,8 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     params.state_ae = state_ae;
     params.state_awb = state_awb;
     params.ir_intensity = ir_intensity;
+
+    mynteye->EnableProcessMode(proc_mode);
 
     // Image publishers
 
