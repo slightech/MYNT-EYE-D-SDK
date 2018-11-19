@@ -35,7 +35,8 @@ PointCloudGenerator::~PointCloudGenerator() {
   Stop();
 }
 
-bool PointCloudGenerator::Push(cv::Mat color, cv::Mat depth, ros::Time stamp) {
+bool PointCloudGenerator::Push(const cv::Mat& color, const cv::Mat& depth,
+    ros::Time stamp) {
   if (!running_) {
     throw new std::runtime_error("Start first!");
   }
@@ -44,8 +45,8 @@ bool PointCloudGenerator::Push(cv::Mat color, cv::Mat depth, ros::Time stamp) {
     std::lock_guard<std::mutex> _(mutex_);
     if (generating_) return false;
     generating_ = true;
-    color_ = color/*.clone()*/;
-    depth_ = depth/*.clone()*/;
+    color_ = color.clone();
+    depth_ = depth.clone();
     stamp_ = stamp;
   }
   condition_.notify_one();
