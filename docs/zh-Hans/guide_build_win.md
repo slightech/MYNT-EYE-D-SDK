@@ -76,8 +76,9 @@ make all
 ```
 
 ## 3. 运行例程
+Note:: 默认打开矫正后的图像。(跑vio时需要使用原图，跑深度或者点云使用矫正后的图像)
 
-1) get_image 显示左目的图像和彩色深度图
+1) get_image 显示左右目的图像和彩色深度图
 
 ```
 .\samples\_output\bin\get_image.bat
@@ -93,6 +94,31 @@ make all
 
 ```
 .\samples\_output\bin\get_points.bat
+```
+
+4) get_imu 打印 imu 数据 
+```
+.\samples\_output\bin\get_imu
+```
+
+5) get_img_params 打印相机参数并保存在文件中
+```
+.\samples\_output\bin\get_img_params
+```
+
+6) get_imu_params 打印 imu 参数并保存在文件中
+```
+.\samples\_output\bin\get_imu_params
+```
+
+7) get_from_callbacks 使用回调方式获取图像和 imu 数据
+```
+.\samples\_output\bin\get_from_callbacks
+```
+
+8) get_all_with_options 使用不同参数打开设备
+```
+.\samples\_output\bin\get_all_with_options
 ```
 
 ## 4. 清理
