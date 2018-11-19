@@ -793,10 +793,12 @@ void Device::CompatibleUSB2() {
     return;
   }
 
+  // default color(1280x720), depth(640x720), fps(5)
   if (stream_depth_info_ptr_[1].nWidth == 320) {
     color_res_index_ = 0;
     depth_res_index_ = 0;
     framerate_ = 5;
+    // 8bit 1, 6 match 14bit 2, 7
     depth_data_type_ = depth_data_type_ == 7 ? 6 : 1;
   }
 }
