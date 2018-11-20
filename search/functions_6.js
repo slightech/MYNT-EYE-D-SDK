@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['setcalibrationwithfile',['SetCalibrationWithFile',['../classmynteye_1_1_camera.html#adf892b4e848ec892b717d1b1ac993f68',1,'mynteye::Camera']]],
-  ['setimagemode',['SetImageMode',['../classmynteye_1_1_camera.html#a213a7874e9be02d2aab5724e7837d46a',1,'mynteye::Camera']]]
+  ['open',['Open',['../classmynteye_1_1_camera.html#a4074e1fb5abe8f0857c1583070869055',1,'mynteye::Camera::Open()'],['../classmynteye_1_1_camera.html#a702cd3d4e0661654b73f2e18268807b8',1,'mynteye::Camera::Open(const OpenParams &amp;params)']]],
+  ['openparams',['OpenParams',['../structmynteye_1_1_open_params.html#a3ef347a854fb023d14ea33b08ef62b67',1,'mynteye::OpenParams']]]
 ];

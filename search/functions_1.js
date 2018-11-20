@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['enableimagetype',['EnableImageType',['../classmynteye_1_1_camera.html#ab1d27e2a50a0898839a10118afaac833',1,'mynteye::Camera']]],
-  ['enableimuprocessmode',['EnableImuProcessMode',['../classmynteye_1_1_camera.html#a7a275bd3c0ca62122e1f30d4998c6b46',1,'mynteye::Camera']]]
+  ['disableimageinfo',['DisableImageInfo',['../classmynteye_1_1_camera.html#a64078410fbe1bdca063b050ad0856df8',1,'mynteye::Camera']]],
+  ['disablemotiondatas',['DisableMotionDatas',['../classmynteye_1_1_camera.html#a957a5479c14d799116d914800dfe41ce',1,'mynteye::Camera']]],
+  ['disablestreamdata',['DisableStreamData',['../classmynteye_1_1_camera.html#aeac3062a53bd2047e9705fc3fbc8a6f0',1,'mynteye::Camera']]]
 ];

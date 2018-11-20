@@ -37,7 +37,7 @@
   <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">MYNT EYE D SDK
-   &#160;<span id="projectnumber">1.5.0-rc0</span>
+   &#160;<span id="projectnumber">1.5.0-rc1</span>
    </div>
    <div id="projectbrief">http://www.myntai.com/mynteye/depth</div>
   </td>
@@ -124,10 +124,11 @@ $(document).ready(function(){initNavTree('md_guide_build_win.html','');});
 <h2>2. 编译 SDK</h2>
 <p>打开 "适用于 VS 2017 的 x64 本机工具命令提示" 命令行界面</p>
 <div class="fragment"><div class="line">cd &lt;sdk&gt;</div><div class="line">make all</div></div><!-- fragment --><h2>3. 运行例程</h2>
-<p>1) get_image 显示左目的图像和彩色深度图</p>
+<p>Note:: 默认打开矫正后的图像。(跑vio时需要使用原图，跑深度或者点云使用矫正后的图像)</p>
+<p>1) get_image 显示左右目的图像和彩色深度图</p>
 <div class="fragment"><div class="line">.\samples\_output\bin\get_image.bat</div></div><!-- fragment --><p>2) get_depth 显示左目的图像，16UC1的深度图和鼠标选中的像素的深度值(mm)</p>
 <div class="fragment"><div class="line">.\samples\_output\bin\get_depth.bat</div></div><!-- fragment --><p>3) get_points 显示左目的图像，16UC1的深度图和点云</p>
-<div class="fragment"><div class="line">.\samples\_output\bin\get_points.bat</div></div><!-- fragment --><h2>4. 清理</h2>
+<div class="fragment"><div class="line">.\samples\_output\bin\get_points.bat</div></div><!-- fragment --><p>4) get_imu 打印 imu 数据 </p><div class="fragment"><div class="line">.\samples\_output\bin\get_imu</div></div><!-- fragment --><p>5) get_img_params 打印相机参数并保存在文件中 </p><div class="fragment"><div class="line">.\samples\_output\bin\get_img_params</div></div><!-- fragment --><p>6) get_imu_params 打印 imu 参数并保存在文件中 </p><div class="fragment"><div class="line">.\samples\_output\bin\get_imu_params</div></div><!-- fragment --><p>7) get_from_callbacks 使用回调方式获取图像和 imu 数据 </p><div class="fragment"><div class="line">.\samples\_output\bin\get_from_callbacks</div></div><!-- fragment --><p>8) get_all_with_options 使用不同参数打开设备 </p><div class="fragment"><div class="line">.\samples\_output\bin\get_all_with_options</div></div><!-- fragment --><h2>4. 清理</h2>
 <div class="fragment"><div class="line">cd &lt;sdk&gt;</div><div class="line">make cleanall</div></div><!-- fragment --> </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

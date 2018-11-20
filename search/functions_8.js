@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['_7einitparams',['~InitParams',['../structmynteye_1_1_init_params.html#a4150fa8b2a5cc41cc85e15ed5f1304af',1,'mynteye::InitParams']]]
+  ['writecameracalibrationbinfile',['WriteCameraCalibrationBinFile',['../classmynteye_1_1_camera.html#a64538285fe666eef840963c90fdbf9be',1,'mynteye::Camera']]],
+  ['writedeviceflash',['WriteDeviceFlash',['../classmynteye_1_1_camera.html#af679e8c2b116038c83fc4b8732a8f182',1,'mynteye::Camera']]]
 ];

@@ -37,7 +37,7 @@
   <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">MYNT EYE D SDK
-   &#160;<span id="projectnumber">1.5.0-rc0</span>
+   &#160;<span id="projectnumber">1.5.0-rc1</span>
    </div>
    <div id="projectbrief">http://www.myntai.com/mynteye/depth</div>
   </td>
@@ -121,35 +121,47 @@ $(document).ready(function(){initNavTree('functions_vars.html','');});
 
 <h3><a id="index_c"></a>- c -</h3><ul>
 <li>CamDist1
-: <a class="el" href="structmynteye_1_1_camera_ctrl_rect_log_data.html#a29aba1a6fe963620caeb0305b15eb7cf">mynteye::CameraCtrlRectLogData</a>
+: <a class="el" href="structmynteye_1_1_camera_calibration.html#a5f7d821f146c9248a776cdabc2d12117">mynteye::CameraCalibration</a>
 </li>
 <li>CamDist2
-: <a class="el" href="structmynteye_1_1_camera_ctrl_rect_log_data.html#ae72589097767300a9ae5cfcc9f1e1d72">mynteye::CameraCtrlRectLogData</a>
+: <a class="el" href="structmynteye_1_1_camera_calibration.html#a5963b0490b703d543559ff70737837f8">mynteye::CameraCalibration</a>
 </li>
 <li>CamMat1
-: <a class="el" href="structmynteye_1_1_camera_ctrl_rect_log_data.html#a45d9fb240fb1d570b13c233ff6b7941e">mynteye::CameraCtrlRectLogData</a>
+: <a class="el" href="structmynteye_1_1_camera_calibration.html#a3203f749376c67c9c954b84d4ec21d86">mynteye::CameraCalibration</a>
 </li>
 <li>CamMat2
-: <a class="el" href="structmynteye_1_1_camera_ctrl_rect_log_data.html#acdabf3965741fe39fc8c3f50390a8b18">mynteye::CameraCtrlRectLogData</a>
+: <a class="el" href="structmynteye_1_1_camera_calibration.html#ae384519fb4273256194d601449bb9342">mynteye::CameraCalibration</a>
 </li>
 <li>chip_id
 : <a class="el" href="structmynteye_1_1_device_info.html#a8a72114aa78073232b9f4c26d8cc9c72">mynteye::DeviceInfo</a>
 </li>
+<li>coeffs
+: <a class="el" href="structmynteye_1_1_camera_intrinsics.html#a4f0d30172c0363e89c92804121fa9098">mynteye::CameraIntrinsics</a>
+</li>
+<li>color_mode
+: <a class="el" href="structmynteye_1_1_open_params.html#a5957ce4a22184e84cacaf74300756846">mynteye::OpenParams</a>
+</li>
 <li>color_stream_format
-: <a class="el" href="structmynteye_1_1_init_params.html#aaa5abb66683ac4772416961065c6152f">mynteye::InitParams</a>
+: <a class="el" href="structmynteye_1_1_open_params.html#afec4866c0b434f14ae1da272ac658ac5">mynteye::OpenParams</a>
+</li>
+<li>cx
+: <a class="el" href="structmynteye_1_1_camera_intrinsics.html#ab0f1d79af2d52163bf4186135176727c">mynteye::CameraIntrinsics</a>
+</li>
+<li>cy
+: <a class="el" href="structmynteye_1_1_camera_intrinsics.html#a88a535eb62414e2fdd6ea31607f363d7">mynteye::CameraIntrinsics</a>
 </li>
 </ul>
 
 
 <h3><a id="index_d"></a>- d -</h3><ul>
 <li>depth_mode
-: <a class="el" href="structmynteye_1_1_init_params.html#aa3d819aff118b8cbb6fa18ceb452cdec">mynteye::InitParams</a>
+: <a class="el" href="structmynteye_1_1_open_params.html#a34da89c43411d243452032063ae6d6b9">mynteye::OpenParams</a>
 </li>
 <li>depth_stream_format
-: <a class="el" href="structmynteye_1_1_init_params.html#a8343cbbca33aa5227a74893e28437320">mynteye::InitParams</a>
+: <a class="el" href="structmynteye_1_1_open_params.html#a306b2ebf06379cd30568c94228b2f70c">mynteye::OpenParams</a>
 </li>
 <li>dev_index
-: <a class="el" href="structmynteye_1_1_init_params.html#a9ae9cdde9671c6892522efc0165dc8ab">mynteye::InitParams</a>
+: <a class="el" href="structmynteye_1_1_open_params.html#ac99aaa260adfa9661d287c8b3b9ce295">mynteye::OpenParams</a>
 </li>
 </ul>
 
@@ -172,10 +184,16 @@ $(document).ready(function(){initNavTree('functions_vars.html','');});
 : <a class="el" href="structmynteye_1_1_img_info.html#a62d7bf9dde60b4d719ef103db3f1a8f3">mynteye::ImgInfo</a>
 </li>
 <li>framerate
-: <a class="el" href="structmynteye_1_1_init_params.html#a322ce247e28ccecbbacd7fb66aed2636">mynteye::InitParams</a>
+: <a class="el" href="structmynteye_1_1_open_params.html#a754bd8dfc49e2d3194cbc7fcec015977">mynteye::OpenParams</a>
 </li>
 <li>fw_version
 : <a class="el" href="structmynteye_1_1_device_info.html#a670730870105c99bc74da1db4e352cd2">mynteye::DeviceInfo</a>
+</li>
+<li>fx
+: <a class="el" href="structmynteye_1_1_camera_intrinsics.html#a8545112ceb209d2e33fbaeb2cf9d52c6">mynteye::CameraIntrinsics</a>
+</li>
+<li>fy
+: <a class="el" href="structmynteye_1_1_camera_intrinsics.html#ac7c1a294d41978984f59bee1fbf9aaa7">mynteye::CameraIntrinsics</a>
 </li>
 </ul>
 
@@ -190,44 +208,41 @@ $(document).ready(function(){initNavTree('functions_vars.html','');});
 
 <h3><a id="index_h"></a>- h -</h3><ul>
 <li>height
-: <a class="el" href="structmynteye_1_1_stream_info.html#a79e7511d7096b5cae803780ef086d49e">mynteye::StreamInfo</a>
+: <a class="el" href="structmynteye_1_1_camera_intrinsics.html#a41cb9af50792fb2c7effdd61400b3135">mynteye::CameraIntrinsics</a>
+, <a class="el" href="structmynteye_1_1_stream_info.html#a79e7511d7096b5cae803780ef086d49e">mynteye::StreamInfo</a>
 </li>
 </ul>
 
 
 <h3><a id="index_i"></a>- i -</h3><ul>
 <li>img
-: <a class="el" href="structmynteye_1_1device_1_1_stream_data.html#a9902ed87e2d9b2d52f7b3c5df1a9355a">mynteye::device::StreamData</a>
-, <a class="el" href="structmynteye_1_1_stream_data.html#a28d266c1ca6f88e8ede0e129117d32ea">mynteye::StreamData</a>
+: <a class="el" href="structmynteye_1_1_stream_data.html#a28d266c1ca6f88e8ede0e129117d32ea">mynteye::StreamData</a>
 </li>
 <li>img_info
-: <a class="el" href="structmynteye_1_1device_1_1_img_info_data.html#a524caa5c43cab351029e31faf5462881">mynteye::device::ImgInfoData</a>
-, <a class="el" href="structmynteye_1_1device_1_1_stream_data.html#a02a3c895d6fc0d0b9d10d953574ef47f">mynteye::device::StreamData</a>
-, <a class="el" href="structmynteye_1_1_stream_data.html#a9037f93136d711dc1ccf0267fb1ed592">mynteye::StreamData</a>
+: <a class="el" href="structmynteye_1_1_stream_data.html#a9037f93136d711dc1ccf0267fb1ed592">mynteye::StreamData</a>
 </li>
 <li>imu
-: <a class="el" href="structmynteye_1_1device_1_1_motion_data.html#a551819c9d38e3d2ec2eb8e1febf1d18c">mynteye::device::MotionData</a>
-, <a class="el" href="structmynteye_1_1_motion_data.html#a41898bf28f9ff3768bf5f70dd275cae2">mynteye::MotionData</a>
+: <a class="el" href="structmynteye_1_1_motion_data.html#a41898bf28f9ff3768bf5f70dd275cae2">mynteye::MotionData</a>
 </li>
 <li>index
 : <a class="el" href="structmynteye_1_1_device_info.html#a4623cb93790b2dd2dd4b421579b284b7">mynteye::DeviceInfo</a>
 , <a class="el" href="structmynteye_1_1_stream_info.html#a41619a5fc6fe5b0e67d6f6c2efa8e04f">mynteye::StreamInfo</a>
 </li>
 <li>InImgHeight
-: <a class="el" href="structmynteye_1_1_camera_ctrl_rect_log_data.html#a859217d1c9da61fc826f685e543de709">mynteye::CameraCtrlRectLogData</a>
+: <a class="el" href="structmynteye_1_1_camera_calibration.html#a348c0c05f94cc350b1f000fb3a93425b">mynteye::CameraCalibration</a>
 </li>
 <li>InImgWidth
-: <a class="el" href="structmynteye_1_1_camera_ctrl_rect_log_data.html#a3d06409cb1ddc1b1a9e24736dde764ee">mynteye::CameraCtrlRectLogData</a>
+: <a class="el" href="structmynteye_1_1_camera_calibration.html#ac64b9ddf928a59a0c9350b12042df62e">mynteye::CameraCalibration</a>
 </li>
 <li>ir_intensity
-: <a class="el" href="structmynteye_1_1_init_params.html#a7736ccd9df5b8029cc82a07bf34b44c5">mynteye::InitParams</a>
+: <a class="el" href="structmynteye_1_1_open_params.html#a11161d92e1f7bbaad071d2f9527dea3e">mynteye::OpenParams</a>
 </li>
 </ul>
 
 
 <h3><a id="index_l"></a>- l -</h3><ul>
 <li>LRotaMat
-: <a class="el" href="structmynteye_1_1_camera_ctrl_rect_log_data.html#ada6b860dccff9939426c7c18d5d357a7">mynteye::CameraCtrlRectLogData</a>
+: <a class="el" href="structmynteye_1_1_camera_calibration.html#ae8ccc882d624c9a79c8dc23db7f3f49d">mynteye::CameraCalibration</a>
 </li>
 </ul>
 
@@ -237,13 +252,13 @@ $(document).ready(function(){initNavTree('functions_vars.html','');});
 : <a class="el" href="structmynteye_1_1_device_info.html#aef688f2ad4493e252e6b529056babcef">mynteye::DeviceInfo</a>
 </li>
 <li>NewCamMat1
-: <a class="el" href="structmynteye_1_1_camera_ctrl_rect_log_data.html#accaaf8047c0b3bcab1623ddc29975f12">mynteye::CameraCtrlRectLogData</a>
+: <a class="el" href="structmynteye_1_1_camera_calibration.html#ae9f40c3285880cb9a8206fddc9a6c4ce">mynteye::CameraCalibration</a>
 </li>
 <li>NewCamMat2
-: <a class="el" href="structmynteye_1_1_camera_ctrl_rect_log_data.html#a23b4b567645b856278a3320fafc4ef7a">mynteye::CameraCtrlRectLogData</a>
+: <a class="el" href="structmynteye_1_1_camera_calibration.html#a8fefbcad3b0c009db2fc7c3e2acfb588">mynteye::CameraCalibration</a>
 </li>
 <li>nLineBuffers
-: <a class="el" href="structmynteye_1_1_camera_ctrl_rect_log_data.html#af3b87cd2c1de5c529eaff78565c4b13e">mynteye::CameraCtrlRectLogData</a>
+: <a class="el" href="structmynteye_1_1_camera_calibration.html#adae762fe04f9d01f9feae80b406f8801">mynteye::CameraCalibration</a>
 </li>
 <li>noise
 : <a class="el" href="structmynteye_1_1_imu_intrinsics.html#a1efbe33c6c4fe7ede63551f457890d77">mynteye::ImuIntrinsics</a>
@@ -253,10 +268,10 @@ $(document).ready(function(){initNavTree('functions_vars.html','');});
 
 <h3><a id="index_o"></a>- o -</h3><ul>
 <li>OutImgHeight
-: <a class="el" href="structmynteye_1_1_camera_ctrl_rect_log_data.html#a8af4e18b60e8dda23928e5030f7c6875">mynteye::CameraCtrlRectLogData</a>
+: <a class="el" href="structmynteye_1_1_camera_calibration.html#a70a714acbd42d69ac3ecf657037344fb">mynteye::CameraCalibration</a>
 </li>
 <li>OutImgWidth
-: <a class="el" href="structmynteye_1_1_camera_ctrl_rect_log_data.html#a74c52380cfcd2b4b6fce93d8326dd6eb">mynteye::CameraCtrlRectLogData</a>
+: <a class="el" href="structmynteye_1_1_camera_calibration.html#a03fcb0b6fff7e6841cc91bdbacce809e">mynteye::CameraCalibration</a>
 </li>
 </ul>
 
@@ -270,52 +285,52 @@ $(document).ready(function(){initNavTree('functions_vars.html','');});
 
 <h3><a id="index_r"></a>- r -</h3><ul>
 <li>RECT_AvgErr
-: <a class="el" href="structmynteye_1_1_camera_ctrl_rect_log_data.html#ade09bdf295f7ce6e956cd9138de15a59">mynteye::CameraCtrlRectLogData</a>
+: <a class="el" href="structmynteye_1_1_camera_calibration.html#a2b742dee11c447a74306d0ee80adfc43">mynteye::CameraCalibration</a>
 </li>
 <li>RECT_Crop_Col_BG_L
-: <a class="el" href="structmynteye_1_1_camera_ctrl_rect_log_data.html#add20731666b658c6aef193c296227164">mynteye::CameraCtrlRectLogData</a>
+: <a class="el" href="structmynteye_1_1_camera_calibration.html#afe32540dc412bb6cc9f0d9f3b09407b4">mynteye::CameraCalibration</a>
 </li>
 <li>RECT_Crop_Col_ED_L
-: <a class="el" href="structmynteye_1_1_camera_ctrl_rect_log_data.html#acde30473db67086d3e72fd939b2618f0">mynteye::CameraCtrlRectLogData</a>
+: <a class="el" href="structmynteye_1_1_camera_calibration.html#a2f956e8f09b3c428522dfbd6a95f3cdc">mynteye::CameraCalibration</a>
 </li>
 <li>RECT_Crop_Row_BG
-: <a class="el" href="structmynteye_1_1_camera_ctrl_rect_log_data.html#a097adfae61e99967cb50d328d347892d">mynteye::CameraCtrlRectLogData</a>
+: <a class="el" href="structmynteye_1_1_camera_calibration.html#a196ca4a574e99353ac100196cdce9d23">mynteye::CameraCalibration</a>
 </li>
 <li>RECT_Crop_Row_ED
-: <a class="el" href="structmynteye_1_1_camera_ctrl_rect_log_data.html#a228a8a521c77413941b9b3c2d5b195da">mynteye::CameraCtrlRectLogData</a>
+: <a class="el" href="structmynteye_1_1_camera_calibration.html#a54529222a2e5964d57adcd89a4cad45e">mynteye::CameraCalibration</a>
 </li>
 <li>RECT_CropEnable
-: <a class="el" href="structmynteye_1_1_camera_ctrl_rect_log_data.html#a54a19a53e6deaa1f25c3319f670e177d">mynteye::CameraCtrlRectLogData</a>
+: <a class="el" href="structmynteye_1_1_camera_calibration.html#afe402b0fdcb5a9a6c63baa1897350d27">mynteye::CameraCalibration</a>
 </li>
 <li>RECT_Scale_Col_M
-: <a class="el" href="structmynteye_1_1_camera_ctrl_rect_log_data.html#aa7753939c8faf9d4410462c48230a229">mynteye::CameraCtrlRectLogData</a>
+: <a class="el" href="structmynteye_1_1_camera_calibration.html#a20106158ad0f5ec20810c1a2b7ddfd0a">mynteye::CameraCalibration</a>
 </li>
 <li>RECT_Scale_Col_N
-: <a class="el" href="structmynteye_1_1_camera_ctrl_rect_log_data.html#aa45d641eb2e53b9822badeacd2c0ed99">mynteye::CameraCtrlRectLogData</a>
+: <a class="el" href="structmynteye_1_1_camera_calibration.html#adec1ce17df721f50e3392d80d38d5267">mynteye::CameraCalibration</a>
 </li>
 <li>RECT_Scale_Row_M
-: <a class="el" href="structmynteye_1_1_camera_ctrl_rect_log_data.html#ac0a64517fa06f86e1bbe12f20b7f80b5">mynteye::CameraCtrlRectLogData</a>
+: <a class="el" href="structmynteye_1_1_camera_calibration.html#af0e2ec1d157e9db01895cd570a2a9347">mynteye::CameraCalibration</a>
 </li>
 <li>RECT_Scale_Row_N
-: <a class="el" href="structmynteye_1_1_camera_ctrl_rect_log_data.html#a82ba2c38d44c57eac1a08fccc59d1700">mynteye::CameraCtrlRectLogData</a>
+: <a class="el" href="structmynteye_1_1_camera_calibration.html#a3e9c2eec8912a5871658360649fe0662">mynteye::CameraCalibration</a>
 </li>
 <li>RECT_ScaleEnable
-: <a class="el" href="structmynteye_1_1_camera_ctrl_rect_log_data.html#a04e171d0be970c66577f9d192e756400">mynteye::CameraCtrlRectLogData</a>
+: <a class="el" href="structmynteye_1_1_camera_calibration.html#ae5928ca9f5e87455a98ad4556d2d27cd">mynteye::CameraCalibration</a>
 </li>
 <li>RECT_ScaleHeight
-: <a class="el" href="structmynteye_1_1_camera_ctrl_rect_log_data.html#adb0ea6f3db775941b10be25f914c7ae9">mynteye::CameraCtrlRectLogData</a>
+: <a class="el" href="structmynteye_1_1_camera_calibration.html#ae01222ee476043017a3b8ad78c6bddf9">mynteye::CameraCalibration</a>
 </li>
 <li>RECT_ScaleWidth
-: <a class="el" href="structmynteye_1_1_camera_ctrl_rect_log_data.html#ac19f1f5e0f5afd5c2918697ae63a765f">mynteye::CameraCtrlRectLogData</a>
+: <a class="el" href="structmynteye_1_1_camera_calibration.html#a49dd9f2c31ca02c9e9e04f1ad3a34083">mynteye::CameraCalibration</a>
 </li>
 <li>RotaMat
-: <a class="el" href="structmynteye_1_1_camera_ctrl_rect_log_data.html#a3ec09d6b8464295124a7065b608a940f">mynteye::CameraCtrlRectLogData</a>
+: <a class="el" href="structmynteye_1_1_camera_calibration.html#a160c1e0dacc4687b92e5ef4bc1d580be">mynteye::CameraCalibration</a>
 </li>
 <li>rotation
 : <a class="el" href="structmynteye_1_1_extrinsics.html#af3f66a2f749ccf448851163c81affa2d">mynteye::Extrinsics</a>
 </li>
 <li>RRotaMat
-: <a class="el" href="structmynteye_1_1_camera_ctrl_rect_log_data.html#a619d8d0a8fd0424e917d2ffb753f1853">mynteye::CameraCtrlRectLogData</a>
+: <a class="el" href="structmynteye_1_1_camera_calibration.html#ac317f0d81bec356324f598f99df54f2e">mynteye::CameraCalibration</a>
 </li>
 </ul>
 
@@ -325,13 +340,13 @@ $(document).ready(function(){initNavTree('functions_vars.html','');});
 : <a class="el" href="structmynteye_1_1_imu_intrinsics.html#a55c8ebe46493565debc6178d34636d62">mynteye::ImuIntrinsics</a>
 </li>
 <li>state_ae
-: <a class="el" href="structmynteye_1_1_init_params.html#a93c0de9019dc3f4a9b175ca8e37e0246">mynteye::InitParams</a>
+: <a class="el" href="structmynteye_1_1_open_params.html#abbdde98994739bcae52ac27376c20c09">mynteye::OpenParams</a>
 </li>
 <li>state_awb
-: <a class="el" href="structmynteye_1_1_init_params.html#aa6758c8520fbc31544a1b1b24f341781">mynteye::InitParams</a>
+: <a class="el" href="structmynteye_1_1_open_params.html#a6d1c45a5acdadd307359ff41e460a58b">mynteye::OpenParams</a>
 </li>
 <li>stream_mode
-: <a class="el" href="structmynteye_1_1_init_params.html#ab04553920e016a7e220a7389b598efb0">mynteye::InitParams</a>
+: <a class="el" href="structmynteye_1_1_open_params.html#ab9dc8401dd012522a3ad6dfe54060789">mynteye::OpenParams</a>
 </li>
 </ul>
 
@@ -345,7 +360,7 @@ $(document).ready(function(){initNavTree('functions_vars.html','');});
 , <a class="el" href="structmynteye_1_1_imu_data.html#abdd1b91f9e1a07e8d558b7404260bb7a">mynteye::ImuData</a>
 </li>
 <li>TranMat
-: <a class="el" href="structmynteye_1_1_camera_ctrl_rect_log_data.html#a849363dc38b1518a1c02e7bb947d5575">mynteye::CameraCtrlRectLogData</a>
+: <a class="el" href="structmynteye_1_1_camera_calibration.html#a8e7a1424c16c6f66d2e31d51cf194b37">mynteye::CameraCalibration</a>
 </li>
 <li>translation
 : <a class="el" href="structmynteye_1_1_extrinsics.html#a36093cc06059d4f59663b9e7006c79ff">mynteye::Extrinsics</a>
@@ -358,7 +373,7 @@ $(document).ready(function(){initNavTree('functions_vars.html','');});
 
 <h3><a id="index_u"></a>- u -</h3><ul>
 <li>uByteArray
-: <a class="el" href="structmynteye_1_1_camera_ctrl_rect_log_data.html#aac9b356dde210ca6ddec0dd9a18d23c4">mynteye::CameraCtrlRectLogData</a>
+: <a class="el" href="structmynteye_1_1_camera_calibration.html#a6313f7546939d93e859971fb7922c170">mynteye::CameraCalibration</a>
 </li>
 </ul>
 
@@ -372,7 +387,8 @@ $(document).ready(function(){initNavTree('functions_vars.html','');});
 
 <h3><a id="index_w"></a>- w -</h3><ul>
 <li>width
-: <a class="el" href="structmynteye_1_1_stream_info.html#a86f2623b9a4d9fefa4969532aadd371b">mynteye::StreamInfo</a>
+: <a class="el" href="structmynteye_1_1_camera_intrinsics.html#acad70dd1c913f1298c50667f2a93c55e">mynteye::CameraIntrinsics</a>
+, <a class="el" href="structmynteye_1_1_stream_info.html#a86f2623b9a4d9fefa4969532aadd371b">mynteye::StreamInfo</a>
 </li>
 </ul>
 

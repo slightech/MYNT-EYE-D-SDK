@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.14"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>MYNT EYE D SDK: mynteye::device::StreamData结构体 参考</title>
+<title>MYNT EYE D SDK: mynteye::CameraCalibration结构体 参考</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -37,7 +37,7 @@
   <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">MYNT EYE D SDK
-   &#160;<span id="projectnumber">1.5.0-rc0</span>
+   &#160;<span id="projectnumber">1.5.0-rc1</span>
    </div>
    <div id="projectbrief">http://www.myntai.com/mynteye/depth</div>
   </td>
@@ -80,7 +80,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </div>
 <script type="text/javascript">
 /* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
-$(document).ready(function(){initNavTree('structmynteye_1_1device_1_1_stream_data.html','');});
+$(document).ready(function(){initNavTree('structmynteye_1_1_camera_calibration.html','');});
 /* @license-end */
 </script>
 <div id="doc-content">
@@ -100,35 +100,125 @@ $(document).ready(function(){initNavTree('structmynteye_1_1device_1_1_stream_dat
 
 <div class="header">
   <div class="summary">
-<a href="#pub-attribs">Public 属性</a> &#124;
-<a href="structmynteye_1_1device_1_1_stream_data-members.html">所有成员列表</a>  </div>
+<a href="structmynteye_1_1_camera_calibration-members.html">所有成员列表</a>  </div>
   <div class="headertitle">
-<div class="title">mynteye::device::StreamData结构体 参考</div>  </div>
+<div class="title">mynteye::CameraCalibration结构体 参考</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>Device stream data.  
- <a href="structmynteye_1_1device_1_1_stream_data.html#details">更多...</a></p>
-<table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
-Public 属性</h2></td></tr>
-<tr class="memitem:a02a3c895d6fc0d0b9d10d953574ef47f"><td class="memItemLeft" align="right" valign="top"><a id="a02a3c895d6fc0d0b9d10d953574ef47f"></a>
-std::shared_ptr&lt; <a class="el" href="structmynteye_1_1_img_info.html">ImgInfo</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structmynteye_1_1device_1_1_stream_data.html#a02a3c895d6fc0d0b9d10d953574ef47f">img_info</a></td></tr>
-<tr class="memdesc:a02a3c895d6fc0d0b9d10d953574ef47f"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classmynteye_1_1_image.html">Image</a> information <br /></td></tr>
-<tr class="separator:a02a3c895d6fc0d0b9d10d953574ef47f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9902ed87e2d9b2d52f7b3c5df1a9355a"><td class="memItemLeft" align="right" valign="top"><a id="a9902ed87e2d9b2d52f7b3c5df1a9355a"></a>
-std::shared_ptr&lt; <a class="el" href="classmynteye_1_1_image.html">Image</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structmynteye_1_1device_1_1_stream_data.html#a9902ed87e2d9b2d52f7b3c5df1a9355a">img</a></td></tr>
-<tr class="memdesc:a9902ed87e2d9b2d52f7b3c5df1a9355a"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classmynteye_1_1_image.html">Image</a> data <br /></td></tr>
-<tr class="separator:a9902ed87e2d9b2d52f7b3c5df1a9355a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table>
+<p><a class="el" href="classmynteye_1_1_camera.html">Camera</a> calibration.  
+ <a href="structmynteye_1_1_camera_calibration.html#details">更多...</a></p>
 <a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
-<div class="textblock"><p>Device stream data. </p>
-</div></div><!-- contents -->
+<div class="textblock"><p><a class="el" href="classmynteye_1_1_camera.html">Camera</a> calibration. </p>
+</div><h2 class="groupheader">类成员变量说明</h2>
+<a id="ae8ccc882d624c9a79c8dc23db7f3f49d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae8ccc882d624c9a79c8dc23db7f3f49d">&#9670;&nbsp;</a></span>LRotaMat</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float mynteye::CameraCalibration::LRotaMat[9]</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>3x3 rectification transform (rotation matrix) for the left camera. </p>
+<p>| [0] [1] [2] | |Xcl| | [3] [4] [5] | * |Ycl| =&gt; cl = left camera coordinate | [6] [7] [8] | |Zcl| </p>
+
+</div>
+</div>
+<a id="ae9f40c3285880cb9a8206fddc9a6c4ce"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae9f40c3285880cb9a8206fddc9a6c4ce">&#9670;&nbsp;</a></span>NewCamMat1</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float mynteye::CameraCalibration::NewCamMat1[12]</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>3x4 projection matrix in the (rectified) coordinate systems for the left camera. </p>
+<p>fx' 0 cx' 0 0 fy' cy' 0 0 0 1 0 fx',fy' : rectified focus ; cx', cy; : rectified principle point </p>
+
+</div>
+</div>
+<a id="a8fefbcad3b0c009db2fc7c3e2acfb588"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8fefbcad3b0c009db2fc7c3e2acfb588">&#9670;&nbsp;</a></span>NewCamMat2</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float mynteye::CameraCalibration::NewCamMat2[12]</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>3x4 projection matrix in the (rectified) coordinate systems for the rightt camera. </p>
+<p>fx' 0 cx' TranMat[0]* 0 fy' cy' 0 0 0 1 0 fx',fy' : rectified focus ; cx', cy; : rectified principle point </p>
+
+</div>
+</div>
+<a id="a160c1e0dacc4687b92e5ef4bc1d580be"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a160c1e0dacc4687b92e5ef4bc1d580be">&#9670;&nbsp;</a></span>RotaMat</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float mynteye::CameraCalibration::RotaMat[9]</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Rotation matrix between the left and right camera coordinate systems. </p>
+<p>| [0] [1] [2] | |Xcr| | [3] [4] [5] | * |Ycr| =&gt; cr = right camera coordinate | [6] [7] [8] | |Zcr| </p>
+
+</div>
+</div>
+<a id="ac317f0d81bec356324f598f99df54f2e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac317f0d81bec356324f598f99df54f2e">&#9670;&nbsp;</a></span>RRotaMat</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float mynteye::CameraCalibration::RRotaMat[9]</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>3x3 rectification transform (rotation matrix) for the left camera. </p>
+<p>| [0] [1] [2] | |Xcr| | [3] [4] [5] | * |Ycr| =&gt; cr = right camera coordinate | [6] [7] [8] | |Zcr| </p>
+
+</div>
+</div>
+<a id="a8e7a1424c16c6f66d2e31d51cf194b37"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8e7a1424c16c6f66d2e31d51cf194b37">&#9670;&nbsp;</a></span>TranMat</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float mynteye::CameraCalibration::TranMat[3]</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Translation vector between the coordinate systems of the cameras. </p>
+<p>|[0]| |Xcr| |[1]| + |Ycr| =&gt; cr = right camera coordinate |[2]| |Zcr| </p>
+
+</div>
+</div>
+</div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><b>mynteye</b></li><li class="navelem"><b>device</b></li><li class="navelem"><a class="el" href="structmynteye_1_1device_1_1_stream_data.html">StreamData</a></li>
+    <li class="navelem"><b>mynteye</b></li><li class="navelem"><a class="el" href="structmynteye_1_1_camera_calibration.html">CameraCalibration</a></li>
     <li class="footer">制作者
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.14 </li>
