@@ -100,9 +100,6 @@ class Device {
       int* color_res_index,
       int* depth_res_index);
 
-  /** Set hardware post process enabled or not */
-  bool SetHWPostProcess(bool enabled);
-
   bool GetSensorRegister(int id, std::uint16_t address, std::uint16_t* value,
       int flag = FG_Address_1Byte);
   bool GetHWRegister(std::uint16_t address, std::uint16_t* value,

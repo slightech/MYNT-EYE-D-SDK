@@ -313,8 +313,6 @@ bool Device::Open(const OpenParams& params) {
   ReleaseBuf();
 
 #ifdef MYNTEYE_OS_WIN
-  SetHWPostProcess(true);
-
   // int EtronDI_OpenDeviceEx(
   //     void* pHandleEtronDI,
   //     PDEVSELINFO pDevSelInfo,
@@ -526,15 +524,6 @@ void Device::GetStreamIndex(const std::int32_t& dev_index,
         get_stream_format_string(depth_stream_format));
     *depth_res_index = 0;
   }
-}
-
-bool Device::SetHWPostProcess(bool enabled) {
-#ifdef MYNTEYE_OS_WIN
-  return ETronDI_OK == EtronDI_SetHWPostProcess(etron_di_, &dev_sel_info_,
-      enabled);
-#else
-  return false;
-#endif
 }
 
 bool Device::GetSensorRegister(int id, std::uint16_t address,
