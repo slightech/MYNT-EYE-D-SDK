@@ -274,7 +274,8 @@ void Streams::OnStreamDataStateChanged(const ImageType& type, bool enabled) {
   if (enabled) {
     is_image_enabled_set_.insert(type);
     // lazy init queue about image
-    if (image_queue_map_.find(type) == image_queue_map_.end()) {
+    // if (image_queue_map_.find(type) == image_queue_map_.end()) {
+    if (image_queue_map_[type] == nullptr) {
       image_queue_map_[type] =
           std::make_shared<image_queue_t>(IMAGE_QUEUE_MAX_SIZE);
     }
@@ -386,9 +387,13 @@ void Streams::OnDepthCaptured(const Image::pointer& depth) {
 void Streams::PushImage(const Image::pointer& image) {
   auto type = image->type();
   if (image->is_buffer()) {
-    image_queue_map_[type]->Put(image->Clone());
+    if (nullptr != image_queue_map_[type]) {
+      image_queue_map_[type]->Put(image->Clone());
+    }
   } else {
-    image_queue_map_[type]->Put(image);
+    if (nullptr != image_queue_map_[type]) {
+      image_queue_map_[type]->Put(image);
+    }
   }
 }
 
