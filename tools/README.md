@@ -50,3 +50,35 @@ python tools/analytics/imu_analytics.py -i dataset -c tools/config/mynteye/mynte
 ```bash
 python tools/analytics/stamp_analytics.py -i dataset -c tools/config/mynteye/mynteye_config.yaml
 ```
+
+---
+
+## Record data (rosbag)
+
+```bash
+cd <sdk>
+make ros
+```
+
+```bash
+source wrappers/ros/devel/setup.bash
+roslaunch mynteye_wrapper_d mynteye.launch
+```
+
+```bash
+rosbag record -O mynteye.bag /mynteye/left/image_color /mynteye/imu/data_raw /mynteye/temp/data_raw
+```
+
+## Analytics data (rosbag)
+
+### imu_analytics.py
+
+```bash
+python tools/analytics/imu_analytics.py -i mynteye.bag
+```
+
+### stamp_analytics.py
+
+```bash
+python tools/analytics/stamp_analytics.py -i mynteye.bag
+```
