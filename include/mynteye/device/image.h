@@ -122,6 +122,8 @@ class MYNTEYE_API Image {
   int height_;
   bool is_buffer_;
   int frame_id_;
+
+  // Special state for dual data
   bool is_dual_;
 
   ImageFormat raw_format_;

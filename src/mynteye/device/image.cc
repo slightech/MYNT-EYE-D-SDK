@@ -105,6 +105,7 @@ Image::pointer Image::Clone() const {
   auto image = Create(type_, format_, width_, height_, false);
   image->set_frame_id(frame_id_);
   image->set_valid_size(valid_size_);
+  image->set_is_dual(is_dual_);
   // The valid size of some compress format will much smaller, e.g. MJPG.
   // Therefore, we could only copy valid data to another.
   std::copy(data_.begin(), data_.begin() + valid_size_, image->data_.begin());

@@ -20,10 +20,10 @@
 #include "mynteye/util/strings.h"
 #include "mynteye/util/times.h"
 
-#define IMAGE_QUEUE_MAX_SIZE 4
-#define IMAGE_QUEUE_WITH_INFO_MAX_SIZE 4
-#define IMAGE_INFO_QUEUE_MAX_SIZE 120  // 60fps, 2s
-#define IMAGE_INFO_SYNC_FREQUENCY 100  // 100hz
+#define STREAM_QUEUE_MAX_SIZE 4
+#define IMG_DATA_QUEUE_MAX_SIZE 4
+#define IMG_INFO_QUEUE_MAX_SIZE 120  // 60fps, 2s
+#define IMG_INFO_SYNC_FREQUENCY 100  // 100hz
 
 MYNTEYE_USE_NAMESPACE
 
@@ -33,19 +33,38 @@ Streams::Streams(std::shared_ptr<Device> device)
       ImageType::IMAGE_LEFT_COLOR,
       ImageType::IMAGE_RIGHT_COLOR,
       ImageType::IMAGE_DEPTH}),
+    all_stream_types_({STREAM_COLOR, STREAM_DEPTH}),
     is_image_info_enabled_(false),
     is_image_info_sync_(false),
     is_right_color_supported_(false),
-    is_image_capturing_(false),
+    is_stream_capturing_(false),
+    stream_queue_map_({
+      {STREAM_COLOR, std::make_shared<stream_queue_t>(STREAM_QUEUE_MAX_SIZE)},
+      {STREAM_DEPTH, std::make_shared<stream_queue_t>(STREAM_QUEUE_MAX_SIZE)}
+    }),
+    stream_info_queue_map_({
+      {STREAM_COLOR,
+          std::make_shared<img_info_queue_t>(IMG_INFO_QUEUE_MAX_SIZE)},
+      {STREAM_DEPTH,
+          std::make_shared<img_info_queue_t>(IMG_INFO_QUEUE_MAX_SIZE)},
+    }),
+    img_data_queue_map_({
+      {ImageType::IMAGE_LEFT_COLOR,
+          std::make_shared<img_data_queue_t>(IMG_DATA_QUEUE_MAX_SIZE)},
+      {ImageType::IMAGE_RIGHT_COLOR,
+          std::make_shared<img_data_queue_t>(IMG_DATA_QUEUE_MAX_SIZE)},
+      {ImageType::IMAGE_DEPTH,
+          std::make_shared<img_data_queue_t>(IMG_DATA_QUEUE_MAX_SIZE)}
+    }),
     img_info_callback_(nullptr),
-    stream_callbacks_({
+    img_data_callbacks_({
       {ImageType::IMAGE_LEFT_COLOR, nullptr},
       {ImageType::IMAGE_RIGHT_COLOR, nullptr},
       {ImageType::IMAGE_DEPTH, nullptr}}) {
 #ifdef MYNTEYE_OS_WIN
-  is_win = true;
+  is_win_ = true;
 #else
-  is_win = false;
+  is_win_ = false;
 #endif
 }
 
@@ -72,6 +91,10 @@ bool Streams::IsImageInfoEnabled() const {
 
 bool Streams::IsImageInfoSynced() const {
   return is_image_info_sync_;
+}
+
+void Streams::SetImgInfoCallback(img_info_callback_t callback) {
+  img_info_callback_ = callback;
 }
 
 void Streams::EnableStreamData(const ImageType& type) {
@@ -114,13 +137,13 @@ bool Streams::HasStreamDataEnabled() const {
   return !is_image_enabled_set_.empty();
 }
 
-Streams::data_t Streams::GetStreamData(const ImageType& type) {
+Streams::img_data_t Streams::GetStreamData(const ImageType& type) {
   auto&& datas = GetStreamDatas(type);
   if (datas.empty()) return {};
   return std::move(datas.back());
 }
 
-Streams::datas_t Streams::GetStreamDatas(const ImageType& type) {
+Streams::img_datas_t Streams::GetStreamDatas(const ImageType& type) {
   device_->CheckOpened(__func__);
 
   if (!IsStreamDataEnabled(type)) {
@@ -131,37 +154,22 @@ Streams::datas_t Streams::GetStreamDatas(const ImageType& type) {
     return {};
   }
 
-  if (is_image_info_sync_ && !IsSyncIgnored(type)) {
-    auto&& datas = image_with_info_datas_map_[type]->MoveAll();
-    return {datas.begin(), datas.end()};
-  } else {
-    auto&& images = image_queue_map_[type]->MoveAll();
-
-    datas_t datas;
-    while (!images.empty()) {
-      datas.push_back({images.front(), nullptr});
-      images.pop_front();
-    }
-    return std::move(datas);
-  }
-}
-
-void Streams::SetImgInfoCallback(img_info_callback_t callback) {
-  img_info_callback_ = callback;
+  auto&& datas = img_data_queue_map_[type]->MoveAll();
+  return {datas.begin(), datas.end()};
 }
 
 void Streams::SetStreamCallback(const ImageType& type,
-    stream_callback_t callback) {
-  stream_callbacks_[type] = callback;
+    img_data_callback_t callback) {
+  img_data_callbacks_[type] = callback;
 }
 
 void Streams::OnCameraOpen() {
   is_right_color_supported_ = IsRightColorSupported();
-  StartImageCapturing();
+  StartStreamCapturing();
 }
 
 void Streams::OnCameraClose() {
-  StopImageCapturing();
+  StopStreamCapturing();
 }
 
 void Streams::OnImageInfoCallback(const ImgInfoPacket& packet) {
@@ -171,17 +179,38 @@ void Streams::OnImageInfoCallback(const ImgInfoPacket& packet) {
   img_info->timestamp = packet.timestamp;
   img_info->exposure_time = packet.exposure_time;
 
-  // push info
-  for (auto&& info : image_info_queue_map_) {
-    info.second->Put(img_info);
+  if (is_image_info_sync_) {
+    // push info
+    for (auto&& info : stream_info_queue_map_) {
+      if (is_win_ && info.first == STREAM_DEPTH) {
+        // on win, unnessesary to push info for depth
+        continue;
+      }
+      info.second->Put(img_info);
+    }
+    SyncStreamWithInfo(false);
   }
-
-  SyncImageWithInfo(false);
 
   // callback
   if (img_info_callback_) {
     img_info_callback_(img_info);
   }
+}
+
+Streams::StreamType Streams::GetStreamType(const ImageType& type) const {
+  if (IsStreamColor(type)) return STREAM_COLOR;
+  if (IsStreamDepth(type)) return STREAM_DEPTH;
+  throw_error("Image type is unaccepted to be a stream type.");
+}
+
+bool Streams::IsStreamEnabled(const StreamType& type) const {
+  if (type == STREAM_COLOR) {
+    return IsStreamDataEnabled(ImageType::IMAGE_LEFT_COLOR)
+        || IsStreamDataEnabled(ImageType::IMAGE_RIGHT_COLOR);
+  } else if (type == STREAM_DEPTH) {
+    return IsStreamDataEnabled(ImageType::IMAGE_DEPTH);
+  }
+  return false;
 }
 
 bool Streams::IsRightColorSupported() {
@@ -191,8 +220,8 @@ bool Streams::IsRightColorSupported() {
       || stream_mode == StreamMode::STREAM_2560x720;
 }
 
-void Streams::StartImageCapturing() {
-  if (is_image_capturing_) return;
+void Streams::StartStreamCapturing() {
+  if (is_stream_capturing_) return;
   if (!HasStreamDataEnabled()) return;
   if (!device_->IsOpened()) return;
 
@@ -203,68 +232,35 @@ void Streams::StartImageCapturing() {
         "\nOr cancel EnableStreamData(ImageType::IMAGE_RIGHT_COLOR)");
   }
 
-  is_image_capturing_ = true;
-  image_capture_thread_ = std::thread([this]() {
+  is_stream_capturing_ = true;
+  stream_capture_thread_ = std::thread([this]() {
     Rate rate(device_->GetOpenParams().framerate);
-    while (is_image_capturing_) {
-      if (IsStreamDataEnabled(ImageType::IMAGE_LEFT_COLOR)
-          || IsStreamDataEnabled(ImageType::IMAGE_RIGHT_COLOR)) {
-        auto color = device_->GetImageColor();
-        if (color) OnColorCaptured(color);
-      }
-      if (IsStreamDataEnabled(ImageType::IMAGE_DEPTH)) {
-        auto depth = device_->GetImageDepth();
-        if (depth) OnDepthCaptured(depth);
-      }
-      SyncImageWithInfo(true);
+    while (is_stream_capturing_) {
+      CaptureStreamColor();
+      CaptureStreamDepth();
+      SyncStreamWithInfo(true);
       rate.Sleep();
     }
   });
 }
 
-void Streams::StopImageCapturing() {
-  if (!is_image_capturing_) return;
-  is_image_capturing_ = false;
-  if (image_capture_thread_.joinable()) {
-    image_capture_thread_.join();
-  }
-}
-
-// lazy init the queues about image info
-void Streams::InitImageWithInfoQueue() {
-  if (!is_image_info_sync_) return;
-
-  // init queue for enabled image type
-  auto&& img_datas_map = image_with_info_datas_map_;
-  auto&& img_info_queue_map = image_info_queue_map_;
-  for (auto&& type : all_image_types_) {
-    if (!IsStreamDataEnabled(type)) continue;
-
-    // init image with info vector
-    if (img_datas_map.find(type) == img_datas_map.end()) {
-      img_datas_map[type] =
-          std::make_shared<img_datas_t>(IMAGE_QUEUE_WITH_INFO_MAX_SIZE);
-    }
-
-    // init image info queue
-    if (img_info_queue_map.find(type) == img_info_queue_map.end()) {
-      img_info_queue_map[type] =
-          std::make_shared<img_info_queue_t>(IMAGE_INFO_QUEUE_MAX_SIZE);
-    }
+void Streams::StopStreamCapturing() {
+  if (!is_stream_capturing_) return;
+  is_stream_capturing_ = false;
+  if (stream_capture_thread_.joinable()) {
+    stream_capture_thread_.join();
   }
 }
 
 void Streams::OnImageInfoStateChanged(bool enabled, bool sync) {
   is_image_info_enabled_ = enabled;
   is_image_info_sync_ = sync;
-  if (sync) {
-    InitImageWithInfoQueue();
-  } else {
-    // not remove their keys, as may access in thread but no lock
-    for (auto&& datas : image_with_info_datas_map_) {
+  if (!sync) {
+    // clear queue for sync
+    for (auto&& datas : stream_queue_map_) {
       datas.second->Clear();
     }
-    for (auto&& infos : image_info_queue_map_) {
+    for (auto&& infos : stream_info_queue_map_) {
       infos.second->Clear();
     }
   }
@@ -273,35 +269,28 @@ void Streams::OnImageInfoStateChanged(bool enabled, bool sync) {
 void Streams::OnStreamDataStateChanged(const ImageType& type, bool enabled) {
   if (enabled) {
     is_image_enabled_set_.insert(type);
-    // lazy init queue about image
-    if (image_queue_map_.find(type) == image_queue_map_.end()) {
-      image_queue_map_[type] =
-          std::make_shared<image_queue_t>(IMAGE_QUEUE_MAX_SIZE);
-    }
-    InitImageWithInfoQueue();
-    StartImageCapturing();
+    StartStreamCapturing();
   } else {
     is_image_enabled_set_.erase(type);
-    // not remove the key, as will access in thread but no lock
-    if (image_queue_map_.find(type) == image_queue_map_.end()) {
-      image_queue_map_[type]->Clear();
-      image_with_info_datas_map_[type]->Clear();
-      image_info_queue_map_[type]->Clear();
-    }
     if (!HasStreamDataEnabled()) {
-      StopImageCapturing();
+      StopStreamCapturing();
     }
+    // clear queue
+    auto&& stream_type = GetStreamType(type);
+    stream_queue_map_[stream_type]->Clear();
+    stream_info_queue_map_[stream_type]->Clear();
+    img_data_queue_map_[type]->Clear();
   }
 }
 
-void Streams::SyncImageWithInfo(bool force) {
+void Streams::SyncStreamWithInfo(bool force) {
   if (!is_image_info_sync_) return;
 
   // keep sync frequency
   {
     using clock = times::clock;
     static clock::duration time_dist{clock::period::den / clock::period::num \
-        / IMAGE_INFO_SYNC_FREQUENCY};
+        / IMG_INFO_SYNC_FREQUENCY};
     static clock::time_point time_prev = times::now();
 
     if (force) {
@@ -317,112 +306,129 @@ void Streams::SyncImageWithInfo(bool force) {
     }
   }
 
-  for (auto&& type : all_image_types_) {
-    if (!IsStreamDataEnabled(type)) continue;
+  for (auto&& type : all_stream_types_) {
+    if (!IsStreamEnabled(type)) continue;
 
-    if (IsSyncIgnored(type)) continue;
+    auto&& streams = stream_queue_map_[type];
+    if (streams->empty()) continue;
 
-    auto&& imgs = image_queue_map_[type];
-    if (imgs->empty()) continue;
+    auto&& infos = stream_info_queue_map_[type];
+    if (infos->empty()) continue;
 
-    auto&& img_infos = image_info_queue_map_[type];
-    if (img_infos->empty()) continue;
+    std::lock_guard<std::mutex> _(streams->mutex());
+    std::lock_guard<std::mutex> _i(infos->mutex());
 
-    std::lock_guard<std::mutex> _(imgs->mutex());
-    std::lock_guard<std::mutex> _i(img_infos->mutex());
-
-    if (imgs->empty() || img_infos->empty()) continue;
+    if (streams->empty() || infos->empty()) continue;
 
     bool next = false;
-    for (auto img_it = imgs->begin(); img_it != imgs->end();) {
+    for (auto st_it = streams->begin(); st_it != streams->end();) {
       next = true;
-      auto frame_id = (*img_it)->frame_id();
+      auto frame_id = (*st_it)->frame_id();
 
-      for (auto img_info_it = img_infos->begin();
-          img_info_it != img_infos->end();) {
-        if (frame_id == (*img_info_it)->frame_id) {
-          PushImageWithInfo(*img_it, *img_info_it);
+      for (auto info_it = infos->begin();
+          info_it != infos->end();) {
+        if (frame_id == (*info_it)->frame_id) {
+          OnStreamSyncedInfoCaptured(type, *st_it, *info_it);
 
-          img_it = imgs->erase(img_it);
-          img_info_it = img_infos->erase(img_info_it);
+          st_it = streams->erase(st_it);
+          info_it = infos->erase(info_it);
           next = false;
           break;
         }
 
-        ++img_info_it;
+        ++info_it;
       }
-      if (next) ++img_it;
+      if (next) ++st_it;
     }
   }
 }
 
-void Streams::OnColorCaptured(const Image::pointer& color) {
-  if (is_right_color_supported_) {
-    OnLeftColorCaptured(images::split_left_color(color));
-    OnRightColorCaptured(images::split_right_color(color));
+void Streams::OnStreamSyncedInfoCaptured(const StreamType& type,
+    const Image::pointer& stream,
+    const img_info_ptr_t& stream_info) {
+  if (type == StreamType::STREAM_COLOR) {
+    DoImageColorCaptured(stream, stream_info);
+  } else if (type == StreamType::STREAM_DEPTH) {
+    DoImageDepthCaptured(stream, stream_info);
   } else {
-    OnLeftColorCaptured(color);
+    throw_error("Unbelievable stream type");
   }
 }
 
-void Streams::OnLeftColorCaptured(const Image::pointer& color) {
+void Streams::CaptureStreamColor() {
+  if (!IsStreamEnabled(STREAM_COLOR)) return;
+
+  auto color = device_->GetImageColor();
+  if (!color) return;
   // LOGI("%s: %d", __func__, color->frame_id());
-  PushImage(color);
-  DoDirectStreamCallback(color);
-}
 
-void Streams::OnRightColorCaptured(const Image::pointer& color) {
-  // LOGI("%s: %d", __func__, color->frame_id());
-  PushImage(color);
-  DoDirectStreamCallback(color);
-}
+  color->set_is_dual(is_right_color_supported_);
 
-void Streams::OnDepthCaptured(const Image::pointer& depth) {
-  // LOGI("%s: %d", __func__, depth->frame_id());
-  PushImage(depth);
-  DoDirectStreamCallback(depth);
-}
-
-void Streams::PushImage(const Image::pointer& image) {
-  auto type = image->type();
-  if (image->is_buffer()) {
-    image_queue_map_[type]->Put(image->Clone());
-  } else {
-    image_queue_map_[type]->Put(image);
+  // Ensure not buffer to user, as it may changed when captured again.
+  if (color->is_buffer() && !color->is_dual()) {
+    // will split if dual, need not clone
+    color = color->Clone();
   }
-}
 
-void Streams::PushImageWithInfo(const Image::pointer& image,
-    const img_info_ptr_t& info) {
-  auto type = image->type();
-  auto&& images = image_with_info_datas_map_[type];
-  StreamData data;
-  if (image->is_buffer()) {
-    data = {image->Clone(), info};
-  } else {
-    data = {image, info};
-  }
-  images->Put(data);
-  DoSyncInfoStreamCallback(data);
-}
-
-void Streams::DoDirectStreamCallback(const Image::pointer& image) {
-  if ((!is_image_info_sync_ || IsSyncIgnored(image->type()))
-      && stream_callbacks_[image->type()]) {
-    stream_callbacks_[image->type()]({image, nullptr});
-  }
-}
-
-void Streams::DoSyncInfoStreamCallback(const StreamData& data) {
   if (is_image_info_sync_) {
-    auto type = data.img->type();
-    if (stream_callbacks_[type]) {
-      stream_callbacks_[type](data);
-    }
+    stream_queue_map_[STREAM_COLOR]->Put(color);
+  } else {
+    DoImageColorCaptured(color, nullptr);
   }
 }
 
-bool Streams::IsSyncIgnored(const ImageType& type) const {
+void Streams::CaptureStreamDepth() {
+  if (!IsStreamEnabled(STREAM_DEPTH)) return;
+
+  auto depth = device_->GetImageDepth();
+  if (!depth) return;
+  // LOGI("%s: %d", __func__, depth->frame_id());
+
+  // Ensure not buffer to user, as it may changed when captured again.
+  if (depth->is_buffer()) {
+    depth = depth->Clone();
+  }
+
   // On win, could not sync image info for depth
-  return is_win && type == ImageType::IMAGE_DEPTH;
+  if (is_image_info_sync_ && !is_win_) {
+    stream_queue_map_[STREAM_DEPTH]->Put(depth);
+  } else {
+    DoImageDepthCaptured(depth, nullptr);
+  }
+}
+
+void Streams::DoImageColorCaptured(const Image::pointer& color,
+    const img_info_ptr_t& info) {
+  if (color->is_dual()) {
+    // left, right may only one or both enabled
+    bool left_enabled = IsStreamDataEnabled(ImageType::IMAGE_LEFT_COLOR);
+    bool right_enabled = IsStreamDataEnabled(ImageType::IMAGE_RIGHT_COLOR);
+    // TODO(JohnZhao): share dual data, not split
+    if (left_enabled) {
+      auto&& left = images::split_left_color(color);
+      DoStreamDataCaptured(left, info);
+    }
+    if (right_enabled) {
+      auto&& right = images::split_right_color(color);
+      DoStreamDataCaptured(right, info);
+    }
+  } else /*if (left_enabled)*/ {
+    // left must enabled if left only, as could not enable right if left only
+    DoStreamDataCaptured(color, info);
+  }
+}
+
+void Streams::DoImageDepthCaptured(const Image::pointer& depth,
+    const img_info_ptr_t& info) {
+  DoStreamDataCaptured(depth, info);
+}
+
+void Streams::DoStreamDataCaptured(const Image::pointer& image,
+    const img_info_ptr_t& info) {
+  auto&& type = image->type();
+  StreamData data{image, info};
+  img_data_queue_map_[type]->Put(data);
+  if (img_data_callbacks_[type]) {
+    img_data_callbacks_[type](data);
+  }
 }

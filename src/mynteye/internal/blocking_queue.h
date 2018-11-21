@@ -62,6 +62,22 @@ class BlockingQueue {
   bool empty() const { return queue_.empty(); }
   size_type size() const { return queue_.size(); }
 
+  typename Container::reference back() { return queue_.back(); }
+  typename Container::const_reference back() const { return queue_.back(); }
+
+  typename Container::reference front() { return queue_.front(); }
+  typename Container::const_reference front() const { return queue_.front(); }
+
+  /*
+  void push_back(const T& t) { queue_.push_back(t); }
+  void push_back(T&& t) { queue_.push_back(std::move(t)); }
+  void pop_front() { queue_.pop_front(); }
+
+  void push_front(const T& t) { queue_.push_front(t); }
+  void push_front(T&& t) { queue_.push_front(std::move(t)); }
+  void pop_back() { queue_.pop_back(); }
+  */
+
   iterator begin() { return queue_.begin(); }
   const_iterator begin() const { return queue_.begin(); }
   const_iterator cbegin() const { return queue_.cbegin(); }
