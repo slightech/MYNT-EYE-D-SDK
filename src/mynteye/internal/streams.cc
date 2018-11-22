@@ -258,7 +258,7 @@ void Streams::StartStreamCapturing() {
 
   is_stream_capturing_ = true;
   stream_capture_thread_ = std::thread([this]() {
-    Rate rate(device_->GetOpenParams().framerate);
+    Rate rate(100);
     while (is_stream_capturing_) {
       CaptureStreamColor();
       CaptureStreamDepth();
