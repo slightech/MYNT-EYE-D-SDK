@@ -84,6 +84,17 @@ class Streams {
   bool IsStreamDataEnabled(const ImageType& type) const;
   bool HasStreamDataEnabled() const;
 
+  /**
+   * Enable stream datas.
+   *
+   * If max_size <= 1, indicates only can get the latest stream data using GetStreamDatas().
+   * If max_size > 1, indicates can get more stream datas using GetStreamDatas().
+   */
+  void EnableStreamDatas(std::size_t max_size);
+  bool IsStreamDatasEnabled() {
+    return stream_datas_max_size_ > 1;
+  }
+
   img_data_t GetStreamData(const ImageType& type);
   img_datas_t GetStreamDatas(const ImageType& type);
 
@@ -143,6 +154,8 @@ class Streams {
   bool is_right_color_supported_;
 
   std::set<ImageType> is_image_enabled_set_;
+
+  std::size_t stream_datas_max_size_;
 
   bool is_stream_capturing_;
   std::thread stream_capture_thread_;

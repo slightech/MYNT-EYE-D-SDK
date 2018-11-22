@@ -48,8 +48,16 @@ extern int MJPEG_TO_RGB_LIBJPEG(unsigned char* jpg, int nJpgSize,
 
 extern int YUYV_TO_RGB(unsigned char* yuv, unsigned char* rgb,
     unsigned int width, unsigned int height);
+extern int YUYV_TO_RGB_LEFT(unsigned char* yuv, unsigned char* rgb,
+    unsigned int width, unsigned int height);
+extern int YUYV_TO_RGB_RIGHT(unsigned char* yuv, unsigned char* rgb,
+    unsigned int width, unsigned int height);
 
 extern int YUYV_TO_BGR(unsigned char* yuv, unsigned char* bgr,
+    unsigned int width, unsigned int height);
+extern int YUYV_TO_BGR_LEFT(unsigned char* yuv, unsigned char* bgr,
+    unsigned int width, unsigned int height);
+extern int YUYV_TO_BGR_RIGHT(unsigned char* yuv, unsigned char* bgr,
     unsigned int width, unsigned int height);
 
 extern void RGB_TO_BGR(unsigned char* rgb,

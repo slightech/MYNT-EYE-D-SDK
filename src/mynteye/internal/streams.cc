@@ -14,14 +14,13 @@
 #include "mynteye/internal/streams.h"
 
 #include "mynteye/device/device.h"
-#include "mynteye/internal/image_utils.h"
 #include "mynteye/util/log.h"
 #include "mynteye/util/rate.h"
 #include "mynteye/util/strings.h"
 #include "mynteye/util/times.h"
 
-#define STREAM_QUEUE_MAX_SIZE 4
-#define IMG_DATA_QUEUE_MAX_SIZE 4
+// set 1 only for the latest stream data
+#define STREAM_DATAS_MAX_SIZE 4
 #define IMG_INFO_QUEUE_MAX_SIZE 120  // 60fps, 2s
 #define IMG_INFO_SYNC_FREQUENCY 100  // 100hz
 
@@ -37,10 +36,11 @@ Streams::Streams(std::shared_ptr<Device> device)
     is_image_info_enabled_(false),
     is_image_info_sync_(false),
     is_right_color_supported_(false),
+    stream_datas_max_size_(STREAM_DATAS_MAX_SIZE),
     is_stream_capturing_(false),
     stream_queue_map_({
-      {STREAM_COLOR, std::make_shared<stream_queue_t>(STREAM_QUEUE_MAX_SIZE)},
-      {STREAM_DEPTH, std::make_shared<stream_queue_t>(STREAM_QUEUE_MAX_SIZE)}
+      {STREAM_COLOR, std::make_shared<stream_queue_t>(stream_datas_max_size_)},
+      {STREAM_DEPTH, std::make_shared<stream_queue_t>(stream_datas_max_size_)}
     }),
     stream_info_queue_map_({
       {STREAM_COLOR,
@@ -50,11 +50,11 @@ Streams::Streams(std::shared_ptr<Device> device)
     }),
     img_data_queue_map_({
       {ImageType::IMAGE_LEFT_COLOR,
-          std::make_shared<img_data_queue_t>(IMG_DATA_QUEUE_MAX_SIZE)},
+          std::make_shared<img_data_queue_t>(stream_datas_max_size_)},
       {ImageType::IMAGE_RIGHT_COLOR,
-          std::make_shared<img_data_queue_t>(IMG_DATA_QUEUE_MAX_SIZE)},
+          std::make_shared<img_data_queue_t>(stream_datas_max_size_)},
       {ImageType::IMAGE_DEPTH,
-          std::make_shared<img_data_queue_t>(IMG_DATA_QUEUE_MAX_SIZE)}
+          std::make_shared<img_data_queue_t>(stream_datas_max_size_)}
     }),
     img_info_callback_(nullptr),
     img_data_callbacks_({
@@ -142,6 +142,24 @@ bool Streams::HasStreamDataEnabled() const {
   return !is_image_enabled_set_.empty();
 }
 
+void Streams::EnableStreamDatas(std::size_t max_size) {
+  std::size_t size = max_size;
+  if (size < 1) size = 1;
+  if (stream_datas_max_size_ == size) {
+    return;
+  }
+  stream_datas_max_size_ = size;
+
+  // Limit the stream queue
+  for (auto&& type : all_stream_types_) {
+    stream_queue_map_[type] = std::make_shared<stream_queue_t>(size);
+  }
+  // Limit the img data queue
+  for (auto&& type : all_image_types_) {
+    img_data_queue_map_[type] = std::make_shared<img_data_queue_t>(size);
+  }
+}
+
 Streams::img_data_t Streams::GetStreamData(const ImageType& type) {
   auto&& datas = GetStreamDatas(type);
   if (datas.empty()) return {};
@@ -159,8 +177,14 @@ Streams::img_datas_t Streams::GetStreamDatas(const ImageType& type) {
     return {};
   }
 
-  auto&& datas = img_data_queue_map_[type]->MoveAll();
-  return {datas.begin(), datas.end()};
+  if (IsStreamDatasEnabled()) {
+    // auto&& datas = img_data_queue_map_[type]->TakeAll();  // Block
+    auto&& datas = img_data_queue_map_[type]->MoveAll();  // Not block
+    return {datas.begin(), datas.end()};
+  } else {
+    // Block to get the latest one
+    return {img_data_queue_map_[type]->Take()};
+  }
 }
 
 void Streams::SetStreamCallback(const ImageType& type,
@@ -239,7 +263,7 @@ void Streams::StartStreamCapturing() {
 
   is_stream_capturing_ = true;
   stream_capture_thread_ = std::thread([this]() {
-    Rate rate(device_->GetOpenParams().framerate);
+    Rate rate(100);
     while (is_stream_capturing_) {
       CaptureStreamColor();
       CaptureStreamDepth();
@@ -370,8 +394,7 @@ void Streams::CaptureStreamColor() {
   color->set_is_dual(is_right_color_supported_);
 
   // Ensure not buffer to user, as it may changed when captured again.
-  if (color->is_buffer() && !color->is_dual()) {
-    // will split if dual, need not clone
+  if (color->is_buffer()) {
     color = color->Clone();
   }
 
@@ -406,16 +429,11 @@ void Streams::DoImageColorCaptured(const Image::pointer& color,
     const img_info_ptr_t& info) {
   if (color->is_dual()) {
     // left, right may only one or both enabled
-    bool left_enabled = IsStreamDataEnabled(ImageType::IMAGE_LEFT_COLOR);
-    bool right_enabled = IsStreamDataEnabled(ImageType::IMAGE_RIGHT_COLOR);
-    // TODO(JohnZhao): share dual data, not split
-    if (left_enabled) {
-      auto&& left = images::split_left_color(color);
-      DoStreamDataCaptured(left, info);
+    if (IsStreamDataEnabled(ImageType::IMAGE_LEFT_COLOR)) {
+      DoStreamDataCaptured(color->Shadow(ImageType::IMAGE_LEFT_COLOR), info);
     }
-    if (right_enabled) {
-      auto&& right = images::split_right_color(color);
-      DoStreamDataCaptured(right, info);
+    if (IsStreamDataEnabled(ImageType::IMAGE_RIGHT_COLOR)) {
+      DoStreamDataCaptured(color->Shadow(ImageType::IMAGE_RIGHT_COLOR), info);
     }
   } else /*if (left_enabled)*/ {
     // left must enabled if left only, as could not enable right if left only

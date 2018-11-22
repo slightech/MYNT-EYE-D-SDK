@@ -127,35 +127,136 @@ int YUYV_TO_RGB(unsigned char* yuv, unsigned char* rgb, unsigned int width,
   unsigned char pixel_24[3];
   unsigned int pixel32;
   int y0, u, y1, v;
-  for (in = 0; in < width * height * 2; in += 4) {
-    pixel_16 =
-    yuv[in + 3] << 24 |
-    yuv[in + 2] << 16 |
-    yuv[in + 1] <<  8 |
-    yuv[in + 0];
 
-    y0 = (pixel_16 & 0x000000ff);
-    u  = (pixel_16 & 0x0000ff00) >>  8;
-    y1 = (pixel_16 & 0x00ff0000) >> 16;
-    v  = (pixel_16 & 0xff000000) >> 24;
+  for (unsigned int r = 0; r < height; ++r) {
+    for (unsigned int c = 0; c < width / 2; ++c) {
+      in = (r * width * 2) + (c * 4);
 
-    pixel32 = yuv_to_rgb_pixel(y0, u, v);
+      pixel_16 =
+      yuv[in + 3] << 24 |
+      yuv[in + 2] << 16 |
+      yuv[in + 1] <<  8 |
+      yuv[in + 0];
 
-    pixel_24[0] = (pixel32 & 0x000000ff);
-    pixel_24[1] = (pixel32 & 0x0000ff00) >> 8;
-    pixel_24[2] = (pixel32 & 0x00ff0000) >> 16;
-    rgb[out++] = pixel_24[0];
-    rgb[out++] = pixel_24[1];
-    rgb[out++] = pixel_24[2];
+      y0 = (pixel_16 & 0x000000ff);
+      u  = (pixel_16 & 0x0000ff00) >>  8;
+      y1 = (pixel_16 & 0x00ff0000) >> 16;
+      v  = (pixel_16 & 0xff000000) >> 24;
 
-    pixel32 = yuv_to_rgb_pixel(y1, u, v);
+      pixel32 = yuv_to_rgb_pixel(y0, u, v);
 
-    pixel_24[0] = (pixel32 & 0x000000ff);
-    pixel_24[1] = (pixel32 & 0x0000ff00) >> 8;
-    pixel_24[2] = (pixel32 & 0x00ff0000) >> 16;
-    rgb[out++] = pixel_24[0];
-    rgb[out++] = pixel_24[1];
-    rgb[out++] = pixel_24[2];
+      pixel_24[0] = (pixel32 & 0x000000ff);
+      pixel_24[1] = (pixel32 & 0x0000ff00) >> 8;
+      pixel_24[2] = (pixel32 & 0x00ff0000) >> 16;
+      rgb[out++] = pixel_24[0];
+      rgb[out++] = pixel_24[1];
+      rgb[out++] = pixel_24[2];
+
+      pixel32 = yuv_to_rgb_pixel(y1, u, v);
+
+      pixel_24[0] = (pixel32 & 0x000000ff);
+      pixel_24[1] = (pixel32 & 0x0000ff00) >> 8;
+      pixel_24[2] = (pixel32 & 0x00ff0000) >> 16;
+      rgb[out++] = pixel_24[0];
+      rgb[out++] = pixel_24[1];
+      rgb[out++] = pixel_24[2];
+    }
+  }
+
+  return 0;
+}
+
+int YUYV_TO_RGB_LEFT(unsigned char* yuv, unsigned char* rgb,
+    unsigned int width, unsigned int height) {
+  unsigned int w = width / 2;
+  unsigned int h = height;
+  unsigned int in, out = 0;
+  unsigned int pixel_16;
+  unsigned char pixel_24[3];
+  unsigned int pixel32;
+  int y0, u, y1, v;
+
+  for (unsigned int r = 0; r < h; ++r) {
+    for (unsigned int c = 0; c < w / 2; ++c) {
+      in = (r * w * 4) + (c * 4);
+
+      pixel_16 =
+      yuv[in + 3] << 24 |
+      yuv[in + 2] << 16 |
+      yuv[in + 1] <<  8 |
+      yuv[in + 0];
+
+      y0 = (pixel_16 & 0x000000ff);
+      u  = (pixel_16 & 0x0000ff00) >>  8;
+      y1 = (pixel_16 & 0x00ff0000) >> 16;
+      v  = (pixel_16 & 0xff000000) >> 24;
+
+      pixel32 = yuv_to_rgb_pixel(y0, u, v);
+
+      pixel_24[0] = (pixel32 & 0x000000ff);
+      pixel_24[1] = (pixel32 & 0x0000ff00) >> 8;
+      pixel_24[2] = (pixel32 & 0x00ff0000) >> 16;
+      rgb[out++] = pixel_24[0];
+      rgb[out++] = pixel_24[1];
+      rgb[out++] = pixel_24[2];
+
+      pixel32 = yuv_to_rgb_pixel(y1, u, v);
+
+      pixel_24[0] = (pixel32 & 0x000000ff);
+      pixel_24[1] = (pixel32 & 0x0000ff00) >> 8;
+      pixel_24[2] = (pixel32 & 0x00ff0000) >> 16;
+      rgb[out++] = pixel_24[0];
+      rgb[out++] = pixel_24[1];
+      rgb[out++] = pixel_24[2];
+    }
+  }
+
+  return 0;
+}
+
+int YUYV_TO_RGB_RIGHT(unsigned char* yuv, unsigned char* rgb,
+    unsigned int width, unsigned int height) {
+  unsigned int w = width / 2;
+  unsigned int h = height;
+  unsigned int in, out = 0;
+  unsigned int pixel_16;
+  unsigned char pixel_24[3];
+  unsigned int pixel32;
+  int y0, u, y1, v;
+
+  for (unsigned int r = 0; r < h; ++r) {
+    for (unsigned int c = 0; c < w / 2; ++c) {
+      in = (width + r * w * 4) + (c * 4);
+
+      pixel_16 =
+      yuv[in + 3] << 24 |
+      yuv[in + 2] << 16 |
+      yuv[in + 1] <<  8 |
+      yuv[in + 0];
+
+      y0 = (pixel_16 & 0x000000ff);
+      u  = (pixel_16 & 0x0000ff00) >>  8;
+      y1 = (pixel_16 & 0x00ff0000) >> 16;
+      v  = (pixel_16 & 0xff000000) >> 24;
+
+      pixel32 = yuv_to_rgb_pixel(y0, u, v);
+
+      pixel_24[0] = (pixel32 & 0x000000ff);
+      pixel_24[1] = (pixel32 & 0x0000ff00) >> 8;
+      pixel_24[2] = (pixel32 & 0x00ff0000) >> 16;
+      rgb[out++] = pixel_24[0];
+      rgb[out++] = pixel_24[1];
+      rgb[out++] = pixel_24[2];
+
+      pixel32 = yuv_to_rgb_pixel(y1, u, v);
+
+      pixel_24[0] = (pixel32 & 0x000000ff);
+      pixel_24[1] = (pixel32 & 0x0000ff00) >> 8;
+      pixel_24[2] = (pixel32 & 0x00ff0000) >> 16;
+      rgb[out++] = pixel_24[0];
+      rgb[out++] = pixel_24[1];
+      rgb[out++] = pixel_24[2];
+    }
   }
 
   return 0;
@@ -168,35 +269,136 @@ int YUYV_TO_BGR(unsigned char* yuv, unsigned char* bgr, unsigned int width,
   unsigned char pixel_24[3];
   unsigned int pixel32;
   int y0, u, y1, v;
-  for (in = 0; in < width * height * 2; in += 4) {
-    pixel_16 =
-    yuv[in + 3] << 24 |
-    yuv[in + 2] << 16 |
-    yuv[in + 1] <<  8 |
-    yuv[in + 0];
 
-    y0 = (pixel_16 & 0x000000ff);
-    u  = (pixel_16 & 0x0000ff00) >>  8;
-    y1 = (pixel_16 & 0x00ff0000) >> 16;
-    v  = (pixel_16 & 0xff000000) >> 24;
+  for (unsigned int r = 0; r < height; ++r) {
+    for (unsigned int c = 0; c < width / 2; ++c) {
+      in = (r * width * 2) + (c * 4);
 
-    pixel32 = yuv_to_rgb_pixel(y0, u, v);
+      pixel_16 =
+      yuv[in + 3] << 24 |
+      yuv[in + 2] << 16 |
+      yuv[in + 1] <<  8 |
+      yuv[in + 0];
 
-    pixel_24[0] = (pixel32 & 0x000000ff);
-    pixel_24[1] = (pixel32 & 0x0000ff00) >> 8;
-    pixel_24[2] = (pixel32 & 0x00ff0000) >> 16;
-    bgr[out++] = pixel_24[2];
-    bgr[out++] = pixel_24[1];
-    bgr[out++] = pixel_24[0];
+      y0 = (pixel_16 & 0x000000ff);
+      u  = (pixel_16 & 0x0000ff00) >>  8;
+      y1 = (pixel_16 & 0x00ff0000) >> 16;
+      v  = (pixel_16 & 0xff000000) >> 24;
 
-    pixel32 = yuv_to_rgb_pixel(y1, u, v);
+      pixel32 = yuv_to_rgb_pixel(y0, u, v);
 
-    pixel_24[0] = (pixel32 & 0x000000ff);
-    pixel_24[1] = (pixel32 & 0x0000ff00) >> 8;
-    pixel_24[2] = (pixel32 & 0x00ff0000) >> 16;
-    bgr[out++] = pixel_24[2];
-    bgr[out++] = pixel_24[1];
-    bgr[out++] = pixel_24[0];
+      pixel_24[0] = (pixel32 & 0x000000ff);
+      pixel_24[1] = (pixel32 & 0x0000ff00) >> 8;
+      pixel_24[2] = (pixel32 & 0x00ff0000) >> 16;
+      bgr[out++] = pixel_24[2];
+      bgr[out++] = pixel_24[1];
+      bgr[out++] = pixel_24[0];
+
+      pixel32 = yuv_to_rgb_pixel(y1, u, v);
+
+      pixel_24[0] = (pixel32 & 0x000000ff);
+      pixel_24[1] = (pixel32 & 0x0000ff00) >> 8;
+      pixel_24[2] = (pixel32 & 0x00ff0000) >> 16;
+      bgr[out++] = pixel_24[2];
+      bgr[out++] = pixel_24[1];
+      bgr[out++] = pixel_24[0];
+    }
+  }
+
+  return 0;
+}
+
+int YUYV_TO_BGR_LEFT(unsigned char* yuv, unsigned char* bgr,
+    unsigned int width, unsigned int height) {
+  unsigned int w = width / 2;
+  unsigned int h = height;
+  unsigned int in, out = 0;
+  unsigned int pixel_16;
+  unsigned char pixel_24[3];
+  unsigned int pixel32;
+  int y0, u, y1, v;
+
+  for (unsigned int r = 0; r < h; ++r) {
+    for (unsigned int c = 0; c < w / 2; ++c) {
+      in = (r * w * 4) + (c * 4);
+
+      pixel_16 =
+      yuv[in + 3] << 24 |
+      yuv[in + 2] << 16 |
+      yuv[in + 1] <<  8 |
+      yuv[in + 0];
+
+      y0 = (pixel_16 & 0x000000ff);
+      u  = (pixel_16 & 0x0000ff00) >>  8;
+      y1 = (pixel_16 & 0x00ff0000) >> 16;
+      v  = (pixel_16 & 0xff000000) >> 24;
+
+      pixel32 = yuv_to_rgb_pixel(y0, u, v);
+
+      pixel_24[0] = (pixel32 & 0x000000ff);
+      pixel_24[1] = (pixel32 & 0x0000ff00) >> 8;
+      pixel_24[2] = (pixel32 & 0x00ff0000) >> 16;
+      bgr[out++] = pixel_24[2];
+      bgr[out++] = pixel_24[1];
+      bgr[out++] = pixel_24[0];
+
+      pixel32 = yuv_to_rgb_pixel(y1, u, v);
+
+      pixel_24[0] = (pixel32 & 0x000000ff);
+      pixel_24[1] = (pixel32 & 0x0000ff00) >> 8;
+      pixel_24[2] = (pixel32 & 0x00ff0000) >> 16;
+      bgr[out++] = pixel_24[2];
+      bgr[out++] = pixel_24[1];
+      bgr[out++] = pixel_24[0];
+    }
+  }
+
+  return 0;
+}
+
+int YUYV_TO_BGR_RIGHT(unsigned char* yuv, unsigned char* bgr,
+    unsigned int width, unsigned int height) {
+  unsigned int w = width / 2;
+  unsigned int h = height;
+  unsigned int in, out = 0;
+  unsigned int pixel_16;
+  unsigned char pixel_24[3];
+  unsigned int pixel32;
+  int y0, u, y1, v;
+
+  for (unsigned int r = 0; r < h; ++r) {
+    for (unsigned int c = 0; c < w / 2; ++c) {
+      in = (width + r * w * 4) + (c * 4);
+
+      pixel_16 =
+      yuv[in + 3] << 24 |
+      yuv[in + 2] << 16 |
+      yuv[in + 1] <<  8 |
+      yuv[in + 0];
+
+      y0 = (pixel_16 & 0x000000ff);
+      u  = (pixel_16 & 0x0000ff00) >>  8;
+      y1 = (pixel_16 & 0x00ff0000) >> 16;
+      v  = (pixel_16 & 0xff000000) >> 24;
+
+      pixel32 = yuv_to_rgb_pixel(y0, u, v);
+
+      pixel_24[0] = (pixel32 & 0x000000ff);
+      pixel_24[1] = (pixel32 & 0x0000ff00) >> 8;
+      pixel_24[2] = (pixel32 & 0x00ff0000) >> 16;
+      bgr[out++] = pixel_24[2];
+      bgr[out++] = pixel_24[1];
+      bgr[out++] = pixel_24[0];
+
+      pixel32 = yuv_to_rgb_pixel(y1, u, v);
+
+      pixel_24[0] = (pixel32 & 0x000000ff);
+      pixel_24[1] = (pixel32 & 0x0000ff00) >> 8;
+      pixel_24[2] = (pixel32 & 0x00ff0000) >> 16;
+      bgr[out++] = pixel_24[2];
+      bgr[out++] = pixel_24[1];
+      bgr[out++] = pixel_24[0];
+    }
   }
 
   return 0;
