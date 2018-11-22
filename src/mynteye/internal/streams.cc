@@ -102,10 +102,15 @@ void Streams::EnableStreamData(const ImageType& type) {
   switch (type) {
     case ImageType::IMAGE_LEFT_COLOR:
     case ImageType::IMAGE_RIGHT_COLOR:
+      device_->EnableDeviceMode(DeviceMode::COLOR_DEVICE, true);
+      OnStreamDataStateChanged(type, true);
+      break;
     case ImageType::IMAGE_DEPTH:
+      device_->EnableDeviceMode(DeviceMode::DEPTH_DEVICE, true);
       OnStreamDataStateChanged(type, true);
       break;
     case ImageType::IMAGE_ALL:
+      device_->EnableDeviceMode(DeviceMode::ALL_DEVICE, true);
       EnableStreamData(ImageType::IMAGE_LEFT_COLOR);
       EnableStreamData(ImageType::IMAGE_RIGHT_COLOR);
       EnableStreamData(ImageType::IMAGE_DEPTH);

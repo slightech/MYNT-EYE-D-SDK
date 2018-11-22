@@ -21,6 +21,7 @@
 #include <memory>
 #include <mutex>
 #include <thread>
+#include <map>
 
 #include "eSPDI.h"
 
@@ -86,6 +87,8 @@ class Device {
 
   /** Close device */
   void Close();
+
+  void EnableDeviceMode(const DeviceMode& mode, const bool& status);
 
  protected:
   /** Get stream index for open */
@@ -166,6 +169,8 @@ class Device {
   std::vector<std::shared_ptr<CameraCalibration>> camera_calibrations_;
 
   OpenParams open_params_;
+
+  std::map<DeviceMode, bool> device_mode_;
 };
 
 MYNTEYE_END_NAMESPACE

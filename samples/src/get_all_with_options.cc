@@ -63,6 +63,12 @@ int main(int argc, char const* argv[]) {
           "\n  1: STREAM_1280x480, 480p, vga, left+right"
           "\n  2: STREAM_1280x720, 720p, hd, left"
           "\n  3: STREAM_2560x720, 720p, hd, left+right");
+  op_group.add_option("--dm2").dest("device_mode")
+      .type("int").set_default(2)
+      .metavar("MODE").help("Device mode, default %default (ALL_DEVICE)"
+          "\n  0: COLOR_DEVICE"
+          "\n  1: DEPTH_DEVICE"
+          "\n  2: ALL_DEVICE");
   op_group.add_option("--ae").dest("state_ae")
       .action("store_true").help("Enable auto-exposure");
   op_group.add_option("--awb").dest("state_awb")
@@ -175,6 +181,8 @@ int main(int argc, char const* argv[]) {
     params.depth_mode = static_cast<DepthMode>(val);
     if (!in_range("stream_mode", 0, 3, &val)) return 2;
     params.stream_mode = static_cast<StreamMode>(val);
+    if (!in_range("device_mode", 0, 2, &val)) return 2;
+    params.device_mode = static_cast<DeviceMode>(val);
     params.state_ae = options.get("state_ae");
     params.state_awb = options.get("state_awb");
     if (!in_range("ir_intensity", 0, 6, &val)) return 2;

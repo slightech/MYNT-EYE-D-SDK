@@ -117,6 +117,16 @@ enum class ImageFormat : std::int32_t {
   IMAGE_FORMAT_LAST
 };
 
+/**
+ * @ingroup enumerations
+ * @brief List device mode.
+ */
+enum class DeviceMode : std::int32_t {
+  COLOR_DEVICE = 0,
+  DEPTH_DEVICE = 1,
+  ALL_DEVICE = 2
+};
+
 /** Camera calibration. */
 struct MYNTEYE_API CameraCalibration {
   union {

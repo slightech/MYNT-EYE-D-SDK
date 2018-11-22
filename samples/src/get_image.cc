@@ -61,6 +61,12 @@ int main(int argc, char const* argv[]) {
 
     // Infrared intensity: 0(default), [0,6]
     params.ir_intensity = 4;
+
+    // Device mode, default ALL
+    // Note:: If COLOR_DEVICE is enable, ImageType::IMAGE_DEPTH will not be available.
+    //        if DEPTH_DEVICE is enable, ImageType::IMAGE_LEFT_COLOR and
+    //           ImageType::IMAGE_RIGHT_COLOR will not be available.
+    // params.device_mode = DeviceMode::COLOR_DEVICE;
   }
 
   // Enable what process logics

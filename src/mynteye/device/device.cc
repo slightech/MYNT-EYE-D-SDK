@@ -86,6 +86,10 @@ void Device::Init() {
   // default frame rate
   framerate_ = 10;
 
+  device_mode_ = {{DeviceMode::COLOR_DEVICE, false},
+                  {DeviceMode::DEPTH_DEVICE, false},
+                  {DeviceMode::ALL_DEVICE, false}};
+
   OnInit();
 }
 
@@ -341,13 +345,50 @@ bool Device::Open(const OpenParams& params) {
       depth_res_index_, depthStreamSwitch,
       Device::ImgCallback, this, &framerate_, ctrlMode);
 #else
-  int ret = EtronDI_OpenDevice2(etron_di_, &dev_sel_info_,
-      stream_color_info_ptr_[color_res_index_].nWidth,
-      stream_color_info_ptr_[color_res_index_].nHeight,
-      stream_color_info_ptr_[color_res_index_].bFormatMJPG,
-      stream_depth_info_ptr_[depth_res_index_].nWidth,
-      stream_depth_info_ptr_[depth_res_index_].nHeight,
-      dtc_, false, NULL, &framerate_);
+  int ret = 0;
+  switch (params.device_mode) {
+    case DeviceMode::COLOR_DEVICE:
+      // if want depth image, but open depth device only ...
+      if (device_mode_[DeviceMode::DEPTH_DEVICE]) {
+        throw_error("\n  If you want to get depth image, you should use "
+            "\"params.device_mode = DeviceMode::DEPTH_DEVICE\" or "
+            "\"params.device_mode = DeviceMode::ALL_DEVICE\", "
+            "before openning the device.\n");
+        return false;
+      }
+      ret = EtronDI_OpenDevice2(etron_di_, &dev_sel_info_,
+          stream_color_info_ptr_[color_res_index_].nWidth,
+          stream_color_info_ptr_[color_res_index_].nHeight,
+          stream_color_info_ptr_[color_res_index_].bFormatMJPG,
+          0, 0, dtc_, false, NULL, &framerate_);
+      break;
+    case DeviceMode::DEPTH_DEVICE:
+      // if want color image, but open color device only ...
+      if (device_mode_[DeviceMode::COLOR_DEVICE]) {
+        throw_error("\n  If you want to get color image, you should use "
+            "\"params.device_mode = DeviceMode::COLOR_DEVICE\" or "
+            "\"params.device_mode = DeviceMode::ALL_DEVICE\", "
+            "before openning the device.\n");
+        return false;
+      }
+      ret = EtronDI_OpenDevice2(etron_di_, &dev_sel_info_,
+          0, 0, false, stream_depth_info_ptr_[depth_res_index_].nWidth,
+          stream_depth_info_ptr_[depth_res_index_].nHeight,
+          dtc_, false, NULL, &framerate_);
+      break;
+    case DeviceMode::ALL_DEVICE:
+      ret = EtronDI_OpenDevice2(etron_di_, &dev_sel_info_,
+          stream_color_info_ptr_[color_res_index_].nWidth,
+          stream_color_info_ptr_[color_res_index_].nHeight,
+          stream_color_info_ptr_[color_res_index_].bFormatMJPG,
+          stream_depth_info_ptr_[depth_res_index_].nWidth,
+          stream_depth_info_ptr_[depth_res_index_].nHeight,
+          dtc_, false, NULL, &framerate_);
+      break;
+    default:
+      throw_error("ERROR:: DeviceMode is unknown.");
+      return false;
+  }
 #endif
 
   if (ETronDI_OK == ret) {
@@ -789,5 +830,13 @@ void Device::CompatibleUSB2() {
     framerate_ = 5;
     // 8bit 1, 6 match 14bit 2, 7
     depth_data_type_ = depth_data_type_ == 7 ? 6 : 1;
+  }
+}
+
+void Device::EnableDeviceMode(const DeviceMode& mode, const bool& status) {
+  try {
+    device_mode_[mode] = status;
+  } catch (const std::out_of_range& e) {
+    throw_error("ERROR:: DeviceMode is unknown.");
   }
 }
