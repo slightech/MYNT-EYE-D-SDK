@@ -46,6 +46,7 @@ class BlockingQueue {
   T Peek();  // block
   bool TryPeek(T* t);
 
+  Container TakeAll();  // block
   Container MoveAll();
 
   void Clear();
@@ -179,6 +180,14 @@ bool BlockingQueue<T, C>::TryPeek(T* t) {
 
   *t = queue_.front();
   return true;
+}
+
+template <typename T, typename C>
+C BlockingQueue<T, C>::TakeAll() {
+  std::unique_lock<std::mutex> lock(mutex_);
+  condition_.wait(lock, [this] { return !queue_.empty(); });
+
+  return std::move(queue_);
 }
 
 template <typename T, typename C>
