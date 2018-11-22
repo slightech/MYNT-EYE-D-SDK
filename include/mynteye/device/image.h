@@ -34,15 +34,18 @@ class MYNTEYE_API Image {
  public:
   using pointer = std::shared_ptr<Image>;
 
+  using data_t = std::vector<std::uint8_t>;
+  using data_ptr_t = std::shared_ptr<data_t>;
+
  protected:
-  Image(ImageType type, ImageFormat format, int width, int height,
-      bool is_buffer);
+  Image(const ImageType& type, const ImageFormat& format,
+      int width, int height, bool is_buffer);
 
  public:
   virtual ~Image();
 
-  static pointer Create(ImageType type, ImageFormat format, int width,
-      int height, bool is_buffer);
+  static pointer Create(const ImageType& type, const ImageFormat& format,
+      int width, int height, bool is_buffer);
 
   ImageType type() const {
     return type_;
@@ -85,15 +88,15 @@ class MYNTEYE_API Image {
   }
 
   std::uint8_t* data() {
-    return data_.data();
+    return data_->data();
   }
 
   const std::uint8_t* data() const {
-    return data_.data();
+    return data_->data();
   }
 
   std::size_t data_size() const {
-    return data_.size();
+    return data_->size();
   }
 
   std::size_t valid_size() const {
@@ -103,7 +106,7 @@ class MYNTEYE_API Image {
   // will resize data if larger then data size
   void set_valid_size(std::size_t valid_size);
 
-  virtual pointer To(ImageFormat format) = 0;
+  virtual pointer To(const ImageFormat& format) = 0;
 
 #ifdef WITH_OPENCV
   cv::Mat ToMat();
@@ -114,25 +117,24 @@ class MYNTEYE_API Image {
   bool ResetBuffer();
 
  protected:
-  Image::pointer GetCache(const ImageFormat& format);
+  pointer GetCache(const ImageFormat& format) const;
 
   ImageType type_;
   ImageFormat format_;
   int width_;
   int height_;
   bool is_buffer_;
-  int frame_id_;
-
-  // Special state for dual data
-  bool is_dual_;
 
   ImageFormat raw_format_;
 
-  std::vector<std::uint8_t> data_;
+  // Frame id
+  int frame_id_;
+  // Special state for dual data
+  bool is_dual_;
+
+  data_ptr_t data_;
   // The real valid size of some compress format or other cases.
   std::size_t valid_size_;
-
-  std::map<int, Image::pointer> bpp_caches_;
 
   MYNTEYE_DISABLE_COPY(Image)
   MYNTEYE_DISABLE_MOVE(Image)
@@ -144,22 +146,22 @@ class MYNTEYE_API ImageColor : public Image,
   using pointer = std::shared_ptr<ImageColor>;
 
  protected:
-  ImageColor(ImageType type, ImageFormat format, int width, int height,
-             bool is_buffer);
+  ImageColor(const ImageType& type, const ImageFormat& format,
+      int width, int height, bool is_buffer);
 
  public:
   virtual ~ImageColor();
 
-  static pointer Create(ImageFormat format, int width, int height,
+  static pointer Create(const ImageFormat& format, int width, int height,
       bool is_buffer) {
     return Create(ImageType::IMAGE_LEFT_COLOR, format, width, height,
         is_buffer);
   }
 
-  static pointer Create(ImageType type, ImageFormat format, int width,
-      int height, bool is_buffer);
+  static pointer Create(const ImageType& type, const ImageFormat& format,
+      int width, int height, bool is_buffer);
 
-  Image::pointer To(ImageFormat format) override;
+  Image::pointer To(const ImageFormat& format) override;
 
  private:
   MYNTEYE_DISABLE_COPY(ImageColor)
@@ -172,17 +174,17 @@ class MYNTEYE_API ImageDepth : public Image,
   using pointer = std::shared_ptr<ImageDepth>;
 
  protected:
-  ImageDepth(ImageFormat format, int width, int height, bool is_buffer);
+  ImageDepth(const ImageFormat& format, int width, int height, bool is_buffer);
 
  public:
   virtual ~ImageDepth();
 
-  static pointer Create(ImageFormat format, int width, int height,
+  static pointer Create(const ImageFormat& format, int width, int height,
       bool is_buffer) {
     return pointer(new ImageDepth(format, width, height, is_buffer));
   }
 
-  Image::pointer To(ImageFormat format) override;
+  Image::pointer To(const ImageFormat& format) override;
 
  private:
   MYNTEYE_DISABLE_COPY(ImageDepth)

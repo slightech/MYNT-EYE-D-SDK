@@ -16,9 +16,31 @@
 #include "mynteye/device/convertor.h"
 #include "mynteye/util/log.h"
 
+#include "mynteye/device/data_caches.h"
+
 MYNTEYE_USE_NAMESPACE
 
 namespace {
+
+// Global data caches
+DataCaches g_data_caches;
+
+void InitProperSizes() {
+  std::set<size_t> sizes;
+
+  // all stream size
+  std::vector<std::size_t> stream_sizes{640*480, 1280*480, 1280*720, 2560*720};
+  // all bbp
+  std::vector<std::size_t> bbps{1, 2, 3};
+
+  for (auto&& ss : stream_sizes) {
+    for (auto&& bbp : bbps) {
+      sizes.insert(ss * bbp);
+    }
+  }
+
+  g_data_caches.SetProperSizes(sizes);
+}
 
 // bytes_per_pixel
 int get_image_bpp(const ImageFormat& format) {
@@ -56,26 +78,31 @@ int get_mat_type(const ImageFormat& format) {
 
 }  // namespace
 
-Image::Image(ImageType type, ImageFormat format, int width, int height,
-    bool is_buffer)
+Image::Image(const ImageType& type, const ImageFormat& format,
+    int width, int height, bool is_buffer)
   : type_(type),
     format_(format),
     width_(width),
     height_(height),
     is_buffer_(is_buffer),
+    raw_format_(format),
     frame_id_(0),
-    is_dual_(false),
-    raw_format_(format) {
-  auto n = get_image_size(format, width, height);
-  data_.assign(n, 0);
+    is_dual_(false) {
+  static bool is_proper_sizes_set = false;
+  if (!is_proper_sizes_set) {
+    InitProperSizes();
+    is_proper_sizes_set = true;
+  }
+  auto&& n = get_image_size(format, width, height);
+  data_ = g_data_caches.GetFixed(n);
   set_valid_size(n);
 }
 
 Image::~Image() {
 }
 
-Image::pointer Image::Create(ImageType type, ImageFormat format, int width,
-    int height, bool is_buffer) {
+Image::pointer Image::Create(const ImageType& type, const ImageFormat& format,
+    int width, int height, bool is_buffer) {
   switch (type) {
     case ImageType::IMAGE_LEFT_COLOR:
     case ImageType::IMAGE_RIGHT_COLOR:
@@ -90,7 +117,7 @@ Image::pointer Image::Create(ImageType type, ImageFormat format, int width,
 void Image::set_valid_size(std::size_t valid_size) {
   if (valid_size > data_size()) {
     // resize data to valid size
-    data_.assign(valid_size, 0);
+    data_ = g_data_caches.GetProper(valid_size);
   }
   valid_size_ = valid_size;
 }
@@ -104,21 +131,12 @@ cv::Mat Image::ToMat() {
 Image::pointer Image::Clone() const {
   auto image = Create(type_, format_, width_, height_, false);
   image->set_frame_id(frame_id_);
-  image->set_valid_size(valid_size_);
   image->set_is_dual(is_dual_);
+  image->set_valid_size(valid_size_);
   // The valid size of some compress format will much smaller, e.g. MJPG.
   // Therefore, we could only copy valid data to another.
-  std::copy(data_.begin(), data_.begin() + valid_size_, image->data_.begin());
-  return image;
-}
-
-Image::pointer Image::GetCache(const ImageFormat& format) {
-  auto bpp = get_image_bpp(format);
-  if (bpp_caches_.find(bpp) != bpp_caches_.end()) {
-    return bpp_caches_[bpp];
-  }
-  auto image = Create(type_, format, width_, height_, false);
-  bpp_caches_[bpp] = image;
+  std::copy(data_->begin(), data_->begin() + valid_size_,
+      image->data_->begin());
   return image;
 }
 
@@ -131,18 +149,25 @@ bool Image::ResetBuffer() {
   return false;
 }
 
+Image::pointer Image::GetCache(const ImageFormat& format) const {
+  auto&& image = Create(type_, format, width_, height_, false);
+  image->set_frame_id(frame_id_);
+  image->set_is_dual(is_dual_);
+  return image;
+}
+
 // ImageColor
 
-ImageColor::ImageColor(ImageType type, ImageFormat format, int width,
-    int height, bool is_buffer)
+ImageColor::ImageColor(const ImageType& type, const ImageFormat& format,
+    int width, int height, bool is_buffer)
   : Image(type, format, width, height, is_buffer) {
 }
 
 ImageColor::~ImageColor() {
 }
 
-ImageColor::pointer ImageColor::Create(ImageType type, ImageFormat format,
-    int width, int height, bool is_buffer) {
+ImageColor::pointer ImageColor::Create(const ImageType& type,
+    const ImageFormat& format, int width, int height, bool is_buffer) {
   if (type == ImageType::IMAGE_LEFT_COLOR
       || type == ImageType::IMAGE_RIGHT_COLOR) {
     return pointer(new ImageColor(type, format, width, height, is_buffer));
@@ -151,7 +176,7 @@ ImageColor::pointer ImageColor::Create(ImageType type, ImageFormat format,
   }
 }
 
-Image::pointer ImageColor::To(ImageFormat format) {
+Image::pointer ImageColor::To(const ImageFormat& format) {
   // LOGI(strings::format_string("color src: %d, dst: %d", format_, format));
   if (format == format_) {
     return shared_from_this();
@@ -199,7 +224,7 @@ Image::pointer ImageColor::To(ImageFormat format) {
 
 // ImageDepth
 
-ImageDepth::ImageDepth(ImageFormat format, int width, int height,
+ImageDepth::ImageDepth(const ImageFormat& format, int width, int height,
     bool is_buffer)
   : Image(ImageType::IMAGE_DEPTH, format, width, height, is_buffer) {
 }
@@ -207,7 +232,7 @@ ImageDepth::ImageDepth(ImageFormat format, int width, int height,
 ImageDepth::~ImageDepth() {
 }
 
-Image::pointer ImageDepth::To(ImageFormat format) {
+Image::pointer ImageDepth::To(const ImageFormat& format) {
   // LOGI(strings::format_string("depth src: %d, dst: %d", format_, format));
   if (format == format_) {
     return shared_from_this();

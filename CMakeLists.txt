@@ -111,6 +111,7 @@ set(MYNTEYE_DEPTH ${MYNTEYE_NAME}_depth)
 set(MYNTEYE_DEPTH_SRCS
   src/mynteye/data/channels.cc
   src/mynteye/device/convertor.cc
+  src/mynteye/device/data_caches.cc
   src/mynteye/device/device_info.cc
   src/mynteye/device/device.cc
   src/mynteye/device/device_linux.cc
