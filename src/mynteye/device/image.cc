@@ -14,9 +14,9 @@
 #include "mynteye/device/image.h"
 
 #include "mynteye/device/convertor.h"
-#include "mynteye/util/log.h"
-
 #include "mynteye/device/data_caches.h"
+// #include "mynteye/internal/image_utils.h"
+#include "mynteye/util/log.h"
 
 MYNTEYE_USE_NAMESPACE
 
@@ -140,6 +140,16 @@ Image::pointer Image::Clone() const {
   return image;
 }
 
+Image::pointer Image::Shadow(const ImageType& type) const {
+  auto image = Create(type, format_, width_, height_, false);
+  image->set_frame_id(frame_id_);
+  image->set_is_dual(is_dual_);
+  image->set_valid_size(valid_size_);
+  // Set data to this
+  image->data_ = data_;
+  return image;
+}
+
 bool Image::ResetBuffer() {
   if (is_buffer_) {
     format_ = raw_format_;
@@ -151,6 +161,14 @@ bool Image::ResetBuffer() {
 
 Image::pointer Image::GetCache(const ImageFormat& format) const {
   auto&& image = Create(type_, format, width_, height_, false);
+  image->set_frame_id(frame_id_);
+  image->set_is_dual(is_dual_);
+  return image;
+}
+
+Image::pointer Image::GetCache(const ImageFormat& format, int width,
+    int height) const {
+  auto&& image = Create(type_, format, width, height, false);
   image->set_frame_id(frame_id_);
   image->set_is_dual(is_dual_);
   return image;
@@ -183,6 +201,7 @@ Image::pointer ImageColor::To(const ImageFormat& format) {
   }
   switch (format_) {  // src
     case ImageFormat::COLOR_BGR:
+      if (is_dual_) goto to_fail;
       if (format == ImageFormat::COLOR_RGB) {
         BGR_TO_RGB(data(), width_, height_);
         format_ = format;
@@ -190,6 +209,7 @@ Image::pointer ImageColor::To(const ImageFormat& format) {
       }
       break;
     case ImageFormat::COLOR_RGB:
+      if (is_dual_) goto to_fail;
       if (format == ImageFormat::COLOR_BGR) {
         RGB_TO_BGR(data(), width_, height_);
         format_ = format;
@@ -197,20 +217,69 @@ Image::pointer ImageColor::To(const ImageFormat& format) {
       }
       break;
     case ImageFormat::COLOR_YUYV:
-      if (format == ImageFormat::COLOR_RGB) {
-        auto image = GetCache(format);
-        YUYV_TO_RGB(data(), image->data(), width_, height_);
+      if (is_dual_) {
+        /*
+        Image::pointer color = shared_from_this();
+        if (color->type() == ImageType::IMAGE_LEFT_COLOR) {
+          color = images::split_left_color(color);
+        } else if (color->type() == ImageType::IMAGE_RIGHT_COLOR) {
+          color = images::split_right_color(color);
+        } else {
+          goto to_fail;
+        }
+        auto image = GetCache(format, width_ / 2, height_);
+        image->set_is_dual(false);
+        if (format == ImageFormat::COLOR_RGB) {
+          YUYV_TO_RGB(color->data(), image->data(), width_ / 2, height_);
+        } else if (format == ImageFormat::COLOR_BGR) {
+          YUYV_TO_BGR(color->data(), image->data(), width_ / 2, height_);
+        } else {
+          goto to_fail;
+        }
         return image;
-      } else if (format == ImageFormat::COLOR_BGR) {
+        */
+        auto image = GetCache(format, width_ / 2, height_);
+        image->set_is_dual(false);
+        if (format == ImageFormat::COLOR_RGB) {
+          if (type_ == ImageType::IMAGE_LEFT_COLOR) {
+            YUYV_TO_RGB_LEFT(data(), image->data(), width_, height_);
+          } else if (type_ == ImageType::IMAGE_RIGHT_COLOR) {
+            YUYV_TO_RGB_RIGHT(data(), image->data(), width_, height_);
+          } else {
+            goto to_fail;
+          }
+        } else if (format == ImageFormat::COLOR_BGR) {
+          if (type_ == ImageType::IMAGE_LEFT_COLOR) {
+            YUYV_TO_BGR_LEFT(data(), image->data(), width_, height_);
+          } else if (type_ == ImageType::IMAGE_RIGHT_COLOR) {
+            YUYV_TO_BGR_RIGHT(data(), image->data(), width_, height_);
+          } else {
+            goto to_fail;
+          }
+        } else {
+          goto to_fail;
+        }
+        return image;
+      } else {
         auto image = GetCache(format);
-        YUYV_TO_BGR(data(), image->data(), width_, height_);
+        if (format == ImageFormat::COLOR_RGB) {
+          YUYV_TO_RGB(data(), image->data(), width_, height_);
+        } else if (format == ImageFormat::COLOR_BGR) {
+          YUYV_TO_BGR(data(), image->data(), width_, height_);
+        } else {
+          goto to_fail;
+        }
         return image;
       }
       break;
     case ImageFormat::COLOR_MJPG:
+      if (is_dual_) goto to_fail;
       if (format == ImageFormat::COLOR_RGB) {
         auto image = GetCache(format);
         MJPEG_TO_RGB_LIBJPEG(data(), valid_size_, image->data());
+        if (is_dual_) {
+          // Split to left or right
+        }
         return image;
       } else if (format == ImageFormat::COLOR_BGR) {
         return To(ImageFormat::COLOR_RGB)->To(ImageFormat::COLOR_BGR);
@@ -218,6 +287,7 @@ Image::pointer ImageColor::To(const ImageFormat& format) {
       break;
     default: break;
   }
+to_fail:
   throw new std::runtime_error(strings::format_string(
       "Can not convert from %s to %s", format_, format));
 }

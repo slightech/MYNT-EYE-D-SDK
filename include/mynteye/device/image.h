@@ -113,11 +113,13 @@ class MYNTEYE_API Image {
 #endif
 
   pointer Clone() const;
+  pointer Shadow(const ImageType& type) const;
 
   bool ResetBuffer();
 
  protected:
   pointer GetCache(const ImageFormat& format) const;
+  pointer GetCache(const ImageFormat& format, int width, int height) const;
 
   ImageType type_;
   ImageFormat format_;

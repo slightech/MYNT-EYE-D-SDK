@@ -14,7 +14,6 @@
 #include "mynteye/internal/streams.h"
 
 #include "mynteye/device/device.h"
-#include "mynteye/internal/image_utils.h"
 #include "mynteye/util/log.h"
 #include "mynteye/util/rate.h"
 #include "mynteye/util/strings.h"
@@ -365,8 +364,7 @@ void Streams::CaptureStreamColor() {
   color->set_is_dual(is_right_color_supported_);
 
   // Ensure not buffer to user, as it may changed when captured again.
-  if (color->is_buffer() && !color->is_dual()) {
-    // will split if dual, need not clone
+  if (color->is_buffer()) {
     color = color->Clone();
   }
 
@@ -401,16 +399,11 @@ void Streams::DoImageColorCaptured(const Image::pointer& color,
     const img_info_ptr_t& info) {
   if (color->is_dual()) {
     // left, right may only one or both enabled
-    bool left_enabled = IsStreamDataEnabled(ImageType::IMAGE_LEFT_COLOR);
-    bool right_enabled = IsStreamDataEnabled(ImageType::IMAGE_RIGHT_COLOR);
-    // TODO(JohnZhao): share dual data, not split
-    if (left_enabled) {
-      auto&& left = images::split_left_color(color);
-      DoStreamDataCaptured(left, info);
+    if (IsStreamDataEnabled(ImageType::IMAGE_LEFT_COLOR)) {
+      DoStreamDataCaptured(color->Shadow(ImageType::IMAGE_LEFT_COLOR), info);
     }
-    if (right_enabled) {
-      auto&& right = images::split_right_color(color);
-      DoStreamDataCaptured(right, info);
+    if (IsStreamDataEnabled(ImageType::IMAGE_RIGHT_COLOR)) {
+      DoStreamDataCaptured(color->Shadow(ImageType::IMAGE_RIGHT_COLOR), info);
     }
   } else /*if (left_enabled)*/ {
     // left must enabled if left only, as could not enable right if left only
