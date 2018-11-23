@@ -825,6 +825,9 @@ void Device::CompatibleUSB2() {
 
   // default color(1280x720), depth(640x720), fps(5)
   if (stream_depth_info_ptr_[1].nWidth == 320) {
+    LOGI("\nYou are using the USB 2.0 interface. "
+         "For bandwidth reasons, "
+         "it is recommended to use the USB 3.0 interface.\n");
     color_res_index_ = 0;
     depth_res_index_ = 0;
     framerate_ = 5;
