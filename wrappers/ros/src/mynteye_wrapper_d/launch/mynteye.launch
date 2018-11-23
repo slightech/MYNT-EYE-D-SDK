@@ -54,7 +54,7 @@
   <!-- Generating points frequency, make slower than framerate -->
   <arg name="points_frequency" default="2" />
 
-  <arg name="gravity" default="1" />
+  <arg name="gravity" default="9.8" />
   <!-- <arg name="gravity" default="9.8" /> -->
 
   <!-- Node params -->

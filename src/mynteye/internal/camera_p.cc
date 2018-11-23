@@ -353,8 +353,7 @@ void CameraPrivate::ReadDeviceFlash() {
 
   Channels::imu_params_t imu_params;
   if (!channels_->GetFiles(descriptors_.get(), &imu_params)) {
-    LOGE("%s %d:: Read device descriptors failed. Please upgrade"
-         "your firmware to the latest version.", __FILE__, __LINE__);
+    LOGE("%s %d:: Read device descriptors failed.", __FILE__, __LINE__);
     return;
   }
 
