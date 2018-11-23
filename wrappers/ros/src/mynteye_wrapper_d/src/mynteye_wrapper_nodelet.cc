@@ -123,6 +123,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     int color_mode = 0;
     int depth_mode = 0;
     int stream_mode = 0;
+    int device_mode = 2;
     int color_stream_format = 0;
     int depth_stream_format = 0;
     bool state_ae = true;
@@ -137,6 +138,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     nh_ns.getParam("color_mode", color_mode);
     nh_ns.getParam("depth_mode", depth_mode);
     nh_ns.getParam("stream_mode", stream_mode);
+    nh_ns.getParam("device_mode", device_mode);
     nh_ns.getParam("color_stream_format", color_stream_format);
     nh_ns.getParam("depth_stream_format", depth_stream_format);
     nh_ns.getParam("state_ae", state_ae);
@@ -235,6 +237,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     params.color_mode = static_cast<ColorMode>(color_mode);
     params.depth_mode = static_cast<DepthMode>(depth_mode);
     params.stream_mode = static_cast<StreamMode>(stream_mode);
+    params.device_mode = static_cast<DeviceMode>(device_mode);
     params.color_stream_format =
         static_cast<StreamFormat>(color_stream_format);
     params.depth_stream_format =

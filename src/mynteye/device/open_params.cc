@@ -30,7 +30,7 @@ OpenParams::OpenParams(const std::int32_t& dev_index)
     stream_mode(StreamMode::STREAM_1280x720),
     color_stream_format(StreamFormat::STREAM_YUYV),
     depth_stream_format(StreamFormat::STREAM_YUYV),
-    device_mode(DeviceMode::ALL_DEVICE),
+    device_mode(DeviceMode::DEVICE_ALL),
     state_ae(true),
     state_awb(true),
     ir_intensity(0) {

@@ -86,9 +86,11 @@ void Device::Init() {
   // default frame rate
   framerate_ = 10;
 
-  device_mode_ = {{DeviceMode::COLOR_DEVICE, false},
-                  {DeviceMode::DEPTH_DEVICE, false},
-                  {DeviceMode::ALL_DEVICE, false}};
+  device_mode_ = {{DeviceMode::DEVICE_COLOR, false},
+                  {DeviceMode::DEVICE_DEPTH, false},
+                  {DeviceMode::DEVICE_ALL, false}};
+  opened_color_device_ = false;
+  opened_depth_device_ = false;
 
   OnInit();
 }
@@ -347,12 +349,12 @@ bool Device::Open(const OpenParams& params) {
 #else
   int ret = 0;
   switch (params.device_mode) {
-    case DeviceMode::COLOR_DEVICE:
+    case DeviceMode::DEVICE_COLOR:
       // if want depth image, but open depth device only ...
-      if (device_mode_[DeviceMode::DEPTH_DEVICE]) {
+      if (device_mode_[DeviceMode::DEVICE_DEPTH]) {
         throw_error("\n  If you want to get depth image, you should use "
-            "\"params.device_mode = DeviceMode::DEPTH_DEVICE\" or "
-            "\"params.device_mode = DeviceMode::ALL_DEVICE\", "
+            "\"params.device_mode = DeviceMode::DEVICE_DEPTH\" or "
+            "\"params.device_mode = DeviceMode::DEVICE_ALL\", "
             "before openning the device.\n");
         return false;
       }
@@ -361,13 +363,14 @@ bool Device::Open(const OpenParams& params) {
           stream_color_info_ptr_[color_res_index_].nHeight,
           stream_color_info_ptr_[color_res_index_].bFormatMJPG,
           0, 0, dtc_, false, NULL, &framerate_);
+      opened_color_device_ = true;
       break;
-    case DeviceMode::DEPTH_DEVICE:
+    case DeviceMode::DEVICE_DEPTH:
       // if want color image, but open color device only ...
-      if (device_mode_[DeviceMode::COLOR_DEVICE]) {
+      if (device_mode_[DeviceMode::DEVICE_COLOR]) {
         throw_error("\n  If you want to get color image, you should use "
-            "\"params.device_mode = DeviceMode::COLOR_DEVICE\" or "
-            "\"params.device_mode = DeviceMode::ALL_DEVICE\", "
+            "\"params.device_mode = DeviceMode::DEVICE_COLOR\" or "
+            "\"params.device_mode = DeviceMode::DEVICE_ALL\", "
             "before openning the device.\n");
         return false;
       }
@@ -375,8 +378,9 @@ bool Device::Open(const OpenParams& params) {
           0, 0, false, stream_depth_info_ptr_[depth_res_index_].nWidth,
           stream_depth_info_ptr_[depth_res_index_].nHeight,
           dtc_, false, NULL, &framerate_);
+      opened_depth_device_ = true;
       break;
-    case DeviceMode::ALL_DEVICE:
+    case DeviceMode::DEVICE_ALL:
       ret = EtronDI_OpenDevice2(etron_di_, &dev_sel_info_,
           stream_color_info_ptr_[color_res_index_].nWidth,
           stream_color_info_ptr_[color_res_index_].nHeight,
@@ -384,6 +388,8 @@ bool Device::Open(const OpenParams& params) {
           stream_depth_info_ptr_[depth_res_index_].nWidth,
           stream_depth_info_ptr_[depth_res_index_].nHeight,
           dtc_, false, NULL, &framerate_);
+      opened_color_device_ = true;
+      opened_depth_device_ = true;
       break;
     default:
       throw_error("ERROR:: DeviceMode is unknown.");
@@ -838,6 +844,34 @@ void Device::CompatibleUSB2() {
 
 void Device::EnableDeviceMode(const DeviceMode& mode, const bool& status) {
   try {
+    switch (mode) {
+      case DeviceMode::DEVICE_COLOR:
+        if (!opened_color_device_ && opened_depth_device_) {
+          throw_error("\n  If you want to get color image, you should use "
+              "\"params.device_mode = DeviceMode::DEVICE_COLOR\" or "
+              "\"params.device_mode = DeviceMode::DEVICE_ALL\", "
+              "before openning the device.\n");
+        }
+        break;
+      case DeviceMode::DEVICE_DEPTH:
+        if (opened_color_device_ && !opened_depth_device_) {
+          throw_error("\n  If you want to get depth image, you should use "
+              "\"params.device_mode = DeviceMode::DEVICE_DEPTH\" or "
+              "\"params.device_mode = DeviceMode::DEVICE_ALL\", "
+              "before openning the device.\n");
+        }
+        break;
+      case DeviceMode::DEVICE_ALL:
+        if ((!opened_color_device_ && opened_depth_device_) ||
+            (opened_color_device_ && !opened_depth_device_)) {
+          throw_error("\n  If you want to get color and depth image, you should use "
+              "\"params.device_mode = DeviceMode::DEVICE_ALL\", "
+              "before openning the device.\n");
+        }
+        break;
+      default:
+        break;
+    }
     device_mode_[mode] = status;
   } catch (const std::out_of_range& e) {
     throw_error("ERROR:: DeviceMode is unknown.");

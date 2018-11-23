@@ -171,6 +171,8 @@ class Device {
   OpenParams open_params_;
 
   std::map<DeviceMode, bool> device_mode_;
+  bool opened_color_device_;
+  bool opened_depth_device_;
 };
 
 MYNTEYE_END_NAMESPACE

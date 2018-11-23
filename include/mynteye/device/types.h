@@ -122,9 +122,9 @@ enum class ImageFormat : std::int32_t {
  * @brief List device mode.
  */
 enum class DeviceMode : std::int32_t {
-  COLOR_DEVICE = 0,
-  DEPTH_DEVICE = 1,
-  ALL_DEVICE = 2
+  DEVICE_COLOR = 0,
+  DEVICE_DEPTH = 1,
+  DEVICE_ALL = 2
 };
 
 /** Camera calibration. */

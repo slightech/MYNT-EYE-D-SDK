@@ -63,7 +63,7 @@ int main(int argc, char const* argv[]) {
           "\n  1: STREAM_1280x480, 480p, vga, left+right"
           "\n  2: STREAM_1280x720, 720p, hd, left"
           "\n  3: STREAM_2560x720, 720p, hd, left+right");
-  op_group.add_option("--dm2").dest("device_mode")
+  op_group.add_option("--dev-mode").dest("device_mode")
       .type("int").set_default(2)
       .metavar("MODE").help("Device mode, default %default (ALL_DEVICE)"
           "\n  0: COLOR_DEVICE"
