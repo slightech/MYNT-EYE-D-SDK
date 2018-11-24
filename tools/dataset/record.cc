@@ -81,22 +81,22 @@ int main(int argc, char const *argv[]) {
     auto &&left_color = cam.GetStreamDatas(ImageType::IMAGE_LEFT_COLOR);
     auto &&right_color = cam.GetStreamDatas(ImageType::IMAGE_RIGHT_COLOR);
     img_count += left_color.size();
-    if (!left_color.empty() && !right_color.empty()) {
+
+    if (!left_color.empty()) {
       auto &&left = left_color.back();
-      auto &&right = right_color.back();
       cv::Mat image_left =
         left.img->To(ImageFormat::COLOR_BGR)->ToMat();
-      cv::Mat image_right =
-        right.img->To(ImageFormat::COLOR_BGR)->ToMat();
-
       cv::imshow("left", image_left);
-      cv::imshow("right", image_right);
-    }
-
-    {
       for (auto &&left : left_color) {
         dataset.SaveStreamData(ImageType::IMAGE_LEFT_COLOR, left);
       }
+    }
+
+    if (!right_color.empty()) {
+      auto &&right = right_color.back();
+      cv::Mat image_right =
+        right.img->To(ImageFormat::COLOR_BGR)->ToMat();
+      cv::imshow("right", image_right);
       for (auto &&right : right_color) {
         dataset.SaveStreamData(ImageType::IMAGE_RIGHT_COLOR, right);
       }
