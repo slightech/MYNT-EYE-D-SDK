@@ -53,7 +53,8 @@ sudo ln -sf /usr/lib/aarch64-linux-gnu/tegra/libGL.so /usr/lib/aarch64-linux-gnu
 ## 2. Build SDK
 
 ```
-cd <sdk>
+git clone https://github.com/slightech/MYNT-EYE-D-SDK.git
+cd MYNT-EYE-D-SDK
 make all
 ```
 
