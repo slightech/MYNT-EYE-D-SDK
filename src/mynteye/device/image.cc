@@ -273,16 +273,40 @@ Image::pointer ImageColor::To(const ImageFormat& format) {
       }
       break;
     case ImageFormat::COLOR_MJPG:
-      if (is_dual_) goto to_fail;
+      // if (is_dual_) goto to_fail;
       if (format == ImageFormat::COLOR_RGB) {
-        auto image = GetCache(format);
-        MJPEG_TO_RGB_LIBJPEG(data(), valid_size_, image->data());
+        auto imageBeforeSplit = GetCache(format);
+        auto imageAfterSplit = GetCache(format, width_, height_ );
+        MJPEG_TO_RGB_LIBJPEG(data(), valid_size_, imageBeforeSplit->data());
         if (is_dual_) {
-          // Split to left or right
+          if (type_ == ImageType::IMAGE_LEFT_COLOR) {
+            SPLIT_TO_LEFT(imageBeforeSplit->data(), imageAfterSplit->data(), width_ , height_);
+          } else if (type_ == ImageType::IMAGE_RIGHT_COLOR) {
+            SPLIT_TO_RIGHT(imageBeforeSplit->data(), imageAfterSplit->data(), width_ , height_);
+          } else {
+            goto to_fail;
+          }
+          imageAfterSplit->set_is_dual(false);
+          return imageAfterSplit;
+        }else {
+          return imageBeforeSplit;
         }
-        return image;
       } else if (format == ImageFormat::COLOR_BGR) {
-        return To(ImageFormat::COLOR_RGB)->To(ImageFormat::COLOR_BGR);
+        auto imageBeforeSplit = To(ImageFormat::COLOR_RGB)->To(ImageFormat::COLOR_BGR);
+        auto imageAfterSplit = GetCache(format,  width_, height_);
+        if (is_dual_) {
+          if (type_ == ImageType::IMAGE_LEFT_COLOR) {
+            SPLIT_TO_LEFT(imageBeforeSplit->data(), imageAfterSplit->data(), width_  , height_);
+          } else if (type_ == ImageType::IMAGE_RIGHT_COLOR) {
+            SPLIT_TO_RIGHT(imageBeforeSplit->data(), imageAfterSplit->data(), width_  , height_);
+          } else {
+            goto to_fail;
+          }
+          imageAfterSplit->set_is_dual(false);
+          return imageAfterSplit;
+        }else {
+          return imageBeforeSplit;
+        }
       }
       break;
     default: break;

@@ -92,6 +92,51 @@ int MJPEG_TO_RGB_LIBJPEG(unsigned char* jpg, int nJpgSize,
 #endif
 }
 
+int SPLIT_TO_LEFT(unsigned char* rgb, unsigned char* left,
+    unsigned int width, unsigned int height) {
+  unsigned int in, out = 0;
+  
+  for (unsigned int r = 0; r < height ; ++r) {
+    for (unsigned int c = 0; c < width ; ++c) {
+      in = (r * width + c) * 3;
+      if(c >= (width / 2) )
+      {
+		left[out++] = 0;
+        left[out++] = 0;
+        left[out++] = 0;
+	  }else {
+		left[out++] = rgb[0 + in];
+        left[out++] = rgb[1 + in];
+        left[out++] = rgb[2 + in];
+      }
+    }
+  }
+  return 0;
+}
+
+int SPLIT_TO_RIGHT(unsigned char* rgb, unsigned char* right,
+    unsigned int width, unsigned int height) {
+  unsigned int in = 0, out = 0;
+
+  for (unsigned int r = 0; r < height; ++r) {
+    for (unsigned int c = 0; c < width; ++c) {
+      in = r * width * 3 + c * 3;
+      if(c < (width / 2))
+      {
+		right[out++] = 0;
+        right[out++] = 0;
+        right[out++] = 0;
+	  }else {
+		right[out++] = rgb[0 + in];
+        right[out++] = rgb[1 + in];
+        right[out++] = rgb[2 + in];
+      }
+    }
+  }
+
+  return 0;
+}
+
 namespace {
 
 int yuv_to_rgb_pixel(int y, int u, int v) {

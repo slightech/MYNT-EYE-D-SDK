@@ -46,6 +46,11 @@ typedef struct my_error_mgr* my_error_ptr;
 extern int MJPEG_TO_RGB_LIBJPEG(unsigned char* jpg, int nJpgSize,
     unsigned char* rgb);
 
+extern int SPLIT_TO_LEFT(unsigned char* orig, unsigned char* left,
+    unsigned int width, unsigned int height);
+extern int SPLIT_TO_RIGHT(unsigned char* orig, unsigned char* right,
+    unsigned int width, unsigned int height);
+
 extern int YUYV_TO_RGB(unsigned char* yuv, unsigned char* rgb,
     unsigned int width, unsigned int height);
 extern int YUYV_TO_RGB_LEFT(unsigned char* yuv, unsigned char* rgb,
