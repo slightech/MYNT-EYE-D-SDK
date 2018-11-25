@@ -63,7 +63,8 @@ https://github.com/PointCloudLibrary/pcl/releases
 Open "x64 Native Tools Command Prompt for VS 2017"(适用于 VS 2017 的 x64 本机工具命令提示) command shell
 
 ```
-cd <sdk>
+git clone https://github.com/slightech/MYNT-EYE-D-SDK.git
+cd MYNT-EYE-D-SDK
 make all
 ```
 
