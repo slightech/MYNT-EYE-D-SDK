@@ -63,8 +63,8 @@ struct MYNTEYE_API OpenParams {
 
   /**
    * Device mode, default ALL
-   * Note:: If COLOR_DEVICE is enable, ImageType::IMAGE_DEPTH will not be available.
-   *        if DEPTH_DEVICE is enable, ImageType::IMAGE_LEFT_COLOR and
+   * Note:: If DEVICE_COLOR is enable, ImageType::IMAGE_DEPTH will not be available.
+   *        if DEVICE_DEPTH is enable, ImageType::IMAGE_LEFT_COLOR and
    *           ImageType::IMAGE_RIGHT_COLOR will not be available.
    */
   DeviceMode device_mode;
