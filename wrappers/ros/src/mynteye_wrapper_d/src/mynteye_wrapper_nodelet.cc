@@ -268,10 +268,10 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     pub_points = nh.advertise<sensor_msgs::PointCloud2>(points_topic, 1);
     NODELET_INFO_STREAM("Advertized on topic " << points_topic);
     // imu
-    pub_imu = nh.advertise<sensor_msgs::Imu>(imu_topic, 1);
+    pub_imu = nh.advertise<sensor_msgs::Imu>(imu_topic, 100);
     NODELET_INFO_STREAM("Advertized on topic " << imu_topic);
     // temp
-    pub_temp = nh.advertise<mynteye_wrapper_d::Temp>(temp_topic, 1);
+    pub_temp = nh.advertise<mynteye_wrapper_d::Temp>(temp_topic, 100);
     NODELET_INFO_STREAM("Advertized on topic " << temp_topic);
 
     // camera infos
