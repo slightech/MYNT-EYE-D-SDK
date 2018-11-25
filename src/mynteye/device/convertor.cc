@@ -13,6 +13,8 @@
 // limitations under the License.
 #include "mynteye/device/convertor.h"
 
+#include <algorithm>
+
 #include "mynteye/util/log.h"
 
 MYNTEYE_BEGIN_NAMESPACE
@@ -92,48 +94,65 @@ int MJPEG_TO_RGB_LIBJPEG(unsigned char* jpg, int nJpgSize,
 #endif
 }
 
-int SPLIT_TO_LEFT(unsigned char* rgb, unsigned char* left,
+int RGB_TO_RGB_LEFT(unsigned char* rgb, unsigned char* left,
     unsigned int width, unsigned int height) {
-  unsigned int in, out = 0;
-  
-  for (unsigned int r = 0; r < height ; ++r) {
-    for (unsigned int c = 0; c < width ; ++c) {
-      in = (r * width + c) * 3;
-      if(c >= (width / 2) )
-      {
-		left[out++] = 0;
-        left[out++] = 0;
-        left[out++] = 0;
-	  }else {
-		left[out++] = rgb[0 + in];
-        left[out++] = rgb[1 + in];
-        left[out++] = rgb[2 + in];
-      }
-    }
+  unsigned int row = width * 3;
+  unsigned int row_l = row / 2;
+
+  for (unsigned int r = 0; r < height; ++r) {
+    std::copy(rgb, rgb + row_l, left);
+    rgb += row;
+    left += row_l;
   }
   return 0;
 }
 
-int SPLIT_TO_RIGHT(unsigned char* rgb, unsigned char* right,
+int RGB_TO_RGB_RIGHT(unsigned char* rgb, unsigned char* right,
     unsigned int width, unsigned int height) {
-  unsigned int in = 0, out = 0;
+  unsigned int row = width * 3;
+  unsigned int row_r = row / 2;
+
+  rgb += row_r;
+  for (unsigned int r = 0; r < height; ++r) {
+    std::copy(rgb, rgb + row_r, right);
+    rgb += row;
+    right += row_r;
+  }
+  return 0;
+}
+
+int RGB_TO_BGR_LEFT(unsigned char* rgb, unsigned char* left,
+    unsigned int width, unsigned int height) {
+  unsigned int row = width * 3;
+  unsigned int row_l = row / 2;
 
   for (unsigned int r = 0; r < height; ++r) {
-    for (unsigned int c = 0; c < width; ++c) {
-      in = r * width * 3 + c * 3;
-      if(c < (width / 2))
-      {
-		right[out++] = 0;
-        right[out++] = 0;
-        right[out++] = 0;
-	  }else {
-		right[out++] = rgb[0 + in];
-        right[out++] = rgb[1 + in];
-        right[out++] = rgb[2 + in];
-      }
+    for (unsigned int c = 0; c < width / 2; ++c) {
+      *(left + c*3) = *(rgb + c*3 + 2);
+      *(left + c*3 + 1) = *(rgb + c*3 + 1);
+      *(left + c*3 + 2) = *(rgb + c*3);
     }
+    rgb += row;
+    left += row_l;
   }
+  return 0;
+}
 
+int RGB_TO_BGR_RIGHT(unsigned char* rgb, unsigned char* right,
+    unsigned int width, unsigned int height) {
+  unsigned int row = width * 3;
+  unsigned int row_r = row / 2;
+
+  rgb += row_r;
+  for (unsigned int r = 0; r < height; ++r) {
+    for (unsigned int c = 0; c < width / 2; ++c) {
+      *(right + c*3) = *(rgb + c*3 + 2);
+      *(right + c*3 + 1) = *(rgb + c*3 + 1);
+      *(right + c*3 + 2) = *(rgb + c*3);
+    }
+    rgb += row;
+    right += row_r;
+  }
   return 0;
 }
 

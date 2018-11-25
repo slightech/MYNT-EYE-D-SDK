@@ -273,40 +273,40 @@ Image::pointer ImageColor::To(const ImageFormat& format) {
       }
       break;
     case ImageFormat::COLOR_MJPG:
-      // if (is_dual_) goto to_fail;
       if (format == ImageFormat::COLOR_RGB) {
-        auto imageBeforeSplit = GetCache(format);
-        auto imageAfterSplit = GetCache(format, width_, height_ );
-        MJPEG_TO_RGB_LIBJPEG(data(), valid_size_, imageBeforeSplit->data());
+        auto image = GetCache(ImageFormat::COLOR_RGB);
+        MJPEG_TO_RGB_LIBJPEG(data(), valid_size_, image->data());
         if (is_dual_) {
+          auto half = GetCache(ImageFormat::COLOR_RGB, width_ / 2, height_);
+          half->set_is_dual(false);
           if (type_ == ImageType::IMAGE_LEFT_COLOR) {
-            SPLIT_TO_LEFT(imageBeforeSplit->data(), imageAfterSplit->data(), width_ , height_);
+            RGB_TO_RGB_LEFT(image->data(), half->data(), width_, height_);
           } else if (type_ == ImageType::IMAGE_RIGHT_COLOR) {
-            SPLIT_TO_RIGHT(imageBeforeSplit->data(), imageAfterSplit->data(), width_ , height_);
+            RGB_TO_RGB_RIGHT(image->data(), half->data(), width_, height_);
           } else {
             goto to_fail;
           }
-          imageAfterSplit->set_is_dual(false);
-          return imageAfterSplit;
-        }else {
-          return imageBeforeSplit;
+          return half;  // left or right
         }
+        return image;  // left only
       } else if (format == ImageFormat::COLOR_BGR) {
-        auto imageBeforeSplit = To(ImageFormat::COLOR_RGB)->To(ImageFormat::COLOR_BGR);
-        auto imageAfterSplit = GetCache(format,  width_, height_);
+        // return To(ImageFormat::COLOR_RGB)->To(ImageFormat::COLOR_BGR);
+        auto image = GetCache(ImageFormat::COLOR_RGB);
+        MJPEG_TO_RGB_LIBJPEG(data(), valid_size_, image->data());
         if (is_dual_) {
+          auto half = GetCache(ImageFormat::COLOR_BGR, width_ / 2, height_);
+          half->set_is_dual(false);
+          // Split from rgb to bgr directly
           if (type_ == ImageType::IMAGE_LEFT_COLOR) {
-            SPLIT_TO_LEFT(imageBeforeSplit->data(), imageAfterSplit->data(), width_  , height_);
+            RGB_TO_BGR_LEFT(image->data(), half->data(), width_, height_);
           } else if (type_ == ImageType::IMAGE_RIGHT_COLOR) {
-            SPLIT_TO_RIGHT(imageBeforeSplit->data(), imageAfterSplit->data(), width_  , height_);
+            RGB_TO_BGR_RIGHT(image->data(), half->data(), width_, height_);
           } else {
             goto to_fail;
           }
-          imageAfterSplit->set_is_dual(false);
-          return imageAfterSplit;
-        }else {
-          return imageBeforeSplit;
+          return half;  // left or right
         }
+        return image->To(ImageFormat::COLOR_BGR);  // left only
       }
       break;
     default: break;
