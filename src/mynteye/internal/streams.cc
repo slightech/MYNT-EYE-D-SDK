@@ -263,7 +263,11 @@ void Streams::StartStreamCapturing() {
 
   is_stream_capturing_ = true;
   stream_capture_thread_ = std::thread([this]() {
+#ifdef MYNTEYE_OS_WIN
+    Rate rate(device_->GetOpenParams().framerate);
+#else
     Rate rate(100);
+#endif
     while (is_stream_capturing_) {
       CaptureStreamColor();
       CaptureStreamDepth();

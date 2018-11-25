@@ -399,7 +399,10 @@ bool Device::Open(const OpenParams& params) {
 
   if (ETronDI_OK == ret) {
     open_params_ = params;
-    SyncCameraCalibrations();
+    if (opened_depth_device_) {
+      // depth device must be opened.
+      SyncCameraCalibrations();
+    }
     return true;
   } else {
     dev_sel_info_.index = -1;  // reset flag
