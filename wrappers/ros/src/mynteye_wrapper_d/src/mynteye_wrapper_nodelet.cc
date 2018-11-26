@@ -486,6 +486,34 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       auto&& mat = data.img->To(ImageFormat::DEPTH_RAW)->ToMat();
       pub_depth.publish(
           cv_bridge::CvImage(header, enc::MONO16, mat).toImageMsg(), info);
+      /*{
+        sensor_msgs::ImagePtr depth_msg =
+            boost::make_shared<sensor_msgs::Image>();
+        depth_msg->header = header;
+
+        depth_msg->width = mat.cols;
+        depth_msg->height = mat.rows;
+
+        int num = 1;  // for endian detection
+        depth_msg->is_bigendian = !(*(char*)&num == 1);  // NOLINT
+
+        depth_msg->encoding = enc::MONO16;
+        depth_msg->step = depth_msg->width * sizeof(std::uint16_t);
+
+        std::size_t size = depth_msg->step * depth_msg->height;
+        depth_msg->data.resize(size);
+
+        std::uint16_t* data = reinterpret_cast<std::uint16_t*>(
+            &depth_msg->data[0]);
+        int data_size = depth_msg->width * depth_msg->height;
+
+        ushort* depth_data_ptr = mat.ptr<ushort>();
+        for (int i = 0; i < data_size; i++) {
+          *(data++) = *(depth_data_ptr++);
+        }
+
+        pub_depth.publish(depth_msg, info);
+      }*/
 
       if (sub_result.points) {
         points_depth = mat;

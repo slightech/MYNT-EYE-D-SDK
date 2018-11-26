@@ -153,4 +153,25 @@
   <node pkg="tf" type="static_transform_publisher" name="b2temp_broadcaster"
       args="0 0 0 $(arg pi/2) 0 $(arg pi) $(arg base_frame) $(arg temp_frame) 100" />
 
+  <!-- disable compressed depth plugin for image topics -->
+  <group ns="$(arg left_mono_topic)">
+    <rosparam param="disable_pub_plugins">
+      - 'image_transport/compressedDepth'
+    </rosparam>
+  </group>
+  <group ns="$(arg left_color_topic)">
+    <rosparam param="disable_pub_plugins">
+      - 'image_transport/compressedDepth'
+    </rosparam>
+  </group>
+  <group ns="$(arg right_mono_topic)">
+    <rosparam param="disable_pub_plugins">
+      - 'image_transport/compressedDepth'
+    </rosparam>
+  </group>
+  <group ns="$(arg right_color_topic)">
+    <rosparam param="disable_pub_plugins">
+      - 'image_transport/compressedDepth'
+    </rosparam>
+  </group>
 </launch>
