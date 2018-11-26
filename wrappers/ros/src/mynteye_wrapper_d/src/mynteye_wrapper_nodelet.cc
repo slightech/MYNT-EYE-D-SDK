@@ -371,14 +371,14 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
     // Set motion data callback
     mynteye->SetMotionCallback([this](const MotionData& data) {
-      if (sub_result.imu && data.imu) {
+      if (data.imu && (sub_result.imu || sub_result.temp)) {
         ros::Time stamp = hardTimeToSoftTime(data.imu->timestamp);
         if (data.imu->flag == MYNTEYE_IMU_ACCEL) {
           imu_accel = data.imu;
-          publishImu(stamp, sub_result.temp);
+          publishImu(stamp, sub_result.imu, sub_result.temp);
         } else if (data.imu->flag == MYNTEYE_IMU_GYRO) {
           imu_gyro = data.imu;
-          publishImu(stamp, sub_result.temp);
+          publishImu(stamp, sub_result.imu, sub_result.temp);
         }
       }
     });
@@ -515,51 +515,54 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     points_depth.release();
   }
 
-  void publishImu(ros::Time stamp, bool temp_sub) {
+  void publishImu(ros::Time stamp, bool imu_sub, bool temp_sub) {
     if (imu_accel == nullptr || imu_gyro == nullptr) {
       return;
     }
-    sensor_msgs::Imu msg;
 
-    // msg.header.seq = seq;
-    msg.header.stamp = stamp;
-    msg.header.frame_id = imu_frame_id;
+    if (imu_sub) {
+      sensor_msgs::Imu msg;
 
-    // acceleration should be in m/s^2 (not in g's)
-    msg.linear_acceleration.x = imu_accel->accel[0] * gravity;
-    msg.linear_acceleration.y = imu_accel->accel[1] * gravity;
-    msg.linear_acceleration.z = imu_accel->accel[2] * gravity;
+      // msg.header.seq = seq;
+      msg.header.stamp = stamp;
+      msg.header.frame_id = imu_frame_id;
 
-    msg.linear_acceleration_covariance[0] = 0;
-    msg.linear_acceleration_covariance[1] = 0;
-    msg.linear_acceleration_covariance[2] = 0;
+      // acceleration should be in m/s^2 (not in g's)
+      msg.linear_acceleration.x = imu_accel->accel[0] * gravity;
+      msg.linear_acceleration.y = imu_accel->accel[1] * gravity;
+      msg.linear_acceleration.z = imu_accel->accel[2] * gravity;
 
-    msg.linear_acceleration_covariance[3] = 0;
-    msg.linear_acceleration_covariance[4] = 0;
-    msg.linear_acceleration_covariance[5] = 0;
+      msg.linear_acceleration_covariance[0] = 0;
+      msg.linear_acceleration_covariance[1] = 0;
+      msg.linear_acceleration_covariance[2] = 0;
 
-    msg.linear_acceleration_covariance[6] = 0;
-    msg.linear_acceleration_covariance[7] = 0;
-    msg.linear_acceleration_covariance[8] = 0;
+      msg.linear_acceleration_covariance[3] = 0;
+      msg.linear_acceleration_covariance[4] = 0;
+      msg.linear_acceleration_covariance[5] = 0;
 
-    // velocity should be in rad/sec
-    msg.angular_velocity.x = imu_gyro->gyro[0] * M_PI / 180;
-    msg.angular_velocity.y = imu_gyro->gyro[1] * M_PI / 180;
-    msg.angular_velocity.z = imu_gyro->gyro[2] * M_PI / 180;
+      msg.linear_acceleration_covariance[6] = 0;
+      msg.linear_acceleration_covariance[7] = 0;
+      msg.linear_acceleration_covariance[8] = 0;
 
-    msg.angular_velocity_covariance[0] = 0;
-    msg.angular_velocity_covariance[1] = 0;
-    msg.angular_velocity_covariance[2] = 0;
+      // velocity should be in rad/sec
+      msg.angular_velocity.x = imu_gyro->gyro[0] * M_PI / 180;
+      msg.angular_velocity.y = imu_gyro->gyro[1] * M_PI / 180;
+      msg.angular_velocity.z = imu_gyro->gyro[2] * M_PI / 180;
 
-    msg.angular_velocity_covariance[3] = 0;
-    msg.angular_velocity_covariance[4] = 0;
-    msg.angular_velocity_covariance[5] = 0;
+      msg.angular_velocity_covariance[0] = 0;
+      msg.angular_velocity_covariance[1] = 0;
+      msg.angular_velocity_covariance[2] = 0;
 
-    msg.angular_velocity_covariance[6] = 0;
-    msg.angular_velocity_covariance[7] = 0;
-    msg.angular_velocity_covariance[8] = 0;
+      msg.angular_velocity_covariance[3] = 0;
+      msg.angular_velocity_covariance[4] = 0;
+      msg.angular_velocity_covariance[5] = 0;
 
-    pub_imu.publish(msg);
+      msg.angular_velocity_covariance[6] = 0;
+      msg.angular_velocity_covariance[7] = 0;
+      msg.angular_velocity_covariance[8] = 0;
+
+      pub_imu.publish(msg);
+    }
 
     if (temp_sub) {
       publishTemp(imu_accel->temperature, stamp);
