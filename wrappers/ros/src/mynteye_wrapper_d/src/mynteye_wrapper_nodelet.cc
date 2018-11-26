@@ -81,6 +81,8 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   // Others
 
   std::unique_ptr<PointCloudGenerator> pointcloud_generator;
+  double points_factor_;
+  std::int32_t points_frequency_;
 
   std::shared_ptr<ImuData> imu_accel;
   std::shared_ptr<ImuData> imu_gyro;
@@ -130,7 +132,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     bool state_awb = true;
     int ir_intensity = 0;
     int proc_mode = 0;
-    double factor = DEFAULT_POINTS_FACTOR;
+    double points_factor = DEFAULT_POINTS_FACTOR;
     std::int32_t points_frequency = DEFAULT_POINTS_FREQUENCE;
     gravity = 9.8;
     nh_ns.getParam("dev_index", dev_index);
@@ -145,7 +147,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     nh_ns.getParam("state_awb", state_awb);
     nh_ns.getParam("ir_intensity", ir_intensity);
     nh_ns.getParam("proc_mode", proc_mode);
-    nh_ns.getParam("factor", factor);
+    nh_ns.getParam("points_factor", points_factor);
     nh_ns.getParam("points_frequency", points_frequency);
     nh_ns.getParam("gravity", gravity);
 
@@ -274,26 +276,13 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     pub_temp = nh.advertise<mynteye_wrapper_d::Temp>(temp_topic, 100);
     NODELET_INFO_STREAM("Advertized on topic " << temp_topic);
 
-    // camera infos
-    bool in_ok;
-    auto&& in = mynteye->GetStreamIntrinsics(params.stream_mode, &in_ok);
-    if (in_ok) {
-      left_info_ptr_ = createCameraInfo(in.left);
-      right_info_ptr_ = createCameraInfo(in.right);
-    } else {
-      left_info_ptr_ = nullptr;
-      right_info_ptr_ = nullptr;
-    }
+    points_factor_ = points_factor;
+    points_frequency_ = points_frequency;
 
-    // pointcloud generator
-    pointcloud_generator.reset(new PointCloudGenerator(
-      in_ok ? in.left : getDefaultCameraIntrinsics(params.stream_mode),
-      [this](sensor_msgs::PointCloud2 msg) {
-        // msg.header.seq = 0;
-        // msg.header.stamp = ros::Time::now();
-        msg.header.frame_id = points_frame_id;
-        pub_points.publish(msg);
-      }, factor, points_frequency));
+    // detect subscribers to enable/disable features
+    detectSubscribers();
+    // open device
+    openDevice();
 
     // loop
     ros::Rate loop_rate(framerate);
@@ -305,7 +294,6 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
   void onLoopEvent() {
     detectSubscribers();
-    openDevice();
   }
 
   void detectSubscribers() {
@@ -407,6 +395,29 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       return;
     }
     NODELET_INFO_STREAM("Open camera success");
+
+    // camera infos
+    bool in_ok;
+    auto&& in = mynteye->GetStreamIntrinsics(params.stream_mode, &in_ok);
+    if (in_ok) {
+      NODELET_INFO_STREAM("Camera info is created");
+      left_info_ptr_ = createCameraInfo(in.left);
+      right_info_ptr_ = createCameraInfo(in.right);
+    } else {
+      NODELET_WARN_STREAM("Camera info is null");
+      left_info_ptr_ = nullptr;
+      right_info_ptr_ = nullptr;
+    }
+
+    // pointcloud generator
+    pointcloud_generator.reset(new PointCloudGenerator(
+      in_ok ? in.left : getDefaultCameraIntrinsics(params.stream_mode),
+      [this](sensor_msgs::PointCloud2 msg) {
+        // msg.header.seq = 0;
+        // msg.header.stamp = ros::Time::now();
+        msg.header.frame_id = points_frame_id;
+        pub_points.publish(msg);
+      }, points_factor_, points_frequency_));
   }
 
   void closeDevice() {

@@ -48,14 +48,13 @@
   <!-- Process mode, e.g. imu assembly, temp_drift -->
   <arg name="proc_mode" default="$(arg proc_none)" />
 
-  <!-- Points display z distance scale ctrl pram -->
-  <arg name="factor" default="1000.0" />
-
   <!-- Generating points frequency, make slower than framerate -->
   <arg name="points_frequency" default="2" />
+  <!-- Points display z distance scale factor -->
+  <arg name="points_factor" default="1000.0" />
 
+  <!-- Setup your local gravity here -->
   <arg name="gravity" default="9.8" />
-  <!-- <arg name="gravity" default="9.8" /> -->
 
   <!-- Node params -->
 
@@ -102,7 +101,7 @@
     <param name="ir_intensity"  value="$(arg ir_intensity)" />
     <param name="proc_mode"     value="$(arg proc_mode)" />
 
-    <param name="factor"           value="$(arg factor)" />
+    <param name="points_factor"    value="$(arg points_factor)" />
     <param name="points_frequency" value="$(arg points_frequency)" />
 
     <param name="gravity" value="$(arg gravity)" />
