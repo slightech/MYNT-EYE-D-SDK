@@ -369,7 +369,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       mynteye->SetStreamCallback(type, [this](const StreamData& data) {
         switch (data.img->type()) {
           case ImageType::IMAGE_LEFT_COLOR: {
-            if (sub_result.left) {
+            if (sub_result.left || sub_result.points) {
               publishLeft(data, sub_result.left_color, sub_result.left_mono);
             }
           } break;
@@ -379,7 +379,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
             }
           } break;
           case ImageType::IMAGE_DEPTH: {
-            if (sub_result.depth) {
+            if (sub_result.depth || sub_result.points) {
               publishDepth(data);
             }
           } break;
