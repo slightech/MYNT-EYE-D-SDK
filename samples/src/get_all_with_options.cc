@@ -63,12 +63,23 @@ int main(int argc, char const* argv[]) {
           "\n  1: STREAM_1280x480, 480p, vga, left+right"
           "\n  2: STREAM_1280x720, 720p, hd, left"
           "\n  3: STREAM_2560x720, 720p, hd, left+right");
+  op_group.add_option("--csf").dest("color_stream_format")
+      .type("int").set_default(1)
+      .metavar("MODE").help("Stream mode of color & depth, "
+          "\ndefault %default (STREAM_1280x720)"
+          "\n  0: STREAM_MJPG"
+          "\n  1: STREAM_YUYV");
+  op_group.add_option("--dsf").dest("depth_stream_format")
+      .type("int").set_default(1)
+      .metavar("MODE").help("Stream mode of color & depth, "
+          "\ndefault %default (STREAM_1280x720)"
+          "\n  1: STREAM_YUYV");
   op_group.add_option("--dev-mode").dest("device_mode")
       .type("int").set_default(2)
-      .metavar("MODE").help("Device mode, default %default (DEVICE_ALL)"
-          "\n  0: DEVICE_COLOR"
-          "\n  1: DEVICE_DEPTH"
-          "\n  2: DEVICE_ALL");
+      .metavar("MODE").help("Device mode, default %default (ALL_DEVICE)"
+          "\n  0: COLOR_DEVICE"
+          "\n  1: DEPTH_DEVICE"
+          "\n  2: ALL_DEVICE");
   op_group.add_option("--ae").dest("state_ae")
       .action("store_true").help("Enable auto-exposure");
   op_group.add_option("--awb").dest("state_awb")
@@ -181,6 +192,10 @@ int main(int argc, char const* argv[]) {
     params.depth_mode = static_cast<DepthMode>(val);
     if (!in_range("stream_mode", 0, 3, &val)) return 2;
     params.stream_mode = static_cast<StreamMode>(val);
+    if (!in_range("color_stream_format", 0, 1, &val)) return 2;
+    params.color_stream_format = static_cast<StreamFormat>(val);
+    if (!in_range("depth_stream_format", 1, 1, &val)) return 2;
+    params.depth_stream_format = static_cast<StreamFormat>(val);
     if (!in_range("device_mode", 0, 2, &val)) return 2;
     params.device_mode = static_cast<DeviceMode>(val);
     params.state_ae = options.get("state_ae");
