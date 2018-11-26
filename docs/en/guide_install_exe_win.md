@@ -1,10 +1,10 @@
 # Windows exe installation {#install_exe}
 
-> Download here:
+> Download here: mynteye-d-1.5.0-rc-win-x64-opencv-3.4.3.exe [Google Drive](https://drive.google.com/open?id=1rvF440Qco-hNU33L6cQbX8udM6Y0lW-7), [百度网盘](https://pan.baidu.com/s/1cP3Zqyv6CLXuUNG2hAJtDQ)
 
 After you install the win pack of SDK, there will be a shortcut to the SDK root directory on your desktop.
 
-First, you should plug the MYNT® EYE camera in a USB 3.0 port. 
+First, you should plug the MYNT® EYE camera in a USB 3.0 port.
 
 Second, goto the "<SDK_ROOT_DIR>\bin\samples" directory and click "get_image.exe" to run.
 

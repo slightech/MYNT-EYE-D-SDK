@@ -1,6 +1,6 @@
 # Windows 预编译 exe 安装 {#install_exe}
 
-> 下载地址：
+> 下载地址： mynteye-d-1.5.0-rc-win-x64-opencv-3.4.3.exe [Google Drive](https://drive.google.com/open?id=1rvF440Qco-hNU33L6cQbX8udM6Y0lW-7), [百度网盘](https://pan.baidu.com/s/1cP3Zqyv6CLXuUNG2hAJtDQ)
 
 安装完 SDK 的 exe 安装包后，桌面会生成 SDK 根目录的快捷方式。
 
