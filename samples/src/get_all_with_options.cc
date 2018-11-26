@@ -65,21 +65,21 @@ int main(int argc, char const* argv[]) {
           "\n  3: STREAM_2560x720, 720p, hd, left+right");
   op_group.add_option("--csf").dest("color_stream_format")
       .type("int").set_default(1)
-      .metavar("MODE").help("Stream mode of color & depth, "
-          "\ndefault %default (STREAM_1280x720)"
+      .metavar("MODE").help("Stream format of color, "
+          "\ndefault %default (STREAM_YUYV)"
           "\n  0: STREAM_MJPG"
           "\n  1: STREAM_YUYV");
   op_group.add_option("--dsf").dest("depth_stream_format")
       .type("int").set_default(1)
-      .metavar("MODE").help("Stream mode of color & depth, "
-          "\ndefault %default (STREAM_1280x720)"
+      .metavar("MODE").help("Stream format of depth, "
+          "\ndefault %default (STREAM_YUYV)"
           "\n  1: STREAM_YUYV");
   op_group.add_option("--dev-mode").dest("device_mode")
       .type("int").set_default(2)
-      .metavar("MODE").help("Device mode, default %default (ALL_DEVICE)"
-          "\n  0: COLOR_DEVICE"
-          "\n  1: DEPTH_DEVICE"
-          "\n  2: ALL_DEVICE");
+      .metavar("MODE").help("Device mode, default %default (DEVICE_ALL)"
+          "\n  0: DEVICE_COLOR"
+          "\n  1: DEVICE_DEPTH"
+          "\n  2: DEVICE_ALL");
   op_group.add_option("--ae").dest("state_ae")
       .action("store_true").help("Enable auto-exposure");
   op_group.add_option("--awb").dest("state_awb")
