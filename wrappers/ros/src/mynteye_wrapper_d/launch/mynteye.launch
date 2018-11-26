@@ -129,6 +129,7 @@
     <param name="temp_topic"        value="$(arg temp_topic)" />
   </node>
 
+  <arg name="pi"   value="3.1415926535897932" />
   <arg name="pi/2" value="1.5707963267948966" />
   <arg name="optical_rotate" value="0 0 0 -$(arg pi/2) 0 -$(arg pi/2)" />
 
@@ -148,8 +149,8 @@
       args="$(arg optical_rotate) $(arg base_frame) $(arg points_frame) 100" />
 
   <node pkg="tf" type="static_transform_publisher" name="b2imu_broadcaster"
-      args="0 0 0 0 0 0 $(arg base_frame) $(arg imu_frame) 100" />
+      args="0 0 0 $(arg pi/2) 0 $(arg pi) $(arg base_frame) $(arg imu_frame) 100" />
   <node pkg="tf" type="static_transform_publisher" name="b2temp_broadcaster"
-      args="0 0 0 0 0 0 $(arg base_frame) $(arg temp_frame) 100" />
+      args="0 0 0 $(arg pi/2) 0 $(arg pi) $(arg base_frame) $(arg temp_frame) 100" />
 
 </launch>
