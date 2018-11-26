@@ -1,11 +1,8 @@
 # Windows SDK 用户指南
 
-## 1. 安装 SDK 依赖
+以下源码编译安装过程。如果只需使用预编译好的库，请参考 \link install_exe "Windows 预编译 exe 安装"\endlink 。
 
-注意: 因为设备权限的问题，命令执行完成之后，您必须重新拔插设备.
-```
-make init
-```
+## 1. 安装 SDK 依赖
 
 ### 1.1 安装 OpenCV
 
@@ -68,7 +65,7 @@ C:\libjpeg-turbo64\bin
 
 ## 2. 编译 SDK
 
-打开 "适用于 VS 2017 的 x64 本机工具命令提示" 命令行界面
+打开 "x64 Native Tools Command Prompt for VS 2017"(适用于 VS 2017 的 x64 本机工具命令提示) 命令行界面
 
 ```
 git clone https://github.com/slightech/MYNT-EYE-D-SDK.git
@@ -77,6 +74,7 @@ make all
 ```
 
 ## 3. 运行例程
+
 Note:: 默认打开矫正后的图像。(跑vio时需要使用原图，跑深度或者点云使用矫正后的图像)
 
 1) get_image 显示左右目的图像和彩色深度图

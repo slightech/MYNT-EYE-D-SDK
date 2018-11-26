@@ -795,6 +795,7 @@ INPUT                  = guide_product_description.md \
                          guide_imu_coord.md \
                          guide_build_linux.md \
                          guide_build_win.md \
+                         guide_install_exe_win.md \
                          guide_ros.md \
                          guide_recording_data.md \
                          guide_analyzing_imu.md \

@@ -1,5 +1,7 @@
 # SDK Quick Start Guide for Windows
 
+The following steps are how to install from source codes. If you wanna using prebuilt DLL, please see \link install_exe "Windows exe installation"\endlink.
+
 ## 1. Install SDK dependencies
 
 ### 1.1 Install OpenCV
