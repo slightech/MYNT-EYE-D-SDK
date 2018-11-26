@@ -37,7 +37,7 @@
   <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">MYNT EYE D SDK
-   &#160;<span id="projectnumber">1.5.0-rc1</span>
+   &#160;<span id="projectnumber">1.5.0-rc</span>
    </div>
    <div id="projectbrief">http://www.myntai.com/mynteye/depth</div>
   </td>
@@ -109,10 +109,13 @@ $(document).ready(function(){initNavTree('md_guide_build_linux.html','');});
 <h4>1.1.1 apt 或者编译安装 OpenCV (选择一个)</h4>
 <h5>1.1.1.1 使用 apt 安装 OpenCV (推荐)</h5>
 <div class="fragment"><div class="line">sudo apt-get install libopencv-dev</div></div><!-- fragment --><h5>1.1.1.2 编译安装 OpenCV</h5>
-<div class="fragment"><div class="line">git clone https://github.com/opencv/opencv.git</div><div class="line">cd opencv/</div><div class="line">git checkout tags/3.4.0</div><div class="line"></div><div class="line">cd opencv/</div><div class="line">mkdir build</div><div class="line">cd build/</div><div class="line"></div><div class="line">cmake ..</div><div class="line"></div><div class="line">make -j4</div><div class="line">sudo make install</div></div><!-- fragment --><h3>1.2 安装点云例程依赖的 PCL 库 (可选)</h3>
+<blockquote class="doxtable">
+<p>OpenCV 如何编译安装，请见官方文档 <code>Installation in Linux &lt;<a href="https://docs.opencv.org/master/d7/d9f/tutorial_linux_install.html">https://docs.opencv.org/master/d7/d9f/tutorial_linux_install.html</a>&gt;</code>_ 。或参考如下命令： </p>
+</blockquote>
+<div class="fragment"><div class="line">[compiler] sudo apt-get install build-essential</div><div class="line">[required] sudo apt-get install cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev</div><div class="line">[optional] sudo apt-get install python-dev python-numpy libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev libjasper-dev libdc1394-22-dev</div></div><!-- fragment --><div class="fragment"><div class="line">git clone https://github.com/opencv/opencv.git</div><div class="line">cd opencv/</div><div class="line">git checkout tags/3.4.0</div><div class="line"></div><div class="line">cd opencv/</div><div class="line">mkdir build</div><div class="line">cd build/</div><div class="line"></div><div class="line">cmake ..</div><div class="line"></div><div class="line">make -j4</div><div class="line">sudo make install</div></div><!-- fragment --><h3>1.2 安装点云例程依赖的 PCL 库 (可选)</h3>
 <div class="fragment"><div class="line">sudo add-apt-repository ppa:v-launchpad-jochen-sprickerhof-de/pcl</div><div class="line">sudo apt-get update</div><div class="line">sudo apt-get install libpcl-all</div></div><!-- fragment --><h3>1.3 建立 libGL.so 软链接用以解决在 TX1/TX2 上的 bug (可选)</h3>
 <div class="fragment"><div class="line">sudo ln -sf /usr/lib/aarch64-linux-gnu/tegra/libGL.so /usr/lib/aarch64-linux-gnu/libGL.so</div></div><!-- fragment --><h2>2. 编译 SDK</h2>
-<div class="fragment"><div class="line">cd &lt;sdk&gt;</div><div class="line">make all</div></div><!-- fragment --><h2>3. 运行例程</h2>
+<div class="fragment"><div class="line">git clone https://github.com/slightech/MYNT-EYE-D-SDK.git</div><div class="line">cd MYNT-EYE-D-SDK</div><div class="line">make all</div></div><!-- fragment --><h2>3. 运行例程</h2>
 <p>Note:: 默认打开矫正后的图像。(跑vio时需要使用原图，跑深度或者点云使用矫正后的图像)</p>
 <p>1) get_image 显示左右目的图像和彩色深度图</p>
 <div class="fragment"><div class="line">./samples/_output/bin/get_image</div></div><!-- fragment --><p>2) get_depth 显示左目的图像，16UC1的深度图和鼠标选中的像素的深度值(mm)</p>

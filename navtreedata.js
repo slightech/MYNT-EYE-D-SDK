@@ -29,6 +29,7 @@ var NAVTREE =
     [ "IMU 坐标系统", "md_guide_imu_coord.html", null ],
     [ "Linux SDK 用户指南", "md_guide_build_linux.html", null ],
     [ "Windows SDK 用户指南", "md_guide_build_win.html", null ],
+    [ "Windows 预编译 exe 安装", "install_exe.html", null ],
     [ "ROS 安装", "md_guide_ros.html", null ],
     [ "录制数据集", "md_guide_recording_data.html", null ],
     [ "分析IMU", "md_guide_analyzing_imu.html", null ],

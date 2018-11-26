@@ -37,7 +37,7 @@
   <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">MYNT EYE D SDK
-   &#160;<span id="projectnumber">1.5.0-rc1</span>
+   &#160;<span id="projectnumber">1.5.0-rc</span>
    </div>
    <div id="projectbrief">http://www.myntai.com/mynteye/depth</div>
   </td>
@@ -150,6 +150,9 @@ StreamFormat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 StreamFormat&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structmynteye_1_1_open_params.html#a306b2ebf06379cd30568c94228b2f70c">depth_stream_format</a></td></tr>
 <tr class="memdesc:a306b2ebf06379cd30568c94228b2f70c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stream format of depth, default STREAM_YUYV. <br /></td></tr>
 <tr class="separator:a306b2ebf06379cd30568c94228b2f70c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac2b6ec584b87ba12b53b62ce0640c4a1"><td class="memItemLeft" align="right" valign="top">DeviceMode&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structmynteye_1_1_open_params.html#ac2b6ec584b87ba12b53b62ce0640c4a1">device_mode</a></td></tr>
+<tr class="memdesc:ac2b6ec584b87ba12b53b62ce0640c4a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Device mode, default ALL Note:: If DEVICE_COLOR is enable, ImageType::IMAGE_DEPTH will not be available.  <a href="#ac2b6ec584b87ba12b53b62ce0640c4a1">更多...</a><br /></td></tr>
+<tr class="separator:ac2b6ec584b87ba12b53b62ce0640c4a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abbdde98994739bcae52ac27376c20c09"><td class="memItemLeft" align="right" valign="top"><a id="abbdde98994739bcae52ac27376c20c09"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structmynteye_1_1_open_params.html#abbdde98994739bcae52ac27376c20c09">state_ae</a></td></tr>
 <tr class="memdesc:abbdde98994739bcae52ac27376c20c09"><td class="mdescLeft">&#160;</td><td class="mdescRight">Auto-exposure, default true. <br /></td></tr>
@@ -201,6 +204,24 @@ std::uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 </div><div class="memdoc">
 
 <p>Destructor. </p>
+
+</div>
+</div>
+<h2 class="groupheader">类成员变量说明</h2>
+<a id="ac2b6ec584b87ba12b53b62ce0640c4a1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac2b6ec584b87ba12b53b62ce0640c4a1">&#9670;&nbsp;</a></span>device_mode</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">DeviceMode mynteye::OpenParams::device_mode</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Device mode, default ALL Note:: If DEVICE_COLOR is enable, ImageType::IMAGE_DEPTH will not be available. </p>
+<p>if DEVICE_DEPTH is enable, ImageType::IMAGE_LEFT_COLOR and ImageType::IMAGE_RIGHT_COLOR will not be available. </p>
 
 </div>
 </div>
