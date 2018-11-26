@@ -156,6 +156,7 @@ if(PCL_FOUND)
       src/util/cam_utils.cc
       src/util/cv_painter.cc
       src/util/pc_viewer.cc
+    WITH_THREAD
     LINK_LIBS mynteye_depth ${OpenCV_LIBS} ${PCL_LIBRARIES}
     DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
   )
