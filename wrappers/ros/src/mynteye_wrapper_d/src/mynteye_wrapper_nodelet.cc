@@ -57,11 +57,13 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   ros::Publisher pub_imu;
   ros::Publisher pub_temp;
 
-  sensor_msgs::CameraInfoPtr left_info_ptr_;
-  sensor_msgs::CameraInfoPtr right_info_ptr_;
+  sensor_msgs::CameraInfoPtr left_info_ptr;
+  sensor_msgs::CameraInfoPtr right_info_ptr;
 
   // Launch params
 
+  std::int32_t points_frequency;
+  double points_factor;
   int gravity;
 
   std::string base_frame_id;
@@ -81,8 +83,6 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   // Others
 
   std::unique_ptr<PointCloudGenerator> pointcloud_generator;
-  double points_factor_;
-  std::int32_t points_frequency_;
 
   std::shared_ptr<ImuData> imu_accel;
   std::shared_ptr<ImuData> imu_gyro;
@@ -132,9 +132,6 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     bool state_awb = true;
     int ir_intensity = 0;
     int proc_mode = 0;
-    double points_factor = DEFAULT_POINTS_FACTOR;
-    std::int32_t points_frequency = DEFAULT_POINTS_FREQUENCE;
-    gravity = 9.8;
     nh_ns.getParam("dev_index", dev_index);
     nh_ns.getParam("framerate", framerate);
     nh_ns.getParam("color_mode", color_mode);
@@ -147,8 +144,12 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     nh_ns.getParam("state_awb", state_awb);
     nh_ns.getParam("ir_intensity", ir_intensity);
     nh_ns.getParam("proc_mode", proc_mode);
-    nh_ns.getParam("points_factor", points_factor);
+
+    points_frequency = DEFAULT_POINTS_FREQUENCE;
+    points_factor = DEFAULT_POINTS_FACTOR;
+    gravity = 9.8;
     nh_ns.getParam("points_frequency", points_frequency);
+    nh_ns.getParam("points_factor", points_factor);
     nh_ns.getParam("gravity", gravity);
 
     base_frame_id = "mynteye_link";
@@ -276,9 +277,6 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     pub_temp = nh.advertise<mynteye_wrapper_d::Temp>(temp_topic, 100);
     NODELET_INFO_STREAM("Advertized on topic " << temp_topic);
 
-    points_factor_ = points_factor;
-    points_frequency_ = points_frequency;
-
     // detect subscribers to enable/disable features
     detectSubscribers();
     // open device
@@ -287,13 +285,9 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     // loop
     ros::Rate loop_rate(framerate);
     while (nh_ns.ok()) {
-      onLoopEvent();
+      detectSubscribers();
       loop_rate.sleep();
     }
-  }
-
-  void onLoopEvent() {
-    detectSubscribers();
   }
 
   void detectSubscribers() {
@@ -401,12 +395,12 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     auto&& in = mynteye->GetStreamIntrinsics(params.stream_mode, &in_ok);
     if (in_ok) {
       NODELET_INFO_STREAM("Camera info is created");
-      left_info_ptr_ = createCameraInfo(in.left);
-      right_info_ptr_ = createCameraInfo(in.right);
+      left_info_ptr = createCameraInfo(in.left);
+      right_info_ptr = createCameraInfo(in.right);
     } else {
       NODELET_WARN_STREAM("Camera info is null");
-      left_info_ptr_ = nullptr;
-      right_info_ptr_ = nullptr;
+      left_info_ptr = nullptr;
+      right_info_ptr = nullptr;
     }
 
     // pointcloud generator
@@ -417,7 +411,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
         // msg.header.stamp = ros::Time::now();
         msg.header.frame_id = points_frame_id;
         pub_points.publish(msg);
-      }, points_factor_, points_frequency_));
+      }, points_factor, points_frequency));
   }
 
   void closeDevice() {
@@ -427,13 +421,13 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   }
 
   void publishLeft(const StreamData& data, bool color_sub, bool mono_sub) {
-    publishColor(data, left_info_ptr_,
+    publishColor(data, left_info_ptr,
         pub_left_color, color_sub, left_color_frame_id,
         pub_left_mono, mono_sub, left_mono_frame_id, true);
   }
 
   void publishRight(const StreamData& data, bool color_sub, bool mono_sub) {
-    publishColor(data, right_info_ptr_,
+    publishColor(data, right_info_ptr,
         pub_right_color, color_sub, right_color_frame_id,
         pub_right_mono, mono_sub, right_mono_frame_id, false);
   }
@@ -486,7 +480,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
         : ros::Time().now();
     header.frame_id = depth_frame_id;
 
-    auto&& info = left_info_ptr_;
+    auto&& info = left_info_ptr;
     if (info) info->header.stamp = header.stamp;
     if (params.depth_mode == DepthMode::DEPTH_RAW) {
       auto&& mat = data.img->To(ImageFormat::DEPTH_RAW)->ToMat();
