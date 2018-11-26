@@ -49,10 +49,6 @@ IMU_ALL = 0
 IMU_ACCEL = 1
 IMU_GYRO = 2
 
-IMU_ALL_S = str(IMU_ALL)
-IMU_ACCEL_S = str(IMU_ACCEL)
-IMU_GYRO_S = str(IMU_GYRO)
-
 
 class RawDataset(Dataset):
 
@@ -84,7 +80,7 @@ class RawDataset(Dataset):
     if self._has_imu:
       # accel
       accels = [imu for imu in results[What.imu] \
-          if imu.flag == IMU_ALL_S or imu.flag == IMU_ACCEL_S]
+          if imu.flag == IMU_ALL or imu.flag == IMU_ACCEL]
       if accels:
         print('accels: {}'.format(len(accels)))
         accel_t_beg = accels[0].timestamp
@@ -100,7 +96,7 @@ class RawDataset(Dataset):
 
       # gyro
       gyros = [imu for imu in results[What.imu] \
-          if imu.flag == IMU_ALL_S or imu.flag == IMU_GYRO_S]
+          if imu.flag == IMU_ALL or imu.flag == IMU_GYRO]
       if gyros:
         print('gyros: {}'.format(len(gyros)))
         gyro_t_beg = gyros[0].timestamp

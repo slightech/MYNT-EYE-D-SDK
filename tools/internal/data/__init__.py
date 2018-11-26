@@ -390,7 +390,7 @@ class MYNTEYE(Dataset):
           values = [_.strip() for _ in line.split(',')]
           imu = IMU()
           imu.timestamp = float(values[fields['timestamp']]) * 0.00001
-          imu.flag = values[fields['flag']]
+          imu.flag = int(values[fields['flag']])
           imu.accel_x = float(values[fields['accel_x']])
           imu.accel_y = float(values[fields['accel_y']])
           imu.accel_z = float(values[fields['accel_z']])
