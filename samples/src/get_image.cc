@@ -78,7 +78,9 @@ int main(int argc, char const* argv[]) {
   // Enable what stream datas: left_color, right_color, depth
   bool is_right_ok = util::is_right_color_supported(params.stream_mode);
   if (is_right_ok) {
-    cam.EnableStreamData(ImageType::IMAGE_ALL);
+    cam.EnableStreamData(ImageType::IMAGE_LEFT_COLOR);
+    cam.EnableStreamData(ImageType::IMAGE_RIGHT_COLOR);
+    cam.EnableStreamData(ImageType::IMAGE_DEPTH);
   } else {
     cam.EnableStreamData(ImageType::IMAGE_LEFT_COLOR);
     cam.EnableStreamData(ImageType::IMAGE_DEPTH);
