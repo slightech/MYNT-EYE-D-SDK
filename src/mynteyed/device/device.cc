@@ -892,7 +892,6 @@ void Device::EnableIRInterleave(bool status) {
   if (framerate_ < 30) {
     LOGW("\nWARNING:: IR interleave will not be effective"
         " for frame rate less than 30 fps!\n");
-    return;
   }
   if (depth_data_type_ == 1 ||
       depth_data_type_ == 2 ||
