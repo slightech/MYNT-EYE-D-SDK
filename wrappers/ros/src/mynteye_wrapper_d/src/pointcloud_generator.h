@@ -26,8 +26,8 @@
 #include <sensor_msgs/PointCloud2.h>
 #include <sensor_msgs/point_cloud2_iterator.h>
 
-#include "mynteye/util/rate.h"
-#include "mynteye/stubs/types_calib.h"
+#include "mynteyed/util/rate.h"
+#include "mynteyed/stubs/types_calib.h"
 
 MYNTEYE_BEGIN_NAMESPACE
 
@@ -57,7 +57,7 @@ class PointCloudGenerator {
   CameraIntrinsics in_;
   Callback callback_;
 
-  std::unique_ptr<mynteye::Rate> rate_;
+  std::unique_ptr<MYNTEYE_NAMESPACE::Rate> rate_;
 
   std::mutex mutex_;
   std::condition_variable condition_;

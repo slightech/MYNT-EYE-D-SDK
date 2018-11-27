@@ -1,24 +1,23 @@
 #include <iostream>
 #include <fstream>
 
-#include "mynteye/camera.h"
-#include "mynteye/utils.h"
+#include "mynteyed/camera.h"
+#include "mynteyed/utils.h"
 
 MYNTEYE_USE_NAMESPACE
 
 int main(int argc, char *argv[]) {
-  mynteye::Camera cam;
-  mynteye::DeviceInfo dev_info;
-  if (!mynteye::util::select(cam, &dev_info)) {
+  Camera cam;
+  DeviceInfo dev_info;
+  if (!util::select(cam, &dev_info)) {
     return 1;
   }
-  mynteye::util::print_stream_infos(cam, dev_info.index);
+  util::print_stream_infos(cam, dev_info.index);
 
   std::cout << "Open device: " << dev_info.index << ", "
     << dev_info.name << std::endl << std::endl;
 
-  // Warning: Color stream format MJPG doesn't work.
-  mynteye::OpenParams params(dev_info.index);
+  OpenParams params(dev_info.index);
   cam.Open(params);
 
   std::cout << std::endl;

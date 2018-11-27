@@ -55,9 +55,9 @@ message(STATUS "CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
 LIST(APPEND CMAKE_MODULE_PATH ${PRO_DIR}/cmake)
 
 LIST(APPEND CMAKE_PREFIX_PATH ${PRO_DIR}/_install/lib/cmake)
-find_package(mynteye REQUIRED)
+find_package(mynteyed REQUIRED)
 message(STATUS "Found mynteye: ${mynteye_VERSION}")
-if(NOT mynteye_WITH_OPENCV)
+if(NOT mynteyed_WITH_OPENCV)
   message(FATAL_ERROR "Please install OpenCV, then rebuild mynteye with it."
       " Because these samples use OpenCV to show images.")
 endif()

@@ -67,7 +67,7 @@ cv::Rect CVPainter::DrawSize(const cv::Mat &img, const gravity_t &gravity) {
 }
 
 cv::Rect CVPainter::DrawStreamData(
-    const cv::Mat &img, const mynteye::StreamData &data,
+    const cv::Mat &img, const MYNTEYE_NAMESPACE::StreamData &data,
     const gravity_t &gravity) {
   auto&& info = data.img_info;
   if (info == nullptr) return cv::Rect();
@@ -102,7 +102,7 @@ cv::Rect CVPainter::DrawStreamData(
 }
 
 cv::Rect CVPainter::DrawMotionData(
-    const cv::Mat &img, const mynteye::MotionData &data,
+    const cv::Mat &img, const MYNTEYE_NAMESPACE::MotionData &data,
     const gravity_t &gravity) {
   auto&& imu = data.imu;
   if (imu == nullptr) return cv::Rect();

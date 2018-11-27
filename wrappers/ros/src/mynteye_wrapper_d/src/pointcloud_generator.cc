@@ -26,7 +26,7 @@ PointCloudGenerator::PointCloudGenerator(CameraIntrinsics in, Callback callback,
     generating_(false),
     factor_(factor) {
   if (frequency > 0) {
-    rate_.reset(new mynteye::Rate(frequency));
+    rate_.reset(new MYNTEYE_NAMESPACE::Rate(frequency));
   }
   Start();
 }

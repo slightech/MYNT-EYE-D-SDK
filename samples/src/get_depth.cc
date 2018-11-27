@@ -17,8 +17,8 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
-#include "mynteye/camera.h"
-#include "mynteye/utils.h"
+#include "mynteyed/camera.h"
+#include "mynteyed/utils.h"
 
 #include "util/cam_utils.h"
 #include "util/counter.h"
@@ -148,7 +148,8 @@ void OnDepthMouseCallback(int event, int x, int y, int flags, void* userdata) {
 }  // namespace
 
 using namespace std;
-using namespace mynteye;
+
+MYNTEYE_USE_NAMESPACE
 
 int main(int argc, char const* argv[]) {
   Camera cam;

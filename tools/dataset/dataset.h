@@ -19,7 +19,7 @@
 #include <string>
 #include <map>
 
-#include "mynteye/camera.h"
+#include "mynteyed/camera.h"
 
 MYNTEYE_BEGIN_NAMESPACE
 
@@ -38,9 +38,9 @@ class Dataset {
   explicit Dataset(std::string outdir);
   virtual ~Dataset();
 
-  void SaveMotionData(const mynteye::MotionData &data);
+  void SaveMotionData(const MYNTEYE_NAMESPACE::MotionData &data);
   void SaveStreamData(const ImageType &type,
-      const mynteye::StreamData &data);
+      const MYNTEYE_NAMESPACE::StreamData &data);
 
  private:
   writer_t GetMotionWriter();

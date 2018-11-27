@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #include "dataset/dataset.h"
-#include "mynteye/util/files.h"
+#include "mynteyed/util/files.h"
 
 #ifdef WITH_OPENCV2
 #include <opencv2/highgui/highgui.hpp>
@@ -54,7 +54,7 @@ Dataset::~Dataset() {
   }
 }
 
-void Dataset::SaveMotionData(const mynteye::MotionData &data) {
+void Dataset::SaveMotionData(const MYNTEYE_NAMESPACE::MotionData &data) {
   auto &&writer = GetMotionWriter();
   auto seq = motion_count_;
 
@@ -67,7 +67,7 @@ void Dataset::SaveMotionData(const mynteye::MotionData &data) {
 }
 
 void Dataset::SaveStreamData(const ImageType &type,
-    const mynteye::StreamData &data) {
+    const MYNTEYE_NAMESPACE::StreamData &data) {
   auto &&writer = GetStreamWriter(type);
   auto seq = stream_count_[type];
 

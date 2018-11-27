@@ -24,14 +24,14 @@
 
 #include <pcl/visualization/pcl_visualizer.h>
 
-#include <mynteye/types.h>
+#include "mynteyed/types.h"
 
 class PCViewer {
  public:
   using point_t = pcl::PointXYZRGBA;
   using pointcloud_t = pcl::PointCloud<point_t>;
 
-  PCViewer(const mynteye::CameraIntrinsics& cam_in, float cam_factor);
+  PCViewer(const MYNTEYE_NAMESPACE::CameraIntrinsics& cam_in, float cam_factor);
   ~PCViewer();
 
   bool Update(const cv::Mat &rgb, const cv::Mat& depth);
@@ -52,7 +52,7 @@ class PCViewer {
 
   std::shared_ptr<pcl::visualization::PCLVisualizer> viewer_;
 
-  mynteye::CameraIntrinsics cam_in_;
+  MYNTEYE_NAMESPACE::CameraIntrinsics cam_in_;
   float cam_factor_;
 
   std::mutex mutex_;
