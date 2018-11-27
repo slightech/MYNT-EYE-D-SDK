@@ -5,7 +5,7 @@
 #include <memory>
 #include <string>
 
-#include "mynteye/camera.h"
+#include "mynteyed/camera.h"
 
 MYNTEYE_BEGIN_NAMESPACE
 

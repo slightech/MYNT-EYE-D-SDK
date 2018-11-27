@@ -18,8 +18,8 @@
 #include <iostream>
 #include <opencv2/highgui/highgui.hpp>
 
-#include "mynteye/camera.h"
-#include "mynteye/utils.h"
+#include "mynteyed/camera.h"
+#include "mynteyed/utils.h"
 
 #include "util/cam_utils.h"
 #include "util/counter.h"

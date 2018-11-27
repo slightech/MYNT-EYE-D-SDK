@@ -27,7 +27,10 @@
 #include <memory>
 #include <utility>
 
-namespace mynteye {
+#include "mynteyed/stubs/global.h"
+
+MYNTEYE_BEGIN_NAMESPACE
+
 namespace util {
 
 inline
@@ -60,9 +63,8 @@ std::string to_string(T val, int width, int prec, char fillch = ' ') {
   return to_string(val, fmt);
 }
 
-char waitKey();
-
 }  // namespace util
-}  // namespace mynteye
+
+MYNTEYE_END_NAMESPACE
 
 #endif  // MYNTEYE_SAMPLES_UTIL_CAM_UTILS_H_

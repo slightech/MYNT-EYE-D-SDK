@@ -15,7 +15,8 @@
 
 #include <iostream>
 
-namespace mynteye {
+MYNTEYE_BEGIN_NAMESPACE
+
 namespace util {
 
 std::shared_ptr<std::ios> new_format(int width, int prec, char fillch) {
@@ -29,39 +30,6 @@ std::shared_ptr<std::ios> new_format(int width, int prec, char fillch) {
   return fmt;
 }
 
-/*
-#ifdef MYNTEYE_OS_LINUX
-char waitKey() {
-  int ret = system("stty -icanon");
-  fd_set rfds;
-  struct timeval tv;
-  char c = '\0';
-
-  FD_ZERO(&rfds);
-  FD_SET(0, &rfds);
-  tv.tv_sec = 1;
-  tv.tv_usec = 0;
-
-  if (select(1, &rfds, NULL, NULL, &tv) > 0) {
-    c = getchar();
-    return c;
-  }
-
-  return 'n';
-}
-#endif
-
-#ifdef MYNTEYE_OS_WIN
-char waitKey() {
-  int ch;
-  if (_kbhit()) {
-    ch = _getch();
-	  return static_cast<char>(ch);
-  }
-  return 'n';
-}
-#endif
-*/
-
 }  // namespace util
-}  // namespace mynteye
+
+MYNTEYE_END_NAMESPACE

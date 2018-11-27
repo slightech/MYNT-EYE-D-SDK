@@ -13,7 +13,7 @@
 # limitations under the License.
 cmake_minimum_required(VERSION 3.0)
 
-project(mynteye VERSION 1.5.0 LANGUAGES C CXX)
+project(mynteyed VERSION 1.5.0 LANGUAGES C CXX)
 
 include(cmake/Common.cmake)
 
@@ -43,8 +43,8 @@ if(NOT MYNTEYE_NAMESPACE)
 endif()
 
 configure_file(
-  include/mynteye/stubs/global_config.h.in
-  include/mynteye/stubs/global_config.h @ONLY
+  include/mynteyed/stubs/global_config.h.in
+  include/mynteyed/stubs/global_config.h @ONLY
 )
 
 # flags
@@ -106,35 +106,35 @@ add_definitions(-DMYNTEYE_EXPORTS)
 
 ## mynteye_depth
 
-set(MYNTEYE_DEPTH ${MYNTEYE_NAME}_depth)
+set(MYNTEYE_DEPTH mynteye_depth)
 
 set(MYNTEYE_DEPTH_SRCS
-  src/mynteye/data/channels.cc
-  src/mynteye/device/convertor.cc
-  src/mynteye/device/data_caches.cc
-  src/mynteye/device/device_info.cc
-  src/mynteye/device/device.cc
-  src/mynteye/device/device_linux.cc
-  src/mynteye/device/device_win.cc
-  src/mynteye/device/image.cc
-  src/mynteye/device/open_params.cc
-  src/mynteye/device/stream_info.cc
-  src/mynteye/device/types.cc
-  src/mynteye/stubs/types_calib.cc
-  src/mynteye/util/rate.cc
-  src/mynteye/util/strings.cc
-  src/mynteye/camera.cc
-  src/mynteye/types_data.cc
-  src/mynteye/utils.cc
-  src/mynteye/internal/camera_p.cc
-  src/mynteye/internal/image_utils.cc
-  src/mynteye/internal/motions.cc
-  src/mynteye/internal/streams.cc
+  src/mynteyed/data/channels.cc
+  src/mynteyed/device/convertor.cc
+  src/mynteyed/device/data_caches.cc
+  src/mynteyed/device/device_info.cc
+  src/mynteyed/device/device.cc
+  src/mynteyed/device/device_linux.cc
+  src/mynteyed/device/device_win.cc
+  src/mynteyed/device/image.cc
+  src/mynteyed/device/open_params.cc
+  src/mynteyed/device/stream_info.cc
+  src/mynteyed/device/types.cc
+  src/mynteyed/stubs/types_calib.cc
+  src/mynteyed/util/rate.cc
+  src/mynteyed/util/strings.cc
+  src/mynteyed/camera.cc
+  src/mynteyed/types_data.cc
+  src/mynteyed/utils.cc
+  src/mynteyed/internal/camera_p.cc
+  src/mynteyed/internal/image_utils.cc
+  src/mynteyed/internal/motions.cc
+  src/mynteyed/internal/streams.cc
 )
 if(OS_WIN)
-  list(APPEND MYNTEYE_DEPTH_SRCS "src/mynteye/data/hid/hid_win.cc")
+  list(APPEND MYNTEYE_DEPTH_SRCS "src/mynteyed/data/hid/hid_win.cc")
 else()
-  list(APPEND MYNTEYE_DEPTH_SRCS "src/mynteye/data/hid/hid_linux.cc")
+  list(APPEND MYNTEYE_DEPTH_SRCS "src/mynteyed/data/hid/hid_linux.cc")
 endif()
 
 if(OS_WIN)
@@ -277,7 +277,7 @@ install(DIRECTORY "${__3rdparty_out_dir}"
 )
 
 install(TARGETS ${MYNTEYE_DEPTH}
-  EXPORT mynteye-targets
+  EXPORT mynteyed-targets
   ARCHIVE DESTINATION ${MYNTEYE_CMAKE_LIBDIR}
   LIBRARY DESTINATION ${MYNTEYE_CMAKE_LIBDIR}
   RUNTIME DESTINATION ${MYNTEYE_CMAKE_BINDIR}
@@ -287,24 +287,24 @@ install(TARGETS ${MYNTEYE_DEPTH}
 
 include(CMakePackageConfigHelpers)
 
-configure_package_config_file(mynteye-config.cmake.in
-  ${CMAKE_CURRENT_BINARY_DIR}/mynteye-config.cmake
+configure_package_config_file(mynteyed-config.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/mynteyed-config.cmake
   INSTALL_DESTINATION ${MYNTEYE_CMAKE_INSTALLDIR}
   NO_CHECK_REQUIRED_COMPONENTS_MACRO
 )
 
-write_basic_package_version_file(mynteye-config-version.cmake
+write_basic_package_version_file(mynteyed-config-version.cmake
   VERSION ${PROJECT_VERSION} COMPATIBILITY SameMajorVersion
 )
 
 install(FILES
-  ${CMAKE_CURRENT_BINARY_DIR}/mynteye-config.cmake
-  ${CMAKE_CURRENT_BINARY_DIR}/mynteye-config-version.cmake
+  ${CMAKE_CURRENT_BINARY_DIR}/mynteyed-config.cmake
+  ${CMAKE_CURRENT_BINARY_DIR}/mynteyed-config-version.cmake
   DESTINATION ${MYNTEYE_CMAKE_INSTALLDIR}
 )
 
-install(EXPORT mynteye-targets
-  #NAMESPACE mynteye::
+install(EXPORT mynteyed-targets
+  #NAMESPACE mynteyed::
   DESTINATION ${MYNTEYE_CMAKE_INSTALLDIR}
 )
 

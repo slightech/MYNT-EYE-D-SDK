@@ -34,8 +34,8 @@
 
 #include <mynteye_wrapper_d/Temp.h>
 
-#include "mynteye/camera.h"
-#include "mynteye/utils.h"
+#include "mynteyed/camera.h"
+#include "mynteyed/utils.h"
 
 #include "pointcloud_generator.h" // NOLINT
 

@@ -4,7 +4,7 @@
 
 #include <opencv2/core/core.hpp>
 
-#include "mynteye/util/files.h"
+#include "mynteyed/util/files.h"
 
 MYNTEYE_BEGIN_NAMESPACE
 

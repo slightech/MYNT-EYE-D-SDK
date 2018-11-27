@@ -33,7 +33,8 @@ std::shared_ptr<pcl::visualization::PCLVisualizer> CustomColorVis(
   return (viewer);
 }
 
-PCViewer::PCViewer(const mynteye::CameraIntrinsics& cam_in, float cam_factor)
+PCViewer::PCViewer(const MYNTEYE_NAMESPACE::CameraIntrinsics& cam_in,
+    float cam_factor)
   : viewer_(nullptr), cam_in_(cam_in), cam_factor_(cam_factor),
     generating_(false), running_(false) {
   Start();

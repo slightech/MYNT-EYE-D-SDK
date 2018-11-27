@@ -19,7 +19,7 @@
 
 #include <opencv2/core/core.hpp>
 
-#include "mynteye/types.h"
+#include "mynteyed/types.h"
 
 class CVPainter {
  public:
@@ -35,10 +35,10 @@ class CVPainter {
 
   cv::Rect DrawSize(const cv::Mat &img, const gravity_t &gravity = TOP_LEFT);
   cv::Rect DrawStreamData(
-      const cv::Mat &img, const mynteye::StreamData &data,
+      const cv::Mat &img, const MYNTEYE_NAMESPACE::StreamData &data,
       const gravity_t &gravity = TOP_LEFT);
   cv::Rect DrawMotionData(
-      const cv::Mat &img, const mynteye::MotionData &data,
+      const cv::Mat &img, const MYNTEYE_NAMESPACE::MotionData &data,
       const gravity_t &gravity = TOP_RIGHT);
 
   cv::Rect DrawInformation(

@@ -18,9 +18,10 @@
 #include <cstdint>
 #include <queue>
 
-#include "mynteye/util/times.h"
+#include "mynteyed/util/times.h"
 
-namespace mynteye {
+MYNTEYE_BEGIN_NAMESPACE
+
 namespace util {
 
 class Counter {
@@ -77,6 +78,7 @@ class Counter {
 };
 
 }  // namespace util
-}  // namespace mynteye
+
+MYNTEYE_END_NAMESPACE
 
 #endif  // MYNTEYE_SAMPLES_UTIL_COUNTER_H_
