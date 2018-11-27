@@ -130,6 +130,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     int depth_stream_format = 0;
     bool state_ae = true;
     bool state_awb = true;
+    bool ir_interleave = true;
     int ir_intensity = 0;
     int proc_mode = 0;
     nh_ns.getParam("dev_index", dev_index);
@@ -142,6 +143,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     nh_ns.getParam("depth_stream_format", depth_stream_format);
     nh_ns.getParam("state_ae", state_ae);
     nh_ns.getParam("state_awb", state_awb);
+    nh_ns.getParam("ir_interleave", ir_interleave);
     nh_ns.getParam("ir_intensity", ir_intensity);
     nh_ns.getParam("proc_mode", proc_mode);
 
@@ -247,6 +249,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
         static_cast<StreamFormat>(depth_stream_format);
     params.state_ae = state_ae;
     params.state_awb = state_awb;
+    params.ir_interleave = ir_interleave;
     params.ir_intensity = ir_intensity;
 
     mynteye->EnableProcessMode(proc_mode);

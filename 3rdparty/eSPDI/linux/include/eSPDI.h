@@ -26,6 +26,8 @@ int EtronDI_DoFusion(unsigned char **pDepthBufList, double *pDepthMerge, unsigne
 int  EtronDI_GetDeviceNumber(void *pHandleEtronDI);
 int  EtronDI_GetDeviceInfo(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo ,DEVINFORMATION* pdevinfo);
 int  EtronDI_SelectDevice(void *pHandleEtronDI, int dev_index);
+bool EtronDI_IsInterleaveDevice(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo);
+int EtronDI_EnableInterleave(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, bool enable);
 
 // register APIs +
 int  EtronDI_GetSensorRegister(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int nId, unsigned short address, unsigned short *pValue, int flag, SENSORMODE_INFO SensorMode);
@@ -86,6 +88,8 @@ int  EtronDI_CloseDeviceMBL(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo);
 
 int  EtronDI_CloseDevice(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo);
 
+int EtronDI_CloseDeviceEx(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo);
+
 int  EtronDI_GetImage(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo,
                         BYTE *pBuf, unsigned long int *pImageSize,
                         int *pSerial = 0, int nDepthDataType =0);
@@ -133,7 +137,8 @@ int  EtronDI_EnableAE     (void *pHandleEtronDI, PDEVSELINFO pDevSelInfo);
 int  EtronDI_DisableAE    (void *pHandleEtronDI, PDEVSELINFO pDevSelInfo);
 int  EtronDI_EnableAWB    (void *pHandleEtronDI, PDEVSELINFO pDevSelInfo);
 int  EtronDI_DisableAWB   (void *pHandleEtronDI, PDEVSELINFO pDevSelInfo);
-
+int  EtronDI_GetAEStatus (void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, PAE_STATUS pAEStatus);
+int  EtronDI_GetAWBStatus (void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, PAWB_STATUS pAWBStatus);
 int  EtronDI_GetGPIOValue(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int nGPIOIndex, BYTE *pValue);
 int  EtronDI_SetGPIOValue(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int nGPIOIndex, BYTE nValue);
 int  EtronDI_SetGPIOCtrl(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int nGPIOIndex, BYTE nValue);

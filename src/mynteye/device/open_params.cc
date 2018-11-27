@@ -33,7 +33,8 @@ OpenParams::OpenParams(const std::int32_t& dev_index)
     device_mode(DeviceMode::DEVICE_ALL),
     state_ae(true),
     state_awb(true),
-    ir_intensity(0) {
+    ir_intensity(0),
+    ir_interleave(true) {
   DBG_LOGD(__func__);
 }
 

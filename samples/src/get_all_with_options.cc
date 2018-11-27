@@ -84,6 +84,8 @@ int main(int argc, char const* argv[]) {
       .action("store_true").help("Enable auto-exposure");
   op_group.add_option("--awb").dest("state_awb")
       .action("store_true").help("Enable auto-white balance");
+  op_group.add_option("--ir-inter").dest("ir_interleave")
+      .action("store_true").help("Enable ir-interleave");
   op_group.add_option("--ir").dest("ir_intensity")
       .type("int").set_default(0)
       .metavar("VALUE").help("IR intensity, range [0,6], default %default");
@@ -200,6 +202,7 @@ int main(int argc, char const* argv[]) {
     params.device_mode = static_cast<DeviceMode>(val);
     params.state_ae = options.get("state_ae");
     params.state_awb = options.get("state_awb");
+    params.ir_interleave = options.get("ir_interleave");
     if (!in_range("ir_intensity", 0, 6, &val)) return 2;
     params.ir_intensity = val;
 

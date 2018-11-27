@@ -164,7 +164,7 @@ int main(int argc, char const* argv[]) {
   OpenParams params(dev_info.index);
   {
     // Framerate: 10(default), [0,60], [0,30](STREAM_2560x720)
-    // params.framerate = 30;
+    params.framerate = 10;
 
     // Color mode: raw(default), rectified
     // params.color_mode = ColorMode::COLOR_RECTIFIED;

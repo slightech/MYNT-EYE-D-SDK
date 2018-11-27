@@ -60,7 +60,7 @@ class Device {
   bool SetAutoWhiteBalanceEnabled(bool enabled);
 
   /** Set infrared intensity */
-  bool SetInfraredIntensity(std::uint16_t value);
+  void SetInfraredIntensity(std::uint16_t value);
 
   /** Open device */
   bool Open(const OpenParams& params);
@@ -89,6 +89,8 @@ class Device {
   void Close();
 
   void EnableDeviceMode(const DeviceMode& mode, const bool& status);
+
+  void EnableIRInterleave(bool status);
 
  protected:
   /** Get stream index for open */
@@ -173,6 +175,10 @@ class Device {
   std::map<DeviceMode, bool> device_mode_;
   bool opened_color_device_;
   bool opened_depth_device_;
+
+  bool ir_interleave_;
+  bool color_interleave_mode_;
+  bool depth_interleave_mode_;
 };
 
 MYNTEYE_END_NAMESPACE

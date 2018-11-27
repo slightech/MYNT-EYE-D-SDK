@@ -1,3 +1,11 @@
+/*! \file eSPDI_Common.h
+  	\brief Etron SDK API export functions, data structure and variable definition
+  	\copyright This file copyright (C) 2017 by eYs3D an Etron company
+
+	\details An unpublished work.  All rights reserved.
+	This file is proprietary information, and may not be disclosed or
+	copied without the prior permission of eYs3D an Etron company.
+ */
 #pragma once
 
 #ifndef ETRONDI_API
@@ -86,6 +94,9 @@ typedef struct tagETRONDI_STREAM_INFO {
 #define ETronDI_READ_FLASH_TOTAL_SIZE			128
 #define ETronDI_READ_FLASH_FW_PLUGIN_SIZE		104
 #define ETronDI_WRITE_FLASH_TOTAL_SIZE			128
+#define ETronDI_READ_FLASH_TOTAL_SIZE_256		256
+#define ETronDI_WRITE_FLASH_TOTAL_SIZE_256	256
+
 
 // PlugIn data (size in bytes)
 #define ETronDI_Y_OFFSET_FILE_ID_0				30
@@ -476,7 +487,7 @@ int  ETRONDI_API EtronDI_Init2( void **ppHandleEtronDI, bool bIsLogEnabled, bool
 \return none
 */
 #ifndef EtronDI_DeviceEventFn_
-typedef void(*EtronDI_DeviceEventFn)(unsigned int pid, unsigned int vid, BOOL bAttached, void* pData);
+typedef void(*EtronDI_DeviceEventFn)(UINT pid, UINT vid, BOOL bAttached, void* pData);
 #define EtronDI_DeviceEventFn_
 #endif
 
@@ -996,7 +1007,7 @@ int ETRONDI_API EtronDI_Get2ImageEx(void* pHandleEtronDI, PDEVSELINFO pDevSelInf
 int ETRONDI_API EtronDI_OpenDevice2( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, 
                                      int nEP0Width, int nEP0Height, BOOL bEP0MJPG, 
                                      int nEP1Width, int nEP1Height,
-                                     BOOL bIsOutputRGB24=false, void *phWndNotice=NULL, 
+                                     BOOL bIsOutputRGB24=FALSE, void *phWndNotice=NULL, 
                                      int *nFPS=NULL, BYTE bCtrlMode=0);
 
 									 

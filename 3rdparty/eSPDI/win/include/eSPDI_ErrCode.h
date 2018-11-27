@@ -1,3 +1,17 @@
+/*! \file eSPDI_ErrCode.h
+  	\brief definition of Etron SDK error code
+  	Copyright:
+	This file copyright (C) 2017 by
+
+	eYs3D an Etron company
+
+	An unpublished work.  All rights reserved.
+
+	This file is proprietary information, and may not be disclosed or
+	copied without the prior permission of eYs3D an Etron company.
+ */
+ 
+//define Error Code by Wolf 2013/08/30
 #define  ETronDI_OK                             0
 #define  ETronDI_NoDevice                      -1
 #define  ETronDI_NullPtr                       -2

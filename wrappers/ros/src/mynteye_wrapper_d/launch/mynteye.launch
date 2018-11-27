@@ -42,6 +42,8 @@
   <arg name="state_ae" default="true" />
   <!-- Auto-white balance -->
   <arg name="state_awb" default="true" />
+  <!-- IR interleave -->
+  <arg name="ir_interleave" default="true" />
   <!-- IR intensity -->
   <arg name="ir_intensity" default="4" />
 
@@ -98,6 +100,7 @@
     <param name="depth_stream_format" value="$(arg depth_stream_format)" />
     <param name="state_ae"      value="$(arg state_ae)" />
     <param name="state_awb"     value="$(arg state_awb)" />
+    <param name="ir_interleave" value="$(arg ir_interleave)" />
     <param name="ir_intensity"  value="$(arg ir_intensity)" />
     <param name="proc_mode"     value="$(arg proc_mode)" />
 

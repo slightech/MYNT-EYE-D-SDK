@@ -84,6 +84,11 @@ struct MYNTEYE_API OpenParams {
    */
   std::uint8_t ir_intensity;
 
+  /**
+   * IR interleave mode, default true.
+   */
+  bool ir_interleave;
+
   /** Constructor. */
   OpenParams();
   explicit OpenParams(const std::int32_t& dev_index);

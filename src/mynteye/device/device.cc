@@ -92,6 +92,9 @@ void Device::Init() {
   opened_color_device_ = false;
   opened_depth_device_ = false;
 
+  color_interleave_mode_ = false;
+  depth_interleave_mode_ = false;
+
   OnInit();
 }
 
@@ -220,8 +223,14 @@ bool Device::SetAutoWhiteBalanceEnabled(bool enabled) {
   return ok;
 }
 
-bool Device::SetInfraredIntensity(std::uint16_t value) {
-  return SetFWRegister(0xE0, value);
+void Device::SetInfraredIntensity(std::uint16_t value) {
+  if (value != 0) {
+    EtronDI_SetIRMode(etron_di_, &dev_sel_info_, 0x03);
+    EtronDI_SetCurrentIRValue(etron_di_, &dev_sel_info_, value);
+  } else {
+    EtronDI_SetCurrentIRValue(etron_di_, &dev_sel_info_, value);
+    EtronDI_SetIRMode(etron_di_, &dev_sel_info_, 0x00);
+  }
 }
 
 bool Device::Open(const OpenParams& params) {
@@ -308,12 +317,10 @@ bool Device::Open(const OpenParams& params) {
       stream_depth_info_ptr_[depth_res_index_].nHeight,
       stream_depth_info_ptr_[depth_res_index_].bFormatMJPG ? "MJPG" : "YUYV");
 
+  EnableIRInterleave(params.ir_interleave);
   if (params.ir_intensity >= 0) {
-    if (SetInfraredIntensity(params.ir_intensity)) {
-      LOGI("\n-- IR intensity: %d", params.ir_intensity);
-    } else {
-      LOGI("\n-- IR intensity: %d (failed)", params.ir_intensity);
-    }
+    SetInfraredIntensity(params.ir_intensity);
+    LOGI("\n-- IR intensity: %d", params.ir_intensity);
   }
 
   ReleaseBuf();
@@ -879,4 +886,23 @@ void Device::EnableDeviceMode(const DeviceMode& mode, const bool& status) {
   } catch (const std::out_of_range& e) {
     throw_error("ERROR:: DeviceMode is unknown.");
   }
+}
+
+void Device::EnableIRInterleave(bool status) {
+  if (framerate_ < 30) {
+    LOGW("\nWARNING:: IR interleave will not be effective"
+        " for frame rate less than 30 fps!\n");
+    return;
+  }
+  if (depth_data_type_ == 1 ||
+      depth_data_type_ == 2 ||
+      depth_data_type_ == 4) {
+    color_interleave_mode_ = false;
+    depth_interleave_mode_ = true;
+  } else {
+    color_interleave_mode_ = true;
+    depth_interleave_mode_ = false;
+  }
+  ir_interleave_ = status;
+  EtronDI_EnableInterleave(etron_di_, &dev_sel_info_, status);
 }
