@@ -46,10 +46,10 @@ int main(int argc, char const* argv[]) {
   op_group.add_option("--dm").dest("dev_mode")
       .type("int").set_default(2)
       .metavar("MODE").help("Device mode, default %default (DEVICE_ALL)"
-          "\n  0: DEVICE_COLOR, left ✓ right ? depth x"
-          "\n  1: DEVICE_DEPTH, left x right x depth ✓"
-          "\n  2: DEVICE_ALL,   left ✓ right ? depth ✓"
-          "\nNote: ✓: available, x: unavailable, ?: depends on stream mode");
+          "\n  0: DEVICE_COLOR, left y right - depth n"
+          "\n  1: DEVICE_DEPTH, left n right n depth y"
+          "\n  2: DEVICE_ALL,   left y right - depth y"
+          "\n  Note: y: available, n: unavailable, -: depends on stream mode");
   op_group.add_option("--cm").dest("color_mode")
       .type("int").set_default(0)
       .metavar("MODE").help("Color mode, default %default (COLOR_RAW)"
