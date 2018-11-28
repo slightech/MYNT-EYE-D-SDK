@@ -487,7 +487,7 @@ int  ETRONDI_API EtronDI_Init2( void **ppHandleEtronDI, bool bIsLogEnabled, bool
 \return none
 */
 #ifndef EtronDI_DeviceEventFn_
-typedef void(*EtronDI_DeviceEventFn)(UINT pid, UINT vid, BOOL bAttached, void* pData);
+typedef void(*EtronDI_DeviceEventFn)(unsigned int pid, unsigned int  vid, BOOL bAttached, void* pData);
 #define EtronDI_DeviceEventFn_
 #endif
 
@@ -1007,8 +1007,8 @@ int ETRONDI_API EtronDI_Get2ImageEx(void* pHandleEtronDI, PDEVSELINFO pDevSelInf
 int ETRONDI_API EtronDI_OpenDevice2( void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, 
                                      int nEP0Width, int nEP0Height, BOOL bEP0MJPG, 
                                      int nEP1Width, int nEP1Height,
-                                     BOOL bIsOutputRGB24=FALSE, void *phWndNotice=NULL, 
-                                     int *nFPS=NULL, BYTE bCtrlMode=0);
+                                     BOOL bIsOutputRGB24=false, void *phWndNotice=nullptr, 
+                                     int *nFPS=nullptr, BYTE bCtrlMode=0);
 
 									 
 /*! \fn int EtronDI_OpenDeviceEx(
