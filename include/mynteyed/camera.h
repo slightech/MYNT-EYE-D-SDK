@@ -129,10 +129,6 @@ class MYNTEYE_API Camera {
   /** Whethor image info synced or not */
   bool IsImageInfoSynced() const;
 
-  /** Enable stream data of certain image type */
-  void EnableStreamData(const ImageType& type);
-  /** Disable stream data of certain image type */
-  void DisableStreamData(const ImageType& type);
   /** Whethor stream data of certain image type enabled or not */
   bool IsStreamDataEnabled(const ImageType& type) const;
   /** Has any stream data enabled */
@@ -175,6 +171,13 @@ class MYNTEYE_API Camera {
 
   /** Close the camera */
   void Close();
+
+#ifdef MYNTEYE_DEPRECATED_COMPAT
+  /** @deprecated Replaced by OpenParams#device_mode */
+  void EnableStreamData(const ImageType& type);
+  /** @deprecated Replaced by OpenParams#device_mode */
+  void DisableStreamData(const ImageType& type);
+#endif
 
  private:
   std::unique_ptr<CameraPrivate> p_;

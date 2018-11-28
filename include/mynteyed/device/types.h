@@ -24,6 +24,20 @@ MYNTEYE_BEGIN_NAMESPACE
 
 /**
  * @ingroup enumerations
+ * @brief List device modes.
+ *
+ * Control the color & depth streams enabled or not.
+ *
+ * Note: ✓: available, x: unavailable, ?: depends on StreamMode
+ */
+enum class DeviceMode : std::int32_t {
+  DEVICE_COLOR = 0,  // IMAGE_LEFT_COLOR ✓ IMAGE_RIGHT_COLOR ? IMAGE_DEPTH x
+  DEVICE_DEPTH = 1,  // IMAGE_LEFT_COLOR x IMAGE_RIGHT_COLOR x IMAGE_DEPTH ✓
+  DEVICE_ALL = 2,    // IMAGE_LEFT_COLOR ✓ IMAGE_RIGHT_COLOR ? IMAGE_DEPTH ✓
+};
+
+/**
+ * @ingroup enumerations
  * @brief List color modes.
  */
 enum class ColorMode : std::int32_t {
@@ -111,16 +125,6 @@ enum class ImageFormat : std::int32_t {
   DEPTH_RGB     = IMAGE_RGB_24,   // > DEPTH_BGR
   /** Last guard. */
   IMAGE_FORMAT_LAST
-};
-
-/**
- * @ingroup enumerations
- * @brief List device mode.
- */
-enum class DeviceMode : std::int32_t {
-  DEVICE_COLOR = 0,
-  DEVICE_DEPTH = 1,
-  DEVICE_ALL = 2
 };
 
 MYNTEYE_END_NAMESPACE

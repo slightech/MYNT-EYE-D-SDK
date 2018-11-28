@@ -54,10 +54,6 @@ int main(int argc, char const* argv[]) {
   params.stream_mode = StreamMode::STREAM_1280x720;
   params.ir_intensity = 4;
 
-  // Enable what stream datas: left_color, right_color, depth
-  cam.EnableStreamData(ImageType::IMAGE_LEFT_COLOR);
-  cam.EnableStreamData(ImageType::IMAGE_DEPTH);
-
   StreamMode stream_mode = params.stream_mode;
 
   cam.Open(params);

@@ -102,15 +102,12 @@ void Streams::EnableStreamData(const ImageType& type) {
   switch (type) {
     case ImageType::IMAGE_LEFT_COLOR:
     case ImageType::IMAGE_RIGHT_COLOR:
-      device_->EnableDeviceMode(DeviceMode::DEVICE_COLOR, true);
       OnStreamDataStateChanged(type, true);
       break;
     case ImageType::IMAGE_DEPTH:
-      device_->EnableDeviceMode(DeviceMode::DEVICE_DEPTH, true);
       OnStreamDataStateChanged(type, true);
       break;
     case ImageType::IMAGE_ALL:
-      device_->EnableDeviceMode(DeviceMode::DEVICE_ALL, true);
       EnableStreamData(ImageType::IMAGE_LEFT_COLOR);
       EnableStreamData(ImageType::IMAGE_RIGHT_COLOR);
       EnableStreamData(ImageType::IMAGE_DEPTH);
@@ -193,7 +190,7 @@ void Streams::SetStreamCallback(const ImageType& type,
 }
 
 void Streams::OnCameraOpen() {
-  is_right_color_supported_ = IsRightColorSupported();
+  is_right_color_supported_ = device_->IsRightColorSupported();
   StartStreamCapturing();
 }
 
@@ -240,13 +237,6 @@ bool Streams::IsStreamEnabled(const StreamType& type) const {
     return IsStreamDataEnabled(ImageType::IMAGE_DEPTH);
   }
   return false;
-}
-
-bool Streams::IsRightColorSupported() {
-  device_->CheckOpened(__func__);
-  auto stream_mode = device_->GetOpenParams().stream_mode;
-  return stream_mode == StreamMode::STREAM_1280x480
-      || stream_mode == StreamMode::STREAM_2560x720;
 }
 
 void Streams::StartStreamCapturing() {

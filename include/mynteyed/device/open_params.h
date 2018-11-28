@@ -37,6 +37,21 @@ struct MYNTEYE_API OpenParams {
   std::int32_t framerate;
 
   /**
+   * Device mode, default DEVICE_ALL
+   *
+   * <ul>
+   * <li>DEVICE_COLOR: IMAGE_LEFT_COLOR ✓ IMAGE_RIGHT_COLOR ? IMAGE_DEPTH x
+   * <li>DEVICE_DEPTH: IMAGE_LEFT_COLOR x IMAGE_RIGHT_COLOR x IMAGE_DEPTH ✓
+   * <li>DEVICE_ALL:   IMAGE_LEFT_COLOR ✓ IMAGE_RIGHT_COLOR ? IMAGE_DEPTH ✓
+   * </ul>
+   *
+   * Could detect image type is enabled after opened through Camera::IsStreamDataEnabled().
+   *
+   * Note: ✓: available, x: unavailable, ?: depends on #stream_mode
+   */
+  DeviceMode dev_mode;
+
+  /**
    * Color mode, default COLOR_RAW.
    */
   ColorMode color_mode;
@@ -60,14 +75,6 @@ struct MYNTEYE_API OpenParams {
    * Stream format of depth, default STREAM_YUYV.
    */
   StreamFormat depth_stream_format;
-
-  /**
-   * Device mode, default ALL
-   * Note:: If DEVICE_COLOR is enable, ImageType::IMAGE_DEPTH will not be available.
-   *        if DEVICE_DEPTH is enable, ImageType::IMAGE_LEFT_COLOR and
-   *           ImageType::IMAGE_RIGHT_COLOR will not be available.
-   */
-  DeviceMode device_mode;
 
   /**
    * Auto-exposure, default true.

@@ -60,6 +60,9 @@ class Device {
   /** Set auto-white-balance enabled or not */
   bool SetAutoWhiteBalanceEnabled(bool enabled);
 
+  /** Set infrared interleave */
+  void SetInfraredInterleave(bool enabled);
+
   /** Set infrared intensity */
   void SetInfraredIntensity(std::uint16_t value);
 
@@ -71,6 +74,8 @@ class Device {
   bool ExpectOpened(const std::string& event) const;
 
   OpenParams GetOpenParams() const;
+  bool IsRightColorSupported() const;
+  bool IsRightColorSupported(const StreamMode& stream_mode) const;
 
   /** Get color image, nullptr if failed */
   Image::pointer GetImageColor();  // cross
@@ -88,10 +93,6 @@ class Device {
 
   /** Close device */
   void Close();
-
-  void EnableDeviceMode(const DeviceMode& mode, const bool& status);
-
-  void EnableIRInterleave(bool status);
 
  protected:
   /** Get stream index for open */
@@ -173,13 +174,12 @@ class Device {
 
   OpenParams open_params_;
 
-  std::map<DeviceMode, bool> device_mode_;
-  bool opened_color_device_;
-  bool opened_depth_device_;
+  bool color_device_opened_;
+  bool depth_device_opened_;
 
-  bool ir_interleave_;
-  bool color_interleave_mode_;
-  bool depth_interleave_mode_;
+  bool ir_interleave_enabled_;
+  bool color_interleave_enabled_;
+  bool depth_interleave_enabled_;
 };
 
 MYNTEYE_END_NAMESPACE

@@ -129,14 +129,6 @@ bool Camera::IsImageInfoSynced() const {
   return p_->IsImageInfoSynced();
 }
 
-void Camera::EnableStreamData(const ImageType& type) {
-  p_->EnableStreamData(type);
-}
-
-void Camera::DisableStreamData(const ImageType& type) {
-  p_->DisableStreamData(type);
-}
-
 bool Camera::IsStreamDataEnabled(const ImageType& type) const {
   return p_->IsStreamDataEnabled(type);
 }
@@ -189,3 +181,13 @@ void Camera::SetMotionCallback(motion_callback_t callback, bool async) {
 void Camera::Close() {
   p_->Close();
 }
+
+#ifdef MYNTEYE_DEPRECATED_COMPAT
+void Camera::EnableStreamData(const ImageType& type) {
+  LOGW("%s is deprecated, replaced by OpenParams#device_mode.", __func__);
+}
+
+void Camera::DisableStreamData(const ImageType& type) {
+  LOGW("%s is deprecated, replaced by OpenParams#device_mode.", __func__);
+}
+#endif

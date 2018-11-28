@@ -190,10 +190,6 @@ int main(int argc, char const* argv[]) {
     params.ir_intensity = 4;
   }
 
-  // Enable what stream datas: left_color, right_color, depth
-  cam.EnableStreamData(ImageType::IMAGE_LEFT_COLOR);
-  cam.EnableStreamData(ImageType::IMAGE_DEPTH);
-
   cam.Open(params);
 
   cout << endl;
