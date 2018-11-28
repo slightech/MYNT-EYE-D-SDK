@@ -7,7 +7,7 @@
 
 !include WinMessages.nsh
 
-!define VERSION "@mynteye_VERSION@"
+!define VERSION "@mynteyed_VERSION@"
 !define OpenCV_VERSION "@OpenCV_VERSION@"
 
 !define DSETDIR "$APPDATA"
