@@ -30,15 +30,6 @@
 
 MYNTEYE_BEGIN_NAMESPACE
 
-#ifdef MYNTEYE_DEPRECATED_COMPAT
-// @Deprecated
-using InitParams = OpenParams;
-// @Deprecated
-using Info = Descriptor;
-// @Deprecated
-using CameraCtrlRectLogData = CameraCalibration;
-#endif
-
 class CameraPrivate;
 
 class MYNTEYE_API Camera {
@@ -184,67 +175,6 @@ class MYNTEYE_API Camera {
 
   /** Close the camera */
   void Close();
-
-#ifdef MYNTEYE_DEPRECATED_COMPAT
-  // @Deprecated
-
-  /** @deprecated Replaced by GetDeviceInfos() */
-  std::vector<DeviceInfo> GetDevices() const;
-  /** @deprecated Replaced by GetDeviceInfos(std::vector<DeviceInfo>*) */
-  void GetDevices(std::vector<DeviceInfo>* dev_infos) const;
-
-  /** @deprecated Replaced by GetStreamInfos() */
-  void GetResolutions(
-      const std::int32_t& dev_index,
-      std::vector<StreamInfo>* color_infos,
-      std::vector<StreamInfo>* depth_infos) const;
-
-  /** @deprecated Useless */
-  // StreamMode GetStreamMode();
-
-  /** @deprecated Useless */
-  void Wait() const;
-
-  /** @deprecated Replaced by GetDescriptor() */
-  std::string GetInfo(const Info &info) const;
-
-  /** @deprecated Replaced by GetCameraCalibration() */
-  CameraCtrlRectLogData GetHDCameraCtrlData();
-  /** @deprecated Replaced by GetCameraCalibration() */
-  CameraCtrlRectLogData GetVGACameraCtrlData();
-
-  /** @deprecated Replaced by GetCameraCalibrationFile()
-   *              Saved to RectfyLog_PUMA_1.txt */
-  void GetHDCameraLogDataFile();
-  /** @deprecated Replaced by GetCameraCalibrationFile()
-   *              Saved to RectfyLog_PUMA_2.txt */
-  void GetVGACameraLogDataFile();
-
-  /** @deprecated Replaced by WriteCameraCalibrationBinFile() */
-  void SetCalibrationWithFile(const std::string& file_name);
-
-  /** @deprecated Replaced by EnableProcessMode() */
-  void EnableImuProcessMode(const ProcessMode &mode);
-
-  /** @deprecated Replaced by EnableStreamData() */
-  void EnableImageType(const ImageType& type);
-
-  /** @deprecated Replaced by GetStreamData() */
-  MYNTEYE_NAMESPACE::StreamData RetrieveImage(const ImageType& type);
-  /** @deprecated Replaced by GetStreamData() */
-  MYNTEYE_NAMESPACE::StreamData RetrieveImage(const ImageType& type,
-      ErrorCode* code);
-
-  /** @deprecated Replaced by GetStreamDatas() */
-  std::vector<MYNTEYE_NAMESPACE::StreamData> RetrieveImages(
-      const ImageType& type);
-  /** @deprecated Replaced by GetStreamDatas() */
-  std::vector<MYNTEYE_NAMESPACE::StreamData> RetrieveImages(
-      const ImageType& type, ErrorCode* code);
-
-  /** @deprecated Replaced by GetMotionDatas() */
-  std::vector<MotionData> RetrieveMotions();
-#endif
 
  private:
   std::unique_ptr<CameraPrivate> p_;

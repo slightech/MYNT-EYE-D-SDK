@@ -34,6 +34,7 @@
 #include "mynteyed/device/device_info.h"
 #include "mynteyed/device/open_params.h"
 #include "mynteyed/device/stream_info.h"
+#include "mynteyed/device/types_internal.h"
 
 #include "mynteyed/device/image.h"
 

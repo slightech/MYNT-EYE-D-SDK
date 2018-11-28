@@ -24,6 +24,7 @@
 #include <vector>
 
 #include "mynteyed/data/types_internal.h"
+#include "mynteyed/device/types_internal.h"
 #include "mynteyed/internal/async_callback.h"
 #include "mynteyed/types.h"
 
