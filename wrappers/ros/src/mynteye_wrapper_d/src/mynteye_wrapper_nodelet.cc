@@ -83,7 +83,6 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   ros::Publisher pub_imu;
   ros::Publisher pub_temp;
   ros::Publisher pub_imu_processed;
-  ros::Publisher pub_temp_processed;
 
   sensor_msgs::CameraInfoPtr left_info_ptr;
   sensor_msgs::CameraInfoPtr right_info_ptr;
@@ -112,15 +111,15 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   // Others
 
   std::unique_ptr<PointCloudGenerator> pointcloud_generator;
-  std::shared_ptr<MotionIntrinsics> motion_intrinsics_;
+
+  std::shared_ptr<MotionIntrinsics> motion_intrinsics;
+  bool motion_intrinsics_enabled;
 
   std::shared_ptr<ImuData> imu_accel;
   std::shared_ptr<ImuData> imu_gyro;
 
   cv::Mat points_color;
   cv::Mat points_depth;
-
-  bool motion_intrinsics_enable;
 
   typedef struct SubResult {
     bool left_mono;
@@ -144,8 +143,8 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   ~MYNTEYEWrapperNodelet() {
     closeDevice();
     mynteye.reset(nullptr);
-    motion_intrinsics_ = nullptr;
-    motion_intrinsics_enable = false;
+    motion_intrinsics = nullptr;
+    motion_intrinsics_enabled = false;
   }
 
   void onInit() override {
@@ -407,7 +406,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     // Set motion data callback
     mynteye->SetMotionCallback([this](const MotionData& data) {
       if (data.imu && (sub_result.imu || sub_result.temp ||
-          sub_result.imu_processed )) {
+          sub_result.imu_processed)) {
         ros::Time stamp = hardTimeToSoftTime(data.imu->timestamp);
         if (data.imu->flag == MYNTEYE_IMU_ACCEL) {
           imu_accel = data.imu;
@@ -442,12 +441,14 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       left_info_ptr = nullptr;
       right_info_ptr = nullptr;
     }
-    if(motion_intrinsics_ == nullptr) {
-      motion_intrinsics_ = std::make_shared<MotionIntrinsics>();
+
+    // motion intrinsics
+    if (motion_intrinsics == nullptr) {
+      motion_intrinsics = std::make_shared<MotionIntrinsics>();
     }
-    *motion_intrinsics_ = mynteye->GetMotionIntrinsics(&in_ok);
+    *motion_intrinsics = mynteye->GetMotionIntrinsics(&in_ok);
     if (in_ok) {
-      motion_intrinsics_enable = true;
+      motion_intrinsics_enabled = true;
       // std::cout << "Motion Intrinsics: {"
       //           << *motion_intrinsics_
       //           << "}"
@@ -457,8 +458,9 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       //           << "}"
       //           << std::endl;
     } else {
-      motion_intrinsics_enable = false;
-      std::cout << "This device not supported to get motion intrinsics." << std::endl;
+      motion_intrinsics_enabled = false;
+      std::cout << "This device not supported to get motion intrinsics."
+          << std::endl;
     }
 
     // pointcloud generator
@@ -609,14 +611,14 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     if (temp_sub) {
       publishTempOrigin(stamp);
     }
-    if (motion_intrinsics_enable && imu_processed_sub) {
+    if (motion_intrinsics_enabled && imu_processed_sub) {
       publishImuProcessed(stamp);
     }
   }
 
   sensor_msgs::Imu getImuMsgFromeData(ros::Time stamp,
-                  const std::string& frame_id,
-                  const ImuData& imu_accel,const ImuData& imu_gyro) {
+      const std::string& frame_id,
+      const ImuData& imu_accel, const ImuData& imu_gyro) {
     sensor_msgs::Imu msg;
 
     // msg.header.seq = seq;
@@ -691,12 +693,12 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       return;
     }
 
-    auto dateAcc1 = ProcImuTempDrift(*imu_accel);
-    auto dateGyr1 = ProcImuTempDrift(*imu_gyro);
-    auto dateAcc2 = ProcImuAssembly(dateAcc1);
-    auto dateGyr2 = ProcImuAssembly(dateGyr1);
+    auto data_acc1 = ProcImuTempDrift(*imu_accel);
+    auto data_gyr1 = ProcImuTempDrift(*imu_gyro);
+    auto data_acc2 = ProcImuAssembly(data_acc1);
+    auto data_gyr2 = ProcImuAssembly(data_gyr1);
     auto msg = getImuMsgFromeData(stamp, imu_frame_processed_id,
-                                  dateAcc2, dateGyr2);
+                                  data_acc2, data_gyr2);
     pub_imu_processed.publish(msg);
   }
 
@@ -762,7 +764,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
   ImuData ProcImuAssembly(const ImuData& data) const {
     ImuData res = data;
-    if (nullptr == motion_intrinsics_) {
+    if (nullptr == motion_intrinsics) {
       std::cout << "[WARNING!] Motion intrinsic "
                 << "is not been supported at this device."
                 << std::endl;
@@ -770,8 +772,8 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     }
     double dst[3][3] = {0};
     if (data.flag == 1) {
-      matrix_3x3(motion_intrinsics_->accel.scale,
-          motion_intrinsics_->accel.assembly, dst);
+      matrix_3x3(motion_intrinsics->accel.scale,
+          motion_intrinsics->accel.assembly, dst);
       double s[3][1] = {0};
       double d[3][1] = {0};
       for (int i = 0; i < 3; i++) {
@@ -782,8 +784,8 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
         res.accel[i] = d[i][0];
       }
     } else if (data.flag == 2) {
-      matrix_3x3(motion_intrinsics_->gyro.scale,
-          motion_intrinsics_->gyro.assembly, dst);
+      matrix_3x3(motion_intrinsics->gyro.scale,
+          motion_intrinsics->gyro.assembly, dst);
       double s[3][1] = {0};
       double d[3][1] = {0};
       for (int i = 0; i < 3; i++) {
@@ -799,7 +801,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
   ImuData ProcImuTempDrift(const ImuData& data) const {
     ImuData res = data;
-    if (nullptr == motion_intrinsics_) {
+    if (nullptr == motion_intrinsics) {
       std::cout << "[WARNING!] Motion intrinsic "
                 << "is not been supported at this device."
                 << std::endl;
@@ -807,19 +809,19 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     }
     double temp = res.temperature;
     if (res.flag == 1) {
-      res.accel[0] -= motion_intrinsics_->accel.x[1] * temp
-        + motion_intrinsics_->accel.x[0];
-      res.accel[1] -= motion_intrinsics_->accel.y[1] * temp
-        + motion_intrinsics_->accel.y[0];
-      res.accel[2] -= motion_intrinsics_->accel.z[1] * temp
-        + motion_intrinsics_->accel.z[0];
+      res.accel[0] -= motion_intrinsics->accel.x[1] * temp
+        + motion_intrinsics->accel.x[0];
+      res.accel[1] -= motion_intrinsics->accel.y[1] * temp
+        + motion_intrinsics->accel.y[0];
+      res.accel[2] -= motion_intrinsics->accel.z[1] * temp
+        + motion_intrinsics->accel.z[0];
     } else if (res.flag == 2) {
-      res.gyro[0] -= motion_intrinsics_->gyro.x[1] * temp
-        + motion_intrinsics_->gyro.x[0];
-      res.gyro[1] -= motion_intrinsics_->gyro.y[1] * temp
-        + motion_intrinsics_->gyro.y[0];
-      res.gyro[2] -= motion_intrinsics_->gyro.z[1] * temp
-        + motion_intrinsics_->gyro.z[0];
+      res.gyro[0] -= motion_intrinsics->gyro.x[1] * temp
+        + motion_intrinsics->gyro.x[0];
+      res.gyro[1] -= motion_intrinsics->gyro.y[1] * temp
+        + motion_intrinsics->gyro.y[0];
+      res.gyro[2] -= motion_intrinsics->gyro.z[1] * temp
+        + motion_intrinsics->gyro.z[0];
     }
     return res;
   }
