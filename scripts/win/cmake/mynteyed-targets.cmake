@@ -40,6 +40,7 @@ unset(_targetsDefined)
 unset(_targetsNotDefined)
 unset(_expectedTargets)
 
+
 if(NOT MYNTEYED_SDK_ROOT)
   if(DEFINED ENV{MYNTEYED_SDK_ROOT})
     set(MYNTEYED_SDK_ROOT $ENV{MYNTEYED_SDK_ROOT})
@@ -56,7 +57,7 @@ add_library(mynteye_depth SHARED IMPORTED)
 
 set_target_properties(mynteye_depth PROPERTIES
   INTERFACE_INCLUDE_DIRECTORIES "${_IMPORT_PREFIX}/include"
-  INTERFACE_LINK_LIBRARIES "C:/Users/John/Workspace/Slightech/mynt-eye-d-sdk/3rdparty/eSPDI/win/x64/eSPDI_DM.lib;opencv_calib3d;opencv_core;opencv_dnn;opencv_features2d;opencv_flann;opencv_highgui;opencv_imgcodecs;opencv_imgproc;opencv_ml;opencv_objdetect;opencv_photo;opencv_shape;opencv_stitching;opencv_superres;opencv_video;opencv_videoio;opencv_videostab;opencv_world"
+  INTERFACE_LINK_LIBRARIES "${MYNTEYED_SDK_ROOT}/3rdparty/eSPDI/win/x64/eSPDI_DM.lib;opencv_calib3d;opencv_core;opencv_dnn;opencv_features2d;opencv_flann;opencv_highgui;opencv_imgcodecs;opencv_imgproc;opencv_ml;opencv_objdetect;opencv_photo;opencv_shape;opencv_stitching;opencv_superres;opencv_video;opencv_videoio;opencv_videostab;opencv_world;${MYNTEYED_SDK_ROOT}/3rdparty/libjpeg-turbo64/lib/jpeg.lib"
 )
 
 if(CMAKE_VERSION VERSION_LESS 2.8.12)
@@ -65,7 +66,7 @@ endif()
 
 # Load information for each installed configuration.
 get_filename_component(_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
-file(GLOB CONFIG_FILES "${_DIR}/mynteye-targets-*.cmake")
+file(GLOB CONFIG_FILES "${_DIR}/mynteyed-targets-*.cmake")
 foreach(f ${CONFIG_FILES})
   include(${f})
 endforeach()
