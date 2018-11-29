@@ -119,8 +119,6 @@ class Streams {
 
   bool IsStreamEnabled(const StreamType& type) const;
 
-  bool IsRightColorSupported();
-
   void StartStreamCapturing();
   void StopStreamCapturing();
 

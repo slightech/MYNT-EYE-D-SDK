@@ -74,6 +74,25 @@ ErrorCode CameraPrivate::Open(const OpenParams& params) {
 
   if (ok) {
     NotifyDataTrackStateChanged();
+    // Enable streams according to device mode
+    switch (params.dev_mode) {
+      case DeviceMode::DEVICE_COLOR:
+        streams_->EnableStreamData(ImageType::IMAGE_LEFT_COLOR);
+        if (device_->IsRightColorSupported(params.stream_mode)) {
+          streams_->EnableStreamData(ImageType::IMAGE_RIGHT_COLOR);
+        }
+        break;
+      case DeviceMode::DEVICE_DEPTH:
+        streams_->EnableStreamData(ImageType::IMAGE_DEPTH);
+        break;
+      case DeviceMode::DEVICE_ALL:
+        streams_->EnableStreamData(ImageType::IMAGE_LEFT_COLOR);
+        if (device_->IsRightColorSupported(params.stream_mode)) {
+          streams_->EnableStreamData(ImageType::IMAGE_RIGHT_COLOR);
+        }
+        streams_->EnableStreamData(ImageType::IMAGE_DEPTH);
+        break;
+    }
     streams_->OnCameraOpen();
     return ErrorCode::SUCCESS;
   } else {
@@ -244,6 +263,7 @@ bool CameraPrivate::IsImageInfoSynced() const {
   return streams_->IsImageInfoSynced();
 }
 
+/*
 void CameraPrivate::EnableStreamData(const ImageType& type) {
   streams_->EnableStreamData(type);
 }
@@ -251,6 +271,7 @@ void CameraPrivate::EnableStreamData(const ImageType& type) {
 void CameraPrivate::DisableStreamData(const ImageType& type) {
   streams_->DisableStreamData(type);
 }
+*/
 
 bool CameraPrivate::IsStreamDataEnabled(const ImageType& type) const {
   return streams_->IsStreamDataEnabled(type);

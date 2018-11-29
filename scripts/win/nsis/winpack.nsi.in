@@ -7,7 +7,7 @@
 
 !include WinMessages.nsh
 
-!define VERSION "@mynteye_VERSION@"
+!define VERSION "@mynteyed_VERSION@"
 !define OpenCV_VERSION "@OpenCV_VERSION@"
 
 !define DSETDIR "$APPDATA"
@@ -77,7 +77,7 @@ Section "SDK (required)"
   WriteRegExpandStr ${ENV_HKLM} MYNTEYED_SDK_ROOT "$INSTDIR"
 
   ;${EnvVarUpdate} $0 "PATH" "P" "HKLM" "%MYNTEYED_SDK_PATH%"
-  ${EnvVarUpdate} $0 "PATH" "P" "HKLM" "$INSTDIR\bin;$INSTDIR\bin\3rdparty;$INSTDIR\3rdparty\opencv\build\x64\vc15\bin"
+  ${EnvVarUpdate} $0 "PATH" "P" "HKLM" "$INSTDIR\bin;$INSTDIR\bin\3rdparty;$INSTDIR\3rdparty\opencv\build\x64\vc15\bin;$INSTDIR\3rdparty\libjpeg-turbo64\bin"
 
   ; Push "%MYNTEYED_SDK_PATH%"
   ; Call AddToPath
@@ -143,6 +143,7 @@ Section "Uninstall"
   ${un.EnvVarUpdate} $0 "PATH" "R" "HKLM" "$INSTDIR\bin"
   ${un.EnvVarUpdate} $0 "PATH" "R" "HKLM" "$INSTDIR\bin\3rdparty"
   ${un.EnvVarUpdate} $0 "PATH" "R" "HKLM" "$INSTDIR\3rdparty\opencv\build\x64\vc15\bin"
+  ${un.EnvVarUpdate} $0 "PATH" "R" "HKLM" "$INSTDIR\3rdparty\libjpeg-turbo64\bin"
 
   ; Push "%MYNTEYED_SDK_PATH%"
   ; Call un.RemoveFromPath

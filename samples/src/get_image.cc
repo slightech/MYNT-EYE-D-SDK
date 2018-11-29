@@ -40,6 +40,13 @@ int main(int argc, char const* argv[]) {
     // Framerate: 10(default), [0,60], [0,30](STREAM_2560x720)
     params.framerate = 10;
 
+    // Device mode, default DEVICE_ALL
+    //   DEVICE_COLOR: IMAGE_LEFT_COLOR ✓ IMAGE_RIGHT_COLOR ? IMAGE_DEPTH x
+    //   DEVICE_DEPTH: IMAGE_LEFT_COLOR x IMAGE_RIGHT_COLOR x IMAGE_DEPTH ✓
+    //   DEVICE_ALL:   IMAGE_LEFT_COLOR ✓ IMAGE_RIGHT_COLOR ? IMAGE_DEPTH ✓
+    // Note: ✓: available, x: unavailable, ?: depends on #stream_mode
+    // params.dev_mode = DeviceMode::DEVICE_ALL;
+
     // Color mode: raw(default), rectified
     // params.color_mode = ColorMode::COLOR_RECTIFIED;
 
@@ -61,12 +68,6 @@ int main(int argc, char const* argv[]) {
 
     // Infrared intensity: 0(default), [0,6]
     params.ir_intensity = 4;
-
-    // Device mode, default DEVICE_ALL
-    // Note:: If DEVICE_COLOR is enable, ImageType::IMAGE_DEPTH will not be available.
-    //        if DEVICE_DEPTH is enable, ImageType::IMAGE_LEFT_COLOR and
-    //           ImageType::IMAGE_RIGHT_COLOR will not be available.
-    // params.device_mode = DeviceMode::DEVICE_ALL;
   }
 
   // Enable what process logics
@@ -74,17 +75,6 @@ int main(int argc, char const* argv[]) {
 
   // Enable image infos
   cam.EnableImageInfo(true);
-
-  // Enable what stream datas: left_color, right_color, depth
-  bool is_right_ok = util::is_right_color_supported(params.stream_mode);
-  if (is_right_ok) {
-    cam.EnableStreamData(ImageType::IMAGE_LEFT_COLOR);
-    cam.EnableStreamData(ImageType::IMAGE_RIGHT_COLOR);
-    cam.EnableStreamData(ImageType::IMAGE_DEPTH);
-  } else {
-    cam.EnableStreamData(ImageType::IMAGE_LEFT_COLOR);
-    cam.EnableStreamData(ImageType::IMAGE_DEPTH);
-  }
 
   cam.Open(params);
 
@@ -97,23 +87,29 @@ int main(int argc, char const* argv[]) {
 
   std::cout << "Press ESC/Q on Windows to terminate" << std::endl;
 
-  cv::namedWindow("left color");
+  bool is_left_ok = cam.IsStreamDataEnabled(ImageType::IMAGE_LEFT_COLOR);
+  bool is_right_ok = cam.IsStreamDataEnabled(ImageType::IMAGE_RIGHT_COLOR);
+  bool is_depth_ok = cam.IsStreamDataEnabled(ImageType::IMAGE_DEPTH);
+
+  if (is_left_ok) cv::namedWindow("left color");
   if (is_right_ok) cv::namedWindow("right color");
-  cv::namedWindow("depth");
+  if (is_depth_ok) cv::namedWindow("depth");
 
   CVPainter painter;
   util::Counter counter;
   for (;;) {
     counter.Update();
 
-    auto left_color = cam.GetStreamData(ImageType::IMAGE_LEFT_COLOR);
-    if (left_color.img) {
-      cv::Mat left = left_color.img->To(ImageFormat::COLOR_BGR)->ToMat();
-      painter.DrawSize(left, CVPainter::TOP_LEFT);
-      painter.DrawStreamData(left, left_color, CVPainter::TOP_RIGHT);
-      painter.DrawInformation(left, util::to_string(counter.fps()),
-          CVPainter::BOTTOM_RIGHT);
-      cv::imshow("left color", left);
+    if (is_left_ok) {
+      auto left_color = cam.GetStreamData(ImageType::IMAGE_LEFT_COLOR);
+      if (left_color.img) {
+        cv::Mat left = left_color.img->To(ImageFormat::COLOR_BGR)->ToMat();
+        painter.DrawSize(left, CVPainter::TOP_LEFT);
+        painter.DrawStreamData(left, left_color, CVPainter::TOP_RIGHT);
+        painter.DrawInformation(left, util::to_string(counter.fps()),
+            CVPainter::BOTTOM_RIGHT);
+        cv::imshow("left color", left);
+      }
     }
 
     if (is_right_ok) {
@@ -126,12 +122,14 @@ int main(int argc, char const* argv[]) {
       }
     }
 
-    auto image_depth = cam.GetStreamData(ImageType::IMAGE_DEPTH);
-    if (image_depth.img) {
-      cv::Mat depth = image_depth.img->To(ImageFormat::DEPTH_BGR)->ToMat();
-      painter.DrawSize(depth, CVPainter::TOP_LEFT);
-      painter.DrawStreamData(depth, image_depth, CVPainter::TOP_RIGHT);
-      cv::imshow("depth", depth);
+    if (is_depth_ok) {
+      auto image_depth = cam.GetStreamData(ImageType::IMAGE_DEPTH);
+      if (image_depth.img) {
+        cv::Mat depth = image_depth.img->To(ImageFormat::DEPTH_BGR)->ToMat();
+        painter.DrawSize(depth, CVPainter::TOP_LEFT);
+        painter.DrawStreamData(depth, image_depth, CVPainter::TOP_RIGHT);
+        cv::imshow("depth", depth);
+      }
     }
 
     char key = static_cast<char>(cv::waitKey(1));

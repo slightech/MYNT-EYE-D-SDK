@@ -25,12 +25,12 @@ OpenParams::OpenParams() : OpenParams(0) {
 OpenParams::OpenParams(const std::int32_t& dev_index)
   : dev_index(std::move(dev_index)),
     framerate(10),
+    dev_mode(DeviceMode::DEVICE_ALL),
     color_mode(ColorMode::COLOR_RAW),
     depth_mode(DepthMode::DEPTH_COLORFUL),
     stream_mode(StreamMode::STREAM_1280x720),
     color_stream_format(StreamFormat::STREAM_YUYV),
     depth_stream_format(StreamFormat::STREAM_YUYV),
-    device_mode(DeviceMode::DEVICE_ALL),
     state_ae(true),
     state_awb(true),
     ir_intensity(0),

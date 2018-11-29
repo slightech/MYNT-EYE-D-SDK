@@ -157,28 +157,28 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     // Launch params
     int dev_index = 0;
     int framerate = 10;
+    int dev_mode = 2;
     int color_mode = 0;
     int depth_mode = 0;
     int stream_mode = 0;
-    int device_mode = 2;
     int color_stream_format = 0;
     int depth_stream_format = 0;
     bool state_ae = true;
     bool state_awb = true;
-    bool ir_interleave = true;
     int ir_intensity = 0;
+    bool ir_interleave = true;
     nh_ns.getParam("dev_index", dev_index);
     nh_ns.getParam("framerate", framerate);
+    nh_ns.getParam("dev_mode", dev_mode);
     nh_ns.getParam("color_mode", color_mode);
     nh_ns.getParam("depth_mode", depth_mode);
     nh_ns.getParam("stream_mode", stream_mode);
-    nh_ns.getParam("device_mode", device_mode);
     nh_ns.getParam("color_stream_format", color_stream_format);
     nh_ns.getParam("depth_stream_format", depth_stream_format);
     nh_ns.getParam("state_ae", state_ae);
     nh_ns.getParam("state_awb", state_awb);
-    nh_ns.getParam("ir_interleave", ir_interleave);
     nh_ns.getParam("ir_intensity", ir_intensity);
+    nh_ns.getParam("ir_interleave", ir_interleave);
 
     points_frequency = DEFAULT_POINTS_FREQUENCE;
     points_factor = DEFAULT_POINTS_FACTOR;
@@ -277,18 +277,18 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       NODELET_INFO_STREAM(dashes);
     }
     params.framerate = framerate;
+    params.dev_mode = static_cast<DeviceMode>(dev_mode);
     params.color_mode = static_cast<ColorMode>(color_mode);
     params.depth_mode = static_cast<DepthMode>(depth_mode);
     params.stream_mode = static_cast<StreamMode>(stream_mode);
-    params.device_mode = static_cast<DeviceMode>(device_mode);
     params.color_stream_format =
         static_cast<StreamFormat>(color_stream_format);
     params.depth_stream_format =
         static_cast<StreamFormat>(depth_stream_format);
     params.state_ae = state_ae;
     params.state_awb = state_awb;
-    params.ir_interleave = ir_interleave;
     params.ir_intensity = ir_intensity;
+    params.ir_interleave = ir_interleave;
 
     mynteye->EnableProcessMode(ProcessMode::PROC_NONE);
 
@@ -351,18 +351,8 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       if (mynteye->IsImageInfoSupported()) {
         mynteye->EnableImageInfo(true);
       }
-      if (left_sub || points_sub) {
-        mynteye->EnableStreamData(ImageType::IMAGE_LEFT_COLOR);
-      }
-      if (right_sub && util::is_right_color_supported(params.stream_mode)) {
-        mynteye->EnableStreamData(ImageType::IMAGE_RIGHT_COLOR);
-      }
-      if (depth_sub || points_sub) {
-        mynteye->EnableStreamData(ImageType::IMAGE_DEPTH);
-      }
     } else {
       mynteye->DisableImageInfo();
-      mynteye->DisableStreamData(ImageType::IMAGE_ALL);
     }
 
     if (imu_sub || temp_sub || imu_processed_sub) {

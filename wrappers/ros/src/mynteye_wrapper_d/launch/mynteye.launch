@@ -1,4 +1,8 @@
 <launch>
+  <!-- Device mode -->
+  <arg name="device_color"      default="0" />
+  <arg name="device_depth"      default="1" />
+  <arg name="device_all"        default="2" />
   <!-- Color mode -->
   <arg name="color_raw"         default="0" />
   <arg name="color_rectified"   default="1" />
@@ -11,10 +15,6 @@
   <arg name="stream_1280x480"   default="1" />
   <arg name="stream_1280x720"   default="2" />
   <arg name="stream_2560x720"   default="3" />
-  <!-- Device mode -->
-  <arg name="device_color"      default="0" />
-  <arg name="device_depth"      default="1" />
-  <arg name="device_all"        default="2" />
   <!-- Stream format -->
   <arg name="stream_mjpg"       default="0" />
   <arg name="stream_yuyv"       default="1" />
@@ -26,10 +26,18 @@
   <!-- Framerate -->
   <arg name="framerate" default="10" />
 
+  <!--
+  Device mode
+    device_color: left_color ✓ right_color ? depth x
+    device_depth: left_color x right_color x depth ✓
+    device_all:   left_color ✓ right_color ? depth ✓
+  Note: ✓: available, x: unavailable, ?: depends on #stream_mode
+  -->
+  <arg name="dev_mode" default="$(arg device_all)" />
+
   <arg name="color_mode" default="$(arg color_raw)" />
   <arg name="depth_mode" default="$(arg depth_raw)" />
   <arg name="stream_mode" default="$(arg stream_2560x720)" />
-  <arg name="device_mode" default="$(arg device_all)" />
   <arg name="color_stream_format" default="$(arg stream_yuyv)" />
   <arg name="depth_stream_format" default="$(arg stream_yuyv)" />
 
@@ -37,10 +45,10 @@
   <arg name="state_ae" default="true" />
   <!-- Auto-white balance -->
   <arg name="state_awb" default="true" />
-  <!-- IR interleave -->
-  <arg name="ir_interleave" default="true" />
   <!-- IR intensity -->
   <arg name="ir_intensity" default="4" />
+  <!-- IR interleave -->
+  <arg name="ir_interleave" default="true" />
 
   <!-- Generating points frequency, make slower than framerate -->
   <arg name="points_frequency" default="2" />
@@ -87,16 +95,16 @@
     <!-- Camera params -->
     <param name="dev_index"     value="$(arg dev_index)" />
     <param name="framerate"     value="$(arg framerate)" />
+    <param name="dev_mode"      value="$(arg dev_mode)" />
     <param name="color_mode"    value="$(arg color_mode)" />
     <param name="depth_mode"    value="$(arg depth_mode)" />
     <param name="stream_mode"   value="$(arg stream_mode)" />
-    <param name="device_mode"   value="$(arg device_mode)" />
     <param name="color_stream_format" value="$(arg color_stream_format)" />
     <param name="depth_stream_format" value="$(arg depth_stream_format)" />
     <param name="state_ae"      value="$(arg state_ae)" />
     <param name="state_awb"     value="$(arg state_awb)" />
-    <param name="ir_interleave" value="$(arg ir_interleave)" />
     <param name="ir_intensity"  value="$(arg ir_intensity)" />
+    <param name="ir_interleave" value="$(arg ir_interleave)" />
 
     <param name="points_factor"    value="$(arg points_factor)" />
     <param name="points_frequency" value="$(arg points_frequency)" />

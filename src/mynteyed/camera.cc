@@ -129,14 +129,6 @@ bool Camera::IsImageInfoSynced() const {
   return p_->IsImageInfoSynced();
 }
 
-void Camera::EnableStreamData(const ImageType& type) {
-  p_->EnableStreamData(type);
-}
-
-void Camera::DisableStreamData(const ImageType& type) {
-  p_->DisableStreamData(type);
-}
-
 bool Camera::IsStreamDataEnabled(const ImageType& type) const {
   return p_->IsStreamDataEnabled(type);
 }
@@ -191,93 +183,11 @@ void Camera::Close() {
 }
 
 #ifdef MYNTEYE_DEPRECATED_COMPAT
-// @Deprecated
-
-std::vector<DeviceInfo> Camera::GetDevices() const {
-  return GetDeviceInfos();
+void Camera::EnableStreamData(const ImageType& type) {
+  LOGW("%s is deprecated, replaced by OpenParams#device_mode.", __func__);
 }
 
-void Camera::GetDevices(std::vector<DeviceInfo>* dev_infos) const {
-  GetDeviceInfos(dev_infos);
-}
-
-void Camera::GetResolutions(
-    const std::int32_t& dev_index,
-    std::vector<StreamInfo>* color_infos,
-    std::vector<StreamInfo>* depth_infos) const {
-  GetStreamInfos(dev_index, color_infos, depth_infos);
-}
-
-void Camera::Wait() const {
-}
-
-std::string Camera::GetInfo(const Info &info) const {
-  return GetDescriptor(info);
-}
-
-CameraCtrlRectLogData Camera::GetHDCameraCtrlData() {
-  auto calib = p_->GetCameraCalibration(StreamMode::STREAM_1280x720);
-  return (calib == nullptr) ? CameraCalibration() : (*calib);
-}
-
-CameraCtrlRectLogData Camera::GetVGACameraCtrlData() {
-  auto calib = p_->GetCameraCalibration(StreamMode::STREAM_640x480);
-  return (calib == nullptr) ? CameraCalibration() : (*calib);
-}
-
-void Camera::GetHDCameraLogDataFile() {
-  p_->GetCameraCalibrationFile(StreamMode::STREAM_1280x720,
-      "RectfyLog_PUMA_1.txt");
-}
-
-void Camera::GetVGACameraLogDataFile() {
-  p_->GetCameraCalibrationFile(StreamMode::STREAM_640x480,
-      "RectfyLog_PUMA_2.txt");
-}
-
-void Camera::SetCalibrationWithFile(const std::string &file_name) {
-  WriteCameraCalibrationBinFile(file_name);
-}
-
-void Camera::EnableImuProcessMode(const ProcessMode &mode) {
-  EnableProcessMode(mode);
-}
-
-void Camera::EnableImageType(const ImageType& type) {
-  EnableStreamData(type);
-}
-
-StreamData Camera::RetrieveImage(const ImageType& type) {
-  ErrorCode code = ErrorCode::SUCCESS;
-  return RetrieveImage(type, &code);
-}
-
-StreamData Camera::RetrieveImage(const ImageType& type,
-    ErrorCode* code) {
-  if (!IsOpened()) {
-    *code = ErrorCode::ERROR_CAMERA_NOT_OPENED;
-    return {};
-  }
-  *code = ErrorCode::SUCCESS;
-  return GetStreamData(type);
-}
-
-std::vector<StreamData> Camera::RetrieveImages(const ImageType& type) {
-  ErrorCode code = ErrorCode::SUCCESS;
-  return RetrieveImages(type, &code);
-}
-
-std::vector<StreamData> Camera::RetrieveImages(
-    const ImageType& type, ErrorCode* code) {
-  if (!IsOpened()) {
-    *code = ErrorCode::ERROR_CAMERA_NOT_OPENED;
-    return {};
-  }
-  *code = ErrorCode::SUCCESS;
-  return GetStreamDatas(type);
-}
-
-std::vector<MotionData> Camera::RetrieveMotions() {
-  return GetMotionDatas();
+void Camera::DisableStreamData(const ImageType& type) {
+  LOGW("%s is deprecated, replaced by OpenParams#device_mode.", __func__);
 }
 #endif

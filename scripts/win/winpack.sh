@@ -64,6 +64,9 @@ make samples tools
 _md "$ROOT_DIR/_install/3rdparty"
 mv "$ROOT_DIR/3rdparty/opencv" "$ROOT_DIR/_install/3rdparty/opencv"
 
+# 3rdparty/libjpeg-turbo64
+mv "$ROOT_DIR/3rdparty/libjpeg-turbo64" "$ROOT_DIR/_install/3rdparty/libjpeg-turbo64"
+
 # samples
 mv "$ROOT_DIR/samples/_output/bin" "$ROOT_DIR/_install/bin/samples"
 mv "$ROOT_DIR/samples/_output/lib" "$ROOT_DIR/_install/lib/samples"
@@ -91,11 +94,6 @@ mv "$ROOT_DIR/platforms/projects" "$ROOT_DIR/_install/projects"
 ################################################################################
 # copy to _install
 
-# 3rdparty/libjpeg-turbo64
-_md "$ROOT_DIR/_install/bin/3rdparty"
-cp -f "$ROOT_DIR/3rdparty/libjpeg-turbo64/bin/jpeg62.dll" "$ROOT_DIR/_install/bin/3rdparty"
-cp -f "$ROOT_DIR/3rdparty/libjpeg-turbo64/bin/turbojpeg.dll" "$ROOT_DIR/_install/bin/3rdparty"
-
 # cmake
 _md "$ROOT_DIR/_install/cmake"
 cp -f "$ROOT_DIR/cmake/Common.cmake" "$ROOT_DIR/_install/cmake"
@@ -106,8 +104,8 @@ cp -f "$ROOT_DIR/cmake/TargetArch.cmake" "$ROOT_DIR/_install/cmake"
 _md "$ROOT_DIR/_install/cmake/templates"
 cp -f "$ROOT_DIR/cmake/templates/exe.bat.in" "$ROOT_DIR/_install/cmake/templates"
 
-cp -f "$ROOT_DIR/scripts/win/cmake/mynteye-targets.cmake" "$ROOT_DIR/_install/lib/cmake/mynteye/"
-cp -f "$ROOT_DIR/scripts/win/cmake/mynteye-targets-release.cmake" "$ROOT_DIR/_install/lib/cmake/mynteye/"
+cp -f "$ROOT_DIR/scripts/win/cmake/mynteyed-targets.cmake" "$ROOT_DIR/_install/lib/cmake/mynteyed/"
+cp -f "$ROOT_DIR/scripts/win/cmake/mynteyed-targets-release.cmake" "$ROOT_DIR/_install/lib/cmake/mynteyed/"
 
 # generate.bat
 cp -f "$ROOT_DIR/scripts/win/generate.bat" "$ROOT_DIR/_install/samples/"
@@ -146,6 +144,9 @@ _rm "$ROOT_DIR/_install/tools/generate.bat"
 
 # 3rdparty/opencv
 mv "$ROOT_DIR/_install/3rdparty/opencv" "$ROOT_DIR/3rdparty/opencv"
+
+# 3rdparty/libjpeg-turbo64
+mv "$ROOT_DIR/_install/3rdparty/libjpeg-turbo64" "$ROOT_DIR/3rdparty/libjpeg-turbo64"
 
 # samples
 mv "$ROOT_DIR/_install/samples" "$ROOT_DIR/samples"

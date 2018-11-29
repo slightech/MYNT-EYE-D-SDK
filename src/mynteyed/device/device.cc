@@ -86,14 +86,12 @@ void Device::Init() {
   // default frame rate
   framerate_ = 10;
 
-  device_mode_ = {{DeviceMode::DEVICE_COLOR, false},
-                  {DeviceMode::DEVICE_DEPTH, false},
-                  {DeviceMode::DEVICE_ALL, false}};
-  opened_color_device_ = false;
-  opened_depth_device_ = false;
+  color_device_opened_ = false;
+  depth_device_opened_ = false;
 
-  color_interleave_mode_ = false;
-  depth_interleave_mode_ = false;
+  ir_interleave_enabled_ = false;
+  color_interleave_enabled_ = false;
+  depth_interleave_enabled_ = false;
 
   OnInit();
 }
@@ -223,6 +221,26 @@ bool Device::SetAutoWhiteBalanceEnabled(bool enabled) {
   return ok;
 }
 
+void Device::SetInfraredInterleave(bool enabled) {
+  if (framerate_ < 30) {
+    LOGW("\nWARNING:: IR interleave will not be effective"
+        " for framerate less than 30 fps!\n");
+    EtronDI_EnableInterleave(etron_di_, &dev_sel_info_, false);
+    return;
+  }
+  if (depth_data_type_ == 1 ||
+      depth_data_type_ == 2 ||
+      depth_data_type_ == 4) {
+    color_interleave_enabled_ = false;
+    depth_interleave_enabled_ = true;
+  } else {
+    color_interleave_enabled_ = true;
+    depth_interleave_enabled_ = false;
+  }
+  ir_interleave_enabled_ = enabled;
+  EtronDI_EnableInterleave(etron_di_, &dev_sel_info_, enabled);
+}
+
 void Device::SetInfraredIntensity(std::uint16_t value) {
   if (value != 0) {
     EtronDI_SetIRMode(etron_di_, &dev_sel_info_, 0x03);
@@ -317,7 +335,8 @@ bool Device::Open(const OpenParams& params) {
       stream_depth_info_ptr_[depth_res_index_].nHeight,
       stream_depth_info_ptr_[depth_res_index_].bFormatMJPG ? "MJPG" : "YUYV");
 
-  EnableIRInterleave(params.ir_interleave);
+  SetInfraredInterleave(params.ir_interleave);
+
   if (params.ir_intensity >= 0) {
     SetInfraredIntensity(params.ir_intensity);
     LOGI("\n-- IR intensity: %d", params.ir_intensity);
@@ -355,37 +374,23 @@ bool Device::Open(const OpenParams& params) {
       Device::ImgCallback, this, &framerate_, ctrlMode);
 #else
   int ret = 0;
-  switch (params.device_mode) {
+  switch (params.dev_mode) {
     case DeviceMode::DEVICE_COLOR:
-      // if want depth image, but open depth device only ...
-      if (device_mode_[DeviceMode::DEVICE_DEPTH]) {
-        throw_error("\n  If you want to get depth image, you should use "
-            "\"params.device_mode = DeviceMode::DEVICE_DEPTH\" or "
-            "\"params.device_mode = DeviceMode::DEVICE_ALL\", "
-            "before openning the device.\n");
-        return false;
-      }
       ret = EtronDI_OpenDevice2(etron_di_, &dev_sel_info_,
           stream_color_info_ptr_[color_res_index_].nWidth,
           stream_color_info_ptr_[color_res_index_].nHeight,
           stream_color_info_ptr_[color_res_index_].bFormatMJPG,
           0, 0, dtc_, false, NULL, &framerate_);
-      opened_color_device_ = true;
+      color_device_opened_ = true;
+      depth_device_opened_ = false;
       break;
     case DeviceMode::DEVICE_DEPTH:
-      // if want color image, but open color device only ...
-      if (device_mode_[DeviceMode::DEVICE_COLOR]) {
-        throw_error("\n  If you want to get color image, you should use "
-            "\"params.device_mode = DeviceMode::DEVICE_COLOR\" or "
-            "\"params.device_mode = DeviceMode::DEVICE_ALL\", "
-            "before openning the device.\n");
-        return false;
-      }
       ret = EtronDI_OpenDevice2(etron_di_, &dev_sel_info_,
           0, 0, false, stream_depth_info_ptr_[depth_res_index_].nWidth,
           stream_depth_info_ptr_[depth_res_index_].nHeight,
           dtc_, false, NULL, &framerate_);
-      opened_depth_device_ = true;
+      color_device_opened_ = false;
+      depth_device_opened_ = true;
       break;
     case DeviceMode::DEVICE_ALL:
       ret = EtronDI_OpenDevice2(etron_di_, &dev_sel_info_,
@@ -395,8 +400,8 @@ bool Device::Open(const OpenParams& params) {
           stream_depth_info_ptr_[depth_res_index_].nWidth,
           stream_depth_info_ptr_[depth_res_index_].nHeight,
           dtc_, false, NULL, &framerate_);
-      opened_color_device_ = true;
-      opened_depth_device_ = true;
+      color_device_opened_ = true;
+      depth_device_opened_ = true;
       break;
     default:
       throw_error("ERROR:: DeviceMode is unknown.");
@@ -406,7 +411,7 @@ bool Device::Open(const OpenParams& params) {
 
   if (ETronDI_OK == ret) {
     open_params_ = params;
-    if (opened_depth_device_) {
+    if (depth_device_opened_) {
       // depth device must be opened.
       SyncCameraCalibrations();
     }
@@ -443,6 +448,16 @@ bool Device::ExpectOpened(const std::string& event) const {
 
 OpenParams Device::GetOpenParams() const {
   return open_params_;
+}
+
+bool Device::IsRightColorSupported() const {
+  CheckOpened(__func__);
+  return IsRightColorSupported(open_params_.stream_mode);
+}
+
+bool Device::IsRightColorSupported(const StreamMode& stream_mode) const {
+  return stream_mode == StreamMode::STREAM_1280x480
+      || stream_mode == StreamMode::STREAM_2560x720;
 }
 
 std::shared_ptr<CameraCalibration> Device::GetCameraCalibration(
@@ -850,58 +865,4 @@ void Device::CompatibleUSB2() {
     // 8bit 1, 6 match 14bit 2, 7
     depth_data_type_ = depth_data_type_ == 7 ? 6 : 1;
   }
-}
-
-void Device::EnableDeviceMode(const DeviceMode& mode, const bool& status) {
-  try {
-    switch (mode) {
-      case DeviceMode::DEVICE_COLOR:
-        if (!opened_color_device_ && opened_depth_device_) {
-          throw_error("\n  If you want to get color image, you should use "
-              "\"params.device_mode = DeviceMode::DEVICE_COLOR\" or "
-              "\"params.device_mode = DeviceMode::DEVICE_ALL\", "
-              "before openning the device.\n");
-        }
-        break;
-      case DeviceMode::DEVICE_DEPTH:
-        if (opened_color_device_ && !opened_depth_device_) {
-          throw_error("\n  If you want to get depth image, you should use "
-              "\"params.device_mode = DeviceMode::DEVICE_DEPTH\" or "
-              "\"params.device_mode = DeviceMode::DEVICE_ALL\", "
-              "before openning the device.\n");
-        }
-        break;
-      case DeviceMode::DEVICE_ALL:
-        if ((!opened_color_device_ && opened_depth_device_) ||
-            (opened_color_device_ && !opened_depth_device_)) {
-          throw_error("\n  If you want to get color and depth image, you should use "
-              "\"params.device_mode = DeviceMode::DEVICE_ALL\", "
-              "before openning the device.\n");
-        }
-        break;
-      default:
-        break;
-    }
-    device_mode_[mode] = status;
-  } catch (const std::out_of_range& e) {
-    throw_error("ERROR:: DeviceMode is unknown.");
-  }
-}
-
-void Device::EnableIRInterleave(bool status) {
-  if (framerate_ < 30) {
-    LOGW("\nWARNING:: IR interleave will not be effective"
-        " for frame rate less than 30 fps!\n");
-  }
-  if (depth_data_type_ == 1 ||
-      depth_data_type_ == 2 ||
-      depth_data_type_ == 4) {
-    color_interleave_mode_ = false;
-    depth_interleave_mode_ = true;
-  } else {
-    color_interleave_mode_ = true;
-    depth_interleave_mode_ = false;
-  }
-  ir_interleave_ = status;
-  EtronDI_EnableInterleave(etron_di_, &dev_sel_info_, status);
 }

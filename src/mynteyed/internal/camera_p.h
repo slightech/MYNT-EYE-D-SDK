@@ -24,6 +24,7 @@
 #include <vector>
 
 #include "mynteyed/data/types_internal.h"
+#include "mynteyed/device/types_internal.h"
 #include "mynteyed/internal/async_callback.h"
 #include "mynteyed/types.h"
 
@@ -108,9 +109,10 @@ class MYNTEYE_API CameraPrivate {
   bool IsImageInfoSynced() const;
 
   /** Enable stream data of certain image type */
-  void EnableStreamData(const ImageType& type);
+  // void EnableStreamData(const ImageType& type);
   /** Disable stream data of certain image type */
-  void DisableStreamData(const ImageType& type);
+  // void DisableStreamData(const ImageType& type);
+
   /** Whethor stream data of certain image type enabled or not */
   bool IsStreamDataEnabled(const ImageType& type) const;
   /** Has any stream data enabled */

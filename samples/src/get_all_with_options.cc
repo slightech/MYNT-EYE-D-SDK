@@ -30,8 +30,7 @@ int main(int argc, char const* argv[]) {
       .usage("usage: %prog [options]"
       "\n  help: %prog -h"
       "\n  left+depth: %prog"
-      "\n  imu only: %prog -r -m"
-      "\n            -r for right, but default stream mode not support right"
+      "\n  left+right+depth: %prog --sm=3"
       )
       .description("Open device with different options.");
 
@@ -44,6 +43,13 @@ int main(int argc, char const* argv[]) {
       .type("int").set_default(10)
       .metavar("RATE").help("Framerate, range [0,60], [0,30](STREAM_2560x720), "
           "\ndefault: %default");
+  op_group.add_option("--dm").dest("dev_mode")
+      .type("int").set_default(2)
+      .metavar("MODE").help("Device mode, default %default (DEVICE_ALL)"
+          "\n  0: DEVICE_COLOR, left y right - depth n"
+          "\n  1: DEVICE_DEPTH, left n right n depth y"
+          "\n  2: DEVICE_ALL,   left y right - depth y"
+          "\n  Note: y: available, n: unavailable, -: depends on stream mode");
   op_group.add_option("--cm").dest("color_mode")
       .type("int").set_default(0)
       .metavar("MODE").help("Color mode, default %default (COLOR_RAW)"
@@ -74,21 +80,15 @@ int main(int argc, char const* argv[]) {
       .metavar("MODE").help("Stream format of depth, "
           "\ndefault %default (STREAM_YUYV)"
           "\n  1: STREAM_YUYV");
-  op_group.add_option("--dev-mode").dest("device_mode")
-      .type("int").set_default(2)
-      .metavar("MODE").help("Device mode, default %default (DEVICE_ALL)"
-          "\n  0: DEVICE_COLOR"
-          "\n  1: DEVICE_DEPTH"
-          "\n  2: DEVICE_ALL");
   op_group.add_option("--ae").dest("state_ae")
       .action("store_true").help("Enable auto-exposure");
   op_group.add_option("--awb").dest("state_awb")
       .action("store_true").help("Enable auto-white balance");
-  op_group.add_option("--ir-inter").dest("ir_interleave")
-      .action("store_true").help("Enable ir-interleave");
   op_group.add_option("--ir").dest("ir_intensity")
       .type("int").set_default(0)
       .metavar("VALUE").help("IR intensity, range [0,6], default %default");
+  op_group.add_option("--ir-inter").dest("ir_interleave")
+      .action("store_false").help("Enable ir-interleave");
   parser.add_option_group(op_group);
 
   // FeatureToggles
@@ -102,16 +102,10 @@ int main(int argc, char const* argv[]) {
           "\n  2: PROC_IMU_TEMP_DRIFT"
           "\n  3: PROC_IMU_ALL");
   ft_group.add_option("--img-info").dest("img_info")
-      .action("store_true").help("Enable image info, and sync with image");
+      .action("store_false").help("Enable image info, and sync with image");
   parser.add_option_group(ft_group);
 
   // Streams & motions
-  parser.add_option("-l", "--left").dest("left")
-      .action("store_true").help("Enable left color stream");
-  parser.add_option("-r", "--right").dest("right")
-      .action("store_true").help("Enable right color stream");
-  parser.add_option("-d", "--depth").dest("depth")
-      .action("store_true").help("Enable depth stream");
   parser.add_option("-m", "--imu").dest("imu")
       .action("store_true").help("Enable imu datas");
 
@@ -188,6 +182,8 @@ int main(int argc, char const* argv[]) {
     int val;
     params.dev_index = dev_info.index;
 
+    if (!in_range("dev_mode", 0, 2, &val)) return 2;
+    params.dev_mode = static_cast<DeviceMode>(val);
     if (!in_range("color_mode", 0, 1, &val)) return 2;
     params.color_mode = static_cast<ColorMode>(val);
     if (!in_range("depth_mode", 0, 2, &val)) return 2;
@@ -198,13 +194,11 @@ int main(int argc, char const* argv[]) {
     params.color_stream_format = static_cast<StreamFormat>(val);
     if (!in_range("depth_stream_format", 1, 1, &val)) return 2;
     params.depth_stream_format = static_cast<StreamFormat>(val);
-    if (!in_range("device_mode", 0, 2, &val)) return 2;
-    params.device_mode = static_cast<DeviceMode>(val);
     params.state_ae = options.get("state_ae");
     params.state_awb = options.get("state_awb");
-    params.ir_interleave = options.get("ir_interleave");
     if (!in_range("ir_intensity", 0, 6, &val)) return 2;
     params.ir_intensity = val;
+    params.ir_interleave = options.get("ir_interleave");
 
     if (params.stream_mode == StreamMode::STREAM_2560x720) {
       if (!in_range("framerate", 0, 30, &val)) return 2;
@@ -213,10 +207,6 @@ int main(int argc, char const* argv[]) {
     }
     params.framerate = val;
   }
-  bool is_right_ok = util::is_right_color_supported(params.stream_mode);
-  bool left = options.get("left");
-  bool right = options.get("right");
-  bool depth = options.get("depth");
   {
     int val;
 
@@ -227,29 +217,6 @@ int main(int argc, char const* argv[]) {
     if (options.get("img_info")) {
       // Enable image infos
       cam.EnableImageInfo(true);
-    }
-
-    // Enable what stream datas: left_color, right_color, depth
-    if (!left && !right && !depth) {
-      if (is_right_ok) {
-        left = right = depth = true;
-        cam.EnableStreamData(ImageType::IMAGE_ALL);
-      } else {
-        left = depth = true;
-        cam.EnableStreamData(ImageType::IMAGE_LEFT_COLOR);
-        cam.EnableStreamData(ImageType::IMAGE_DEPTH);
-      }
-    } else {
-      if (left) cam.EnableStreamData(ImageType::IMAGE_LEFT_COLOR);
-      if (right && is_right_ok) {
-        cam.EnableStreamData(ImageType::IMAGE_RIGHT_COLOR);
-      } else {
-        right = false;
-        if (!left && !depth) {
-          std::cout << "Warning: there is no stream datas wanted?" << std::endl;
-        }
-      }
-      if (depth) cam.EnableStreamData(ImageType::IMAGE_DEPTH);
     }
 
     bool imu = options.get("imu");
@@ -290,16 +257,20 @@ int main(int argc, char const* argv[]) {
 
   std::cout << "Press ESC/Q on Windows to terminate" << std::endl;
 
-  if (left) cv::namedWindow("left color");
-  if (right) cv::namedWindow("right color");
-  if (depth) cv::namedWindow("depth");
+  bool is_left_ok = cam.IsStreamDataEnabled(ImageType::IMAGE_LEFT_COLOR);
+  bool is_right_ok = cam.IsStreamDataEnabled(ImageType::IMAGE_RIGHT_COLOR);
+  bool is_depth_ok = cam.IsStreamDataEnabled(ImageType::IMAGE_DEPTH);
+
+  if (is_left_ok) cv::namedWindow("left color");
+  if (is_right_ok) cv::namedWindow("right color");
+  if (is_depth_ok) cv::namedWindow("depth");
 
   CVPainter painter;
   util::Counter counter;
   for (;;) {
     counter.Update();
 
-    if (left) {
+    if (is_left_ok) {
       auto left_color = cam.GetStreamData(ImageType::IMAGE_LEFT_COLOR);
       if (left_color.img) {
         cv::Mat mat = left_color.img->To(ImageFormat::COLOR_BGR)->ToMat();
@@ -311,7 +282,7 @@ int main(int argc, char const* argv[]) {
       }
     }
 
-    if (right) {
+    if (is_right_ok) {
       auto right_color = cam.GetStreamData(ImageType::IMAGE_RIGHT_COLOR);
       if (right_color.img) {
         cv::Mat mat = right_color.img->To(ImageFormat::COLOR_BGR)->ToMat();
@@ -321,7 +292,7 @@ int main(int argc, char const* argv[]) {
       }
     }
 
-    if (depth) {
+    if (is_depth_ok) {
       auto image_depth = cam.GetStreamData(ImageType::IMAGE_DEPTH);
       if (image_depth.img) {
         cv::Mat depth;

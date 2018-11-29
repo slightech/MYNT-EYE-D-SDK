@@ -54,12 +54,14 @@ Image::pointer Device::GetImageColor() {
     return nullptr;
   }
 
-  if (ir_interleave_) {
-    if (color_interleave_mode_ &&
+  if (ir_interleave_enabled_) {
+    if (color_interleave_enabled_ &&
         (color_serial_number_ % 2) > 0) {
       return nullptr;
-    } else if (!color_interleave_mode_ &&
-        (color_serial_number_ % 2) == 0) { return nullptr; }
+    } else if (!color_interleave_enabled_ &&
+        (color_serial_number_ % 2) == 0) {
+      return nullptr;
+    }
   }
 
   color_image_buf_->set_valid_size(color_image_size_);
@@ -110,12 +112,14 @@ Image::pointer Device::GetImageDepth() {
     return nullptr;
   }
 
-  if (ir_interleave_) {
-    if (depth_interleave_mode_ &&
+  if (ir_interleave_enabled_) {
+    if (depth_interleave_enabled_ &&
         (depth_serial_number_ % 2) > 0) {
       return nullptr;
-    } else if (!depth_interleave_mode_ &&
-        (depth_serial_number_ % 2) == 0) { return nullptr; }
+    } else if (!depth_interleave_enabled_ &&
+        (depth_serial_number_ % 2) == 0) {
+      return nullptr;
+    }
   }
 
   depth_image_buf_->set_frame_id(depth_serial_number_);

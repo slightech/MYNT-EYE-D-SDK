@@ -53,9 +53,6 @@ int main(int argc, char const *argv[]) {
   // Enable image infos
   cam.EnableImageInfo(true);
 
-  // Enable what stream datas: left_color, right_color, depth
-  cam.EnableStreamData(ImageType::IMAGE_ALL);
-
   bool is_imu_ok = cam.IsMotionDatasSupported();
   // Enable motion datas until you get them
   if (is_imu_ok) cam.EnableMotionDatas();
