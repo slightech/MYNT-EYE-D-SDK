@@ -800,6 +800,7 @@ INPUT                  = guide_product_description.md \
                          guide_recording_data.md \
                          guide_analyzing_imu.md \
                          guide_analyze_time_stamps.md \
+                         guide_support_resolution.md \
                          ../../include
 
 # This tag can be used to specify the character encoding of the source files
