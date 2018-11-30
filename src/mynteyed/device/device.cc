@@ -866,7 +866,9 @@ void Device::CompatibleUSB2() {
     depth_res_index_ = 0;
     framerate_ = 5;
     // 8bit 1, 6 match 14bit 2, 7
-    depth_data_type_ = (depth_data_type_ == 7) ? 6 : 1;
+    // Now, only support 1
+    // depth_data_type_ = (depth_data_type_ == 7) ? 6 : 1;
+    depth_data_type_ = 1;
   }
 }
 
@@ -875,5 +877,7 @@ void Device::CompatibleMJPG() {
     return;
   }
   // 8bit 1, 6 match 14bit 2, 7
-  depth_data_type_ = (depth_data_type_ == 7) ? 6 : 1;
+  // Now, only support 1
+  // depth_data_type_ = (depth_data_type_ == 7) ? 6 : 1;
+  depth_data_type_ = 1;
 }
