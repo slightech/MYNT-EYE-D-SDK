@@ -22,26 +22,6 @@ MYNTEYE_USE_NAMESPACE
 
 namespace {
 
-// Global data caches
-DataCaches g_data_caches;
-
-void InitProperSizes() {
-  std::set<size_t> sizes;
-
-  // all stream size
-  std::vector<std::size_t> stream_sizes{640*480, 1280*480, 1280*720, 2560*720};
-  // all bbp
-  std::vector<std::size_t> bbps{1, 2, 3};
-
-  for (auto&& ss : stream_sizes) {
-    for (auto&& bbp : bbps) {
-      sizes.insert(ss * bbp);
-    }
-  }
-
-  g_data_caches.SetProperSizes(sizes);
-}
-
 // bytes_per_pixel
 int get_image_bpp(const ImageFormat& format) {
   switch (format) {
@@ -76,6 +56,59 @@ int get_mat_type(const ImageFormat& format) {
 }
 #endif
 
+// Global data caches
+DataCaches g_data_caches;
+DataCaches g_depth_data_caches;
+
+void init_cache_proper_sizes() {
+  std::set<std::size_t> sizes;
+
+  // all stream size
+  std::vector<std::size_t> stream_sizes{640*480, 1280*480, 1280*720, 2560*720};
+  // all bbp
+  std::vector<std::size_t> bbps{1, 2, 3};
+
+  for (auto&& ss : stream_sizes) {
+    for (auto&& bbp : bbps) {
+      sizes.insert(ss * bbp);
+    }
+  }
+
+  g_data_caches.SetProperSizes(sizes);
+  g_depth_data_caches.SetProperSizes(sizes);
+}
+
+DataCaches::data_ptr_t get_cache_fixed(const ImageType& type,
+    const std::size_t& size) {
+  if (type == ImageType::IMAGE_DEPTH) {
+    return g_depth_data_caches.GetFixed(size);
+  } else {
+    return g_data_caches.GetFixed(size);
+  }
+}
+
+DataCaches::data_ptr_t get_cache_proper(const ImageType& type,
+    const std::size_t& size) {
+  if (type == ImageType::IMAGE_DEPTH) {
+    return g_depth_data_caches.GetProper(size);
+  } else {
+    return g_data_caches.GetProper(size);
+  }
+}
+
+Image::pointer get_cache_image(const Image::pointer& image,
+    const ImageFormat& format, int width, int height) {
+  auto&& result = Image::Create(image->type(), format, width, height, false);
+  result->set_frame_id(image->frame_id());
+  result->set_is_dual(image->is_dual());
+  return result;
+}
+
+Image::pointer get_cache_image(const Image::pointer& image,
+    const ImageFormat& format) {
+  return get_cache_image(image, format, image->width(), image->height());
+}
+
 }  // namespace
 
 Image::Image(const ImageType& type, const ImageFormat& format,
@@ -88,13 +121,13 @@ Image::Image(const ImageType& type, const ImageFormat& format,
     raw_format_(format),
     frame_id_(0),
     is_dual_(false) {
-  static bool is_proper_sizes_set = false;
-  if (!is_proper_sizes_set) {
-    InitProperSizes();
-    is_proper_sizes_set = true;
+  static bool is_cache_proper_sizes_set = false;
+  if (!is_cache_proper_sizes_set) {
+    init_cache_proper_sizes();
+    is_cache_proper_sizes_set = true;
   }
   auto&& n = get_image_size(format, width, height);
-  data_ = g_data_caches.GetFixed(n);
+  data_ = get_cache_fixed(type_, n);
   set_valid_size(n);
 }
 
@@ -117,7 +150,7 @@ Image::pointer Image::Create(const ImageType& type, const ImageFormat& format,
 void Image::set_valid_size(std::size_t valid_size) {
   if (valid_size > data_size()) {
     // resize data to valid size
-    data_ = g_data_caches.GetProper(valid_size);
+    data_ = get_cache_proper(type_, valid_size);
   }
   valid_size_ = valid_size;
 }
@@ -157,21 +190,6 @@ bool Image::ResetBuffer() {
   }
   LOGW("Reset buffer, but it's not a buffer.");
   return false;
-}
-
-Image::pointer Image::GetCache(const ImageFormat& format) const {
-  auto&& image = Create(type_, format, width_, height_, false);
-  image->set_frame_id(frame_id_);
-  image->set_is_dual(is_dual_);
-  return image;
-}
-
-Image::pointer Image::GetCache(const ImageFormat& format, int width,
-    int height) const {
-  auto&& image = Create(type_, format, width, height, false);
-  image->set_frame_id(frame_id_);
-  image->set_is_dual(is_dual_);
-  return image;
 }
 
 // ImageColor
@@ -227,7 +245,8 @@ Image::pointer ImageColor::To(const ImageFormat& format) {
         } else {
           goto to_fail;
         }
-        auto image = GetCache(format, width_ / 2, height_);
+        auto image = get_cache_image(shared_from_this(), format,
+            width_ / 2, height_);
         image->set_is_dual(false);
         if (format == ImageFormat::COLOR_RGB) {
           YUYV_TO_RGB(color->data(), image->data(), width_ / 2, height_);
@@ -238,7 +257,8 @@ Image::pointer ImageColor::To(const ImageFormat& format) {
         }
         return image;
         */
-        auto image = GetCache(format, width_ / 2, height_);
+        auto image = get_cache_image(shared_from_this(), format,
+            width_ / 2, height_);
         image->set_is_dual(false);
         if (format == ImageFormat::COLOR_RGB) {
           if (type_ == ImageType::IMAGE_LEFT_COLOR) {
@@ -261,7 +281,7 @@ Image::pointer ImageColor::To(const ImageFormat& format) {
         }
         return image;
       } else {
-        auto image = GetCache(format);
+        auto image = get_cache_image(shared_from_this(), format);
         if (format == ImageFormat::COLOR_RGB) {
           YUYV_TO_RGB(data(), image->data(), width_, height_);
         } else if (format == ImageFormat::COLOR_BGR) {
@@ -274,10 +294,12 @@ Image::pointer ImageColor::To(const ImageFormat& format) {
       break;
     case ImageFormat::COLOR_MJPG:
       if (format == ImageFormat::COLOR_RGB) {
-        auto image = GetCache(ImageFormat::COLOR_RGB);
+        auto image = get_cache_image(shared_from_this(),
+            ImageFormat::COLOR_RGB);
         MJPEG_TO_RGB_LIBJPEG(data(), valid_size_, image->data());
         if (is_dual_) {
-          auto half = GetCache(ImageFormat::COLOR_RGB, width_ / 2, height_);
+          auto half = get_cache_image(shared_from_this(),
+              ImageFormat::COLOR_RGB, width_ / 2, height_);
           half->set_is_dual(false);
           if (type_ == ImageType::IMAGE_LEFT_COLOR) {
             RGB_TO_RGB_LEFT(image->data(), half->data(), width_, height_);
@@ -291,10 +313,12 @@ Image::pointer ImageColor::To(const ImageFormat& format) {
         return image;  // left only
       } else if (format == ImageFormat::COLOR_BGR) {
         // return To(ImageFormat::COLOR_RGB)->To(ImageFormat::COLOR_BGR);
-        auto image = GetCache(ImageFormat::COLOR_RGB);
+        auto image = get_cache_image(shared_from_this(),
+            ImageFormat::COLOR_RGB);
         MJPEG_TO_RGB_LIBJPEG(data(), valid_size_, image->data());
         if (is_dual_) {
-          auto half = GetCache(ImageFormat::COLOR_BGR, width_ / 2, height_);
+          auto half = get_cache_image(shared_from_this(),
+              ImageFormat::COLOR_BGR, width_ / 2, height_);
           half->set_is_dual(false);
           // Split from rgb to bgr directly
           if (type_ == ImageType::IMAGE_LEFT_COLOR) {
@@ -345,7 +369,7 @@ Image::pointer ImageDepth::To(const ImageFormat& format) {
           }
         }
 
-        auto image = GetCache(format);
+        auto image = get_cache_image(shared_from_this(), format);
         auto data = image->data();
         int offset;
         std::uint16_t depth_dist = depth_max - depth_min;

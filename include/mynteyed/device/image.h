@@ -118,9 +118,6 @@ class MYNTEYE_API Image {
   bool ResetBuffer();
 
  protected:
-  pointer GetCache(const ImageFormat& format) const;
-  pointer GetCache(const ImageFormat& format, int width, int height) const;
-
   ImageType type_;
   ImageFormat format_;
   int width_;

@@ -43,8 +43,32 @@ void DataCaches::SetProperSizes(std::set<size_t> sizes) {
 }
 
 DataCaches::data_ptr_t DataCaches::GetFixed(const size_t& size) {
-  std::unique_lock<std::recursive_mutex> _(mutex_);
+  std::lock_guard<std::mutex> _(mutex_);
+  return Get(size);
+}
 
+DataCaches::data_ptr_t DataCaches::GetProper(const size_t& size) {
+  std::lock_guard<std::mutex> _(mutex_);
+  auto&& it = std::find_if(proper_sizes_.begin(), proper_sizes_.end(),
+      [&size](const size_t& proper_size) { return proper_size >= size; });
+  if (it == proper_sizes_.end()) {
+    LOGW("GetProper size: %d", size);
+    throw_error("The size is larger then all proper sizes, unaccepted");
+  }
+#ifdef CACHES_INFO_PRINT
+  LOGI("GetProper size: %d, proper_size: %d", size, *it);
+#endif
+  return Get(*it);
+}
+
+DataCaches::data_ptr_t DataCaches::Create(const size_t& size) {
+#ifdef CACHES_INFO_PRINT
+  LOGI("Create data: %d", size);
+#endif
+  return std::make_shared<data_t>(size);
+}
+
+DataCaches::data_ptr_t DataCaches::Get(const size_t& size) {
   auto&& caches = caches_map_[size];
   if (!caches.empty()) {
     for (auto&& data : caches) {
@@ -63,27 +87,6 @@ DataCaches::data_ptr_t DataCaches::GetFixed(const size_t& size) {
   auto&& data = Create(size);
   caches.push_back(data);
   return data;
-}
-
-DataCaches::data_ptr_t DataCaches::GetProper(const size_t& size) {
-  std::unique_lock<std::recursive_mutex> _(mutex_);
-  auto&& it = std::find_if(proper_sizes_.begin(), proper_sizes_.end(),
-      [&size](const size_t& proper_size) { return proper_size >= size; });
-  if (it == proper_sizes_.end()) {
-    LOGW("GetProper size: %d", size);
-    throw_error("The size is larger then all proper sizes, unaccepted");
-  }
-#ifdef CACHES_INFO_PRINT
-  LOGI("GetProper size: %d, proper_size: %d", size, *it);
-#endif
-  return GetFixed(*it);
-}
-
-DataCaches::data_ptr_t DataCaches::Create(const size_t& size) {
-#ifdef CACHES_INFO_PRINT
-  LOGI("Create data: %d", size);
-#endif
-  return std::make_shared<data_t>(size);
 }
 
 void DataCaches::DebugPrint() const {

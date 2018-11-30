@@ -48,12 +48,13 @@ class DataCaches {
 
  private:
   data_ptr_t Create(const size_t& size);
+  data_ptr_t Get(const size_t& size);
 
   std::map<size_t, caches_t> caches_map_;
 
   std::vector<size_t> proper_sizes_;
 
-  std::recursive_mutex mutex_;
+  std::mutex mutex_;
 };
 
 MYNTEYE_END_NAMESPACE
