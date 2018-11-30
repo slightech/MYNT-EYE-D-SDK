@@ -321,10 +321,13 @@ bool Device::Open(const OpenParams& params) {
   GetStreamIndex(params, &color_res_index_, &depth_res_index_);
 
   CompatibleUSB2();
+  CompatibleMJPG();
+
   LOGI("-- Framerate: %d", framerate_);
 
   EtronDI_SetDepthDataType(etron_di_, &dev_sel_info_, depth_data_type_);
   DBG_LOGI("SetDepthDataType: %d", depth_data_type_);
+  LOGI("SetDepthDataType: %d", depth_data_type_);
 
   LOGI("-- Color Stream: %dx%d %s",
       stream_color_info_ptr_[color_res_index_].nWidth,
@@ -863,6 +866,14 @@ void Device::CompatibleUSB2() {
     depth_res_index_ = 0;
     framerate_ = 5;
     // 8bit 1, 6 match 14bit 2, 7
-    depth_data_type_ = depth_data_type_ == 7 ? 6 : 1;
+    depth_data_type_ = (depth_data_type_ == 7) ? 6 : 1;
   }
+}
+
+void Device::CompatibleMJPG() {
+  if (!stream_color_info_ptr_[color_res_index_].bFormatMJPG) {
+    return;
+  }
+  // 8bit 1, 6 match 14bit 2, 7
+  depth_data_type_ = (depth_data_type_ == 7) ? 6 : 1;
 }
