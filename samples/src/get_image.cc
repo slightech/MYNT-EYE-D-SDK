@@ -66,6 +66,10 @@ int main(int argc, char const* argv[]) {
     // Auto-white balance: true(default), false
     // params.state_awb = false;
 
+    // IR Interleave: true(default), false
+    // Note: When frame rate less than 30fps, ir interleave will be not available.
+    // params.ir_interleave = false;
+
     // Infrared intensity: 0(default), [0,6]
     params.ir_intensity = 4;
   }

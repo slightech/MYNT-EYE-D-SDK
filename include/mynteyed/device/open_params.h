@@ -93,6 +93,7 @@ struct MYNTEYE_API OpenParams {
 
   /**
    * IR interleave mode, default true.
+   * Note: When frame rate less than 30fps, ir interleave will be not available.
    */
   bool ir_interleave;
 
