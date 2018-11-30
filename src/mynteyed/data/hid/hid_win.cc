@@ -42,8 +42,16 @@ hid_device::~hid_device() {
 }
 
 int hid_device::get_device_class() {
-  // TODO: fix
-  return -1;
+  unsigned char desc[253] = {'\0'};
+
+  if (!first_hid_)
+    return -1;
+
+  if (HidD_GetProductString(first_hid_->handle, desc, sizeof(desc))) {
+    if ('D' != desc[28]) { return 0xFF; }
+  }
+  else { return -1; }
+  return 0;
 }
 
 /**
@@ -299,8 +307,66 @@ void hid_device::hid_close(hid_t *hid) {
 }
 
 bool hid_device::find_device() {
-  // TODO qujunyang
-  return true;
+  if (first_hid_) { free_all_hid(); }
+  if (!rx_event_) {
+    rx_event_ = CreateEvent(nullptr, true, true, nullptr);
+    tx_event_ = CreateEvent(nullptr, true, true, nullptr);
+    InitializeCriticalSection(&rx_mutex_);
+    InitializeCriticalSection(&tx_mutex_);
+  }
+
+  GUID id;
+  HidD_GetHidGuid(&id);
+  HDEVINFO info = SetupDiGetClassDevs(&id,
+      nullptr, nullptr, DIGCF_PRESENT | DIGCF_DEVICEINTERFACE);
+  if (info == INVALID_HANDLE_VALUE) { return 0; }
+
+  SP_DEVICE_INTERFACE_DATA iface;
+  int count = 0;
+  for (DWORD index = 0; ; index++) {
+    iface.cbSize = sizeof(SP_DEVICE_INTERFACE_DATA);
+    BOOL ret = SetupDiEnumDeviceInterfaces(info,
+        nullptr, &id, index, &iface);
+    if (!ret) { return count; }
+
+    DWORD reqd_size;
+    SetupDiGetInterfaceDeviceDetail(info,
+        &iface, nullptr, 0, &reqd_size, nullptr);
+
+    SP_DEVICE_INTERFACE_DETAIL_DATA *details =
+      (SP_DEVICE_INTERFACE_DETAIL_DATA *)malloc(reqd_size);   // NOLINT
+    if (details == nullptr) { continue; }
+
+    memset(details, 0, reqd_size);
+    details->cbSize = sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA);
+    ret = SetupDiGetDeviceInterfaceDetail(info,
+        &iface, details, reqd_size, nullptr, nullptr);
+    if (!ret) {
+      free(details);
+      continue;
+    }
+
+    HANDLE handle = CreateFile(details->DevicePath,
+        GENERIC_READ | GENERIC_WRITE,
+        FILE_SHARE_READ | FILE_SHARE_WRITE,
+        nullptr, OPEN_EXISTING,
+        FILE_FLAG_OVERLAPPED, nullptr);
+    free(details);
+    if (handle == INVALID_HANDLE_VALUE) { continue; }
+
+    HIDD_ATTRIBUTES attrib;
+    PHIDP_PREPARSED_DATA hid_data;
+    attrib.Size = sizeof(HIDD_ATTRIBUTES);
+    ret = HidD_GetAttributes(handle, &attrib);
+    if (ret && (VID > 0 && attrib.VendorID == VID) &&
+        (PID > 0 && attrib.ProductID == PID) &&
+        HidD_GetPreparsedData(handle, &hid_data)) {
+      return true;
+    }
+  }
+
+  // CloseHandle(handle);
+  return false;;
 }
 
 } // namespace hid
