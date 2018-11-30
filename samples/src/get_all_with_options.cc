@@ -116,6 +116,7 @@ int main(int argc, char const* argv[]) {
 
   Camera cam;
   OpenParams params;
+  util::Counter counter;
 
   DeviceInfo dev_info;
   {
@@ -225,8 +226,9 @@ int main(int argc, char const* argv[]) {
       cam.EnableMotionDatas(0);
 
       // Set motion data callback
-      cam.SetMotionCallback([](const MotionData& data) {
+      cam.SetMotionCallback([&counter](const MotionData& data) {
         if (data.imu->flag == MYNTEYE_IMU_ACCEL) {
+          counter.IncrAccelCount();
           std::cout << "[accel] stamp: " << data.imu->timestamp
             << ", x: " << data.imu->accel[0]
             << ", y: " << data.imu->accel[1]
@@ -234,6 +236,7 @@ int main(int argc, char const* argv[]) {
             << ", temp: " << data.imu->temperature
             << std::endl;
         } else if (data.imu->flag == MYNTEYE_IMU_GYRO) {
+          counter.IncrGyroCount();
           std::cout << "[gyro] stamp: " << data.imu->timestamp
             << ", x: " << data.imu->gyro[0]
             << ", y: " << data.imu->gyro[1]
@@ -244,6 +247,16 @@ int main(int argc, char const* argv[]) {
         std::cout << std::flush;
       });
     }
+  }
+  {
+    cam.SetStreamCallback(ImageType::IMAGE_LEFT_COLOR, [&counter](
+        const StreamData &data) {
+      if (data.img) counter.IncrColorCount();
+    });
+    cam.SetStreamCallback(ImageType::IMAGE_DEPTH, [&counter](
+        const StreamData &data) {
+      if (data.img) counter.IncrDepthCount();
+    });
   }
 
   cam.Open(params);
@@ -266,7 +279,6 @@ int main(int argc, char const* argv[]) {
   if (is_depth_ok) cv::namedWindow("depth");
 
   CVPainter painter;
-  util::Counter counter;
   for (;;) {
     counter.Update();
 
@@ -315,5 +327,7 @@ int main(int argc, char const* argv[]) {
 
   cam.Close();
   cv::destroyAllWindows();
+
+  counter.PrintCountInfo();
   return 0;
 }

@@ -68,6 +68,7 @@ int main(int argc, char const* argv[]) {
       for (auto data : motion_datas) {
         if (data.imu) {
           if (data.imu->flag == MYNTEYE_IMU_ACCEL) {
+            counter.IncrAccelCount();
             std::cout << "[accel] stamp: " << data.imu->timestamp
               << ", x: " << data.imu->accel[0]
               << ", y: " << data.imu->accel[1]
@@ -75,6 +76,7 @@ int main(int argc, char const* argv[]) {
               << ", temp: " << data.imu->temperature
               << std::endl;
           } else if (data.imu->flag == MYNTEYE_IMU_GYRO) {
+            counter.IncrGyroCount();
             std::cout << "[gyro] stamp: " << data.imu->timestamp
               << ", x: " << data.imu->gyro[0]
               << ", y: " << data.imu->gyro[1]
@@ -91,9 +93,13 @@ int main(int argc, char const* argv[]) {
       std::cout << std::endl;
     }
 
+    if (_kbhit()) break;
+
     rate.Sleep();
   }
 
   cam.Close();
+
+  counter.PrintCountInfo();
   return 0;
 }
