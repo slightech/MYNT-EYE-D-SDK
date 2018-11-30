@@ -128,6 +128,8 @@ class Device {
 
   void CompatibleUSB2();
 
+  void CompatibleMJPG();
+
  private:
   void Init();
   void OnInit();  // cross
