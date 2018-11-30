@@ -169,6 +169,8 @@ void UpdateZ14DisplayImage_DIB24(RGBQUAD* pColorPaletteZ14, BYTE* pDepthZ14,
 }  // namespace
 
 void Device::OnInit() {
+  is_color_ok_ = false;
+  is_depth_ok_ = false;
   DmColorMode14(color_palette_z14_, 0/*normal*/);
 }
 
@@ -176,9 +178,9 @@ void Device::ImgCallback(EtronDIImageType::Value imgType, int imgId,
       unsigned char* imgBuf, int imgSize, int width, int height,
       int serialNumber, void *pParam) {
   Device* p = static_cast<Device*>(pParam);
-  std::lock_guard<std::mutex> _(p->mtx_imgs_);
 
   if (EtronDIImageType::IsImageColor(imgType)) {
+    std::lock_guard<std::mutex> _(p->color_mtx_);
     // LOGI("Image callback color");
     if (!p->color_image_buf_) {
       unsigned int color_img_width  =(unsigned int)(
@@ -204,7 +206,10 @@ void Device::ImgCallback(EtronDIImageType::Value imgType, int imgId,
     p->color_image_buf_->set_valid_size(imgSize);
     p->color_image_buf_->set_frame_id(serialNumber);
     std::copy(imgBuf, imgBuf + imgSize, p->color_image_buf_->data());
+    p->is_color_ok_ = true;
+    p->color_condition_.notify_one();
   } else if (EtronDIImageType::IsImageDepth(imgType)) {
+    std::lock_guard<std::mutex> _(p->depth_mtx_);
     // LOGI("Image callback depth");
     if (!p->depth_image_buf_) {
       unsigned int depth_img_width  = (unsigned int)(
@@ -220,6 +225,8 @@ void Device::ImgCallback(EtronDIImageType::Value imgType, int imgId,
     p->depth_image_buf_->set_valid_size(imgSize);
     p->depth_image_buf_->set_frame_id(serialNumber);
     std::copy(imgBuf, imgBuf + imgSize, p->depth_image_buf_->data());
+    p->is_depth_ok_ = true;
+    p->depth_condition_.notify_one();
   } else {
     LOGE("Image callback failed. Unknown image type.");
   }
@@ -227,16 +234,15 @@ void Device::ImgCallback(EtronDIImageType::Value imgType, int imgId,
 
 Image::pointer Device::GetImageColor() {
   // LOGI("Get image color");
-  if (!color_image_buf_) {
-    return nullptr;
-  }
-  std::lock_guard<std::mutex> _(mtx_imgs_);
+  std::unique_lock<std::mutex> lock(color_mtx_);
+  color_condition_.wait(lock, [this] { return is_color_ok_; });
+  is_color_ok_ = false;
 
   if (color_image_buf_) {
-    unsigned int color_img_width  = (unsigned int)(
-        stream_color_info_ptr_[color_res_index_].nWidth);
-    unsigned int color_img_height = (unsigned int)(
-        stream_color_info_ptr_[color_res_index_].nHeight);
+    // unsigned int color_img_width  = (unsigned int)(
+    //     stream_color_info_ptr_[color_res_index_].nWidth);
+    // unsigned int color_img_height = (unsigned int)(
+    //     stream_color_info_ptr_[color_res_index_].nHeight);
 
     if (color_image_buf_->format() == ImageFormat::COLOR_MJPG) {  // mjpg
       // return clone as it will be changed in imgcallback
@@ -260,10 +266,9 @@ Image::pointer Device::GetImageColor() {
 
 Image::pointer Device::GetImageDepth() {
   // LOGI("Get image depth");
-  if (!depth_image_buf_) {
-    return nullptr;
-  }
-  std::lock_guard<std::mutex> _(mtx_imgs_);
+  std::unique_lock<std::mutex> lock(depth_mtx_);
+  depth_condition_.wait(lock, [this] { return is_depth_ok_; });
+  is_depth_ok_ = false;
 
   if (depth_image_buf_) {
     // DEPTH_14BITS for ETronDI_DEPTH_DATA_14_BITS

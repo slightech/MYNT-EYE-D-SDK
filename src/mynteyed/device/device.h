@@ -15,6 +15,7 @@
 #define MYNTEYE_DEVICE_DEVICE_H_
 #pragma once
 
+#include <condition_variable>
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -164,7 +165,12 @@ class Device {
   unsigned char* depth_buf_ = nullptr;
 
 #ifdef MYNTEYE_OS_WIN
-  std::mutex mtx_imgs_;
+  bool is_color_ok_;
+  bool is_depth_ok_;
+  std::condition_variable color_condition_;
+  std::condition_variable depth_condition_;
+  std::mutex color_mtx_;
+  std::mutex depth_mtx_;
   RGBQUAD color_palette_z14_[16384];
 #else  // MYNTEYE_OS_LINUX
   DEPTH_TRANSFER_CTRL dtc_;
