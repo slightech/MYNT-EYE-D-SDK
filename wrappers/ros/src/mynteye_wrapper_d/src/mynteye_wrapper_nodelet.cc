@@ -313,7 +313,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     // imu
     pub_imu = nh.advertise<sensor_msgs::Imu>(imu_topic, 100);
     NODELET_INFO_STREAM("Advertized on topic " << imu_topic);
-    pub_imu_processed = nh.advertise<sensor_msgs::Imu>(imu_processed_topic, 100);
+    pub_imu_processed = nh.advertise<sensor_msgs::Imu>(imu_processed_topic, 100); // NOLINT
     NODELET_INFO_STREAM("Advertized on topic " << imu_processed_topic);
     // temp
     pub_temp = nh.advertise<mynteye_wrapper_d::Temp>(temp_topic, 100);
@@ -668,6 +668,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     msg.header.stamp = stamp;
     msg.header.frame_id = frame_id;
     msg.data = imu_accel.temperature;
+    return msg;
   }
 
   void publishImuOrigin(ros::Time stamp) {
@@ -760,6 +761,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
     return ros::Time(
         soft_time_begin + (_hard_time - hard_time_begin) * 0.00001f);
+    // return ros::Time::now();
   }
 
   ImuData ProcImuAssembly(const ImuData& data) const {
@@ -846,4 +848,4 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 MYNTEYE_END_NAMESPACE
 
 #include <pluginlib/class_list_macros.h> // NOLINT
-PLUGINLIB_EXPORT_CLASS(MYNTEYE_NAMESPACE::MYNTEYEWrapperNodelet, nodelet::Nodelet);
+PLUGINLIB_EXPORT_CLASS(MYNTEYE_NAMESPACE::MYNTEYEWrapperNodelet, nodelet::Nodelet); // NOLINT
