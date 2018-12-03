@@ -354,7 +354,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       mynteye->DisableImageInfo();
     }
 
-    if (imu_sub || temp_sub || imu_processed_sub) {
+    if (imu_sub || imu_processed_sub || temp_sub) {
       if (mynteye->IsMotionDatasSupported()) {
         mynteye->EnableMotionDatas(0);
       }
@@ -405,19 +405,14 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
     // Set motion data callback
     mynteye->SetMotionCallback([this](const MotionData& data) {
-      if (data.imu && (sub_result.imu || sub_result.temp ||
-          sub_result.imu_processed)) {
-        ros::Time stamp = hardTimeToSoftTime(data.imu->timestamp);
+      if (data.imu && (sub_result.imu || sub_result.imu_processed ||
+          sub_result.temp)) {
         if (data.imu->flag == MYNTEYE_IMU_ACCEL) {
           imu_accel = data.imu;
-          publishImuOriginAndProcessed(stamp, sub_result.imu,
-                                      sub_result.imu_processed,
-                                      sub_result.temp);
+          publishImu(sub_result.imu, sub_result.imu_processed, sub_result.temp);
         } else if (data.imu->flag == MYNTEYE_IMU_GYRO) {
           imu_gyro = data.imu;
-          publishImuOriginAndProcessed(stamp, sub_result.imu,
-                                      sub_result.imu_processed,
-                                      sub_result.temp);
+          publishImu(sub_result.imu, sub_result.imu_processed, sub_result.temp);
         }
       }
     });
@@ -449,14 +444,6 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     *motion_intrinsics = mynteye->GetMotionIntrinsics(&in_ok);
     if (in_ok) {
       motion_intrinsics_enabled = true;
-      // std::cout << "Motion Intrinsics: {"
-      //           << *motion_intrinsics_
-      //           << "}"
-      //           << std::endl
-      //           << "Motion Intrinsics: {"
-      //           << *motion_intrinsics_
-      //           << "}"
-      //           << std::endl;
     } else {
       motion_intrinsics_enabled = false;
       std::cout << "This device not supported to get motion intrinsics."
@@ -574,20 +561,39 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     points_depth.release();
   }
 
-  void publishImuOriginAndProcessed(ros::Time stamp, bool imu_sub,
+  void publishImu(bool imu_sub,
         bool imu_processed_sub, bool temp_sub) {
-    if (imu_processed_sub || imu_sub) {
-      publishImuOrigin(stamp);
+    if (imu_accel == nullptr || imu_gyro == nullptr) {
+      return;
     }
-    if (temp_sub) {
-      publishTempOrigin(stamp);
+
+    ros::Time stamp = hardTimeToSoftTime(imu_accel->timestamp);
+
+    if (imu_sub) {
+      auto msg = getImuMsgFromData(stamp, imu_frame_id, *imu_accel, *imu_gyro);
+      pub_imu.publish(msg);
     }
+
     if (motion_intrinsics_enabled && imu_processed_sub) {
-      publishImuProcessed(stamp);
+      auto data_acc1 = ProcImuTempDrift(*imu_accel);
+      auto data_gyr1 = ProcImuTempDrift(*imu_gyro);
+      auto data_acc2 = ProcImuAssembly(data_acc1);
+      auto data_gyr2 = ProcImuAssembly(data_gyr1);
+      auto msg = getImuMsgFromData(stamp, imu_frame_processed_id,
+                                    data_acc2, data_gyr2);
+      pub_imu_processed.publish(msg);
     }
+
+    if (temp_sub) {
+      auto msg = getTempMsgFromData(stamp, temp_frame_id, *imu_accel);
+      pub_temp.publish(msg);
+    }
+
+    imu_accel = nullptr;
+    imu_gyro = nullptr;
   }
 
-  sensor_msgs::Imu getImuMsgFromeData(ros::Time stamp,
+  sensor_msgs::Imu getImuMsgFromData(ros::Time stamp,
       const std::string& frame_id,
       const ImuData& imu_accel, const ImuData& imu_gyro) {
     sensor_msgs::Imu msg;
@@ -629,10 +635,11 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     msg.angular_velocity_covariance[6] = 0;
     msg.angular_velocity_covariance[7] = 0;
     msg.angular_velocity_covariance[8] = 0;
+
     return msg;
   }
 
-  mynteye_wrapper_d::Temp getTempMsgFromeData(ros::Time stamp,
+  mynteye_wrapper_d::Temp getTempMsgFromData(ros::Time stamp,
                   const std::string& frame_id,
                   const ImuData& imu_accel) {
     mynteye_wrapper_d::Temp msg;
@@ -640,38 +647,6 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     msg.header.frame_id = frame_id;
     msg.data = imu_accel.temperature;
     return msg;
-  }
-
-  void publishImuOrigin(ros::Time stamp) {
-    if (imu_accel == nullptr || imu_gyro == nullptr) {
-      return;
-    }
-    auto msg = getImuMsgFromeData(stamp, imu_frame_id,
-            *imu_accel, *imu_gyro);
-    pub_imu.publish(msg);
-  }
-
-  void publishTempOrigin(ros::Time stamp) {
-    if (imu_accel == nullptr || imu_gyro == nullptr) {
-      return;
-    }
-    auto msg = getTempMsgFromeData(stamp, temp_frame_id,
-            *imu_accel);
-    pub_temp.publish(msg);
-  }
-
-  void publishImuProcessed(ros::Time stamp) {
-    if (imu_accel == nullptr || imu_gyro == nullptr) {
-      return;
-    }
-
-    auto data_acc1 = ProcImuTempDrift(*imu_accel);
-    auto data_gyr1 = ProcImuTempDrift(*imu_gyro);
-    auto data_acc2 = ProcImuAssembly(data_acc1);
-    auto data_gyr2 = ProcImuAssembly(data_gyr1);
-    auto msg = getImuMsgFromeData(stamp, imu_frame_processed_id,
-                                  data_acc2, data_gyr2);
-    pub_imu_processed.publish(msg);
   }
 
   sensor_msgs::CameraInfoPtr createCameraInfo(const CameraIntrinsics& in) {
