@@ -27,6 +27,7 @@
 #include "mynteyed/util/strings.h"
 
 // #define PACKET_PRINT
+// #define PACKET_STAMP_DETECTION
 
 #define PACKET_SIZE 64
 #define DATA_SIZE 15
@@ -237,6 +238,44 @@ void print_img_info(const ImgInfoPacket& img_info) {
 }
 #endif
 
+#ifdef PACKET_STAMP_DETECTION
+void detect_imu_data_stamp(const ImuDataPacket& imu_data) {
+  static std::uint32_t accel_stamp_last = imu_data.timestamp;
+  static std::uint32_t gyro_stamp_last = imu_data.timestamp;
+
+  std::uint32_t stamp = imu_data.timestamp;
+  std::uint32_t stamp_diff;
+  if (imu_data.flag == MYNTEYE_IMU_ACCEL) {
+    stamp_diff = stamp - accel_stamp_last;
+    accel_stamp_last = stamp;
+  } else {
+    stamp_diff = stamp - gyro_stamp_last;
+    gyro_stamp_last = stamp;
+  }
+
+  if (stamp_diff <= 0) {
+    // same or rollback
+    std::cout << "[STAMP_WARN]["
+        << (imu_data.flag == MYNTEYE_IMU_ACCEL ? "accel" : "gyro") << "]"
+        << " stamp: " << stamp
+        << ", diff: " << stamp_diff << std::endl;
+  }
+}
+
+void detect_img_info_stamp(const ImgInfoPacket& img_info) {
+  static std::uint32_t stamp_last = img_info.timestamp;
+  auto stamp = img_info.timestamp;
+  auto stamp_diff = stamp - stamp_last;
+  stamp_last = stamp;
+  if (stamp_diff <= 0) {
+    // same or rollback
+    std::cout << "[STAMP_WARN][img_info] fid: " << img_info.frame_id
+        << ", stamp: " << stamp
+        << ", diff: " << stamp_diff << std::endl;
+  }
+}
+#endif
+
 bool Channels::DoHidDataExtract(imu_packets_t &imu, img_packets_t &img) {
   std::uint8_t data[PACKET_SIZE * 2]{};
   std::fill(data, data + PACKET_SIZE * 2, 0);
@@ -284,11 +323,17 @@ bool Channels::DoHidDataExtract(imu_packets_t &imu, img_packets_t &img) {
 #ifdef PACKET_PRINT
         print_imu_data(imu_data);
 #endif
+#ifdef PACKET_STAMP_DETECTION
+        detect_imu_data_stamp(imu_data);
+#endif
       } else if (header == 2) {
         auto&& img_info = ImgInfoPacket(packet + offset);
         img.push_back(img_info);
 #ifdef PACKET_PRINT
         print_img_info(img_info);
+#endif
+#ifdef PACKET_STAMP_DETECTION
+        detect_img_info_stamp(img_info);
 #endif
       }
     }

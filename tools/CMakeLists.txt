@@ -85,3 +85,7 @@ add_subdirectory(dataset)
 # writer
 
 add_subdirectory(writer)
+
+# detection
+
+add_subdirectory(detection)
