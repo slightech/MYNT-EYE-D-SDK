@@ -127,7 +127,7 @@ class Device {
 
   void SyncCameraCalibrations();
 
-  void CompatibleUSB2();
+  void CompatibleUSB2(const StreamMode& mode);
 
   void CompatibleMJPG();
 
@@ -136,6 +136,8 @@ class Device {
   void OnInit();  // cross
 
   void ReleaseBuf();
+
+  bool IsUSB2();
 
 #ifdef MYNTEYE_OS_WIN
   static void ImgCallback(EtronDIImageType::Value imgType, int imgId,
