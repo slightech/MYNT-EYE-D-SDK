@@ -43,7 +43,7 @@ int main(int argc, char const* argv[]) {
       .type("int").set_default(10)
       .metavar("RATE").help("Framerate, range [0,60], [0,30](STREAM_2560x720), "
           "\ndefault: %default");
-  op_group.add_option("--dm").dest("dev_mode")
+  op_group.add_option("--dev-mode").dest("dev_mode")
       .type("int").set_default(2)
       .metavar("MODE").help("Device mode, default %default (DEVICE_ALL)"
           "\n  0: DEVICE_COLOR, left y right - depth n"
