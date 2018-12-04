@@ -801,16 +801,16 @@ void Device::CompatibleUSB2(const OpenParams& params) {
       (params.stream_mode == StreamMode::STREAM_1280x720 &&
        framerate_ <= 10 &&
        params.dev_mode != DeviceMode::DEVICE_ALL)) {
-    LOGI("\n\033[1;30mYou are using the USB 2.0 interface. "
+    LOGI("\nWARNING:: You are using the USB 2.0 interface. "
         "For bandwidth reasons, "
-        "it is recommended to use the USB 3.0 interface.\033[0m\n");
+        "it is recommended to use the USB 3.0 interface.\n");
     // 8bit 1, 6 match 14bit 2, 7
     depth_data_type_ = (depth_data_type_ == 7) ? 6 : 1;
   } else {
-    throw_error("\n\033[47;31mYou are using the USB 2.0 interface."
+    throw_error("\nNote:: You are using the USB 2.0 interface."
         " Current resolution or frame rate is not supported"
         " And you can refer to Resolution Support List"
-        " in the documentation\033[0m\n");
+        " in the documentation\n");
   }
 }
 
