@@ -320,7 +320,7 @@ bool Device::Open(const OpenParams& params) {
 
   GetStreamIndex(params, &color_res_index_, &depth_res_index_);
 
-  CompatibleUSB2(params.stream_mode);
+  CompatibleUSB2(params);
   CompatibleMJPG();
 
   LOGI("-- Framerate: %d", framerate_);
@@ -852,14 +852,18 @@ void Device::ReleaseBuf() {
   }
 }
 
-void Device::CompatibleUSB2(const StreamMode& mode) {
+void Device::CompatibleUSB2(const OpenParams& params) {
   if (!IsUSB2()) {
     return;
   }
 
-  if ((mode == StreamMode::STREAM_1280x720 &&
+  if ((params.stream_mode == StreamMode::STREAM_1280x720 &&
         framerate_ <= 5) ||
-      (mode == StreamMode::STREAM_640x480 && framerate_ <= 15)) {
+      (params.stream_mode == StreamMode::STREAM_640x480 &&
+       framerate_ <= 15) ||
+      (params.stream_mode == StreamMode::STREAM_1280x720 &&
+       framerate_ <= 10 &&
+       params.dev_mode == DeviceMode::DEVICE_COLOR)) {
     LOGI("\n\033[1;30mYou are using the USB 2.0 interface. "
         "For bandwidth reasons, "
         "it is recommended to use the USB 3.0 interface.\033[0m\n");

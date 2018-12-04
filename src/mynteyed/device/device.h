@@ -127,7 +127,7 @@ class Device {
 
   void SyncCameraCalibrations();
 
-  void CompatibleUSB2(const StreamMode& mode);
+  void CompatibleUSB2(const OpenParams& params);
 
   void CompatibleMJPG();
 
