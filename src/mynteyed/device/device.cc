@@ -371,10 +371,45 @@ bool Device::Open(const OpenParams& params) {
   // 0x08: use OpenCL in stitching. This bit effective only when bit-2 is set.
   BYTE ctrlMode = 0x01;
 
+/*
   int ret = EtronDI_OpenDeviceEx(etron_di_, &dev_sel_info_,
       color_res_index_, toRgb,
       depth_res_index_, depthStreamSwitch,
       Device::ImgCallback, this, &framerate_, ctrlMode);
+      */
+  int ret = 0;
+  switch (params.dev_mode) {
+    case DeviceMode::DEVICE_COLOR:
+      ret = EtronDI_OpenDeviceEx(etron_di_, &dev_sel_info_,
+        color_res_index_, toRgb,
+        -1, depthStreamSwitch,
+        Device::ImgCallback, this, &framerate_, ctrlMode);
+
+      color_device_opened_ = true;
+      depth_device_opened_ = false;
+      break;
+    case DeviceMode::DEVICE_DEPTH:
+      ret = EtronDI_OpenDeviceEx(etron_di_, &dev_sel_info_,
+        -1, toRgb,
+        depth_res_index_, depthStreamSwitch,
+        Device::ImgCallback, this, &framerate_, ctrlMode);
+
+      color_device_opened_ = false;
+      depth_device_opened_ = true;
+      break;
+    case DeviceMode::DEVICE_ALL:
+      ret = EtronDI_OpenDeviceEx(etron_di_, &dev_sel_info_,
+        color_res_index_, toRgb,
+        depth_res_index_, depthStreamSwitch,
+        Device::ImgCallback, this, &framerate_, ctrlMode);
+
+      color_device_opened_ = true;
+      depth_device_opened_ = true;
+      break;
+    default:
+      throw_error("ERROR:: DeviceMode is unknown.");
+      return false;
+  }
 #else
   int ret = 0;
   switch (params.dev_mode) {
