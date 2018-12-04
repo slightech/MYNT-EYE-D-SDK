@@ -347,105 +347,7 @@ bool Device::Open(const OpenParams& params) {
 
   ReleaseBuf();
 
-#ifdef MYNTEYE_OS_WIN
-  // int EtronDI_OpenDeviceEx(
-  //     void* pHandleEtronDI,
-  //     PDEVSELINFO pDevSelInfo,
-  //     int colorStreamIndex,
-  //     bool toRgb,
-  //     int depthStreamIndex,
-  //     int depthStreamSwitch,
-  //     EtronDI_ImgCallbackFn callbackFn,
-  //     void* pCallbackParam,
-  //     int* pFps,
-  //     BYTE ctrlMode)
-
-  bool toRgb = false;
-  // Depth0: none
-  // Depth1: unshort
-  // Depth2: ?
-  int depthStreamSwitch = EtronDIDepthSwitch::Depth1;
-  // 0x01: color and depth frame output synchrously, for depth map module only
-  // 0x02: enable post-process, for Depth Map module only
-  // 0x04: stitch images if this bit is set, for fisheye spherical module only
-  // 0x08: use OpenCL in stitching. This bit effective only when bit-2 is set.
-  BYTE ctrlMode = 0x01;
-
-/*
-  int ret = EtronDI_OpenDeviceEx(etron_di_, &dev_sel_info_,
-      color_res_index_, toRgb,
-      depth_res_index_, depthStreamSwitch,
-      Device::ImgCallback, this, &framerate_, ctrlMode);
-      */
-  int ret = 0;
-  switch (params.dev_mode) {
-    case DeviceMode::DEVICE_COLOR:
-      ret = EtronDI_OpenDeviceEx(etron_di_, &dev_sel_info_,
-        color_res_index_, toRgb,
-        -1, depthStreamSwitch,
-        Device::ImgCallback, this, &framerate_, ctrlMode);
-
-      color_device_opened_ = true;
-      depth_device_opened_ = false;
-      break;
-    case DeviceMode::DEVICE_DEPTH:
-      ret = EtronDI_OpenDeviceEx(etron_di_, &dev_sel_info_,
-        -1, toRgb,
-        depth_res_index_, depthStreamSwitch,
-        Device::ImgCallback, this, &framerate_, ctrlMode);
-
-      color_device_opened_ = false;
-      depth_device_opened_ = true;
-      break;
-    case DeviceMode::DEVICE_ALL:
-      ret = EtronDI_OpenDeviceEx(etron_di_, &dev_sel_info_,
-        color_res_index_, toRgb,
-        depth_res_index_, depthStreamSwitch,
-        Device::ImgCallback, this, &framerate_, ctrlMode);
-
-      color_device_opened_ = true;
-      depth_device_opened_ = true;
-      break;
-    default:
-      throw_error("ERROR:: DeviceMode is unknown.");
-      return false;
-  }
-#else
-  int ret = 0;
-  switch (params.dev_mode) {
-    case DeviceMode::DEVICE_COLOR:
-      ret = EtronDI_OpenDevice2(etron_di_, &dev_sel_info_,
-          stream_color_info_ptr_[color_res_index_].nWidth,
-          stream_color_info_ptr_[color_res_index_].nHeight,
-          stream_color_info_ptr_[color_res_index_].bFormatMJPG,
-          0, 0, dtc_, false, NULL, &framerate_);
-      color_device_opened_ = true;
-      depth_device_opened_ = false;
-      break;
-    case DeviceMode::DEVICE_DEPTH:
-      ret = EtronDI_OpenDevice2(etron_di_, &dev_sel_info_,
-          0, 0, false, stream_depth_info_ptr_[depth_res_index_].nWidth,
-          stream_depth_info_ptr_[depth_res_index_].nHeight,
-          dtc_, false, NULL, &framerate_);
-      color_device_opened_ = false;
-      depth_device_opened_ = true;
-      break;
-    case DeviceMode::DEVICE_ALL:
-      ret = EtronDI_OpenDevice2(etron_di_, &dev_sel_info_,
-          stream_color_info_ptr_[color_res_index_].nWidth,
-          stream_color_info_ptr_[color_res_index_].nHeight,
-          stream_color_info_ptr_[color_res_index_].bFormatMJPG,
-          stream_depth_info_ptr_[depth_res_index_].nWidth,
-          stream_depth_info_ptr_[depth_res_index_].nHeight,
-          dtc_, false, NULL, &framerate_);
-      color_device_opened_ = true;
-      depth_device_opened_ = true;
-      break;
-    default:
-      throw_error("ERROR:: DeviceMode is unknown.");
-      return false;
-  }
-#endif
+  int ret = OpenDevice(params.dev_mode);
 
   if (ETronDI_OK == ret) {
     open_params_ = params;
@@ -899,16 +801,16 @@ void Device::CompatibleUSB2(const OpenParams& params) {
       (params.stream_mode == StreamMode::STREAM_1280x720 &&
        framerate_ <= 10 &&
        params.dev_mode != DeviceMode::DEVICE_ALL)) {
-    LOGI("\n\033[1;30mYou are using the USB 2.0 interface. "
+    LOGI("\nWARNING:: You are using the USB 2.0 interface. "
         "For bandwidth reasons, "
-        "it is recommended to use the USB 3.0 interface.\033[0m\n");
+        "it is recommended to use the USB 3.0 interface.\n");
     // 8bit 1, 6 match 14bit 2, 7
     depth_data_type_ = (depth_data_type_ == 7) ? 6 : 1;
   } else {
-    throw_error("\n\033[47;31mYou are using the USB 2.0 interface."
+    throw_error("\nNote:: You are using the USB 2.0 interface."
         " Current resolution or frame rate is not supported"
         " And you can refer to Resolution Support List"
-        " in the documentation\033[0m\n");
+        " in the documentation\n");
   }
 }
 

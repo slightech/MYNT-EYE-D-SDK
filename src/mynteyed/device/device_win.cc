@@ -298,4 +298,59 @@ Image::pointer Device::GetImageDepth() {
   return nullptr;
 }
 
+int Device::OpenDevice(const DeviceMode& dev_mode) {
+  // int EtronDI_OpenDeviceEx(
+  //     void* pHandleEtronDI,
+  //     PDEVSELINFO pDevSelInfo,
+  //     int colorStreamIndex,
+  //     bool toRgb,
+  //     int depthStreamIndex,
+  //     int depthStreamSwitch,
+  //     EtronDI_ImgCallbackFn callbackFn,
+  //     void* pCallbackParam,
+  //     int* pFps,
+  //     BYTE ctrlMode)
+
+  bool toRgb = false;
+  // Depth0: none
+  // Depth1: unshort
+  // Depth2: ?
+  int depthStreamSwitch = EtronDIDepthSwitch::Depth1;
+  // 0x01: color and depth frame output synchrously, for depth map module only
+  // 0x02: enable post-process, for Depth Map module only
+  // 0x04: stitch images if this bit is set, for fisheye spherical module only
+  // 0x08: use OpenCL in stitching. This bit effective only when bit-2 is set.
+  BYTE ctrlMode = 0x01;
+
+  switch (dev_mode) {
+    case DeviceMode::DEVICE_COLOR:
+      color_device_opened_ = true;
+      depth_device_opened_ = false;
+
+      return EtronDI_OpenDeviceEx(etron_di_, &dev_sel_info_,
+        color_res_index_, toRgb,
+        -1, depthStreamSwitch,
+        Device::ImgCallback, this, &framerate_, ctrlMode);
+    case DeviceMode::DEVICE_DEPTH:
+      color_device_opened_ = false;
+      depth_device_opened_ = true;
+
+      return EtronDI_OpenDeviceEx(etron_di_, &dev_sel_info_,
+        -1, toRgb,
+        depth_res_index_, depthStreamSwitch,
+        Device::ImgCallback, this, &framerate_, ctrlMode);
+      break;
+    case DeviceMode::DEVICE_ALL:
+      color_device_opened_ = true;
+      depth_device_opened_ = true;
+
+      return EtronDI_OpenDeviceEx(etron_di_, &dev_sel_info_,
+        color_res_index_, toRgb,
+        depth_res_index_, depthStreamSwitch,
+        Device::ImgCallback, this, &framerate_, ctrlMode);
+    default:
+      throw_error("ERROR:: DeviceMode is unknown.");
+  }
+}
+
 #endif

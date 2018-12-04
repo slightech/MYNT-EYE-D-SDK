@@ -145,6 +145,8 @@ class Device {
       int serialNumber, void *pParam);
 #endif
 
+  int OpenDevice(const DeviceMode& dev_mode);
+  
   void* etron_di_;
 
   DEVSELINFO dev_sel_info_;
