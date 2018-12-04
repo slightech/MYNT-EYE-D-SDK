@@ -62,7 +62,7 @@ class Device {
   bool SetAutoWhiteBalanceEnabled(bool enabled);
 
   /** Set infrared interleave */
-  void SetInfraredInterleave(bool enabled);
+  void SetInfraredInterleave(const OpenParams& params);
 
   /** Set infrared intensity */
   void SetInfraredIntensity(std::uint16_t value);
