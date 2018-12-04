@@ -23,8 +23,8 @@
 
 
 注意::
-分辨率为 1280x720,  color 和 depth 最大支持 60fps.
-分辨率为 640x480,  color 和 depth 最大支持 60fps.
-分辨率为 1280x480,  color 和 depth 支持帧率仅为 60, 30fps.
-分辨率为 2560x720,  color 和 depth 支持帧率仅为 30fps.
-只打开color的情况下， 2560x720分辨率仅支持 60, 30fps.
+分辨率为 1280x720, color 和 depth 最大支持 60fps.
+分辨率为 640x480, color 和 depth 最大支持 60fps.
+分辨率为 1280x480, color 和 depth 支持帧率仅为 60, 30fps.
+分辨率为 2560x720, color 和 depth 支持帧率仅为 30fps.
+只打开color的情况下，2560x720分辨率仅支持 60, 30fps.
