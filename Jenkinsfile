@@ -27,14 +27,14 @@ pipeline {
     stage('Install') {
       steps {
         echo 'make install ..'
-        sh '. /opt/ros/kinetic/setup.sh; make install'
+        sh '. /opt/ros/kinetic/setup.sh; make install SUDO='
       }
     }
     /*
     stage('Test') {
       steps {
         echo 'make test ..'
-        sh '. /opt/ros/kinetic/setup.sh; make test'
+        sh '. /opt/ros/kinetic/setup.sh; make test SUDO='
       }
     }
     */
@@ -43,14 +43,14 @@ pipeline {
         echo 'make samples ..'
         sh '''
         apt-get install -y libasound2-dev
-        . /opt/ros/kinetic/setup.sh; make samples
+        . /opt/ros/kinetic/setup.sh; make samples SUDO=
         '''
       }
     }
     stage('Tools') {
       steps {
         echo 'make tools ..'
-        sh '. /opt/ros/kinetic/setup.sh; make tools'
+        sh '. /opt/ros/kinetic/setup.sh; make tools SUDO='
       }
     }
     stage('ROS') {
@@ -59,7 +59,7 @@ pipeline {
         sh '''
         . /opt/ros/kinetic/setup.sh
         rosdep install --from-paths wrappers/ros/src --ignore-src --rosdistro kinetic -y
-        make ros
+        make ros SUDO=
         '''
       }
     }
