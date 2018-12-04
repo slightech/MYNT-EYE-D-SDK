@@ -867,7 +867,7 @@ void Device::CompatibleUSB2(const StreamMode& mode) {
     depth_data_type_ = (depth_data_type_ == 7) ? 6 : 1;
   } else {
     throw_error("\n\033[47;31mYou are using the USB 2.0 interface."
-        " Current resolution is not supported"
+        " Current resolution or frame rate is not supported"
         " And you can refer to Resolution Support List"
         " in the documentation\033[0m\n");
   }
