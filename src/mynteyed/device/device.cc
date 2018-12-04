@@ -863,7 +863,7 @@ void Device::CompatibleUSB2(const OpenParams& params) {
        framerate_ <= 15) ||
       (params.stream_mode == StreamMode::STREAM_1280x720 &&
        framerate_ <= 10 &&
-       params.dev_mode == DeviceMode::DEVICE_COLOR)) {
+       params.dev_mode != DeviceMode::DEVICE_ALL)) {
     LOGI("\n\033[1;30mYou are using the USB 2.0 interface. "
         "For bandwidth reasons, "
         "it is recommended to use the USB 3.0 interface.\033[0m\n");
