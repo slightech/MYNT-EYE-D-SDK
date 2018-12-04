@@ -16,6 +16,8 @@ MKFILE_DIR := $(patsubst %/,%,$(dir $(MKFILE_PATH)))
 
 include CommonDefs.mk
 
+SUDO ?= sudo
+
 .DEFAULT_GOAL := all
 
 .PHONY: help
@@ -56,7 +58,11 @@ init:
 
 build:
 	@$(call echo,Make $@)
+ifeq ($(HOST_OS),Win)
 	@$(call cmake_build,./_build,..,-DCMAKE_INSTALL_PREFIX=$(MKFILE_DIR)/_install)
+else
+	@$(call cmake_build,./_build,..)
+endif
 
 .PHONY: build
 
@@ -64,9 +70,33 @@ build:
 
 install: build
 	@$(call echo,Make $@)
-	@$(call make_install,./_build)
+ifeq ($(HOST_OS),Win)
+ifneq ($(HOST_NAME),MinGW)
+	@cd ./_build; msbuild.exe INSTALL.vcxproj /property:Configuration=Release
+else
+	@cd ./_build; make install
+endif
+else
+ifeq ($(HOST_OS),Linux)
+	@cd ./_build; $(SUDO) make install
+else
+	@cd ./_build; make install
+endif
+endif
 
 .PHONY: install
+
+uninstall:
+	@$(call echo,Make $@)
+ifeq ($(HOST_OS),Linux)
+	$(SUDO) rm -rf /usr/local/include/mynteyed/
+	$(SUDO) rm -rf /usr/local/lib/libmynteye_depth.so*
+	$(SUDO) rm -rf /usr/local/lib/3rdparty/libeSPDI.so*
+	$(SUDO) rm -rf /usr/local/lib/cmake/mynteyed/
+	$(SUDO) rm -rf /usr/local/share/mynteyed/
+endif
+
+.PHONY: uninstall
 
 # samples
 
