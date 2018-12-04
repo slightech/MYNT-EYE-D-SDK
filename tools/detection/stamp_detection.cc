@@ -127,7 +127,7 @@ int main(int argc, char const* argv[]) {
     // params.stream_mode = StreamMode::STREAM_1280x480;  // vga
     params.stream_mode = StreamMode::STREAM_2560x720;  // hd
 
-    // Infrared intensity: 0(default), [0,6]
+    // Infrared intensity: 0(default), [0,10]
     // params.ir_intensity = 4;
   }
 

@@ -70,7 +70,7 @@ int main(int argc, char const* argv[]) {
     // Note: When frame rate less than 30fps, ir interleave will be not available.
     // params.ir_interleave = false;
 
-    // Infrared intensity: 0(default), [0,6]
+    // Infrared intensity: 0(default), [0,10]
     params.ir_intensity = 4;
   }
 

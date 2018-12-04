@@ -66,7 +66,7 @@ int main(int argc, char const* argv[]) {
     // Auto-white balance: true(default), false
     // params.state_awb = false;
 
-    // Infrared intensity: 0(default), [0,6]
+    // Infrared intensity: 0(default), [0,10]
     params.ir_intensity = 4;
   }
 

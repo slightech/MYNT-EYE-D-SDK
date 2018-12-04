@@ -87,7 +87,7 @@ struct MYNTEYE_API OpenParams {
   bool state_awb;
 
   /**
-   * IR (Infrared), range [0,6], default 0.
+   * IR (Infrared), range [0,10], default 0.
    */
   std::uint8_t ir_intensity;
 

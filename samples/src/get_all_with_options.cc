@@ -86,7 +86,7 @@ int main(int argc, char const* argv[]) {
       .action("store_true").help("Enable auto-white balance");
   op_group.add_option("--ir").dest("ir_intensity")
       .type("int").set_default(0)
-      .metavar("VALUE").help("IR intensity, range [0,6], default %default");
+      .metavar("VALUE").help("IR intensity, range [0,10], default %default");
   op_group.add_option("--ir-inter").dest("ir_interleave")
       .action("store_false").help("Enable ir-interleave");
   parser.add_option_group(op_group);
@@ -197,7 +197,7 @@ int main(int argc, char const* argv[]) {
     params.depth_stream_format = static_cast<StreamFormat>(val);
     params.state_ae = options.get("state_ae");
     params.state_awb = options.get("state_awb");
-    if (!in_range("ir_intensity", 0, 6, &val)) return 2;
+    if (!in_range("ir_intensity", 0, 10, &val)) return 2;
     params.ir_intensity = val;
     params.ir_interleave = options.get("ir_interleave");
 
