@@ -320,14 +320,14 @@ bool Device::Open(const OpenParams& params) {
 
   GetStreamIndex(params, &color_res_index_, &depth_res_index_);
 
-  CompatibleUSB2();
+  CompatibleUSB2(params);
   CompatibleMJPG();
 
   LOGI("-- Framerate: %d", framerate_);
 
   EtronDI_SetDepthDataType(etron_di_, &dev_sel_info_, depth_data_type_);
   DBG_LOGI("SetDepthDataType: %d", depth_data_type_);
-  LOGI("SetDepthDataType: %d", depth_data_type_);
+  LOGI(" SetDepthDataType: %d", depth_data_type_);
 
   LOGI("-- Color Stream: %dx%d %s",
       stream_color_info_ptr_[color_res_index_].nWidth,
@@ -852,23 +852,28 @@ void Device::ReleaseBuf() {
   }
 }
 
-void Device::CompatibleUSB2() {
-  if (stream_depth_info_ptr_ == nullptr) {
+void Device::CompatibleUSB2(const OpenParams& params) {
+  if (!IsUSB2()) {
     return;
   }
 
-  // default color(1280x720), depth(640x720), fps(5)
-  if (stream_depth_info_ptr_[1].nWidth == 320) {
-    LOGI("\nYou are using the USB 2.0 interface. "
-         "For bandwidth reasons, "
-         "it is recommended to use the USB 3.0 interface.\n");
-    color_res_index_ = 0;
-    depth_res_index_ = 0;
-    framerate_ = 5;
+  if ((params.stream_mode == StreamMode::STREAM_1280x720 &&
+        framerate_ <= 5) ||
+      (params.stream_mode == StreamMode::STREAM_640x480 &&
+       framerate_ <= 15) ||
+      (params.stream_mode == StreamMode::STREAM_1280x720 &&
+       framerate_ <= 10 &&
+       params.dev_mode != DeviceMode::DEVICE_ALL)) {
+    LOGI("\n\033[1;30mYou are using the USB 2.0 interface. "
+        "For bandwidth reasons, "
+        "it is recommended to use the USB 3.0 interface.\033[0m\n");
     // 8bit 1, 6 match 14bit 2, 7
-    // Now, only support 1
-    // depth_data_type_ = (depth_data_type_ == 7) ? 6 : 1;
-    depth_data_type_ = 1;
+    depth_data_type_ = (depth_data_type_ == 7) ? 6 : 1;
+  } else {
+    throw_error("\n\033[47;31mYou are using the USB 2.0 interface."
+        " Current resolution or frame rate is not supported"
+        " And you can refer to Resolution Support List"
+        " in the documentation\033[0m\n");
   }
 }
 
@@ -880,4 +885,12 @@ void Device::CompatibleMJPG() {
   // Now, only support 1
   // depth_data_type_ = (depth_data_type_ == 7) ? 6 : 1;
   depth_data_type_ = 1;
+}
+
+bool Device::IsUSB2() {
+  if (stream_depth_info_ptr_ == nullptr) {
+    return false;
+  }
+
+  return stream_depth_info_ptr_[1].nWidth == 320;
 }
