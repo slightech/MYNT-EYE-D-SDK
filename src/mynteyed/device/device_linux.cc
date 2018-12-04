@@ -140,4 +140,42 @@ Image::pointer Device::GetImageDepth() {
   }
 }
 
+int Device::OpenDevice(const DeviceMode& dev_mode) {
+  switch (dev_mode) {
+    case DeviceMode::DEVICE_COLOR:
+      color_device_opened_ = true;
+      depth_device_opened_ = false;
+
+      return EtronDI_OpenDevice2(etron_di_, &dev_sel_info_,
+          stream_color_info_ptr_[color_res_index_].nWidth,
+          stream_color_info_ptr_[color_res_index_].nHeight,
+          stream_color_info_ptr_[color_res_index_].bFormatMJPG,
+          0, 0, dtc_, false, NULL, &framerate_);
+      break;
+    case DeviceMode::DEVICE_DEPTH:
+      color_device_opened_ = false;
+      depth_device_opened_ = true;
+
+      return EtronDI_OpenDevice2(etron_di_, &dev_sel_info_,
+          0, 0, false, stream_depth_info_ptr_[depth_res_index_].nWidth,
+          stream_depth_info_ptr_[depth_res_index_].nHeight,
+          dtc_, false, NULL, &framerate_);
+      break;
+    case DeviceMode::DEVICE_ALL:
+      color_device_opened_ = true;
+      depth_device_opened_ = true;
+
+      return EtronDI_OpenDevice2(etron_di_, &dev_sel_info_,
+          stream_color_info_ptr_[color_res_index_].nWidth,
+          stream_color_info_ptr_[color_res_index_].nHeight,
+          stream_color_info_ptr_[color_res_index_].bFormatMJPG,
+          stream_depth_info_ptr_[depth_res_index_].nWidth,
+          stream_depth_info_ptr_[depth_res_index_].nHeight,
+          dtc_, false, NULL, &framerate_);
+      break;
+    default:
+      throw_error("ERROR:: DeviceMode is unknown.");
+  }
+}
+
 #endif
