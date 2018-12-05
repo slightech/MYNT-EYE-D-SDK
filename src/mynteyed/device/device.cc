@@ -89,9 +89,9 @@ void Device::Init() {
   color_device_opened_ = false;
   depth_device_opened_ = false;
 
-  ir_only_depth_enabled_ = false;
-  color_ir_only_depth_enabled_ = false;
-  depth_ir_only_depth_enabled_ = false;
+  ir_depth_only_enabled_ = false;
+  color_ir_depth_only_enabled_ = false;
+  depth_ir_depth_only_enabled_ = false;
 
   OnInit();
 }
@@ -221,8 +221,8 @@ bool Device::SetAutoWhiteBalanceEnabled(bool enabled) {
   return ok;
 }
 
-void Device::SetInfraredOnlyDepth(const OpenParams& params) {
-  if (!params.ir_only_depth) {
+void Device::SetInfraredDepthOnly(const OpenParams& params) {
+  if (!params.ir_depth_only) {
     EtronDI_EnableInterleave(etron_di_, &dev_sel_info_, false);
     return;
   }
@@ -241,14 +241,14 @@ void Device::SetInfraredOnlyDepth(const OpenParams& params) {
   }
 
   if (error_n > 0) {
-    throw_error("\n\nNote: IR Only Depth mode support frame"
+    throw_error("\n\nNote: IR Depth Only mode support frame"
         " rate only be between 15fps and 30fps.\n"
         "    When dev_mode != DeviceMode::DEVICE_ALL,"
-        " IR Only Depth mode not be supported.\n"
+        " IR Depth Only mode not be supported.\n"
         "    When stream_mode == StreamMode::STREAM_2560x720,"
-        " frame rate only be 15fps.\n"
+        " frame rate only be 15fps in this mode.\n"
         "    When frame rate less than 15fps or greater than 30fps,"
-        " IR Only Depth mode will be not available.\n");
+        " IR Depth Only mode will be not available.\n");
 
     return;
   }
@@ -256,13 +256,13 @@ void Device::SetInfraredOnlyDepth(const OpenParams& params) {
   if (depth_data_type_ == 1 ||
       depth_data_type_ == 2 ||
       depth_data_type_ == 4) {
-    color_ir_only_depth_enabled_ = false;
-    depth_ir_only_depth_enabled_ = true;
+    color_ir_depth_only_enabled_ = false;
+    depth_ir_depth_only_enabled_ = true;
   } else {
-    color_ir_only_depth_enabled_ = true;
-    depth_ir_only_depth_enabled_ = false;
+    color_ir_depth_only_enabled_ = true;
+    depth_ir_depth_only_enabled_ = false;
   }
-  ir_only_depth_enabled_ = true;
+  ir_depth_only_enabled_ = true;
   EtronDI_EnableInterleave(etron_di_, &dev_sel_info_, true);
   framerate_ *= 2;
 }
@@ -364,7 +364,7 @@ bool Device::Open(const OpenParams& params) {
       stream_depth_info_ptr_[depth_res_index_].nHeight,
       stream_depth_info_ptr_[depth_res_index_].bFormatMJPG ? "MJPG" : "YUYV");
 
-  SetInfraredOnlyDepth(params);
+  SetInfraredDepthOnly(params);
 
   if (params.ir_intensity >= 0) {
     SetInfraredIntensity(params.ir_intensity);

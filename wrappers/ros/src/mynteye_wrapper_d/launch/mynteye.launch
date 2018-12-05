@@ -47,8 +47,8 @@
   <arg name="state_awb" default="true" />
   <!-- IR intensity -->
   <arg name="ir_intensity" default="4" />
-  <!-- IR Only Depth -->
-  <arg name="ir_only_depth" default="true" />
+  <!-- IR Depth Only -->
+  <arg name="ir_depth_only" default="true" />
 
   <!-- Generating points frequency, make slower than framerate -->
   <arg name="points_frequency" default="2" />
@@ -104,7 +104,7 @@
     <param name="state_ae"      value="$(arg state_ae)" />
     <param name="state_awb"     value="$(arg state_awb)" />
     <param name="ir_intensity"  value="$(arg ir_intensity)" />
-    <param name="ir_only_depth" value="$(arg ir_only_depth)" />
+    <param name="ir_depth_only" value="$(arg ir_depth_only)" />
 
     <param name="points_factor"    value="$(arg points_factor)" />
     <param name="points_frequency" value="$(arg points_frequency)" />

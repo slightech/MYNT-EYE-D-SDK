@@ -48,7 +48,7 @@ Options:
     --ae                Enable auto-exposure
     --awb               Enable auto-white balance
     --ir=VALUE          IR intensity, range [0,6], default 0
-    --ir-inter          Enable ir-interleave
+    --ir-depth          Enable ir-depth-only
 
   Feature Toggles:
     The feature toggles

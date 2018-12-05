@@ -34,7 +34,7 @@ OpenParams::OpenParams(const std::int32_t& dev_index)
     state_ae(true),
     state_awb(true),
     ir_intensity(0),
-    ir_only_depth(false) {
+    ir_depth_only(false) {
   DBG_LOGD(__func__);
 }
 

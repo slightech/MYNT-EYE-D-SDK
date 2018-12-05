@@ -28,3 +28,4 @@
 > * 分辨率为 1280x480, color 和 depth 支持帧率仅为 60, 30fps.
 > * 分辨率为 2560x720, color 和 depth 支持帧率仅为 30fps.
 > * 只打开 color 的情况下，2560x720 分辨率仅支持 60, 30fps.
+> * 在IR Depth Only模式下，帧率只支持在15fps和30fps之间.

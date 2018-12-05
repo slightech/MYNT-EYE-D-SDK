@@ -86,19 +86,25 @@ Reference code snippet:
 params.ir_intensity = 4;
 ```
 
-## Enable IR Interleave
+## Enable IR Depth Only
 
-Using the `params.ir_interleave` parameter，you can set IR Interleave function. This is enabled by default.
+Using the `params.ir_depth_only` parameter，you can set IR Depth Only function. This is disabled by default.
 
 > Attention
-> - This function doesn't work on 30 frame rate.
+> - This function doesn't work on 15 frame rate below.
 
 Reference code snippet:
 
 ```bash
-// IR Interleave: true(default), false
-// Note: When frame rate less than 30fps, ir interleave will be not available.
-// params.ir_interleave = false;
+// IR Depth Only: true, false(default)↩
+// Note: IR Depth Only mode support frame rate between 15fps and 30fps.↩
+//     When dev_mode != DeviceMode::DEVICE_ALL,↩
+//       IR Depth Only mode not be supported.↩
+//     When stream_mode == StreamMode::STREAM_2560x720,↩
+//       frame rate only be 15fps in this mode.↩
+//     When frame rate less than 15fps or greater than 30fps,↩
+//       IR Depth Only mode will be not available.↩
+// params.ir_depth_only = false;
 ```
 
 Reference running results on Linux:
@@ -112,8 +118,6 @@ D/eSPDI_API: SetPropertyValue control=7 value=0D/eSPDI_API: SetPropertyValue con
 D/eSPDI_API: SetPropertyValue control=7 value=4 SetDepthDataType: 4
 -- Color Stream: 1280x720 YUYV
 -- Depth Stream: 1280x720 YUYV
-
-WARNING:: IR interleave will not be effective for framerate less than 30 fps!
 
 D/eSPDI_API: SetPropertyValue control=7 value=0D/eSPDI_API: SetPropertyValue control=7 value=3D/eSPDI_API: SetPropertyValue control=7 value=4
 -- IR intensity: 4

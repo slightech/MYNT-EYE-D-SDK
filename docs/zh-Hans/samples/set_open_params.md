@@ -88,19 +88,25 @@ params.framerate = 10;
 params.ir_intensity = 4;
 ```
 
-## 启用IR隔帧开合
+## 启用IR Depth Only
 
-通过设置 `params.ir_interleave` 参数，就可以设定IR隔帧开合功能。默认开启。
+通过设置 `params.ir_depth_only` 参数，就可以设定IR Depth Only功能。默认关闭。
 
 > 注意
-> - 30帧下此功能不生效
+> - 15帧下此功能不生效
 
 参考代码片段：
 
 ```bash
-// IR Interleave: true(default), false
-// Note: When frame rate less than 30fps, ir interleave will be not available.
-// params.ir_interleave = false;
+// IR Depth Only: true, false(default)↩↩
+// Note: IR Depth Only mode support frame rate between 15fps and 30fps.↩↩
+//     When dev_mode != DeviceMode::DEVICE_ALL,↩↩
+//       IR Depth Only mode not be supported.↩↩
+//     When stream_mode == StreamMode::STREAM_2560x720,↩↩
+//       frame rate only be 15fps in this mode.↩↩
+//     When frame rate less than 15fps or greater than 30fps,↩↩
+//       IR Depth Only mode will be not available.↩↩
+// params.ir_depth_only = false;↩
 ```
 
 以上功能参考运行结果，于 Linux 上：
@@ -114,8 +120,6 @@ D/eSPDI_API: SetPropertyValue control=7 value=0D/eSPDI_API: SetPropertyValue con
 D/eSPDI_API: SetPropertyValue control=7 value=4 SetDepthDataType: 4
 -- Color Stream: 1280x720 YUYV
 -- Depth Stream: 1280x720 YUYV
-
-WARNING:: IR interleave will not be effective for framerate less than 30 fps!
 
 D/eSPDI_API: SetPropertyValue control=7 value=0D/eSPDI_API: SetPropertyValue control=7 value=3D/eSPDI_API: SetPropertyValue control=7 value=4
 -- IR intensity: 4
