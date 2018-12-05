@@ -49,8 +49,9 @@ int hid_device::get_device_class() {
 
   if (HidD_GetProductString(first_hid_->handle, desc, sizeof(desc))) {
     if ('D' != desc[28]) { return 0xFF; }
+  } else {
+    return -1;
   }
-  else { return -1; }
   return 0;
 }
 
@@ -366,21 +367,9 @@ bool hid_device::find_device() {
   }
 
   // CloseHandle(handle);
-  return false;;
+  return false;
 }
 
 } // namespace hid
 
 MYNTEYE_END_NAMESPACE
-
-
-
-
-
-
-
-
-
-
-
-

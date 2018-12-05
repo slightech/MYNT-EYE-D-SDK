@@ -13,7 +13,7 @@
 # limitations under the License.
 cmake_minimum_required(VERSION 3.0)
 
-project(mynteyed VERSION 1.5.0 LANGUAGES C CXX)
+project(mynteyed VERSION 1.5.1 LANGUAGES C CXX)
 
 include(cmake/Common.cmake)
 
