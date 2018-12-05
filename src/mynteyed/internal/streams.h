@@ -169,7 +169,7 @@ class Streams {
   img_info_callback_t img_info_callback_;
   std::map<ImageType, img_data_callback_t> img_data_callbacks_;
 
-  bool is_win_;
+  // bool is_win_;
 };
 
 MYNTEYE_END_NAMESPACE
