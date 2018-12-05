@@ -790,17 +790,15 @@ WARN_LOGFILE           =
 # directories like /usr/src/myproject. Separate the files or directories with
 # spaces. See also FILE_PATTERNS and EXTENSION_MAPPING
 # Note: If this tag is empty the current directory is searched.
-INPUT                  = guide_product_description.md \
-                         guide_surface.md \
-                         guide_imu_coord.md \
-                         guide_build_linux.md \
-                         guide_build_win.md \
-                         guide_install_exe_win.md \
-                         guide_ros.md \
-                         guide_recording_data.md \
-                         guide_analyzing_imu.md \
-                         guide_analyze_time_stamps.md \
-                         guide_support_resolution.md \
+INPUT                  = mainpage.md \
+                         product.md \
+                         installation.md \
+                         samples.md \
+                         tools.md \
+                         product/ \
+                         installation/ \
+                         samples/ \
+                         tools/ \
                          ../../include
 
 # This tag can be used to specify the character encoding of the source files
@@ -2103,7 +2101,7 @@ INCLUDE_FILE_PATTERNS  =
 # This tag requires that the tag ENABLE_PREPROCESSING is set to YES.
 
 PREDEFINED             = DOXYGEN_WORKING \
-                         "MYNTEYE_BEGIN_NAMESPACE=namespace mynteye {" \
+                         "MYNTEYE_BEGIN_NAMESPACE=namespace mynteyed {" \
                          "MYNTEYE_END_NAMESPACE=}"
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
