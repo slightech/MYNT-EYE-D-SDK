@@ -28,12 +28,12 @@ MYNTEYE_BEGIN_NAMESPACE
  *
  * Control the color & depth streams enabled or not.
  *
- * Note: ✓: available, x: unavailable, ?: depends on StreamMode
+ * Note: y: available, n: unavailable, -: depends on StreamMode
  */
 enum class DeviceMode : std::int32_t {
-  DEVICE_COLOR = 0,  // IMAGE_LEFT_COLOR ✓ IMAGE_RIGHT_COLOR ? IMAGE_DEPTH x
-  DEVICE_DEPTH = 1,  // IMAGE_LEFT_COLOR x IMAGE_RIGHT_COLOR x IMAGE_DEPTH ✓
-  DEVICE_ALL = 2,    // IMAGE_LEFT_COLOR ✓ IMAGE_RIGHT_COLOR ? IMAGE_DEPTH ✓
+  DEVICE_COLOR = 0,  // IMAGE_LEFT_COLOR y IMAGE_RIGHT_COLOR - IMAGE_DEPTH n
+  DEVICE_DEPTH = 1,  // IMAGE_LEFT_COLOR n IMAGE_RIGHT_COLOR n IMAGE_DEPTH y
+  DEVICE_ALL = 2,    // IMAGE_LEFT_COLOR y IMAGE_RIGHT_COLOR - IMAGE_DEPTH y
 };
 
 /**
