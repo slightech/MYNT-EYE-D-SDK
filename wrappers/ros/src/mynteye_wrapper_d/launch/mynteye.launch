@@ -48,7 +48,7 @@
   <!-- IR intensity -->
   <arg name="ir_intensity" default="4" />
   <!-- IR Depth Only -->
-  <arg name="ir_depth_only" default="true" />
+  <arg name="ir_depth_only" default="false" />
 
   <!-- Generating points frequency, make slower than framerate -->
   <arg name="points_frequency" default="2" />

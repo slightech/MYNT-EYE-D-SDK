@@ -87,7 +87,7 @@ int main(int argc, char const* argv[]) {
   op_group.add_option("--ir").dest("ir_intensity")
       .type("int").set_default(0)
       .metavar("VALUE").help("IR intensity, range [0,10], default %default");
-  op_group.add_option("--ir-inter").dest("ir_depth_only")
+  op_group.add_option("--ir-depth").dest("ir_depth_only")
       .action("store_false").help("Enable ir-depth-only");
   parser.add_option_group(op_group);
 
