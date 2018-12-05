@@ -2,11 +2,6 @@
 
 ## 1. Install SDK dependencies
 
-Note: Because of the problem of device permissions, you must reinsert the camera device after the command is executed and on the same computer, this operation only needs to be done once..
-```
-make init
-```
-
 ### 1.1 Install OpenCV
 
 *If you have installed opencv already or you want use it in ROS, you can skip this part.*
@@ -61,6 +56,19 @@ sudo ln -sf /usr/lib/aarch64-linux-gnu/tegra/libGL.so /usr/lib/aarch64-linux-gnu
 ```
 git clone https://github.com/slightech/MYNT-EYE-D-SDK.git
 cd MYNT-EYE-D-SDK
+```
+
+### 2.1 Init SDK
+
+> Note: Because of the problem of device permissions, you must reinsert the camera device after the command is executed and on the same computer, this operation only needs to be done once.
+
+```
+make init
+```
+
+### 2.2 Compile SDK
+
+```
 make all
 ```
 

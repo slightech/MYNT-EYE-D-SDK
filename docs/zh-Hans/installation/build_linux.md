@@ -2,12 +2,6 @@
 
 ## 1. 安装 SDK 依赖
 
-注意: 因为设备权限的问题，命令执行完成之后，您必须重新拔插设备(这个操作在同一台电脑上，只需要做一次).
-
-```
-make init
-```
-
 ### 1.1 安装 OpenCV
 
 *如果您已经安装了 opencv 或者您想要使用 ROS，您可以跳过这步.*
@@ -62,10 +56,24 @@ sudo ln -sf /usr/lib/aarch64-linux-gnu/tegra/libGL.so /usr/lib/aarch64-linux-gnu
 ```
 git clone https://github.com/slightech/MYNT-EYE-D-SDK.git
 cd MYNT-EYE-D-SDK
+```
+
+### 2.1 初始化 SDK
+
+> 注意: 因为设备权限的问题，命令执行完成之后，您必须重新拔插设备(这个操作在同一台电脑上，只需要做一次)。
+
+```
+make init
+```
+
+### 2.2 编译 SDK
+
+```
 make all
 ```
 
 ## 3. 运行例程
+
 Note:: 默认打开矫正后的图像。(跑vio时需要使用原图，跑深度或者点云使用矫正后的图像)
 
 1) get_image 显示左右目的图像和彩色深度图
