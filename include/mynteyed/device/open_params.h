@@ -92,10 +92,10 @@ struct MYNTEYE_API OpenParams {
   std::uint8_t ir_intensity;
 
   /**
-   * IR interleave mode, default true.
-   * Note: When frame rate less than 30fps, ir interleave will be not available.
+   * IR Only Depth mode, default true.
+   * Note: When frame rate less than 30fps, IR Only Depth will be not available.
    */
-  bool ir_interleave;
+  bool ir_only_depth;
 
   /** Constructor. */
   OpenParams();

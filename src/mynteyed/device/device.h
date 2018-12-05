@@ -61,8 +61,8 @@ class Device {
   /** Set auto-white-balance enabled or not */
   bool SetAutoWhiteBalanceEnabled(bool enabled);
 
-  /** Set infrared interleave */
-  void SetInfraredInterleave(const OpenParams& params);
+  /** Set infrared only depth */
+  void SetInfraredOnlyDepth(const OpenParams& params);
 
   /** Set infrared intensity */
   void SetInfraredIntensity(std::uint16_t value);
@@ -189,9 +189,9 @@ class Device {
   bool color_device_opened_;
   bool depth_device_opened_;
 
-  bool ir_interleave_enabled_;
-  bool color_interleave_enabled_;
-  bool depth_interleave_enabled_;
+  bool ir_only_depth_enabled_;
+  bool color_ir_only_depth_enabled_;
+  bool depth_ir_only_depth_enabled_;
 };
 
 MYNTEYE_END_NAMESPACE

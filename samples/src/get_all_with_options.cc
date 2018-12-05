@@ -87,8 +87,8 @@ int main(int argc, char const* argv[]) {
   op_group.add_option("--ir").dest("ir_intensity")
       .type("int").set_default(0)
       .metavar("VALUE").help("IR intensity, range [0,10], default %default");
-  op_group.add_option("--ir-inter").dest("ir_interleave")
-      .action("store_false").help("Enable ir-interleave");
+  op_group.add_option("--ir-inter").dest("ir_only_depth")
+      .action("store_false").help("Enable ir-only-depth");
   parser.add_option_group(op_group);
 
   // FeatureToggles
@@ -199,7 +199,7 @@ int main(int argc, char const* argv[]) {
     params.state_awb = options.get("state_awb");
     if (!in_range("ir_intensity", 0, 10, &val)) return 2;
     params.ir_intensity = val;
-    params.ir_interleave = options.get("ir_interleave");
+    params.ir_only_depth = options.get("ir_only_depth");
 
     if (params.stream_mode == StreamMode::STREAM_2560x720) {
       if (!in_range("framerate", 0, 30, &val)) return 2;

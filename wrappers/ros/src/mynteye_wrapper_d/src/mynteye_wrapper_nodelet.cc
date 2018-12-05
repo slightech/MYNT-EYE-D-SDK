@@ -165,7 +165,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     bool state_ae = true;
     bool state_awb = true;
     int ir_intensity = 0;
-    bool ir_interleave = true;
+    bool ir_only_depth = true;
     nh_ns.getParam("dev_index", dev_index);
     nh_ns.getParam("framerate", framerate);
     nh_ns.getParam("dev_mode", dev_mode);
@@ -177,7 +177,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     nh_ns.getParam("state_ae", state_ae);
     nh_ns.getParam("state_awb", state_awb);
     nh_ns.getParam("ir_intensity", ir_intensity);
-    nh_ns.getParam("ir_interleave", ir_interleave);
+    nh_ns.getParam("ir_only_depth", ir_only_depth);
 
     points_frequency = DEFAULT_POINTS_FREQUENCE;
     points_factor = DEFAULT_POINTS_FACTOR;
@@ -287,7 +287,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     params.state_ae = state_ae;
     params.state_awb = state_awb;
     params.ir_intensity = ir_intensity;
-    params.ir_interleave = ir_interleave;
+    params.ir_only_depth = ir_only_depth;
 
     mynteye->EnableProcessMode(ProcessMode::PROC_NONE);
 

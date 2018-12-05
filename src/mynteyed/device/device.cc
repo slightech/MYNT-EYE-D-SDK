@@ -89,9 +89,9 @@ void Device::Init() {
   color_device_opened_ = false;
   depth_device_opened_ = false;
 
-  ir_interleave_enabled_ = false;
-  color_interleave_enabled_ = false;
-  depth_interleave_enabled_ = false;
+  ir_only_depth_enabled_ = false;
+  color_ir_only_depth_enabled_ = false;
+  depth_ir_only_depth_enabled_ = false;
 
   OnInit();
 }
@@ -221,8 +221,8 @@ bool Device::SetAutoWhiteBalanceEnabled(bool enabled) {
   return ok;
 }
 
-void Device::SetInfraredInterleave(const OpenParams& params) {
-  if (!params.ir_interleave) {
+void Device::SetInfraredOnlyDepth(const OpenParams& params) {
+  if (!params.ir_only_depth) {
     EtronDI_EnableInterleave(etron_di_, &dev_sel_info_, false);
     return;
   }
@@ -241,14 +241,14 @@ void Device::SetInfraredInterleave(const OpenParams& params) {
   }
 
   if (error_n > 0) {
-    throw_error("\n\nNote: IR Interleave mode support frame"
+    throw_error("\n\nNote: IR Only Depth mode support frame"
         " rate only be between 15fps and 30fps.\n"
         "    When dev_mode != DeviceMode::DEVICE_ALL,"
-        " IR Interleave not be supported.\n"
+        " IR Only Depth mode not be supported.\n"
         "    When stream_mode == StreamMode::STREAM_2560x720,"
         " frame rate only be 15fps.\n"
         "    When frame rate less than 15fps or greater than 30fps,"
-        " IR Interleave will be not available.\n");
+        " IR Only Depth mode will be not available.\n");
 
     return;
   }
@@ -256,13 +256,13 @@ void Device::SetInfraredInterleave(const OpenParams& params) {
   if (depth_data_type_ == 1 ||
       depth_data_type_ == 2 ||
       depth_data_type_ == 4) {
-    color_interleave_enabled_ = false;
-    depth_interleave_enabled_ = true;
+    color_ir_only_depth_enabled_ = false;
+    depth_ir_only_depth_enabled_ = true;
   } else {
-    color_interleave_enabled_ = true;
-    depth_interleave_enabled_ = false;
+    color_ir_only_depth_enabled_ = true;
+    depth_ir_only_depth_enabled_ = false;
   }
-  ir_interleave_enabled_ = true;
+  ir_only_depth_enabled_ = true;
   EtronDI_EnableInterleave(etron_di_, &dev_sel_info_, true);
   framerate_ *= 2;
 }
@@ -364,7 +364,7 @@ bool Device::Open(const OpenParams& params) {
       stream_depth_info_ptr_[depth_res_index_].nHeight,
       stream_depth_info_ptr_[depth_res_index_].bFormatMJPG ? "MJPG" : "YUYV");
 
-  SetInfraredInterleave(params);
+  SetInfraredOnlyDepth(params);
 
   if (params.ir_intensity >= 0) {
     SetInfraredIntensity(params.ir_intensity);
@@ -836,7 +836,7 @@ void Device::CompatibleUSB2(const OpenParams& params) {
     throw_error("\nNote:: You are using the USB 2.0 interface."
         " Current resolution or frame rate is not supported"
         " And you can refer to Resolution Support List"
-        " in the documentation\n");
+        " in the documentation.\n");
   }
 }
 

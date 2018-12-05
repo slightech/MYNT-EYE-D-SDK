@@ -66,9 +66,15 @@ int main(int argc, char const* argv[]) {
     // Auto-white balance: true(default), false
     // params.state_awb = false;
 
-    // IR Interleave: true(default), false
-    // Note: When frame rate less than 30fps, ir interleave will be not available.
-    // params.ir_interleave = false;
+    // IR Only Depth: true, false(default)
+    // Note: IR Only Depth mode support frame rate between 15fps and 30fps.
+    //     When dev_mode != DeviceMode::DEVICE_ALL,
+    //       IR Only Depth mode not be supported.
+    //     When stream_mode == StreamMode::STREAM_2560x720,
+    //       frame rate only be 15fps.
+    //     When frame rate less than 15fps or greater than 30fps,
+    //       IR Only Depth mode will be not available.
+    // params.ir_only_depth = true;
 
     // Infrared intensity: 0(default), [0,10]
     params.ir_intensity = 4;

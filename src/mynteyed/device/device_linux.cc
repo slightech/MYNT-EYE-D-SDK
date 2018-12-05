@@ -54,11 +54,11 @@ Image::pointer Device::GetImageColor() {
     return nullptr;
   }
 
-  if (ir_interleave_enabled_) {
-    if (color_interleave_enabled_ &&
+  if (ir_only_depth_enabled_) {
+    if (color_ir_only_depth_enabled_ &&
         (color_serial_number_ % 2) > 0) {
       return nullptr;
-    } else if (!color_interleave_enabled_ &&
+    } else if (!color_ir_only_depth_enabled_ &&
         (color_serial_number_ % 2) == 0) {
       return nullptr;
     }
@@ -112,11 +112,11 @@ Image::pointer Device::GetImageDepth() {
     return nullptr;
   }
 
-  if (ir_interleave_enabled_) {
-    if (depth_interleave_enabled_ &&
+  if (ir_only_depth_enabled_) {
+    if (depth_ir_only_depth_enabled_ &&
         (depth_serial_number_ % 2) > 0) {
       return nullptr;
-    } else if (!depth_interleave_enabled_ &&
+    } else if (!depth_ir_only_depth_enabled_ &&
         (depth_serial_number_ % 2) == 0) {
       return nullptr;
     }
