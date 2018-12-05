@@ -40,14 +40,14 @@ struct MYNTEYE_API OpenParams {
    * Device mode, default DEVICE_ALL
    *
    * <ul>
-   * <li>DEVICE_COLOR: IMAGE_LEFT_COLOR ✓ IMAGE_RIGHT_COLOR ? IMAGE_DEPTH x
-   * <li>DEVICE_DEPTH: IMAGE_LEFT_COLOR x IMAGE_RIGHT_COLOR x IMAGE_DEPTH ✓
-   * <li>DEVICE_ALL:   IMAGE_LEFT_COLOR ✓ IMAGE_RIGHT_COLOR ? IMAGE_DEPTH ✓
+   * <li>DEVICE_COLOR: IMAGE_LEFT_COLOR y IMAGE_RIGHT_COLOR - IMAGE_DEPTH n
+   * <li>DEVICE_DEPTH: IMAGE_LEFT_COLOR n IMAGE_RIGHT_COLOR n IMAGE_DEPTH y
+   * <li>DEVICE_ALL:   IMAGE_LEFT_COLOR y IMAGE_RIGHT_COLOR - IMAGE_DEPTH y
    * </ul>
    *
    * Could detect image type is enabled after opened through Camera::IsStreamDataEnabled().
    *
-   * Note: ✓: available, x: unavailable, ?: depends on #stream_mode
+   * Note: y: available, n: unavailable, -: depends on #stream_mode
    */
   DeviceMode dev_mode;
 
