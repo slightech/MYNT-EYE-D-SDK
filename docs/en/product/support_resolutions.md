@@ -29,3 +29,4 @@ Note:
 * When resolution 1280x480, color and depth only support 60, 30fps.
 * When resolution 2560x720, color and depth only support 30fps.
 * When only the color device be opened，2560x720 only support 60, 30fps.
+* In IR Depth Only mode, frame rate is supported between 15fps and 30fps.
