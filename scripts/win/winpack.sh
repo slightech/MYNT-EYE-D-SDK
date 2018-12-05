@@ -74,10 +74,10 @@ mv "$ROOT_DIR/samples" "$ROOT_DIR/_install/samples"
 # tools
 mv "$ROOT_DIR/tools/_output/bin" "$ROOT_DIR/_install/bin/tools"
 mv "$ROOT_DIR/tools/_output/lib" "$ROOT_DIR/_install/lib/tools"
-# _rm "$ROOT_DIR/tools/_build"
-# _rm "$ROOT_DIR/tools/_output"
-# mv "$ROOT_DIR/tools/linter" "$ROOT_DIR/3rdparty/linter"
-# mv "$ROOT_DIR/tools" "$ROOT_DIR/_install/tools"
+_rm "$ROOT_DIR/tools/_build"
+_rm "$ROOT_DIR/tools/_output"
+mv "$ROOT_DIR/tools/linter" "$ROOT_DIR/3rdparty/linter"
+mv "$ROOT_DIR/tools" "$ROOT_DIR/_install/tools"
 
 # platforms/win
 mv "$ROOT_DIR/platforms/win/README.txt" "$ROOT_DIR/_install"
@@ -151,8 +151,8 @@ mv "$ROOT_DIR/_install/3rdparty/opencv" "$ROOT_DIR/3rdparty/opencv"
 mv "$ROOT_DIR/_install/samples" "$ROOT_DIR/samples"
 
 # tools
-# mv "$ROOT_DIR/_install/tools" "$ROOT_DIR/tools"
-# mv "$ROOT_DIR/3rdparty/linter" "$ROOT_DIR/tools/linter"
+mv "$ROOT_DIR/_install/tools" "$ROOT_DIR/tools"
+mv "$ROOT_DIR/3rdparty/linter" "$ROOT_DIR/tools/linter"
 
 # platforms/win
 mv "$ROOT_DIR/_install/README.txt" "$ROOT_DIR/platforms/win"
