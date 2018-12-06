@@ -61,13 +61,6 @@ Streams::Streams(std::shared_ptr<Device> device)
       {ImageType::IMAGE_LEFT_COLOR, nullptr},
       {ImageType::IMAGE_RIGHT_COLOR, nullptr},
       {ImageType::IMAGE_DEPTH, nullptr}}) {
-        /*
-#ifdef MYNTEYE_OS_WIN
-  is_win_ = true;
-#else
-  is_win_ = false;
-#endif
-*/
 }
 
 Streams::~Streams() {
@@ -211,12 +204,6 @@ void Streams::OnImageInfoCallback(const ImgInfoPacket& packet) {
     // push info
     
     for (auto&& info : stream_info_queue_map_) {
-      /*
-      if (is_win_ && info.first == STREAM_DEPTH) {
-        // on win, unnessesary to push info for depth
-        continue;
-      }
-      */
       info.second->Put(img_info);
     }
     SyncStreamWithInfo(false);
