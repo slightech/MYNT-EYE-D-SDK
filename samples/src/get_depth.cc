@@ -171,6 +171,7 @@ int main(int argc, char const* argv[]) {
     // params.color_mode = ColorMode::COLOR_RECTIFIED;
 
     // Depth mode: colorful(default), gray, raw
+    // Note: must set DEPTH_RAW to get raw depth values
     params.depth_mode = DepthMode::DEPTH_RAW;
 
     // Stream mode: left color only
