@@ -137,6 +137,95 @@ void DmColorMode14(RGBQUAD* pallete, int mode = 0) {
   }
 }
 
+void HSV_to_RGB(double H, double S, double V, double &R, double &G, double &B) {
+  double nMax,nMin;
+  double fDet;
+  //
+  while (H<0.0) H+=360.0;
+  while (H>=360.0) H-=360.0;
+  H /= 60.0;
+  if (V<0.0) V = 0.0;
+  if (V>1.0) V = 1.0;
+  V *= 255.0;
+  if (S<0.0) S = 0.0;
+  if (S>1.0) S = 1.0;
+  //
+  if (V == 0.0) {
+    R = G = B = 0;
+  } else {
+    fDet = S*V;
+    nMax = (V);
+    nMin = (V-fDet);
+    if (H<=1.0) { //R>=G>=B, H=(G-B)/fDet
+      R = nMax;
+      B = nMin;
+      G = (H*fDet+B);
+    } else if (H<=2.0) { //G>=R>=B, H=2+(B-R)/fDet
+      G = nMax;
+      B = nMin;
+      R = ((2.0-H)*fDet+B);
+    } else if (H<=3.0) { //G>=B>=R, H=2+(B-R)/fDet
+      G = nMax;
+      R = nMin;
+      B = ((H-2.0)*fDet+R);
+    } else if (H<=4.0) { //B>=G>=R, H=4+(R-G)/fDet
+      B = nMax;
+      R = nMin;
+      G = ((4.0-H)*fDet+R);
+    } else if (H<=5.0) { //B>=R>=G, H=4+(R-G)/fDet
+      B = nMax;
+      G = nMin;
+      R = ((H-4.0)*fDet+G);
+    } else { // if(H<6.0) //R>=B>=G, H=(G-B)/fDet+6
+      R = nMax;
+      G = nMin;
+      B = ((6.0-H)*fDet+G);
+    }
+  }
+}
+
+void SetBaseGrayPaletteZ14(RGBQUAD *pGrayPaletteZ14) {
+  int i;
+  double R,G,B;
+  double fx,fy;
+  //
+  double fCV = 180;
+  int nCenter=1500;
+  double r1=0.35;
+  double r2=0.55;
+  //
+  for (i=1; i<16384; i++) {
+    if (i==nCenter) {
+      fy = fCV;
+    } else if (i<nCenter) {
+      fx = (double)(nCenter-i)/nCenter;
+      fy = fCV - pow(fx, r1)*fCV;
+    } else {
+      fx = (double)(i-nCenter)/(16384-nCenter);
+      fy = fCV + pow(fx, r2)*(256-fCV);
+    }
+    HSV_to_RGB(fy,1.0,1.0,R,G,B);
+    pGrayPaletteZ14[i].rgbBlue     = (BYTE)B;
+    pGrayPaletteZ14[i].rgbGreen    = (BYTE)B;
+    pGrayPaletteZ14[i].rgbRed      = (BYTE)B;
+    pGrayPaletteZ14[i].rgbReserved = 0;
+  }
+  {
+    i = 0;
+    pGrayPaletteZ14[i].rgbBlue     = (BYTE)0;
+    pGrayPaletteZ14[i].rgbGreen    = (BYTE)0;
+    pGrayPaletteZ14[i].rgbRed      = (BYTE)0;
+    pGrayPaletteZ14[i].rgbReserved = 0;
+  }
+  {
+    i = 16383;
+    pGrayPaletteZ14[i].rgbBlue     = (BYTE)255;
+    pGrayPaletteZ14[i].rgbGreen    = (BYTE)255;
+    pGrayPaletteZ14[i].rgbRed      = (BYTE)255;
+    pGrayPaletteZ14[i].rgbReserved = 0;
+  }
+}
+
 void UpdateZ14DisplayImage_DIB24(RGBQUAD* pColorPaletteZ14, BYTE* pDepthZ14,
     BYTE* pDepthDIB24, int cx, int cy) {
   int x, y, nBPS;
@@ -172,6 +261,7 @@ void Device::OnInit() {
   is_color_ok_ = false;
   is_depth_ok_ = false;
   DmColorMode14(color_palette_z14_, 3/*far*/);
+  SetBaseGrayPaletteZ14(gray_palette_z14_);
 }
 
 void Device::ImgCallback(EtronDIImageType::Value imgType, int imgId,
@@ -281,10 +371,18 @@ Image::pointer Device::GetImageDepth() {
       case DepthMode::DEPTH_RAW:
         // return clone as it will be changed in imgcallback
         return depth_image_buf_->Clone();
-      // case DepthMode::DEPTH_GRAY:
-      //   cv::normalize(depth_raw_, depth, 0, 255, cv::NORM_MINMAX, CV_8UC1);
-      //   return depth_gray_buf;
-      case DepthMode::DEPTH_COLORFUL:
+      case DepthMode::DEPTH_GRAY: {
+        static auto depth_gray_buf = ImageDepth::Create(
+            ImageFormat::DEPTH_GRAY_24,
+            depth_img_width, depth_img_height, true);
+        depth_gray_buf->ResetBuffer();
+        depth_gray_buf->set_frame_id(depth_image_buf_->frame_id());
+        UpdateZ14DisplayImage_DIB24(gray_palette_z14_,
+            depth_image_buf_->data(), depth_gray_buf->data(),
+            depth_img_width, depth_img_height);
+        return depth_gray_buf;
+      } break;
+      case DepthMode::DEPTH_COLORFUL: {
         static auto depth_rgb_buf = ImageDepth::Create(ImageFormat::DEPTH_RGB,
             depth_img_width, depth_img_height, true);
         depth_rgb_buf->ResetBuffer();
@@ -293,6 +391,7 @@ Image::pointer Device::GetImageDepth() {
             depth_image_buf_->data(), depth_rgb_buf->data(),
             depth_img_width, depth_img_height);
         return depth_rgb_buf;
+      } break;
     }
   }
 

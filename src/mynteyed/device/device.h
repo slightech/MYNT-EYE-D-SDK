@@ -180,6 +180,7 @@ class Device {
   std::mutex color_mtx_;
   std::mutex depth_mtx_;
   RGBQUAD color_palette_z14_[16384];
+  RGBQUAD gray_palette_z14_[16384];
 #else  // MYNTEYE_OS_LINUX
   DEPTH_TRANSFER_CTRL dtc_;
 
