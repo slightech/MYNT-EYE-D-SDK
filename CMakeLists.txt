@@ -114,8 +114,6 @@ set(MYNTEYE_DEPTH_SRCS
   src/mynteyed/device/data_caches.cc
   src/mynteyed/device/device_info.cc
   src/mynteyed/device/device.cc
-  src/mynteyed/device/device_linux.cc
-  src/mynteyed/device/device_win.cc
   src/mynteyed/device/image.cc
   src/mynteyed/device/open_params.cc
   src/mynteyed/device/stream_info.cc
@@ -132,9 +130,16 @@ set(MYNTEYE_DEPTH_SRCS
   src/mynteyed/internal/streams.cc
 )
 if(OS_WIN)
-  list(APPEND MYNTEYE_DEPTH_SRCS "src/mynteyed/data/hid/hid_win.cc")
+  list(APPEND MYNTEYE_DEPTH_SRCS
+    src/mynteyed/data/hid/hid_win.cc
+    src/mynteyed/device/win/device_win.cc
+  )
 else()
-  list(APPEND MYNTEYE_DEPTH_SRCS "src/mynteyed/data/hid/hid_linux.cc")
+  list(APPEND MYNTEYE_DEPTH_SRCS
+    src/mynteyed/data/hid/hid_linux.cc
+    src/mynteyed/device/linux/color_palette_generator.cc
+    src/mynteyed/device/linux/device_linux.cc
+  )
 endif()
 
 if(OS_WIN)

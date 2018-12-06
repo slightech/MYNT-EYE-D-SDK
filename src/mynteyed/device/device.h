@@ -30,6 +30,8 @@
 
 #ifdef MYNTEYE_OS_WIN
 #include <Windows.h>
+#else  // MYNTEYE_OS_LINUX
+#include "mynteyed/device/linux/color_palette_generator.h"
 #endif
 
 #include "mynteyed/device/device_info.h"
@@ -146,7 +148,7 @@ class Device {
 #endif
 
   int OpenDevice(const DeviceMode& dev_mode);
-  
+
   void* etron_di_;
 
   DEVSELINFO dev_sel_info_;
@@ -178,6 +180,13 @@ class Device {
   RGBQUAD color_palette_z14_[16384];
 #else  // MYNTEYE_OS_LINUX
   DEPTH_TRANSFER_CTRL dtc_;
+
+  RGBQUAD m_ColorPalette[256];
+  RGBQUAD m_GrayPalette[256];
+  RGBQUAD m_ColorPaletteD11[2048];
+  RGBQUAD m_GrayPaletteD11[2048];
+  RGBQUAD m_ColorPaletteZ14[16384];
+  RGBQUAD m_GrayPaletteZ14[16384];
 #endif
 
   DepthMode depth_mode_;

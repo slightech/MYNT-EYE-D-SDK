@@ -20,10 +20,42 @@
 #include "mynteyed/device/convertor.h"
 #include "mynteyed/util/log.h"
 
+#define Z14_FAR  1000
+#define Z14_NEAR 0
+#define D11_FAR  0
+#define D11_NEAR 2047
+#define D8_FAR   0
+#define D8_NEAR  255
+
 MYNTEYE_USE_NAMESPACE
 
 void Device::OnInit() {
   dtc_ = DEPTH_IMG_NON_TRANSFER;
+
+  {
+    float m_zFar = Z14_FAR;
+    float m_zNear = Z14_NEAR;
+    float m_d11Far = D11_FAR;
+    float m_d11Near = D11_NEAR;
+    float m_d8Far = D8_FAR;
+    float m_d8Near = D8_NEAR;
+    int m_nDepthColorMapMode = 4;  // for customer
+
+    ColorPaletteGenerator::DmColorMode(
+        m_ColorPalette, m_nDepthColorMapMode, m_d8Far, m_d8Near);
+    ColorPaletteGenerator::DmGrayMode(
+        m_GrayPalette, m_nDepthColorMapMode, m_d8Far, m_d8Near);
+
+    ColorPaletteGenerator::DmColorMode11(
+        m_ColorPaletteD11, m_nDepthColorMapMode, m_d11Far, m_d11Near);
+    ColorPaletteGenerator::DmGrayMode11(
+        m_GrayPaletteD11, m_nDepthColorMapMode, m_d11Far, m_d11Near);
+    // SetBaseGrayPaletteD11(m_GrayPaletteD11);
+
+    ColorPaletteGenerator::DmColorMode14(m_ColorPaletteZ14, m_zFar, m_zNear);
+    ColorPaletteGenerator::DmGrayMode14(m_GrayPaletteZ14, m_zFar, m_zNear);
+    // SetBaseGrayPaletteZ14(m_GrayPaletteZ14, zFar);
+  }
 }
 
 // int ret = EtronDI_Get2Image(etron_di_, &dev_sel_info_,
@@ -80,9 +112,15 @@ Image::pointer Device::GetImageDepth() {
   if (dtc_ == DEPTH_IMG_COLORFUL_TRANSFER ||
       dtc_ == DEPTH_IMG_GRAY_TRANSFER) {
     depth_raw = false;
+
+    if (depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS) {
+      depth_img_width = depth_img_width * 2;
+    }
+
     if (!depth_image_buf_) {
       depth_buf_ = (unsigned char*)calloc(
-          depth_img_width * 2 * depth_img_height * 3, sizeof(unsigned char));
+          depth_img_width * depth_img_height * 2, sizeof(unsigned char));
+
       if (dtc_ == DEPTH_IMG_COLORFUL_TRANSFER) {
         depth_image_buf_ = ImageDepth::Create(ImageFormat::DEPTH_RGB,
             depth_img_width, depth_img_height, true);
@@ -127,15 +165,39 @@ Image::pointer Device::GetImageDepth() {
   if (depth_raw) {
     return depth_image_buf_;
   } else {
-    depth_image_buf_->set_valid_size(depth_image_size_);
-
-    std::copy(depth_buf_, depth_buf_ + depth_image_size_,
-        depth_image_buf_->data());
-    // EtronDI_Convert_Depth_Y_To_Buffer(etron_di_, &dev_sel_info_,
-    //   depth_buf_, depth_image_buf_->data(),
-    //   depth_img_width, depth_img_height,
-    //   dtc_ == DEPTH_IMG_COLORFUL_TRANSFER ? true : false,
-    //   depth_data_type_);
+    if (dtc_ == DEPTH_IMG_COLORFUL_TRANSFER) {
+      if (depth_data_type_ == ETronDI_DEPTH_DATA_14_BITS ||
+          depth_data_type_ == ETronDI_DEPTH_DATA_14_BITS_RAW) {
+        ColorPaletteGenerator::UpdateZ14DisplayImage_DIB24(
+            m_ColorPaletteZ14, depth_buf_, depth_image_buf_->data(),
+            depth_img_width, depth_img_height);
+      } else if (depth_data_type_ == ETronDI_DEPTH_DATA_11_BITS ||
+                 depth_data_type_ == ETronDI_DEPTH_DATA_11_BITS_RAW) {
+        ColorPaletteGenerator::UpdateD11DisplayImage_DIB24(
+            m_ColorPaletteD11, depth_buf_, depth_image_buf_->data(),
+            depth_img_width, depth_img_height);
+      } else if (depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS) {
+        ColorPaletteGenerator::UpdateD8bitsDisplayImage_DIB24(
+            m_ColorPalette, depth_buf_, depth_image_buf_->data(),
+            depth_img_width, depth_img_height);
+      }
+    } else {  // DEPTH_IMG_GRAY_TRANSFER
+      if (depth_data_type_ == ETronDI_DEPTH_DATA_14_BITS ||
+          depth_data_type_ == ETronDI_DEPTH_DATA_14_BITS_RAW) {
+        ColorPaletteGenerator::UpdateZ14DisplayImage_DIB24(
+            m_GrayPaletteZ14, depth_buf_, depth_image_buf_->data(),
+            depth_img_width, depth_img_height);
+      } else if (depth_data_type_ == ETronDI_DEPTH_DATA_11_BITS ||
+                 depth_data_type_ == ETronDI_DEPTH_DATA_11_BITS_RAW) {
+        ColorPaletteGenerator::UpdateD11DisplayImage_DIB24(
+            m_GrayPaletteD11, depth_buf_, depth_image_buf_->data(),
+            depth_img_width, depth_img_height);
+      } else if (depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS) {
+        ColorPaletteGenerator::UpdateD8bitsDisplayImage_DIB24(
+            m_GrayPalette, depth_buf_, depth_image_buf_->data(),
+            depth_img_width, depth_img_height);
+      }
+    }
     return depth_image_buf_;
   }
 }
@@ -159,7 +221,7 @@ int Device::OpenDevice(const DeviceMode& dev_mode) {
       return EtronDI_OpenDevice2(etron_di_, &dev_sel_info_,
           0, 0, false, stream_depth_info_ptr_[depth_res_index_].nWidth,
           stream_depth_info_ptr_[depth_res_index_].nHeight,
-          dtc_, false, NULL, &framerate_);
+          DEPTH_IMG_NON_TRANSFER, false, NULL, &framerate_);
       break;
     case DeviceMode::DEVICE_ALL:
       color_device_opened_ = true;
@@ -171,7 +233,7 @@ int Device::OpenDevice(const DeviceMode& dev_mode) {
           stream_color_info_ptr_[color_res_index_].bFormatMJPG,
           stream_depth_info_ptr_[depth_res_index_].nWidth,
           stream_depth_info_ptr_[depth_res_index_].nHeight,
-          dtc_, false, NULL, &framerate_);
+          DEPTH_IMG_NON_TRANSFER, false, NULL, &framerate_);
       break;
     default:
       throw_error("ERROR:: DeviceMode is unknown.");
