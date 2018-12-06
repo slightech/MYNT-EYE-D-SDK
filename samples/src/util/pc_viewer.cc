@@ -62,6 +62,12 @@ bool PCViewer::Update(const cv::Mat &rgb, const cv::Mat& depth) {
   return true;
 }
 
+bool PCViewer::UpdateDirectly(const cv::Mat &rgb, const cv::Mat& depth) {
+  pointcloud_t::Ptr cloud(new pointcloud_t);
+  ConvertToPointCloud(rgb, depth, cloud);
+  Update(cloud);
+}
+
 void PCViewer::Update(pointcloud_t::ConstPtr cloud) {
   if (viewer_ == nullptr) {
     viewer_ = CustomColorVis(cloud, cam_in_.width, cam_in_.height);

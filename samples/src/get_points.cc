@@ -96,6 +96,7 @@ int main(int argc, char const* argv[]) {
       cv::imshow("color", color);
 
       viewer.Update(color, depth);
+      // viewer.UpdateDirectly(color, depth);
     }
 
     char key = static_cast<char>(cv::waitKey(1));
@@ -120,10 +121,10 @@ CameraIntrinsics get_default_camera_intrinsics(const StreamMode& mode) {
     case StreamMode::STREAM_1280x480:
       return {640, 480, 979.8, 942.8, 682.3, 254.9, {0, 0, 0, 0, 0}};
     case StreamMode::STREAM_1280x720:
-      return {640, 480, 979.8, 942.8, 682.3, 254.9 * 2, {0, 0, 0, 0, 0}};
+      return {1280, 720, 979.8, 942.8, 682.3, 254.9 * 2, {0, 0, 0, 0, 0}};
     case StreamMode::STREAM_2560x720:
-      return {640, 480, 979.8, 942.8, 682.3 * 2, 254.9 * 2, {0, 0, 0, 0, 0}};
+      return {1280, 720, 979.8, 942.8, 682.3 * 2, 254.9 * 2, {0, 0, 0, 0, 0}};
     default:
-      return {640, 480, 979.8, 942.8, 682.3, 254.9, {0, 0, 0, 0, 0}};
+      return {1280, 720, 979.8, 942.8, 682.3, 254.9 * 2, {0, 0, 0, 0, 0}};
   }
 }

@@ -35,6 +35,7 @@ class PCViewer {
   ~PCViewer();
 
   bool Update(const cv::Mat &rgb, const cv::Mat& depth);
+  bool UpdateDirectly(const cv::Mat &rgb, const cv::Mat& depth);
 
   bool WasVisual() const;
   bool WasStopped() const;
