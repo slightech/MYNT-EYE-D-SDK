@@ -17,6 +17,10 @@ project(mynteyed VERSION 1.5.1 LANGUAGES C CXX)
 
 include(cmake/Common.cmake)
 
+if(NOT CMAKE_DEBUG_POSTFIX)
+  set(CMAKE_DEBUG_POSTFIX d)
+endif()
+
 # options
 
 option(DEBUG "Enable Debug Log" OFF)
