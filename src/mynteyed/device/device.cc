@@ -289,6 +289,7 @@ bool Device::Open(const OpenParams& params) {
 
   dev_sel_info_.index = params.dev_index;
 
+  // using 14 bits
   switch (params.color_mode) {
     case ColorMode::COLOR_RECTIFIED:
       depth_data_type_ = ETronDI_DEPTH_DATA_14_BITS;
@@ -333,7 +334,7 @@ bool Device::Open(const OpenParams& params) {
   GetStreamIndex(params, &color_res_index_, &depth_res_index_);
 
   CompatibleUSB2(params);
-  CompatibleMJPG();
+  CompatibleMJPG(params);
 
   LOGI("-- Framerate: %d", framerate_);
 
@@ -805,40 +806,150 @@ void Device::CompatibleUSB2(const OpenParams& params) {
     return;
   }
 
-  if ((params.stream_mode == StreamMode::STREAM_1280x720 &&
-        framerate_ <= 5) ||
-      (params.stream_mode == StreamMode::STREAM_640x480 &&
-       framerate_ <= 15) ||
-      (params.stream_mode == StreamMode::STREAM_1280x720 &&
-       framerate_ <= 10 &&
-       params.dev_mode != DeviceMode::DEVICE_ALL)) {
-    LOGI("\nWARNING:: You are using the USB 2.0 interface. "
-        "For bandwidth reasons, "
-        "it is recommended to use the USB 3.0 interface.\n");
-    // 8bit 1, 6 match 14bit 2, 7
-    depth_data_type_ = (depth_data_type_ == 7) ? 6 : 1;
+  if (params.dev_mode == DeviceMode::DEVICE_ALL) {
+  // color + depth
+    depth_data_type_ = ETronDI_DEPTH_DATA_8_BITS;
+
+    if (params.stream_mode == StreamMode::STREAM_2560x720) {
+      // color 2560x720 yuyv, depth 640x720 yuyv, 8 bits rectify, fail
+      goto usb2_error;
+    } else if (params.stream_mode == StreamMode::STREAM_1280x720) {
+      // color 1280x720 yuyv, depth 640x720 yuyv, 8 bits rectify, 5 ok
+      //   1 > 5, 10 fail
+      color_res_index_ =
+          GetStreamIndex(stream_color_info_ptr_, 1280, 720, false);
+      depth_res_index_ =
+          GetStreamIndex(stream_depth_info_ptr_, 640, 720, false);
+      framerate_ = 5;
+    } else if (params.stream_mode == StreamMode::STREAM_1280x480) {
+      // color 1280x480 yuyv, depth 320x480 yuyv, 8 bits rectify, fail
+      goto usb2_error;
+    } else if (params.stream_mode == StreamMode::STREAM_640x480) {
+      // color 640x480 yuyv, depth 320x480 yuyv, 8 bits rectify, 15 ok
+      //   1,5,10,20 > 15, 30 fail
+      color_res_index_ =
+          GetStreamIndex(stream_color_info_ptr_, 640, 480, false);
+      depth_res_index_ =
+          GetStreamIndex(stream_depth_info_ptr_, 320, 480, false);
+      framerate_ = 15;
+    } else {
+      goto usb2_error;
+    }
+    if (color_res_index_ == -1 || depth_res_index_ == -1) {
+      goto usb2_error;
+    }
+  } else if (params.dev_mode == DeviceMode::DEVICE_COLOR) {
+  // color only
+    if (params.stream_mode == StreamMode::STREAM_2560x720) {
+      // color 2560x720 yuyv, <=5 ok (auto change to 5)
+      color_res_index_ =
+          GetStreamIndex(stream_color_info_ptr_, 2560, 720, false);
+      framerate_ = 5;
+    } else if (params.stream_mode == StreamMode::STREAM_1280x720) {
+      // color 1280x720 yuyv, <=10 ok (auto change to 5,10)
+      color_res_index_ =
+          GetStreamIndex(stream_color_info_ptr_, 1280, 720, false);
+      framerate_ = (framerate_ > 5) ? 10 : 5;
+    } else if (params.stream_mode == StreamMode::STREAM_1280x480) {
+      // color 1280x480 yuyv, <=15 ok (auto change to 15)
+      color_res_index_ =
+          GetStreamIndex(stream_color_info_ptr_, 1280, 480, false);
+      framerate_ = 15;
+    } else if (params.stream_mode == StreamMode::STREAM_640x480) {
+      // color 640x480 yuyv, <=30 ok (auto change to 15,30)
+      color_res_index_ =
+          GetStreamIndex(stream_color_info_ptr_, 640, 480, false);
+      framerate_ = (framerate_ > 15) ? 30 : 15;
+    } else {
+      goto usb2_error;
+    }
+    if (color_res_index_ == -1) {
+      goto usb2_error;
+    }
+  } else if (params.dev_mode == DeviceMode::DEVICE_DEPTH) {
+  // depth only
+    depth_data_type_ = ETronDI_DEPTH_DATA_8_BITS;
+
+    if (params.stream_mode == StreamMode::STREAM_2560x720 ||
+        params.stream_mode == StreamMode::STREAM_1280x720) {
+      // depth 640x720 yuyv, 8 bits rectify, 5,10 ok
+      //   15,30 > 10, 1,20 fail
+      depth_res_index_ =
+          GetStreamIndex(stream_depth_info_ptr_, 640, 720, false);
+      framerate_ = (framerate_ > 5) ? 10 : 5;
+    } else if (params.stream_mode == StreamMode::STREAM_1280x480 ||
+               params.stream_mode == StreamMode::STREAM_640x480) {
+      // depth 320x480 yuyv, 8 bits rectify, 15,30 ok
+      //   5,10,20 > 15, 40 > 30, 30 real is 15, 1 fail
+      depth_res_index_ =
+          GetStreamIndex(stream_depth_info_ptr_, 320, 480, false);
+      framerate_ = (framerate_ > 15) ? 30 : 15;
+    } else {
+      goto usb2_error;
+    }
+    if (depth_res_index_ == -1) {
+      goto usb2_error;
+    }
   } else {
-    throw_error("\nNote:: You are using the USB 2.0 interface."
-        " Current resolution or frame rate is not supported"
-        " And you can refer to Resolution Support List"
-        " in the documentation.\n");
+    goto usb2_error;
   }
+
+  LOGI("\nWARNING:: You are using the USB 2.0 interface. "
+      "For bandwidth reasons, "
+      "it is recommended to use the USB 3.0 interface.\n");
+  return;
+
+usb2_error:
+  throw_error("\nNote:: You are using the USB 2.0 interface."
+      " Current resolution or frame rate is not supported"
+      " And you can refer to Resolution Support List"
+      " in the documentation.\n");
 }
 
-void Device::CompatibleMJPG() {
-  if (!stream_color_info_ptr_[color_res_index_].bFormatMJPG) {
-    return;
+void Device::CompatibleMJPG(const OpenParams& params) {
+  if (params.dev_mode == DeviceMode::DEVICE_ALL ||
+      params.dev_mode == DeviceMode::DEVICE_COLOR) {
+    if (!stream_color_info_ptr_[color_res_index_].bFormatMJPG) {
+      return;
+    }
+    // using 8 bits, if mjpg
+    switch (params.color_mode) {
+      case ColorMode::COLOR_RECTIFIED:
+        depth_data_type_ = ETronDI_DEPTH_DATA_8_BITS;
+        break;
+      case ColorMode::COLOR_RAW:
+      default:
+        depth_data_type_ = ETronDI_DEPTH_DATA_8_BITS_RAW;
+        break;
+    }
+  } else {
+    // depth only
   }
-  // 8bit 1, 6 match 14bit 2, 7
-  // Now, only support 1
-  // depth_data_type_ = (depth_data_type_ == 7) ? 6 : 1;
-  depth_data_type_ = 1;
 }
 
 bool Device::IsUSB2() {
   if (stream_depth_info_ptr_ == nullptr) {
     return false;
   }
-
   return stream_depth_info_ptr_[1].nWidth == 320;
+}
+
+int Device::GetStreamIndex(PETRONDI_STREAM_INFO stream_info_ptr,
+    int width, int height, bool mjpg) {
+
+  PETRONDI_STREAM_INFO stream_temp_info_ptr = stream_info_ptr;
+  int res_index = -1;
+  int i = 0;
+  while (i < 64) {
+    if (stream_temp_info_ptr->nWidth == width &&
+        stream_temp_info_ptr->nHeight == height &&
+        stream_temp_info_ptr->bFormatMJPG == mjpg) {
+      res_index = i;
+      break;
+    }
+    stream_temp_info_ptr++;
+    i++;
+  }
+
+  return res_index;
 }

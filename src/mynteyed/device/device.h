@@ -130,8 +130,7 @@ class Device {
   void SyncCameraCalibrations();
 
   void CompatibleUSB2(const OpenParams& params);
-
-  void CompatibleMJPG();
+  void CompatibleMJPG(const OpenParams& params);
 
  private:
   void Init();
@@ -141,13 +140,16 @@ class Device {
 
   bool IsUSB2();
 
+  int GetStreamIndex(PETRONDI_STREAM_INFO stream_info_ptr,
+    int width, int height, bool mjpg);
+
 #ifdef MYNTEYE_OS_WIN
   static void ImgCallback(EtronDIImageType::Value imgType, int imgId,
       unsigned char* imgBuf, int imgSize, int width, int height,
       int serialNumber, void *pParam);
 #endif
 
-  int OpenDevice(const DeviceMode& dev_mode);
+  int OpenDevice(const DeviceMode& dev_mode);  // cross
 
   void* etron_di_;
 
