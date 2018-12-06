@@ -288,11 +288,10 @@ Image::pointer Device::GetImageDepth() {
         static auto depth_rgb_buf = ImageDepth::Create(ImageFormat::DEPTH_RGB,
             depth_img_width, depth_img_height, true);
         depth_rgb_buf->ResetBuffer();
+        depth_rgb_buf->set_frame_id(depth_image_buf_->frame_id());
         UpdateZ14DisplayImage_DIB24(color_palette_z14_,
             depth_image_buf_->data(), depth_rgb_buf->data(),
             depth_img_width, depth_img_height);
-        depth_rgb_buf->set_frame_id(depth_image_buf_->frame_id());
-        depth_rgb_buf->set_valid_size(depth_image_buf_->valid_size());
         return depth_rgb_buf;
     }
   }
