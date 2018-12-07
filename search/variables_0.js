@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['accel',['accel',['../structmynteye_1_1_motion_intrinsics.html#adf9bf1b2ece41726f105086ff92d796c',1,'mynteye::MotionIntrinsics::accel()'],['../structmynteye_1_1_imu_data.html#a7513d9784133b67199dd26db6ac0b091',1,'mynteye::ImuData::accel()']]],
-  ['assembly',['assembly',['../structmynteye_1_1_imu_intrinsics.html#affed1bfc10c931a402c1c5368d6ef297',1,'mynteye::ImuIntrinsics']]]
+  ['accel',['accel',['../structmynteyed_1_1_motion_intrinsics.html#a07b4f1396b290edb96565f0b29061841',1,'mynteyed::MotionIntrinsics::accel()'],['../structmynteyed_1_1_imu_data.html#a15e7d8e50770474a6530909e3c468596',1,'mynteyed::ImuData::accel()']]],
+  ['assembly',['assembly',['../structmynteyed_1_1_imu_intrinsics.html#a8a7a8189f1c013fe464db4bf6fe9e3c6',1,'mynteyed::ImuIntrinsics']]]
 ];

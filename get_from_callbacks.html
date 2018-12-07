@@ -1,0 +1,121 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.14"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>MYNT EYE D SDK: 从回调接口获取数据</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+  $(document).ready(initResizable);
+/* @license-end */</script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="custom.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">MYNT EYE D SDK
+   &#160;<span id="projectnumber">1.6.0</span>
+   </div>
+   <div id="projectbrief">http://www.myntai.com/mynteye/depth</div>
+  </td>
+   <td>        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.png"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="搜索" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+          </span>
+        </div>
+</td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.8.14 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(document).ready(function(){initNavTree('get_from_callbacks.html','');});
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div class="header">
+  <div class="headertitle">
+<div class="title">从回调接口获取数据 </div>  </div>
+</div><!--header-->
+<div class="contents">
+<div class="textblock"><p>API提供了<code>SetStreamCallback()</code>，<code>SetMotionCallback()</code>函数，来设定各类数据的回调。</p>
+<p>参考代码片段：</p>
+<div class="fragment"><div class="line">cam.SetImgInfoCallback([](const std::shared_ptr&lt;ImgInfo&gt;&amp; info) {</div><div class="line">    std::cout &lt;&lt; &quot;  [img_info] fid: &quot; &lt;&lt; info-&gt;frame_id</div><div class="line">        &lt;&lt; &quot;, stamp: &quot; &lt;&lt; info-&gt;timestamp</div><div class="line">        &lt;&lt; &quot;, expos: &quot; &lt;&lt; info-&gt;exposure_time &lt;&lt; std::endl</div><div class="line">        &lt;&lt; std::flush;</div><div class="line">});</div><div class="line">for (auto&amp;&amp; type : types) {</div><div class="line">    // Set stream data callback</div><div class="line">    cam.SetStreamCallback(type, [](const StreamData&amp; data) {</div><div class="line">    std::cout &lt;&lt; &quot;  [&quot; &lt;&lt; data.img-&gt;type() &lt;&lt; &quot;] fid: &quot;</div><div class="line">        &lt;&lt; data.img-&gt;frame_id() &lt;&lt; std::endl</div><div class="line">        &lt;&lt; std::flush;</div><div class="line">    });</div><div class="line">}</div><div class="line"></div><div class="line">// Set motion data callback</div><div class="line">cam.SetMotionCallback([](const MotionData&amp; data) {</div><div class="line">    if (data.imu-&gt;flag == MYNTEYE_IMU_ACCEL) {</div><div class="line">        std::cout &lt;&lt; &quot;[accel] stamp: &quot; &lt;&lt; data.imu-&gt;timestamp</div><div class="line">        &lt;&lt; &quot;, x: &quot; &lt;&lt; data.imu-&gt;accel[0]</div><div class="line">        &lt;&lt; &quot;, y: &quot; &lt;&lt; data.imu-&gt;accel[1]</div><div class="line">        &lt;&lt; &quot;, z: &quot; &lt;&lt; data.imu-&gt;accel[2]</div><div class="line">        &lt;&lt; &quot;, temp: &quot; &lt;&lt; data.imu-&gt;temperature</div><div class="line">        &lt;&lt; std::endl;</div><div class="line">    } else if (data.imu-&gt;flag == MYNTEYE_IMU_GYRO) {</div><div class="line">        std::cout &lt;&lt; &quot;[gyro] stamp: &quot; &lt;&lt; data.imu-&gt;timestamp</div><div class="line">        &lt;&lt; &quot;, x: &quot; &lt;&lt; data.imu-&gt;gyro[0]</div><div class="line">        &lt;&lt; &quot;, y: &quot; &lt;&lt; data.imu-&gt;gyro[1]</div><div class="line">        &lt;&lt; &quot;, z: &quot; &lt;&lt; data.imu-&gt;gyro[2]</div><div class="line">        &lt;&lt; &quot;, temp: &quot; &lt;&lt; data.imu-&gt;temperature</div><div class="line">        &lt;&lt; std::endl;</div><div class="line">    }</div><div class="line">    std::cout &lt;&lt; std::flush;</div><div class="line">});</div></div><!-- fragment --><p>上述代码，用了 OpenCV 来显示图像和数据。选中显示窗口时，按 ESC/Q 就会结束程序。</p>
+<p>完整代码样例，请见 <a href="https://github.com/slightech/MYNT-EYE-D-SDK/blob/master/samples/src/get_from_callbacks.cc">get_from_callbacks.cc</a>。 </p>
+</div></div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.14 </li>
+  </ul>
+</div>
+</body>
+</html>

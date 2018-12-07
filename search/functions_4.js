@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['hasstreamdataenabled',['HasStreamDataEnabled',['../classmynteye_1_1_camera.html#ab3ae37155943b7b260c6738483d73176',1,'mynteye::Camera']]]
+  ['hasstreamdataenabled',['HasStreamDataEnabled',['../classmynteyed_1_1_camera.html#a71f085fe22f79f8042dc6fb7f1a835c7',1,'mynteyed::Camera']]]
 ];

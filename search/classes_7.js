@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['rate',['Rate',['../classmynteye_1_1_rate.html',1,'mynteye']]]
+  ['rate',['Rate',['../classmynteyed_1_1_rate.html',1,'mynteyed']]]
 ];

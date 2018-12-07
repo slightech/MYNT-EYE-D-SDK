@@ -24,16 +24,10 @@ for the JavaScript code in this file
 var NAVTREE =
 [
   [ "MYNT EYE D SDK", "index.html", [
-    [ "产品介绍", "index.html", null ],
-    [ "尺寸与结构", "md_guide_surface.html", null ],
-    [ "IMU 坐标系统", "md_guide_imu_coord.html", null ],
-    [ "Linux SDK 用户指南", "md_guide_build_linux.html", null ],
-    [ "Windows SDK 用户指南", "md_guide_build_win.html", null ],
-    [ "Windows 预编译 exe 安装", "install_exe.html", null ],
-    [ "ROS 安装", "md_guide_ros.html", null ],
-    [ "录制数据集", "md_guide_recording_data.html", null ],
-    [ "分析IMU", "md_guide_analyzing_imu.html", null ],
-    [ "分析时间戳", "md_guide_analyze_time_stamps.html", null ],
+    [ "产品说明", "product.html", "product" ],
+    [ "SDK 安装", "installation.html", "installation" ],
+    [ "SDK 样例", "samples.html", "samples" ],
+    [ "SDK 工具", "tools.html", "tools" ],
     [ "类", "annotated.html", [
       [ "类列表", "annotated.html", "annotated_dup" ],
       [ "类索引", "classes.html", null ],

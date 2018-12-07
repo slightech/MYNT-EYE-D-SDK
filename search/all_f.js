@@ -1,14 +1,17 @@
 var searchData=
 [
-  ['scale',['scale',['../structmynteye_1_1_imu_intrinsics.html#a55c8ebe46493565debc6178d34636d62',1,'mynteye::ImuIntrinsics']]],
-  ['setimginfocallback',['SetImgInfoCallback',['../classmynteye_1_1_camera.html#a79909838ff15a5960a620f235e69d4f6',1,'mynteye::Camera']]],
-  ['setmotioncallback',['SetMotionCallback',['../classmynteye_1_1_camera.html#ab868100591d2a9741efc0d168a8aad2d',1,'mynteye::Camera']]],
-  ['setstreamcallback',['SetStreamCallback',['../classmynteye_1_1_camera.html#a2958b16b192f2296344f8b91328ec593',1,'mynteye::Camera']]],
-  ['state_5fae',['state_ae',['../structmynteye_1_1_open_params.html#abbdde98994739bcae52ac27376c20c09',1,'mynteye::OpenParams']]],
-  ['state_5fawb',['state_awb',['../structmynteye_1_1_open_params.html#a6d1c45a5acdadd307359ff41e460a58b',1,'mynteye::OpenParams']]],
-  ['stream_5fmode',['stream_mode',['../structmynteye_1_1_open_params.html#ab9dc8401dd012522a3ad6dfe54060789',1,'mynteye::OpenParams']]],
-  ['streamdata',['StreamData',['../structmynteye_1_1_stream_data.html',1,'mynteye']]],
-  ['streaminfo',['StreamInfo',['../structmynteye_1_1_stream_info.html',1,'mynteye']]],
-  ['streamintrinsics',['StreamIntrinsics',['../structmynteye_1_1_stream_intrinsics.html',1,'mynteye']]],
-  ['strings_5ferror',['strings_error',['../classmynteye_1_1strings__error.html',1,'mynteye']]]
+  ['sdk_20安装',['SDK 安装',['../installation.html',1,'index']]],
+  ['sdk_20样例',['SDK 样例',['../samples.html',1,'index']]],
+  ['scale',['scale',['../structmynteyed_1_1_imu_intrinsics.html#a29f47c9506c10521ca89be5bd5e06cc3',1,'mynteyed::ImuIntrinsics']]],
+  ['setimginfocallback',['SetImgInfoCallback',['../classmynteyed_1_1_camera.html#a70de9783fa56ed094caa06fb721f9eb1',1,'mynteyed::Camera']]],
+  ['setmotioncallback',['SetMotionCallback',['../classmynteyed_1_1_camera.html#acebc8a17edc17825f16f67a50f3cf643',1,'mynteyed::Camera']]],
+  ['setstreamcallback',['SetStreamCallback',['../classmynteyed_1_1_camera.html#a5765c1be26202f524b959601c484089b',1,'mynteyed::Camera']]],
+  ['state_5fae',['state_ae',['../structmynteyed_1_1_open_params.html#ad817a24a146a4d6c6780e38e3520c79f',1,'mynteyed::OpenParams']]],
+  ['state_5fawb',['state_awb',['../structmynteyed_1_1_open_params.html#a8a7be9d5f8805cdd8cac99285c6dbdaf',1,'mynteyed::OpenParams']]],
+  ['stream_5fmode',['stream_mode',['../structmynteyed_1_1_open_params.html#add1d4a25e1155b9845072f9b1d95e2d5',1,'mynteyed::OpenParams']]],
+  ['streamdata',['StreamData',['../structmynteyed_1_1_stream_data.html',1,'mynteyed']]],
+  ['streaminfo',['StreamInfo',['../structmynteyed_1_1_stream_info.html',1,'mynteyed']]],
+  ['streamintrinsics',['StreamIntrinsics',['../structmynteyed_1_1_stream_intrinsics.html',1,'mynteyed']]],
+  ['strings_5ferror',['strings_error',['../classmynteyed_1_1strings__error.html',1,'mynteyed']]],
+  ['sdk_20工具',['SDK 工具',['../tools.html',1,'index']]]
 ];

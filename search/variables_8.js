@@ -1,10 +1,9 @@
 var searchData=
 [
-  ['img',['img',['../structmynteye_1_1_stream_data.html#a28d266c1ca6f88e8ede0e129117d32ea',1,'mynteye::StreamData']]],
-  ['img_5finfo',['img_info',['../structmynteye_1_1_stream_data.html#a9037f93136d711dc1ccf0267fb1ed592',1,'mynteye::StreamData']]],
-  ['imu',['imu',['../structmynteye_1_1_motion_data.html#a41898bf28f9ff3768bf5f70dd275cae2',1,'mynteye::MotionData']]],
-  ['index',['index',['../structmynteye_1_1_device_info.html#a4623cb93790b2dd2dd4b421579b284b7',1,'mynteye::DeviceInfo::index()'],['../structmynteye_1_1_stream_info.html#a41619a5fc6fe5b0e67d6f6c2efa8e04f',1,'mynteye::StreamInfo::index()']]],
-  ['inimgheight',['InImgHeight',['../structmynteye_1_1_camera_calibration.html#a348c0c05f94cc350b1f000fb3a93425b',1,'mynteye::CameraCalibration']]],
-  ['inimgwidth',['InImgWidth',['../structmynteye_1_1_camera_calibration.html#ac64b9ddf928a59a0c9350b12042df62e',1,'mynteye::CameraCalibration']]],
-  ['ir_5fintensity',['ir_intensity',['../structmynteye_1_1_open_params.html#a11161d92e1f7bbaad071d2f9527dea3e',1,'mynteye::OpenParams']]]
+  ['img',['img',['../structmynteyed_1_1_stream_data.html#a1bfb5074e052036f9edf7147aa6ee879',1,'mynteyed::StreamData']]],
+  ['img_5finfo',['img_info',['../structmynteyed_1_1_stream_data.html#a4b26a3f4fd8cc89af453a31b2c84bf3c',1,'mynteyed::StreamData']]],
+  ['imu',['imu',['../structmynteyed_1_1_motion_data.html#a0e73450efac406d50400ce209f2a4e16',1,'mynteyed::MotionData']]],
+  ['index',['index',['../structmynteyed_1_1_device_info.html#afc28a9b5b6bb3dc1290173a946e684af',1,'mynteyed::DeviceInfo::index()'],['../structmynteyed_1_1_stream_info.html#a7f8b7d1fe1f4cc8292ae972618dd2809',1,'mynteyed::StreamInfo::index()']]],
+  ['ir_5fdepth_5fonly',['ir_depth_only',['../structmynteyed_1_1_open_params.html#ac2fd9add8ced4e7c0307dbadf7f52b59',1,'mynteyed::OpenParams']]],
+  ['ir_5fintensity',['ir_intensity',['../structmynteyed_1_1_open_params.html#ad7d20cd71a3e6582c8f9ab04fa6d9941',1,'mynteyed::OpenParams']]]
 ];

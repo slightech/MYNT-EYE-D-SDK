@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['writecameracalibrationbinfile',['WriteCameraCalibrationBinFile',['../classmynteye_1_1_camera.html#a64538285fe666eef840963c90fdbf9be',1,'mynteye::Camera']]],
-  ['writedeviceflash',['WriteDeviceFlash',['../classmynteye_1_1_camera.html#af679e8c2b116038c83fc4b8732a8f182',1,'mynteye::Camera']]]
+  ['writecameracalibrationbinfile',['WriteCameraCalibrationBinFile',['../classmynteyed_1_1_camera.html#adfc12383275114053f14e0674305859c',1,'mynteyed::Camera']]],
+  ['writedeviceflash',['WriteDeviceFlash',['../classmynteyed_1_1_camera.html#acee05b01e01b44b27b6140b9019c2ef1',1,'mynteyed::Camera']]]
 ];

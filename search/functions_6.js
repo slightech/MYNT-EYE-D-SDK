@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['open',['Open',['../classmynteye_1_1_camera.html#a4074e1fb5abe8f0857c1583070869055',1,'mynteye::Camera::Open()'],['../classmynteye_1_1_camera.html#a702cd3d4e0661654b73f2e18268807b8',1,'mynteye::Camera::Open(const OpenParams &amp;params)']]],
-  ['openparams',['OpenParams',['../structmynteye_1_1_open_params.html#a3ef347a854fb023d14ea33b08ef62b67',1,'mynteye::OpenParams']]]
+  ['open',['Open',['../classmynteyed_1_1_camera.html#a8f088ced93a4f1d734ca84aef8120598',1,'mynteyed::Camera::Open()'],['../classmynteyed_1_1_camera.html#adfb443ba08e9bc613aef364cdb8a5137',1,'mynteyed::Camera::Open(const OpenParams &amp;params)']]],
+  ['openparams',['OpenParams',['../structmynteyed_1_1_open_params.html#a830b91a62f5a6026c3ee38f637362000',1,'mynteyed::OpenParams']]]
 ];

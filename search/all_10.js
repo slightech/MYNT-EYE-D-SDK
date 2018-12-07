@@ -1,8 +1,7 @@
 var searchData=
 [
-  ['temperature',['temperature',['../structmynteye_1_1_imu_data.html#a47f263f2268c4fa2ae3a91a5ba053c34',1,'mynteye::ImuData']]],
-  ['timestamp',['timestamp',['../structmynteye_1_1_img_info.html#aa13c4d27d4b39d876464d6dbfc70c81c',1,'mynteye::ImgInfo::timestamp()'],['../structmynteye_1_1_imu_data.html#abdd1b91f9e1a07e8d558b7404260bb7a',1,'mynteye::ImuData::timestamp()']]],
-  ['tranmat',['TranMat',['../structmynteye_1_1_camera_calibration.html#a8e7a1424c16c6f66d2e31d51cf194b37',1,'mynteye::CameraCalibration']]],
-  ['translation',['translation',['../structmynteye_1_1_extrinsics.html#a36093cc06059d4f59663b9e7006c79ff',1,'mynteye::Extrinsics']]],
-  ['type',['Type',['../classmynteye_1_1_type.html',1,'mynteye::Type'],['../structmynteye_1_1_device_info.html#ab95e84d0392e546b59943a60e0eb46b7',1,'mynteye::DeviceInfo::type()']]]
+  ['temperature',['temperature',['../structmynteyed_1_1_imu_data.html#a2d847fc29451a2f2d12899391595286c',1,'mynteyed::ImuData']]],
+  ['timestamp',['timestamp',['../structmynteyed_1_1_img_info.html#a3665fe9365b6f691a24c1ae1077caa01',1,'mynteyed::ImgInfo::timestamp()'],['../structmynteyed_1_1_imu_data.html#a9d7ece300b3678335469c727dea6ff0c',1,'mynteyed::ImuData::timestamp()']]],
+  ['translation',['translation',['../structmynteyed_1_1_extrinsics.html#aeb1f493f6b2f4a01c668d4e57cec9d99',1,'mynteyed::Extrinsics']]],
+  ['type',['Type',['../classmynteyed_1_1_type.html',1,'mynteyed::Type'],['../structmynteyed_1_1_device_info.html#a95310e2357335fcc47b25459e9108a20',1,'mynteyed::DeviceInfo::type()']]]
 ];

@@ -1,0 +1,511 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.14"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>MYNT EYE D SDK: mynteyed::Camera类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+  $(document).ready(initResizable);
+/* @license-end */</script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="custom.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">MYNT EYE D SDK
+   &#160;<span id="projectnumber">1.6.0</span>
+   </div>
+   <div id="projectbrief">http://www.myntai.com/mynteye/depth</div>
+  </td>
+   <td>        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.png"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="搜索" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+          </span>
+        </div>
+</td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.8.14 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(document).ready(function(){initNavTree('classmynteyed_1_1_camera.html','');});
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public 成员函数</a> &#124;
+<a href="classmynteyed_1_1_camera-members.html">所有成员列表</a>  </div>
+  <div class="headertitle">
+<div class="title">mynteyed::Camera类 参考</div>  </div>
+</div><!--header-->
+<div class="contents">
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:a009e7bd92956d6790716b9be95e9798f"><td class="memItemLeft" align="right" valign="top"><a id="a009e7bd92956d6790716b9be95e9798f"></a>
+std::vector&lt; <a class="el" href="structmynteyed_1_1_device_info.html">DeviceInfo</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#a009e7bd92956d6790716b9be95e9798f">GetDeviceInfos</a> () const</td></tr>
+<tr class="memdesc:a009e7bd92956d6790716b9be95e9798f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get all device infos <br /></td></tr>
+<tr class="separator:a009e7bd92956d6790716b9be95e9798f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad559d94f3ffb9bda8b1927ce811c8da9"><td class="memItemLeft" align="right" valign="top"><a id="ad559d94f3ffb9bda8b1927ce811c8da9"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#ad559d94f3ffb9bda8b1927ce811c8da9">GetDeviceInfos</a> (std::vector&lt; <a class="el" href="structmynteyed_1_1_device_info.html">DeviceInfo</a> &gt; *dev_infos) const</td></tr>
+<tr class="memdesc:ad559d94f3ffb9bda8b1927ce811c8da9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get all device infos <br /></td></tr>
+<tr class="separator:ad559d94f3ffb9bda8b1927ce811c8da9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0c6877a3c300ffd10ccfe0636451609c"><td class="memItemLeft" align="right" valign="top"><a id="a0c6877a3c300ffd10ccfe0636451609c"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#a0c6877a3c300ffd10ccfe0636451609c">GetStreamInfos</a> (const std::int32_t &amp;dev_index, std::vector&lt; <a class="el" href="structmynteyed_1_1_stream_info.html">StreamInfo</a> &gt; *color_infos, std::vector&lt; <a class="el" href="structmynteyed_1_1_stream_info.html">StreamInfo</a> &gt; *depth_infos) const</td></tr>
+<tr class="memdesc:a0c6877a3c300ffd10ccfe0636451609c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get all stream infos <br /></td></tr>
+<tr class="separator:a0c6877a3c300ffd10ccfe0636451609c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8f088ced93a4f1d734ca84aef8120598"><td class="memItemLeft" align="right" valign="top"><a id="a8f088ced93a4f1d734ca84aef8120598"></a>
+ErrorCode&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#a8f088ced93a4f1d734ca84aef8120598">Open</a> ()</td></tr>
+<tr class="memdesc:a8f088ced93a4f1d734ca84aef8120598"><td class="mdescLeft">&#160;</td><td class="mdescRight">Open camera <br /></td></tr>
+<tr class="separator:a8f088ced93a4f1d734ca84aef8120598"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adfb443ba08e9bc613aef364cdb8a5137"><td class="memItemLeft" align="right" valign="top"><a id="adfb443ba08e9bc613aef364cdb8a5137"></a>
+ErrorCode&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#adfb443ba08e9bc613aef364cdb8a5137">Open</a> (const <a class="el" href="structmynteyed_1_1_open_params.html">OpenParams</a> &amp;params)</td></tr>
+<tr class="memdesc:adfb443ba08e9bc613aef364cdb8a5137"><td class="mdescLeft">&#160;</td><td class="mdescRight">Open camera with params <br /></td></tr>
+<tr class="separator:adfb443ba08e9bc613aef364cdb8a5137"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a180f489dbe706a2de37923d9fb231177"><td class="memItemLeft" align="right" valign="top"><a id="a180f489dbe706a2de37923d9fb231177"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#a180f489dbe706a2de37923d9fb231177">IsOpened</a> () const</td></tr>
+<tr class="memdesc:a180f489dbe706a2de37923d9fb231177"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whethor camera is opened or not <br /></td></tr>
+<tr class="separator:a180f489dbe706a2de37923d9fb231177"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a28b978ab687c7ee8c776cc4725c6709e"><td class="memItemLeft" align="right" valign="top"><a id="a28b978ab687c7ee8c776cc4725c6709e"></a>
+std::shared_ptr&lt; <a class="el" href="structmynteyed_1_1device_1_1_descriptors.html">device::Descriptors</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#a28b978ab687c7ee8c776cc4725c6709e">GetDescriptors</a> () const</td></tr>
+<tr class="memdesc:a28b978ab687c7ee8c776cc4725c6709e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get all device descriptors <br /></td></tr>
+<tr class="separator:a28b978ab687c7ee8c776cc4725c6709e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa376f0b1cbdccc14593beb40a3edc9fa"><td class="memItemLeft" align="right" valign="top"><a id="aa376f0b1cbdccc14593beb40a3edc9fa"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#aa376f0b1cbdccc14593beb40a3edc9fa">GetDescriptor</a> (const Descriptor &amp;desc) const</td></tr>
+<tr class="memdesc:aa376f0b1cbdccc14593beb40a3edc9fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get one device descriptor <br /></td></tr>
+<tr class="separator:aa376f0b1cbdccc14593beb40a3edc9fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a114c2e447166035a385da6fe002c25ac"><td class="memItemLeft" align="right" valign="top"><a id="a114c2e447166035a385da6fe002c25ac"></a>
+<a class="el" href="structmynteyed_1_1_stream_intrinsics.html">StreamIntrinsics</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#a114c2e447166035a385da6fe002c25ac">GetStreamIntrinsics</a> (const StreamMode &amp;stream_mode) const</td></tr>
+<tr class="memdesc:a114c2e447166035a385da6fe002c25ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the intrinsics of camera <br /></td></tr>
+<tr class="separator:a114c2e447166035a385da6fe002c25ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a780428555e53821fadd6dc3b614b9b63"><td class="memItemLeft" align="right" valign="top"><a id="a780428555e53821fadd6dc3b614b9b63"></a>
+<a class="el" href="structmynteyed_1_1_stream_intrinsics.html">StreamIntrinsics</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#a780428555e53821fadd6dc3b614b9b63">GetStreamIntrinsics</a> (const StreamMode &amp;stream_mode, bool *ok) const</td></tr>
+<tr class="memdesc:a780428555e53821fadd6dc3b614b9b63"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the intrinsics of camera <br /></td></tr>
+<tr class="separator:a780428555e53821fadd6dc3b614b9b63"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5bb35a903e3d05580cb4466abf28d577"><td class="memItemLeft" align="right" valign="top"><a id="a5bb35a903e3d05580cb4466abf28d577"></a>
+<a class="el" href="structmynteyed_1_1_extrinsics.html">StreamExtrinsics</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#a5bb35a903e3d05580cb4466abf28d577">GetStreamExtrinsics</a> (const StreamMode &amp;stream_mode) const</td></tr>
+<tr class="memdesc:a5bb35a903e3d05580cb4466abf28d577"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the extrinsics of camera <br /></td></tr>
+<tr class="separator:a5bb35a903e3d05580cb4466abf28d577"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac992e9a0f3c5afdc34aee01f37a6a5c0"><td class="memItemLeft" align="right" valign="top"><a id="ac992e9a0f3c5afdc34aee01f37a6a5c0"></a>
+<a class="el" href="structmynteyed_1_1_extrinsics.html">StreamExtrinsics</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#ac992e9a0f3c5afdc34aee01f37a6a5c0">GetStreamExtrinsics</a> (const StreamMode &amp;stream_mode, bool *ok) const</td></tr>
+<tr class="memdesc:ac992e9a0f3c5afdc34aee01f37a6a5c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the extrinsics of camera <br /></td></tr>
+<tr class="separator:ac992e9a0f3c5afdc34aee01f37a6a5c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adfc12383275114053f14e0674305859c"><td class="memItemLeft" align="right" valign="top"><a id="adfc12383275114053f14e0674305859c"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#adfc12383275114053f14e0674305859c">WriteCameraCalibrationBinFile</a> (const std::string &amp;filename)</td></tr>
+<tr class="memdesc:adfc12383275114053f14e0674305859c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write camera calibration bin file <br /></td></tr>
+<tr class="separator:adfc12383275114053f14e0674305859c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a794b38f31f65477d3ce1bfece8f4ade2"><td class="memItemLeft" align="right" valign="top"><a id="a794b38f31f65477d3ce1bfece8f4ade2"></a>
+<a class="el" href="structmynteyed_1_1_motion_intrinsics.html">MotionIntrinsics</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#a794b38f31f65477d3ce1bfece8f4ade2">GetMotionIntrinsics</a> () const</td></tr>
+<tr class="memdesc:a794b38f31f65477d3ce1bfece8f4ade2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the intrinsics of motion <br /></td></tr>
+<tr class="separator:a794b38f31f65477d3ce1bfece8f4ade2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adf6a087898161979d127b0eeec3c160f"><td class="memItemLeft" align="right" valign="top"><a id="adf6a087898161979d127b0eeec3c160f"></a>
+<a class="el" href="structmynteyed_1_1_motion_intrinsics.html">MotionIntrinsics</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#adf6a087898161979d127b0eeec3c160f">GetMotionIntrinsics</a> (bool *ok) const</td></tr>
+<tr class="memdesc:adf6a087898161979d127b0eeec3c160f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the intrinsics of motion <br /></td></tr>
+<tr class="separator:adf6a087898161979d127b0eeec3c160f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a876375b8631b8d7794d7e6b90be5ae90"><td class="memItemLeft" align="right" valign="top"><a id="a876375b8631b8d7794d7e6b90be5ae90"></a>
+<a class="el" href="structmynteyed_1_1_extrinsics.html">MotionExtrinsics</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#a876375b8631b8d7794d7e6b90be5ae90">GetMotionExtrinsics</a> () const</td></tr>
+<tr class="memdesc:a876375b8631b8d7794d7e6b90be5ae90"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the extrinsics from left to motion <br /></td></tr>
+<tr class="separator:a876375b8631b8d7794d7e6b90be5ae90"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad7b94e9724835e97b16806c4fc3f5325"><td class="memItemLeft" align="right" valign="top"><a id="ad7b94e9724835e97b16806c4fc3f5325"></a>
+<a class="el" href="structmynteyed_1_1_extrinsics.html">MotionExtrinsics</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#ad7b94e9724835e97b16806c4fc3f5325">GetMotionExtrinsics</a> (bool *ok) const</td></tr>
+<tr class="memdesc:ad7b94e9724835e97b16806c4fc3f5325"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the extrinsics from left to motion <br /></td></tr>
+<tr class="separator:ad7b94e9724835e97b16806c4fc3f5325"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a031a6e5f94f8f9f305998570c5952c72"><td class="memItemLeft" align="right" valign="top"><a id="a031a6e5f94f8f9f305998570c5952c72"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#a031a6e5f94f8f9f305998570c5952c72">IsWriteDeviceSupported</a> () const</td></tr>
+<tr class="memdesc:a031a6e5f94f8f9f305998570c5952c72"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whethor write device supported or not <br /></td></tr>
+<tr class="separator:a031a6e5f94f8f9f305998570c5952c72"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acee05b01e01b44b27b6140b9019c2ef1"><td class="memItemLeft" align="right" valign="top"><a id="acee05b01e01b44b27b6140b9019c2ef1"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#acee05b01e01b44b27b6140b9019c2ef1">WriteDeviceFlash</a> (<a class="el" href="structmynteyed_1_1device_1_1_descriptors.html">device::Descriptors</a> *desc, <a class="el" href="structmynteyed_1_1device_1_1_imu_params.html">device::ImuParams</a> *imu_params, <a class="el" href="classmynteyed_1_1_version.html">Version</a> *spec_version=nullptr)</td></tr>
+<tr class="memdesc:acee05b01e01b44b27b6140b9019c2ef1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write device flash <br /></td></tr>
+<tr class="separator:acee05b01e01b44b27b6140b9019c2ef1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acbaa3cb2624d985b61d0e67472b727c9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#acbaa3cb2624d985b61d0e67472b727c9">EnableProcessMode</a> (const ProcessMode &amp;mode)</td></tr>
+<tr class="memdesc:acbaa3cb2624d985b61d0e67472b727c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable process mode, e.g.  <a href="#acbaa3cb2624d985b61d0e67472b727c9">更多...</a><br /></td></tr>
+<tr class="separator:acbaa3cb2624d985b61d0e67472b727c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a18d3b096788171564e5439b32c640c8f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#a18d3b096788171564e5439b32c640c8f">EnableProcessMode</a> (const std::int32_t &amp;mode)</td></tr>
+<tr class="memdesc:a18d3b096788171564e5439b32c640c8f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable process mode, e.g.  <a href="#a18d3b096788171564e5439b32c640c8f">更多...</a><br /></td></tr>
+<tr class="separator:a18d3b096788171564e5439b32c640c8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab2f92ffcd36974d50ee66efc426d7c10"><td class="memItemLeft" align="right" valign="top"><a id="ab2f92ffcd36974d50ee66efc426d7c10"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#ab2f92ffcd36974d50ee66efc426d7c10">IsImageInfoSupported</a> () const</td></tr>
+<tr class="memdesc:ab2f92ffcd36974d50ee66efc426d7c10"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whethor image info supported or not <br /></td></tr>
+<tr class="separator:ab2f92ffcd36974d50ee66efc426d7c10"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7769c7a8b0805bc0bd03886bbe4b987f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#a7769c7a8b0805bc0bd03886bbe4b987f">EnableImageInfo</a> (bool sync)</td></tr>
+<tr class="memdesc:a7769c7a8b0805bc0bd03886bbe4b987f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable image infos.  <a href="#a7769c7a8b0805bc0bd03886bbe4b987f">更多...</a><br /></td></tr>
+<tr class="separator:a7769c7a8b0805bc0bd03886bbe4b987f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ada38cff96e2f5f6e4eb009bf65b79dd2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#ada38cff96e2f5f6e4eb009bf65b79dd2">DisableImageInfo</a> ()</td></tr>
+<tr class="memdesc:ada38cff96e2f5f6e4eb009bf65b79dd2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disable image info.  <a href="#ada38cff96e2f5f6e4eb009bf65b79dd2">更多...</a><br /></td></tr>
+<tr class="separator:ada38cff96e2f5f6e4eb009bf65b79dd2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6c2dea8d0ce00c795a4298947a1644c8"><td class="memItemLeft" align="right" valign="top"><a id="a6c2dea8d0ce00c795a4298947a1644c8"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#a6c2dea8d0ce00c795a4298947a1644c8">IsImageInfoEnabled</a> () const</td></tr>
+<tr class="memdesc:a6c2dea8d0ce00c795a4298947a1644c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whethor image info enabled or not <br /></td></tr>
+<tr class="separator:a6c2dea8d0ce00c795a4298947a1644c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5df34f1c5e3f10cc0816b66a3e000c66"><td class="memItemLeft" align="right" valign="top"><a id="a5df34f1c5e3f10cc0816b66a3e000c66"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#a5df34f1c5e3f10cc0816b66a3e000c66">IsImageInfoSynced</a> () const</td></tr>
+<tr class="memdesc:a5df34f1c5e3f10cc0816b66a3e000c66"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whethor image info synced or not <br /></td></tr>
+<tr class="separator:a5df34f1c5e3f10cc0816b66a3e000c66"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a603b39439add1c002f50e4c61911c7d0"><td class="memItemLeft" align="right" valign="top"><a id="a603b39439add1c002f50e4c61911c7d0"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#a603b39439add1c002f50e4c61911c7d0">IsStreamDataEnabled</a> (const ImageType &amp;type) const</td></tr>
+<tr class="memdesc:a603b39439add1c002f50e4c61911c7d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whethor stream data of certain image type enabled or not <br /></td></tr>
+<tr class="separator:a603b39439add1c002f50e4c61911c7d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a71f085fe22f79f8042dc6fb7f1a835c7"><td class="memItemLeft" align="right" valign="top"><a id="a71f085fe22f79f8042dc6fb7f1a835c7"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#a71f085fe22f79f8042dc6fb7f1a835c7">HasStreamDataEnabled</a> () const</td></tr>
+<tr class="memdesc:a71f085fe22f79f8042dc6fb7f1a835c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Has any stream data enabled <br /></td></tr>
+<tr class="separator:a71f085fe22f79f8042dc6fb7f1a835c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a99be695a17627eabfb23b7f0ff78ae34"><td class="memItemLeft" align="right" valign="top"><a id="a99be695a17627eabfb23b7f0ff78ae34"></a>
+<a class="el" href="structmynteyed_1_1_stream_data.html">StreamData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#a99be695a17627eabfb23b7f0ff78ae34">GetStreamData</a> (const ImageType &amp;type)</td></tr>
+<tr class="memdesc:a99be695a17627eabfb23b7f0ff78ae34"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get latest stream data <br /></td></tr>
+<tr class="separator:a99be695a17627eabfb23b7f0ff78ae34"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae66baf82a651392d7780ac5e53fd3b14"><td class="memItemLeft" align="right" valign="top"><a id="ae66baf82a651392d7780ac5e53fd3b14"></a>
+std::vector&lt; <a class="el" href="structmynteyed_1_1_stream_data.html">StreamData</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#ae66baf82a651392d7780ac5e53fd3b14">GetStreamDatas</a> (const ImageType &amp;type)</td></tr>
+<tr class="memdesc:ae66baf82a651392d7780ac5e53fd3b14"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get cached stream datas <br /></td></tr>
+<tr class="separator:ae66baf82a651392d7780ac5e53fd3b14"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a571dc87dcf7d410a0d06fd7755b8e3d1"><td class="memItemLeft" align="right" valign="top"><a id="a571dc87dcf7d410a0d06fd7755b8e3d1"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#a571dc87dcf7d410a0d06fd7755b8e3d1">IsMotionDatasSupported</a> () const</td></tr>
+<tr class="memdesc:a571dc87dcf7d410a0d06fd7755b8e3d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whethor motion datas supported or not <br /></td></tr>
+<tr class="separator:a571dc87dcf7d410a0d06fd7755b8e3d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae803009c37d783b8b30529ff8a9ab435"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#ae803009c37d783b8b30529ff8a9ab435">EnableMotionDatas</a> (std::size_t max_size=std::numeric_limits&lt; std::size_t &gt;::max())</td></tr>
+<tr class="memdesc:ae803009c37d783b8b30529ff8a9ab435"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable motion datas.  <a href="#ae803009c37d783b8b30529ff8a9ab435">更多...</a><br /></td></tr>
+<tr class="separator:ae803009c37d783b8b30529ff8a9ab435"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9fecffe1b92115429a3081a0b3c271dc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#a9fecffe1b92115429a3081a0b3c271dc">DisableMotionDatas</a> ()</td></tr>
+<tr class="memdesc:a9fecffe1b92115429a3081a0b3c271dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disable motion datas.  <a href="#a9fecffe1b92115429a3081a0b3c271dc">更多...</a><br /></td></tr>
+<tr class="separator:a9fecffe1b92115429a3081a0b3c271dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa548da2c8c5916329daeb572b34ffd7b"><td class="memItemLeft" align="right" valign="top"><a id="aa548da2c8c5916329daeb572b34ffd7b"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#aa548da2c8c5916329daeb572b34ffd7b">IsMotionDatasEnabled</a> () const</td></tr>
+<tr class="memdesc:aa548da2c8c5916329daeb572b34ffd7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whethor motion datas enabled or not <br /></td></tr>
+<tr class="separator:aa548da2c8c5916329daeb572b34ffd7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa995cddc411842e812b80a0f60b02432"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="structmynteyed_1_1_motion_data.html">MotionData</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#aa995cddc411842e812b80a0f60b02432">GetMotionDatas</a> ()</td></tr>
+<tr class="memdesc:aa995cddc411842e812b80a0f60b02432"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get cached motion datas.  <a href="#aa995cddc411842e812b80a0f60b02432">更多...</a><br /></td></tr>
+<tr class="separator:aa995cddc411842e812b80a0f60b02432"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a70de9783fa56ed094caa06fb721f9eb1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#a70de9783fa56ed094caa06fb721f9eb1">SetImgInfoCallback</a> (img_info_callback_t callback, bool async=true)</td></tr>
+<tr class="memdesc:a70de9783fa56ed094caa06fb721f9eb1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set image info callback.  <a href="#a70de9783fa56ed094caa06fb721f9eb1">更多...</a><br /></td></tr>
+<tr class="separator:a70de9783fa56ed094caa06fb721f9eb1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5765c1be26202f524b959601c484089b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#a5765c1be26202f524b959601c484089b">SetStreamCallback</a> (const ImageType &amp;type, stream_callback_t callback, bool async=true)</td></tr>
+<tr class="memdesc:a5765c1be26202f524b959601c484089b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set stream data callback.  <a href="#a5765c1be26202f524b959601c484089b">更多...</a><br /></td></tr>
+<tr class="separator:a5765c1be26202f524b959601c484089b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acebc8a17edc17825f16f67a50f3cf643"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#acebc8a17edc17825f16f67a50f3cf643">SetMotionCallback</a> (motion_callback_t callback, bool async=true)</td></tr>
+<tr class="memdesc:acebc8a17edc17825f16f67a50f3cf643"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set motion data callback.  <a href="#acebc8a17edc17825f16f67a50f3cf643">更多...</a><br /></td></tr>
+<tr class="separator:acebc8a17edc17825f16f67a50f3cf643"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8824cafc079668aace1c80b3b755c044"><td class="memItemLeft" align="right" valign="top"><a id="a8824cafc079668aace1c80b3b755c044"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmynteyed_1_1_camera.html#a8824cafc079668aace1c80b3b755c044">Close</a> ()</td></tr>
+<tr class="memdesc:a8824cafc079668aace1c80b3b755c044"><td class="mdescLeft">&#160;</td><td class="mdescRight">Close the camera <br /></td></tr>
+<tr class="separator:a8824cafc079668aace1c80b3b755c044"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">成员函数说明</h2>
+<a id="ada38cff96e2f5f6e4eb009bf65b79dd2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ada38cff96e2f5f6e4eb009bf65b79dd2">&#9670;&nbsp;</a></span>DisableImageInfo()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void mynteyed::Camera::DisableImageInfo </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Disable image info. </p>
+
+</div>
+</div>
+<a id="a9fecffe1b92115429a3081a0b3c271dc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9fecffe1b92115429a3081a0b3c271dc">&#9670;&nbsp;</a></span>DisableMotionDatas()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void mynteyed::Camera::DisableMotionDatas </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Disable motion datas. </p>
+
+</div>
+</div>
+<a id="a7769c7a8b0805bc0bd03886bbe4b987f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7769c7a8b0805bc0bd03886bbe4b987f">&#9670;&nbsp;</a></span>EnableImageInfo()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void mynteyed::Camera::EnableImageInfo </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>sync</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Enable image infos. </p>
+<p>If sync is false, indicates only can get infos from callback. If sync is true, indicates can get infos from callback or access it from <a class="el" href="structmynteyed_1_1_stream_data.html" title="Stream data. ">StreamData</a>. </p>
+
+</div>
+</div>
+<a id="ae803009c37d783b8b30529ff8a9ab435"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae803009c37d783b8b30529ff8a9ab435">&#9670;&nbsp;</a></span>EnableMotionDatas()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void mynteyed::Camera::EnableMotionDatas </td>
+          <td>(</td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>max_size</em> = <code>std::numeric_limits&lt;&#160;std::size_t&#160;&gt;::max()</code></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Enable motion datas. </p>
+<p>If max_size &lt;= 0, indicates only can get datas from callback. If max_size &gt; 0, indicates can get datas from callback or using <a class="el" href="classmynteyed_1_1_camera.html#aa995cddc411842e812b80a0f60b02432" title="Get cached motion datas. ">GetMotionDatas()</a>.</p>
+<p>Note: if max_size &gt; 0, the motion datas will be cached until you call <a class="el" href="classmynteyed_1_1_camera.html#aa995cddc411842e812b80a0f60b02432" title="Get cached motion datas. ">GetMotionDatas()</a>. </p>
+
+</div>
+</div>
+<a id="acbaa3cb2624d985b61d0e67472b727c9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acbaa3cb2624d985b61d0e67472b727c9">&#9670;&nbsp;</a></span>EnableProcessMode() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void mynteyed::Camera::EnableProcessMode </td>
+          <td>(</td>
+          <td class="paramtype">const ProcessMode &amp;&#160;</td>
+          <td class="paramname"><em>mode</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Enable process mode, e.g. </p>
+<p>imu assembly, temp_drift </p>
+
+</div>
+</div>
+<a id="a18d3b096788171564e5439b32c640c8f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a18d3b096788171564e5439b32c640c8f">&#9670;&nbsp;</a></span>EnableProcessMode() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void mynteyed::Camera::EnableProcessMode </td>
+          <td>(</td>
+          <td class="paramtype">const std::int32_t &amp;&#160;</td>
+          <td class="paramname"><em>mode</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Enable process mode, e.g. </p>
+<p>imu assembly, temp_drift </p>
+
+</div>
+</div>
+<a id="aa995cddc411842e812b80a0f60b02432"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa995cddc411842e812b80a0f60b02432">&#9670;&nbsp;</a></span>GetMotionDatas()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="structmynteyed_1_1_motion_data.html">MotionData</a>&gt; mynteyed::Camera::GetMotionDatas </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get cached motion datas. </p>
+<p>Besides, you can also get them from callback </p>
+
+</div>
+</div>
+<a id="a70de9783fa56ed094caa06fb721f9eb1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a70de9783fa56ed094caa06fb721f9eb1">&#9670;&nbsp;</a></span>SetImgInfoCallback()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void mynteyed::Camera::SetImgInfoCallback </td>
+          <td>(</td>
+          <td class="paramtype">img_info_callback_t&#160;</td>
+          <td class="paramname"><em>callback</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>async</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set image info callback. </p>
+
+</div>
+</div>
+<a id="acebc8a17edc17825f16f67a50f3cf643"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acebc8a17edc17825f16f67a50f3cf643">&#9670;&nbsp;</a></span>SetMotionCallback()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void mynteyed::Camera::SetMotionCallback </td>
+          <td>(</td>
+          <td class="paramtype">motion_callback_t&#160;</td>
+          <td class="paramname"><em>callback</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>async</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set motion data callback. </p>
+
+</div>
+</div>
+<a id="a5765c1be26202f524b959601c484089b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5765c1be26202f524b959601c484089b">&#9670;&nbsp;</a></span>SetStreamCallback()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void mynteyed::Camera::SetStreamCallback </td>
+          <td>(</td>
+          <td class="paramtype">const ImageType &amp;&#160;</td>
+          <td class="paramname"><em>type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">stream_callback_t&#160;</td>
+          <td class="paramname"><em>callback</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>async</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set stream data callback. </p>
+
+</div>
+</div>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><b>mynteyed</b></li><li class="navelem"><a class="el" href="classmynteyed_1_1_camera.html">Camera</a></li>
+    <li class="footer">制作者
+    <a href="http://www.doxygen.org/index.html">
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.14 </li>
+  </ul>
+</div>
+</body>
+</html>

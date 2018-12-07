@@ -1,13 +1,9 @@
 var searchData=
 [
-  ['camdist1',['CamDist1',['../structmynteye_1_1_camera_calibration.html#a5f7d821f146c9248a776cdabc2d12117',1,'mynteye::CameraCalibration']]],
-  ['camdist2',['CamDist2',['../structmynteye_1_1_camera_calibration.html#a5963b0490b703d543559ff70737837f8',1,'mynteye::CameraCalibration']]],
-  ['cammat1',['CamMat1',['../structmynteye_1_1_camera_calibration.html#a3203f749376c67c9c954b84d4ec21d86',1,'mynteye::CameraCalibration']]],
-  ['cammat2',['CamMat2',['../structmynteye_1_1_camera_calibration.html#ae384519fb4273256194d601449bb9342',1,'mynteye::CameraCalibration']]],
-  ['chip_5fid',['chip_id',['../structmynteye_1_1_device_info.html#a8a72114aa78073232b9f4c26d8cc9c72',1,'mynteye::DeviceInfo']]],
-  ['coeffs',['coeffs',['../structmynteye_1_1_camera_intrinsics.html#a4f0d30172c0363e89c92804121fa9098',1,'mynteye::CameraIntrinsics']]],
-  ['color_5fmode',['color_mode',['../structmynteye_1_1_open_params.html#a5957ce4a22184e84cacaf74300756846',1,'mynteye::OpenParams']]],
-  ['color_5fstream_5fformat',['color_stream_format',['../structmynteye_1_1_open_params.html#afec4866c0b434f14ae1da272ac658ac5',1,'mynteye::OpenParams']]],
-  ['cx',['cx',['../structmynteye_1_1_camera_intrinsics.html#ab0f1d79af2d52163bf4186135176727c',1,'mynteye::CameraIntrinsics']]],
-  ['cy',['cy',['../structmynteye_1_1_camera_intrinsics.html#a88a535eb62414e2fdd6ea31607f363d7',1,'mynteye::CameraIntrinsics']]]
+  ['chip_5fid',['chip_id',['../structmynteyed_1_1_device_info.html#ad9f7a919668c8820fcd7f266c20f8044',1,'mynteyed::DeviceInfo']]],
+  ['coeffs',['coeffs',['../structmynteyed_1_1_camera_intrinsics.html#a46232f3f3d8f086d3a063276c1d3aa90',1,'mynteyed::CameraIntrinsics']]],
+  ['color_5fmode',['color_mode',['../structmynteyed_1_1_open_params.html#ad653784db7249017dbacdfc5d67692c2',1,'mynteyed::OpenParams']]],
+  ['color_5fstream_5fformat',['color_stream_format',['../structmynteyed_1_1_open_params.html#aa8d158586597d95704c25ef5751c6dcb',1,'mynteyed::OpenParams']]],
+  ['cx',['cx',['../structmynteyed_1_1_camera_intrinsics.html#af427c6dc3244949fcc5a233a0050b7c8',1,'mynteyed::CameraIntrinsics']]],
+  ['cy',['cy',['../structmynteyed_1_1_camera_intrinsics.html#a976bb95f737c1e6ad74db1dfe6efe83c',1,'mynteyed::CameraIntrinsics']]]
 ];

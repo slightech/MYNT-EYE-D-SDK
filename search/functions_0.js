@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['close',['Close',['../classmynteye_1_1_camera.html#a566f51f06bcc511e75e1108aafdbb332',1,'mynteye::Camera']]]
+  ['close',['Close',['../classmynteyed_1_1_camera.html#a8824cafc079668aace1c80b3b755c044',1,'mynteyed::Camera']]]
 ];
