@@ -930,4 +930,8 @@ bool Channels::SetFiles(device_desc_t *desc,
   return true;
 }
 
+bool Channels::IsBetaDevice() {
+  return is_hid_exist_;
+}
+
 MYNTEYE_END_NAMESPACE

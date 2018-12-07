@@ -74,6 +74,8 @@ class MYNTEYE_API Channels {
       imu_params_t *imu_params,
       Version *spec_version);
 
+  bool IsBetaDevice();
+
  protected:
   void Detect();
   bool Open();
