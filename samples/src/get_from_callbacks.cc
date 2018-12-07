@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #include <iostream>
+#include <mutex>
 
 #include <opencv2/highgui/highgui.hpp>
 
@@ -80,9 +81,11 @@ int main(int argc, char const* argv[]) {
   cam.EnableMotionDatas(0);
 
   // Callbacks
+  std::mutex mutex;
   {
     // Set image info callback
-    cam.SetImgInfoCallback([](const std::shared_ptr<ImgInfo>& info) {
+    cam.SetImgInfoCallback([&mutex](const std::shared_ptr<ImgInfo>& info) {
+      std::lock_guard<std::mutex> _(mutex);
       std::cout << "  [img_info] fid: " << info->frame_id
           << ", stamp: " << info->timestamp
           << ", expos: " << info->exposure_time << std::endl
@@ -96,7 +99,8 @@ int main(int argc, char const* argv[]) {
     };
     for (auto&& type : types) {
       // Set stream data callback
-      cam.SetStreamCallback(type, [](const StreamData& data) {
+      cam.SetStreamCallback(type, [&mutex](const StreamData& data) {
+        std::lock_guard<std::mutex> _(mutex);
         std::cout << "  [" << data.img->type() << "] fid: "
             << data.img->frame_id() << std::endl
             << std::flush;
@@ -104,7 +108,8 @@ int main(int argc, char const* argv[]) {
     }
 
     // Set motion data callback
-    cam.SetMotionCallback([](const MotionData& data) {
+    cam.SetMotionCallback([&mutex](const MotionData& data) {
+      std::lock_guard<std::mutex> _(mutex);
       if (data.imu->flag == MYNTEYE_IMU_ACCEL) {
         std::cout << "[accel] stamp: " << data.imu->timestamp
           << ", x: " << data.imu->accel[0]
