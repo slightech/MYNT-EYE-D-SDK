@@ -97,7 +97,7 @@ int main(int argc, char const* argv[]) {
     painter.DrawSize(color, CVPainter::TOP_LEFT);
     painter.DrawStreamData(color, image_color, CVPainter::TOP_RIGHT);
     painter.DrawInformation(color, util::to_string(counter.fps()),
-    CVPainter::BOTTOM_RIGHT);
+        CVPainter::BOTTOM_RIGHT);
 
     cv::imshow("color", color);
 

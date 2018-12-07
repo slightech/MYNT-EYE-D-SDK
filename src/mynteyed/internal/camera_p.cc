@@ -144,8 +144,7 @@ StreamIntrinsics CameraPrivate::GetStreamIntrinsics(
     const StreamMode& stream_mode, bool* ok) {
   StreamIntrinsics in;
   auto calib = GetCameraCalibration(stream_mode);
-  if (calib == nullptr ||
-   !channels_->IsBetaDevice()) {
+  if (calib == nullptr || channels_->IsBetaDevice()) {
     *ok = false;
     return std::move(in);
   }
