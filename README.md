@@ -21,13 +21,13 @@ API reference and the guide documentations.
 ### Quick Start Guide
 
 * en:
-  * [SDK Quick Start Guide for Linux](docs/en/guide_build_linux.md)
-  * [SDK Quick Start Guide for Windows](docs/en/guide_build_win.md)
-    * [Windows exe installation](docs/en/guide_install_exe_win.md)
+  * [Quick Start Guide for Linux](docs/en/installation/build_linux.md)
+  * [Quick Start Guide for Windows](docs/en/installation/build_win.md)
+    * [Windows EXE Installation](docs/en/installation/install_exe_win.md)
 * zh-Hans:
-  * [Linux SDK 用户指南](docs/zh-Hans/guide_build_linux.md)
-  * [Windows SDK 用户指南](docs/zh-Hans/guide_build_win.md)
-    * [Windows 预编译 exe 安装](docs/zh-Hans/guide_install_exe_win.md)
+  * [Linux SDK 用户指南](docs/zh-Hans/installation/build_linux.md)
+  * [Windows SDK 用户指南](docs/zh-Hans/installation/build_win.md)
+    * [Windows 预编译 exe 安装](docs/zh-Hans/installation/install_exe_win.md)
 
 ## Mirrors
 
