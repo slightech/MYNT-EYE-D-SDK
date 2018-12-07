@@ -52,7 +52,7 @@
   <arg name="ir_depth_only" default="false" />
 
   <!-- Generating points frequency, make slower than framerate -->
-  <arg name="points_frequency" default="2" />
+  <arg name="points_frequency" default="10" />
   <!-- Points display z distance scale factor -->
   <arg name="points_factor" default="1000.0" />
 
