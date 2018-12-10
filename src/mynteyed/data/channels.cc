@@ -1038,7 +1038,7 @@ bool Channels::HidFirmwareUpdate(const char *filepath) {
 }
 #else
 bool Channels::HidFirmwareUpdate(const char *filepath) {
-  LOGE("%s %d:: This feature is not supported on Windows", __FILE__, __LINE__);
+  LOGE("\nWARNING:: This feature is not supported on Windows.\n");
   return false;
 }
 #endif

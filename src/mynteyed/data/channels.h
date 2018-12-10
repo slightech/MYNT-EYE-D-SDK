@@ -23,14 +23,14 @@
 
 #include "mynteyed/stubs/global.h"
 
-// #ifdef MYNTEYE_OS_LINUX
+#ifdef MYNTEYE_OS_LINUX
 #include <sys/ioctl.h>
 #include <termios.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
-// #endif
+#endif
 
 #include "mynteyed/data/types_internal.h"
 #include "mynteyed/types_data.h"
