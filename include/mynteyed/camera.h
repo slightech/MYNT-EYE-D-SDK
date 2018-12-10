@@ -179,6 +179,9 @@ class MYNTEYE_API Camera {
   void DisableStreamData(const ImageType& type);
 #endif
 
+  /** Update hid device firmware */
+  bool HidFirmwareUpdate(const char* filepath);
+
  private:
   std::unique_ptr<CameraPrivate> p_;
 };

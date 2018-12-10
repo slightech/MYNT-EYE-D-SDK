@@ -23,4 +23,6 @@
 
 
 Note:
+* L'=left rectify image, L=left image
+  * R'=right rectify image, R=right image, D=depth image
 * In IR Depth Only mode, frame rate only support 15fps and 30fps.

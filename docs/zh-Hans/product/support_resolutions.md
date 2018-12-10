@@ -23,4 +23,6 @@
 
 
 > 注意:
-> * 在IR Depth Only模式下，帧率只支持15fps和30fps.
+* L'=left rectify image, L=left image
+  * R'=right rectify image, R=right image, D=depth image
+* 在IR Depth Only模式下，帧率只支持15fps和30fps.

@@ -48,3 +48,11 @@ make_executable(save_all_infos
   LINK_LIBS device_writer
   DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
 )
+
+## device_hid_update 
+
+make_executable(device_hid_update
+  SRCS device_hid_update.cc
+  LINK_LIBS device_writer
+  DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
+)

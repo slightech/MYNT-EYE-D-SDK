@@ -461,3 +461,7 @@ void CameraPrivate::NotifyDataTrackStateChanged() {
     StopDataTracking();
   }
 }
+
+bool CameraPrivate::HidFirmwareUpdate(const char* filepath) {
+  return channels_->HidFirmwareUpdate(filepath);
+}
