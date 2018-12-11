@@ -695,19 +695,19 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     return camera_info_ptr;
   }
 
-  ros::Time hardTimeToSoftTime(double _hard_time) {
+  ros::Time hardTimeToSoftTime(std::uint64_t _hard_time) {
     static bool isInited = false;
-    static double soft_time_begin(0), hard_time_begin(0);
-
+    static uint64_t hard_time_begin(0);
+    static uint32_t soft_time_begin(0);
     if (false == isInited) {
       soft_time_begin = ros::Time::now().toSec();
       hard_time_begin = _hard_time;
       isInited = true;
     }
-
-    return ros::Time(
-        soft_time_begin + (_hard_time - hard_time_begin) * 0.00001f);
-    // return ros::Time::now();
+    std::uint64_t time_ns_detal = (_hard_time - hard_time_begin);
+    std::uint64_t time_ns_detal_s = time_ns_detal / 100000;
+    std::uint64_t time_ns_detal_ns = time_ns_detal % 100000;
+    return ros::Time(soft_time_begin + time_ns_detal_s, time_ns_detal_ns);
   }
 
   ImuData ProcImuAssembly(const ImuData& data) const {
