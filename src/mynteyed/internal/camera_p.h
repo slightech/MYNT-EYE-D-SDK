@@ -162,6 +162,8 @@ class MYNTEYE_API CameraPrivate {
   bool GetCameraCalibrationFile(const StreamMode& stream_mode,
                                 const std::string& filename);
 
+  bool HidFirmwareUpdate(const char* filepath);
+
  protected:
   std::shared_ptr<Channels> channels() const {
     return channels_;

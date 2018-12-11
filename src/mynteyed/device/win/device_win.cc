@@ -260,7 +260,7 @@ void UpdateZ14DisplayImage_DIB24(RGBQUAD* pColorPaletteZ14, BYTE* pDepthZ14,
 void Device::OnInit() {
   is_color_ok_ = false;
   is_depth_ok_ = false;
-  DmColorMode14(color_palette_z14_, 3/*far*/);
+  DmColorMode14(color_palette_z14_, 0/*normal*/);
   SetBaseGrayPaletteZ14(gray_palette_z14_);
 }
 

@@ -78,27 +78,32 @@ int main(int argc, char const* argv[]) {
   CVPainter painter;
   PCViewer viewer(in, CAMERA_FACTOR);
   util::Counter counter;
+  cv::Mat color;
+  cv::Mat depth;
   for (;;) {
     counter.Update();
 
     auto image_color = cam.GetStreamData(ImageType::IMAGE_LEFT_COLOR);
     auto image_depth = cam.GetStreamData(ImageType::IMAGE_DEPTH);
-    if (image_color.img && image_depth.img) {
-      cv::Mat color = image_color.img->To(ImageFormat::COLOR_BGR)
-          ->ToMat();
-      painter.DrawSize(color, CVPainter::TOP_LEFT);
-      painter.DrawStreamData(color, image_color, CVPainter::TOP_RIGHT);
-      painter.DrawInformation(color, util::to_string(counter.fps()),
-          CVPainter::BOTTOM_RIGHT);
-
-      cv::Mat depth = image_depth.img->To(ImageFormat::DEPTH_RAW)
-          ->ToMat();
-
-      cv::imshow("color", color);
-
-      viewer.Update(color, depth);
-      // viewer.UpdateDirectly(color, depth);
+    if (image_color.img && color.empty()) {
+      color = image_color.img->To(ImageFormat::COLOR_BGR)->ToMat();
     }
+    if (image_depth.img && depth.empty()) {
+      depth = image_depth.img->To(ImageFormat::DEPTH_RAW)->ToMat();
+    }
+
+    if (color.empty() || depth.empty()) { continue; }
+
+    painter.DrawSize(color, CVPainter::TOP_LEFT);
+    painter.DrawStreamData(color, image_color, CVPainter::TOP_RIGHT);
+    painter.DrawInformation(color, util::to_string(counter.fps()),
+        CVPainter::BOTTOM_RIGHT);
+
+    cv::imshow("color", color);
+
+    viewer.Update(color, depth);
+    color.release();
+    depth.release();
 
     char key = static_cast<char>(cv::waitKey(1));
     if (key == 27 || key == 'q' || key == 'Q') {  // ESC/Q

@@ -930,4 +930,118 @@ bool Channels::SetFiles(device_desc_t *desc,
   return true;
 }
 
+bool Channels::IsBetaDevice() const {
+  return !is_hid_exist_;
+}
+
+#ifdef MYNTEYE_OS_LINUX
+bool Channels::HidFirmwareUpdate(const char *filepath) {
+  if (!is_hid_exist_) {
+    LOGE("\n%s %d:: This device not support update hid firmware.\n",
+        __FILE__, __LINE__);
+    return false;
+  }
+
+  std::uint8_t cmd[64];
+
+  int fd = open(filepath, O_RDONLY);
+  if (fd < 0) {
+    LOGE("\n%s %d:: Opened %s failed.\n", __FILE__, __LINE__, filepath);
+    return false;
+  }
+  if ((fstat(fd, &stat_) != 0) || (!S_ISREG(stat_.st_mode))) { return false; }
+  file_size_ = stat_.st_size;
+  packets_sum_ = file_size_ % 60 > 0 ? file_size_ / 60 + 1 : file_size_ / 60;
+
+  cmd[0] = 0xAA;
+  cmd[1] = 4;
+  cmd[2] = file_size_ & 0xFF;
+  cmd[3] = (file_size_ & 0xFF00) >> 8;
+  cmd[4] = (file_size_ & 0xFF0000) >> 16;
+  cmd[5] = (file_size_ & 0xFF000000) >> 24;
+
+  if (hid_->get_device_class() == 0xFF) {
+    LOGI("\nUpdate will start......, "
+      "please don't pull out device!\n");
+  } else {
+    int ret = hid_->send(0, cmd, 64, 10);
+    if (ret <= 0) {
+      LOGE("\n%s %d:: Update failed.\n", __FILE__, __LINE__);
+      return false;
+    }
+
+    hid_->droped();
+    LOGI("\nPlease wait a moment, don't pull out device!\n");
+
+    while (hid_->get_device_class() == -1) {
+      int ret = hid_->open(1, -1, -1);
+      if (ret > 0) { break; }
+      if (++req_count_ > 50) {
+        LOGE("\n%s %d:: Update failed.\n", __FILE__, __LINE__);
+        return false;
+      }
+    }
+    if (hid_->get_device_class() == 0xFF) {
+      LOGI("\nUpdate will start......, "
+        "please don't pull out device!\n");
+    } else {
+      LOGE("\n%s %d:: Update failed.\n", __FILE__, __LINE__);
+      return false;
+    }
+  }
+
+  if (hid_->send(0, cmd, 64, 10) <= 0) {
+    LOGE("\n%s %d:: Update failed. maybe device went offline\n", __FILE__, __LINE__);
+    return false;
+  }
+
+  if (hid_->receive(0, cmd, 64, 20000) <= 0) {
+    LOGE("\n%s %d:: Update failed. maybe device went offline\n", __FILE__, __LINE__);
+    return false;
+  }
+
+  if (0xAB != cmd[0]) {
+    LOGE("\n%s %d:: Update failed.\n", __FILE__, __LINE__);
+    return false;
+  }
+
+  while (true) {
+    int current_len = read(fd, static_cast<std::uint8_t *>(cmd + 3), 60);
+    if (-1 == current_len) {
+      LOGE("\n%s %d:: Update failed.\n" __FILE__, __LINE__);
+      return false;
+    }
+
+    cmd[0] = 0x5A;
+    cmd[1] = packets_index_;
+    cmd[2] = current_len;
+    cmd[current_len + 3] = check_sum(
+        static_cast<std::uint8_t *>(cmd + 3), current_len);
+
+    if (hid_->send(0, cmd, 64, 100) <= 0) {
+      LOGE("\n%s %d:: Update failed.\n" __FILE__, __LINE__);
+      return false;
+    }
+
+    packets_index_++;
+
+    if (current_len < 60) {
+      cmd[0] = 0xAA;
+      cmd[1] = 0xFF;
+      hid_->send(0, cmd, 64, 100);
+      break;
+    }
+  }
+
+  LOGI("\nUpdate success.\n");
+  return true;
+}
+#else
+bool Channels::HidFirmwareUpdate(const char *filepath) {
+  LOGE("\nWARNING:: This feature is not supported on Windows.\n");
+  return false;
+}
+#endif
+
+
 MYNTEYE_END_NAMESPACE

@@ -21,6 +21,17 @@
 #include <thread>
 #include <vector>
 
+#include "mynteyed/stubs/global.h"
+
+#ifdef MYNTEYE_OS_LINUX
+#include <sys/ioctl.h>
+#include <termios.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <fcntl.h>
+#endif
+
 #include "mynteyed/data/types_internal.h"
 #include "mynteyed/types_data.h"
 
@@ -50,6 +61,10 @@ class MYNTEYE_API Channels {
   using imu_callback_t = std::function<void(const ImuDataPacket &packet)>;
   using img_callback_t = std::function<void(const ImgInfoPacket &packet)>;
 
+#ifdef MYNTEYE_OS_LINUX
+  using stat_t = struct stat;
+#endif
+
   Channels();
   virtual ~Channels();
 
@@ -73,6 +88,10 @@ class MYNTEYE_API Channels {
   bool SetFiles(device_desc_t *desc,
       imu_params_t *imu_params,
       Version *spec_version);
+
+  bool IsBetaDevice() const;
+
+  bool HidFirmwareUpdate(const char *filepath);
 
  protected:
   void Detect();
@@ -106,6 +125,14 @@ class MYNTEYE_API Channels {
   std::thread hid_track_thread_;
 
   std::uint16_t package_sn_ = 0;
+
+#ifdef MYNTEYE_OS_LINUX
+  stat_t stat_;
+  int req_count_ = 0;
+  off_t file_size_;
+  std::uint32_t packets_sum_ = 0;
+  std::uint32_t packets_index_ = 0;
+#endif
 };
 
 MYNTEYE_END_NAMESPACE

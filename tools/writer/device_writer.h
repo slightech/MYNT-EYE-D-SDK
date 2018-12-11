@@ -33,6 +33,8 @@ class DeviceWriter {
   /** Save all datas of this device */
   void SaveAllDatas(const std::string &dir);
 
+  bool HidFirmwareUpdate(const char *filepath);
+
  private:
   device_desc_t LoadDescriptors(const std::string &filepath);
   imu_params_t LoadImuParams(const std::string &filepath);

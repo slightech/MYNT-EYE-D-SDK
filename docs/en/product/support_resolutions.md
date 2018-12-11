@@ -23,10 +23,6 @@
 
 
 Note:
-
-* When resolution 1280x720, color and depth maximum support 60fps.
-* When resolution 640x480, color and depth maximum support 60fps.
-* When resolution 1280x480, color and depth only support 60, 30fps.
-* When resolution 2560x720, color and depth only support 30fps.
-* When only the color device be opened，2560x720 only support 60, 30fps.
-* In IR Depth Only mode, frame rate is supported between 15fps and 30fps.
+* L'=left rectify image, L=left image
+  * R'=right rectify image, R=right image, D=depth image
+* In IR Depth Only mode, frame rate only support 15fps and 30fps.

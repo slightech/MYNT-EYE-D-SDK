@@ -266,6 +266,10 @@ DeviceWriter::imu_params_t DeviceWriter::LoadImuParams(
   return params;
 }
 
+bool DeviceWriter::HidFirmwareUpdate(const char* filepath) {
+  return device_->HidFirmwareUpdate(filepath);
+}
+
 }  // namespace tools
 
 MYNTEYE_END_NAMESPACE
