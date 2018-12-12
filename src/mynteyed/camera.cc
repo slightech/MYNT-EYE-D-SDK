@@ -182,6 +182,10 @@ void Camera::Close() {
   p_->Close();
 }
 
+bool Camera::HidFirmwareUpdate(const char* filepath) {
+  return p_->HidFirmwareUpdate(filepath);
+}
+
 #ifdef MYNTEYE_DEPRECATED_COMPAT
 void Camera::EnableStreamData(const ImageType& type) {
   LOGW("%s is deprecated, replaced by OpenParams#device_mode.", __func__);
@@ -191,7 +195,3 @@ void Camera::DisableStreamData(const ImageType& type) {
   LOGW("%s is deprecated, replaced by OpenParams#device_mode.", __func__);
 }
 #endif
-
-bool Camera::HidFirmwareUpdate(const char* filepath) {
-  return p_->HidFirmwareUpdate(filepath);
-}

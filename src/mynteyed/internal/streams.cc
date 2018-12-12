@@ -202,7 +202,6 @@ void Streams::OnImageInfoCallback(const ImgInfoPacket& packet) {
 
   if (is_image_info_sync_) {
     // push info
-    
     for (auto&& info : stream_info_queue_map_) {
       info.second->Put(img_info);
     }

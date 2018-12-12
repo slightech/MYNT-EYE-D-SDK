@@ -172,15 +172,15 @@ class MYNTEYE_API Camera {
   /** Close the camera */
   void Close();
 
+  /** Update hid device firmware */
+  bool HidFirmwareUpdate(const char* filepath);
+
 #ifdef MYNTEYE_DEPRECATED_COMPAT
   /** @deprecated Replaced by OpenParams#device_mode */
   void EnableStreamData(const ImageType& type);
   /** @deprecated Replaced by OpenParams#device_mode */
   void DisableStreamData(const ImageType& type);
 #endif
-
-  /** Update hid device firmware */
-  bool HidFirmwareUpdate(const char* filepath);
 
  private:
   std::unique_ptr<CameraPrivate> p_;

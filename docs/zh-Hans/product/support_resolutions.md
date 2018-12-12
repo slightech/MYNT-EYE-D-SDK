@@ -21,8 +21,7 @@
 | L' | USB2.0 | 1280x720 | 10 | not open | null |
 | L | USB2.0 | 1280x720 | 10 | not open | null |
 
-
-> 注意:
-* L'=left rectify image, L=left image
-  * R'=right rectify image, R=right image, D=depth image
-* 在IR Depth Only模式下，帧率只支持15fps和30fps.
+> 注意：
+> * L'=left rectify image, L=left image
+> * R'=right rectify image, R=right image, D=depth image
+> * 在IR Depth Only模式下，帧率只支持15fps和30fps.
