@@ -74,6 +74,8 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   ros::NodeHandle nh;
   ros::NodeHandle nh_ns;
 
+  pthread_mutex_t mutex_sub_result;
+
   image_transport::CameraPublisher pub_left_mono;
   image_transport::CameraPublisher pub_left_color;
   image_transport::CameraPublisher pub_right_mono;
@@ -138,6 +140,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   sub_result_t sub_result;
 
   MYNTEYEWrapperNodelet() {
+    pthread_mutex_init(&mutex_sub_result, nullptr);
   }
 
   ~MYNTEYEWrapperNodelet() {
@@ -346,20 +349,29 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     bool left_sub = left_mono_sub || left_color_sub;
     bool right_sub = right_mono_sub || right_color_sub;
 
-    if (left_sub || right_sub || depth_sub || points_sub) {
-      if (mynteye->IsImageInfoSupported()) {
-        mynteye->EnableImageInfo(true);
+    pthread_mutex_lock(&mutex_sub_result);
+    if (left_sub != sub_result.left ||
+       right_sub != sub_result.right ||
+       depth_sub != sub_result.depth ||
+       points_sub != sub_result.points) {
+      if (left_sub || right_sub || depth_sub || points_sub) {
+        if (mynteye->IsImageInfoSupported()) {
+          mynteye->EnableImageInfo(true);
+        }
+      } else {
+        mynteye->DisableImageInfo();
       }
-    } else {
-      mynteye->DisableImageInfo();
     }
-
-    if (imu_sub || imu_processed_sub || temp_sub) {
-      if (mynteye->IsMotionDatasSupported()) {
-        mynteye->EnableMotionDatas(0);
+    if (imu_sub != sub_result.imu ||
+       imu_processed_sub != sub_result.imu_processed ||
+       temp_sub != sub_result.temp) {
+        if (imu_sub || imu_processed_sub || temp_sub) {
+        if (mynteye->IsMotionDatasSupported()) {
+          mynteye->EnableMotionDatas(0);
+        }
+      } else {
+        mynteye->DisableMotionDatas();
       }
-    } else {
-      mynteye->DisableMotionDatas();
     }
 
     sub_result = {
@@ -367,6 +379,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       depth_sub, points_sub, imu_sub, temp_sub,
       imu_processed_sub, left_sub, right_sub,
     };
+    pthread_mutex_unlock(&mutex_sub_result);
   }
 
   void openDevice() {
@@ -383,6 +396,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     };
     for (auto&& type : types) {
       mynteye->SetStreamCallback(type, [this](const StreamData& data) {
+        pthread_mutex_lock(&mutex_sub_result);
         switch (data.img->type()) {
           case ImageType::IMAGE_LEFT_COLOR: {
             if (sub_result.left || sub_result.points) {
@@ -391,7 +405,8 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
           } break;
           case ImageType::IMAGE_RIGHT_COLOR: {
             if (sub_result.right) {
-              publishRight(data, sub_result.right_color, sub_result.right_mono);
+              publishRight(data, sub_result.right_color,
+                             sub_result.right_mono);
             }
           } break;
           case ImageType::IMAGE_DEPTH: {
@@ -400,21 +415,26 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
             }
           } break;
         }
+        pthread_mutex_unlock(&mutex_sub_result);
       });
     }
 
     // Set motion data callback
     mynteye->SetMotionCallback([this](const MotionData& data) {
+      pthread_mutex_lock(&mutex_sub_result);
       if (data.imu && (sub_result.imu || sub_result.imu_processed ||
           sub_result.temp)) {
         if (data.imu->flag == MYNTEYE_IMU_ACCEL) {
           imu_accel = data.imu;
-          publishImu(sub_result.imu, sub_result.imu_processed, sub_result.temp);
+          publishImu(sub_result.imu, sub_result.imu_processed,
+                      sub_result.temp);
         } else if (data.imu->flag == MYNTEYE_IMU_GYRO) {
           imu_gyro = data.imu;
-          publishImu(sub_result.imu, sub_result.imu_processed, sub_result.temp);
+          publishImu(sub_result.imu, sub_result.imu_processed,
+                      sub_result.temp);
         }
       }
+      pthread_mutex_unlock(&mutex_sub_result);
     });
 
     mynteye->Open(params);
@@ -570,7 +590,9 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     ros::Time stamp = hardTimeToSoftTime(imu_accel->timestamp);
 
     if (imu_sub) {
-      auto msg = getImuMsgFromData(stamp, imu_frame_id, *imu_accel, *imu_gyro);
+      auto msg = getImuMsgFromData(ros::Time::now(),
+                   imu_frame_id, *imu_accel, *imu_gyro);
+      msg.header.stamp = stamp;
       pub_imu.publish(msg);
     }
 
@@ -579,13 +601,16 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       auto data_gyr1 = ProcImuTempDrift(*imu_gyro);
       auto data_acc2 = ProcImuAssembly(data_acc1);
       auto data_gyr2 = ProcImuAssembly(data_gyr1);
-      auto msg = getImuMsgFromData(stamp, imu_frame_processed_id,
+      auto msg = getImuMsgFromData(ros::Time::now(), imu_frame_processed_id,
                                     data_acc2, data_gyr2);
+      msg.header.stamp = stamp;
       pub_imu_processed.publish(msg);
     }
 
     if (temp_sub) {
-      auto msg = getTempMsgFromData(stamp, temp_frame_id, *imu_accel);
+      auto msg = getTempMsgFromData(ros::Time::now(), temp_frame_id,
+                                     *imu_accel);
+      msg.header.stamp = stamp;
       pub_temp.publish(msg);
     }
 
