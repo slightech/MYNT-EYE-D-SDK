@@ -469,17 +469,12 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     }
 
     // pointcloud generator
-    CameraIntrinsics camera_intrinsics =
-        in_ok ? in.left : getDefaultCameraIntrinsics(params.stream_mode);
-    PointCloudGenerator *point_generator = new PointCloudGenerator(
-        camera_intrinsics,
+    pointcloud_generator.reset(new PointCloudGenerator(
+        in_ok ? in.left : getDefaultCameraIntrinsics(params.stream_mode),
         [this](sensor_msgs::PointCloud2 msg) {
           msg.header.frame_id = points_frame_id;
           pub_points.publish(msg);
         }, points_factor, points_frequency));
-    pointcloud_generator.reset(point_generator,
-                               points_factor,
-                               points_frequency));
   }
 
   void closeDevice() {
