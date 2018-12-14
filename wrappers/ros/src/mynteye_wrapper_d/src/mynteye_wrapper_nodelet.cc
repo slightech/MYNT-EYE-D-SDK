@@ -351,9 +351,9 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
     pthread_mutex_lock(&mutex_sub_result);
     if (left_sub != sub_result.left ||
-       right_sub != sub_result.right ||
-       depth_sub != sub_result.depth ||
-       points_sub != sub_result.points) {
+        right_sub != sub_result.right ||
+        depth_sub != sub_result.depth ||
+        points_sub != sub_result.points) {
       if (left_sub || right_sub || depth_sub || points_sub) {
         if (mynteye->IsImageInfoSupported()) {
           mynteye->EnableImageInfo(true);
@@ -363,8 +363,8 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       }
     }
     if (imu_sub != sub_result.imu ||
-       imu_processed_sub != sub_result.imu_processed ||
-       temp_sub != sub_result.temp) {
+        imu_processed_sub != sub_result.imu_processed ||
+        temp_sub != sub_result.temp) {
         if (imu_sub || imu_processed_sub || temp_sub) {
         if (mynteye->IsMotionDatasSupported()) {
           mynteye->EnableMotionDatas(0);
@@ -396,7 +396,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     };
     for (auto&& type : types) {
       mynteye->SetStreamCallback(type, [this](const StreamData& data) {
-        pthread_mutex_lock(&mutex_sub_result);
+          pthread_mutex_lock(&mutex_sub_result);
         switch (data.img->type()) {
           case ImageType::IMAGE_LEFT_COLOR: {
             if (sub_result.left || sub_result.points) {
@@ -421,7 +421,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
     // Set motion data callback
     mynteye->SetMotionCallback([this](const MotionData& data) {
-      pthread_mutex_lock(&mutex_sub_result);
+        pthread_mutex_lock(&mutex_sub_result);
       if (data.imu && (sub_result.imu || sub_result.imu_processed ||
           sub_result.temp)) {
         if (data.imu->flag == MYNTEYE_IMU_ACCEL) {
@@ -472,8 +472,8 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
     // pointcloud generator
     pointcloud_generator.reset(new PointCloudGenerator(
-      in_ok ? in.left : getDefaultCameraIntrinsics(params.stream_mode),
-      [this](sensor_msgs::PointCloud2 msg) {
+        in_ok ? in.left : getDefaultCameraIntrinsics(params.stream_mode),
+        [this](sensor_msgs::PointCloud2 msg) {
         // msg.header.seq = 0;
         // msg.header.stamp = ros::Time::now();
         msg.header.frame_id = points_frame_id;
@@ -488,13 +488,13 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   }
 
   void publishLeft(const StreamData& data, bool color_sub, bool mono_sub) {
-    publishColor(data, left_info_ptr,
+      publishColor(data, left_info_ptr,
         pub_left_color, color_sub, left_color_frame_id,
         pub_left_mono, mono_sub, left_mono_frame_id, true);
   }
 
   void publishRight(const StreamData& data, bool color_sub, bool mono_sub) {
-    publishColor(data, right_info_ptr,
+      publishColor(data, right_info_ptr,
         pub_right_color, color_sub, right_color_frame_id,
         pub_right_mono, mono_sub, right_mono_frame_id, false);
   }
@@ -582,7 +582,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   }
 
   void publishImu(bool imu_sub,
-        bool imu_processed_sub, bool temp_sub) {
+      bool imu_processed_sub, bool temp_sub) {
     if (imu_accel == nullptr || imu_gyro == nullptr) {
       return;
     }
@@ -591,7 +591,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
     if (imu_sub) {
       auto msg = getImuMsgFromData(ros::Time::now(),
-                   imu_frame_id, *imu_accel, *imu_gyro);
+          imu_frame_id, *imu_accel, *imu_gyro);
       msg.header.stamp = stamp;
       pub_imu.publish(msg);
     }
@@ -602,7 +602,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       auto data_acc2 = ProcImuAssembly(data_acc1);
       auto data_gyr2 = ProcImuAssembly(data_gyr1);
       auto msg = getImuMsgFromData(ros::Time::now(), imu_frame_processed_id,
-                                    data_acc2, data_gyr2);
+          data_acc2, data_gyr2);
       msg.header.stamp = stamp;
       pub_imu_processed.publish(msg);
     }
@@ -665,8 +665,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   }
 
   mynteye_wrapper_d::Temp getTempMsgFromData(ros::Time stamp,
-                  const std::string& frame_id,
-                  const ImuData& imu_accel) {
+      const std::string& frame_id, const ImuData& imu_accel) {
     mynteye_wrapper_d::Temp msg;
     msg.header.stamp = stamp;
     msg.header.frame_id = frame_id;
