@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.14"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>MYNT EYE D SDK: 保存设备信息和参数</title>
+<title>MYNT EYE D SDK: 升级 HID 设备固件</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -80,7 +80,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </div>
 <script type="text/javascript">
 /* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
-$(document).ready(function(){initNavTree('save_all_infos.html','');});
+$(document).ready(function(){initNavTree('update_hid_firmware.html','');});
 /* @license-end */
 </script>
 <div id="doc-content">
@@ -100,16 +100,14 @@ $(document).ready(function(){initNavTree('save_all_infos.html','');});
 
 <div class="header">
   <div class="headertitle">
-<div class="title">保存设备信息和参数 </div>  </div>
+<div class="title">升级 HID 设备固件 </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>SDK 提供了保存信息和参数的工具 <code>save_all_infos</code> 。</p>
-<p>参考运行命令：</p>
-<div class="fragment"><div class="line">./tools/_output/bin/writer/save_all_infos</div><div class="line"></div><div class="line"># Windows</div><div class="line">.\tools\_output\bin\writer\save_all_infos.bat</div></div><!-- fragment --><p>参考运行结果，于 Linux 上：</p>
-<div class="fragment"><div class="line">I/eSPDI_API: eSPDI: EtronDI_Init</div><div class="line">Device descriptors:</div><div class="line">  name: MYNT-EYE-D1000</div><div class="line">  serial_number: 203837533548500F002F0028</div><div class="line">  firmware_version: 1.0</div><div class="line">  hardware_version: 2.0</div><div class="line">  spec_version: 1.0</div><div class="line">  lens_type: 0000</div><div class="line">  imu_type: 0000</div><div class="line">  nominal_baseline: 120</div></div><!-- fragment --><p>默认会保存进 <code>&lt;workdir&gt;/config</code> 目录。你也可以加参数，指定保存到其他目录。</p>
-<p>保存内容如下：</p>
-<div class="fragment"><div class="line">&lt;workdir&gt;/</div><div class="line">└─config/</div><div class="line">   └─SN0610243700090720/</div><div class="line">      ├─device.info</div><div class="line">      └─imu.params</div></div><!-- fragment --><p>完整代码样例 <a href="https://github.com/slightech/MYNT-EYE-D-SDK/blob/master/tools/writer/save_all_infos.cc">save_all_infos</a> 。 </p>
-</div></div><!-- contents -->
+<div class="textblock"><h2>获取固件</h2>
+<p>最新固件： mynteye-d-hid-firmware-1.0.bin <a href="https://drive.google.com/open?id=1gAbTf6W10a8iwT7L9TceMVgxQCWKnEsx">Google Drive</a>, <a href="https://pan.baidu.com/s/1wMfrRTylDCNFqmn2mxvExw">Baidu Pan</a></p>
+<h2>编译 SDK 工具</h2>
+<div class="fragment"><div class="line">cd &lt;sdk&gt;</div><div class="line">make tools</div></div><!-- fragment --><h2>升级固件</h2>
+<div class="fragment"><div class="line">./tools/_output/bin/writer/device_hid_update &lt;firmware-file-path&gt;</div></div><!-- fragment --> </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

@@ -24,6 +24,7 @@ var classmynteyed_1_1_camera =
     [ "GetStreamIntrinsics", "classmynteyed_1_1_camera.html#a114c2e447166035a385da6fe002c25ac", null ],
     [ "GetStreamIntrinsics", "classmynteyed_1_1_camera.html#a780428555e53821fadd6dc3b614b9b63", null ],
     [ "HasStreamDataEnabled", "classmynteyed_1_1_camera.html#a71f085fe22f79f8042dc6fb7f1a835c7", null ],
+    [ "HidFirmwareUpdate", "classmynteyed_1_1_camera.html#a3fdb4b179ea6c8ada074f88686af2385", null ],
     [ "IsImageInfoEnabled", "classmynteyed_1_1_camera.html#a6c2dea8d0ce00c795a4298947a1644c8", null ],
     [ "IsImageInfoSupported", "classmynteyed_1_1_camera.html#ab2f92ffcd36974d50ee66efc426d7c10", null ],
     [ "IsImageInfoSynced", "classmynteyed_1_1_camera.html#a5df34f1c5e3f10cc0816b66a3e000c66", null ],
