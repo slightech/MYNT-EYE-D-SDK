@@ -420,16 +420,15 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     // Set motion data callback
     mynteye->SetMotionCallback([this](const MotionData& data) {
       pthread_mutex_lock(&mutex_sub_result);
-      if (data.imu && (sub_result.imu || sub_result.imu_processed ||
-        sub_result.temp)) {
+      if (data.imu && (sub_result.imu ||
+                       sub_result.imu_processed ||
+                       sub_result.temp)) {
         if (data.imu->flag == MYNTEYE_IMU_ACCEL) {
           imu_accel = data.imu;
-          publishImu(sub_result.imu, sub_result.imu_processed,
-                    sub_result.temp);
+          publishImu(sub_result.imu, sub_result.imu_processed, sub_result.temp);
         } else if (data.imu->flag == MYNTEYE_IMU_GYRO) {
           imu_gyro = data.imu;
-          publishImu(sub_result.imu, sub_result.imu_processed,
-                    sub_result.temp);
+          publishImu(sub_result.imu, sub_result.imu_processed, sub_result.temp);
         }
       }
       pthread_mutex_unlock(&mutex_sub_result);
