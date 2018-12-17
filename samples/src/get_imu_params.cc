@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
 
   std::cout << std::endl;
   if (in_ok || ex_ok) {
-    std::cout << "Imu params saved to image_params.params in current folder." << std::endl;
+    std::cout << "Imu params saved to imu_params.params in current folder." << std::endl;
   }
   return 0;
 }
