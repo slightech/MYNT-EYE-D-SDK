@@ -43,6 +43,7 @@ const int PID = 0x5720;
 typedef struct hid_struct {
 #ifdef MYNTEYE_OS_WIN
   HANDLE handle;
+  USHORT VersionNumber;
 #else
   usb_dev_handle *usb;
   int ep_in;
@@ -74,6 +75,7 @@ class hid_device {
   void droped();
   int get_device_class();
   bool find_device();
+  int get_version_number();
 
  protected:
   void add_hid(hid_t *hid);

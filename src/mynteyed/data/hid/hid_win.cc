@@ -370,6 +370,16 @@ bool hid_device::find_device() {
   return false;
 }
 
+int hid_device::get_version_number() {
+  if (!first_hid_) { return -1; }
+
+  return first_hid_->VersionNumber;
+}
+
+void hid_device::droped() {
+  free_all_hid();
+}
+
 } // namespace hid
 
 MYNTEYE_END_NAMESPACE

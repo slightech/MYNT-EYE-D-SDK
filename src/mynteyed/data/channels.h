@@ -23,13 +23,20 @@
 
 #include "mynteyed/stubs/global.h"
 
-#ifdef MYNTEYE_OS_LINUX
-#include <sys/ioctl.h>
-#include <termios.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
 #include <fcntl.h>
+
+#ifdef MYNTEYE_OS_WIN
+#include <conio.h>
+#include <io.h>
+#else
+#include <sys/ioctl.h>
+#include <termios.h>
+#include <unistd.h>
 #endif
 
 #include "mynteyed/data/types_internal.h"
@@ -60,10 +67,6 @@ class MYNTEYE_API Channels {
 
   using imu_callback_t = std::function<void(const ImuDataPacket &packet)>;
   using img_callback_t = std::function<void(const ImgInfoPacket &packet)>;
-
-#ifdef MYNTEYE_OS_LINUX
-  using stat_t = struct stat;
-#endif
 
   Channels();
   virtual ~Channels();
@@ -126,13 +129,11 @@ class MYNTEYE_API Channels {
 
   std::uint16_t package_sn_ = 0;
 
-#ifdef MYNTEYE_OS_LINUX
-  stat_t stat_;
+  struct stat stat_;
   int req_count_ = 0;
   off_t file_size_;
   std::uint32_t packets_sum_ = 0;
   std::uint32_t packets_index_ = 0;
-#endif
 };
 
 MYNTEYE_END_NAMESPACE

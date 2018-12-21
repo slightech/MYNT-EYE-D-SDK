@@ -934,7 +934,6 @@ bool Channels::IsBetaDevice() const {
   return !is_hid_exist_;
 }
 
-#ifdef MYNTEYE_OS_LINUX
 bool Channels::HidFirmwareUpdate(const char *filepath) {
   if (!is_hid_exist_) {
     LOGE("\n%s %d:: This device not support update hid firmware.\n",
@@ -944,12 +943,21 @@ bool Channels::HidFirmwareUpdate(const char *filepath) {
 
   std::uint8_t cmd[64];
 
+#ifdef MYNTEYE_OS_WIN
+  int fd = open(filepath, O_RDONLY | _O_BINARY);
+#else
   int fd = open(filepath, O_RDONLY);
+#endif
   if (fd < 0) {
     LOGE("\n%s %d:: Opened %s failed.\n", __FILE__, __LINE__, filepath);
     return false;
   }
-  if ((fstat(fd, &stat_) != 0) || (!S_ISREG(stat_.st_mode))) { return false; }
+
+#ifdef MYNTEYE_OS_WIN
+  if (fstat(fd, &stat_) != 0) { return false; }
+#else
+  if ((fstat(fd, &stat_) != 0) || (!_S_ISREG(stat_.st_mode))) { return false; }
+#endif
   file_size_ = stat_.st_size;
   packets_sum_ = file_size_ % 60 > 0 ? file_size_ / 60 + 1 : file_size_ / 60;
 
@@ -995,10 +1003,27 @@ bool Channels::HidFirmwareUpdate(const char *filepath) {
     return false;
   }
 
+#ifdef MYNTEYE_OS_WIN
+  if (0x100 == hid_->get_version_number()) {
+    cmd[0] = 0x00;
+    if (hid_->send(0, cmd, 64, 20000) <= 0) {
+      LOGE("\n%s %d:: Update failed. Please try again.\n");
+      return false;
+    }
+    cmd[0] = 0xAB;
+  } else {
+    if (hid_->receive(0, cmd, 64, 20000) <= 0)
+    {
+      LOGE("\n%s %d:: Update failed. maybe device went offline\n", __FILE__, __LINE__);
+      return false;
+    }
+  }
+#else
   if (hid_->receive(0, cmd, 64, 20000) <= 0) {
     LOGE("\n%s %d:: Update failed. maybe device went offline\n", __FILE__, __LINE__);
     return false;
   }
+#endif
 
   if (0xAB != cmd[0]) {
     LOGE("\n%s %d:: Update failed.\n", __FILE__, __LINE__);
@@ -1036,12 +1061,6 @@ bool Channels::HidFirmwareUpdate(const char *filepath) {
   LOGI("\nUpdate success.\n");
   return true;
 }
-#else
-bool Channels::HidFirmwareUpdate(const char *filepath) {
-  LOGE("\nWARNING:: This feature is not supported on Windows.\n");
-  return false;
-}
-#endif
 
 
 MYNTEYE_END_NAMESPACE
