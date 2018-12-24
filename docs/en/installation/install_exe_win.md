@@ -1,6 +1,6 @@
 # Windows EXE Installation {#install_exe_win}
 
-> Download here: mynteye-d-1.6.1-win-x64-opencv-3.4.3.exe [Google Drive](https://drive.google.com/open?id=1FQrRdpK51U43ihX5pVkMRUedtOOc0FNg), [Baidu Pan](https://pan.baidu.com/s/1GeeZ-4-DVyZJ2wUh0aknjQ)
+> Download here: mynteye-d-1.6.2-win-x64-opencv-3.4.3.exe [Google Drive](https://drive.google.com/open?id=1FQrRdpK51U43ihX5pVkMRUedtOOc0FNg), [Baidu Pan](https://pan.baidu.com/s/1GeeZ-4-DVyZJ2wUh0aknjQ)
 
 After you install the win pack of SDK, there will be a shortcut to the SDK root directory on your desktop.
 
