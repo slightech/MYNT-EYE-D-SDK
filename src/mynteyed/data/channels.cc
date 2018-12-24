@@ -956,7 +956,7 @@ bool Channels::HidFirmwareUpdate(const char *filepath) {
 #ifdef MYNTEYE_OS_WIN
   if (fstat(fd, &stat_) != 0) { return false; }
 #else
-  if ((fstat(fd, &stat_) != 0) || (!_S_ISREG(stat_.st_mode))) { return false; }
+  if ((fstat(fd, &stat_) != 0) || (!S_ISREG(stat_.st_mode))) { return false; }
 #endif
   file_size_ = stat_.st_size;
   packets_sum_ = file_size_ % 60 > 0 ? file_size_ / 60 + 1 : file_size_ / 60;
@@ -978,6 +978,7 @@ bool Channels::HidFirmwareUpdate(const char *filepath) {
       return false;
     }
 
+    hid_->droped();
     hid_->droped();
     LOGI("\nPlease wait a moment, don't pull out device!\n");
 
@@ -1044,7 +1045,7 @@ bool Channels::HidFirmwareUpdate(const char *filepath) {
         static_cast<std::uint8_t *>(cmd + 3), current_len);
 
     if (hid_->send(0, cmd, 64, 100) <= 0) {
-      LOGE("\n%s %d:: Update failed.\n" __FILE__, __LINE__);
+      LOGE("%s %d:: Update failed............\n", __FILE__, __LINE__);
       return false;
     }
 
