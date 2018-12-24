@@ -956,7 +956,7 @@ bool Channels::HidFirmwareUpdate(const char *filepath) {
 #ifdef MYNTEYE_OS_WIN
   if (fstat(fd, &stat_) != 0) { return false; }
 #else
-  if ((fstat(fd, &stat_) != 0) || (!_S_ISREG(stat_.st_mode))) { return false; }
+  if ((fstat(fd, &stat_) != 0) || (!S_ISREG(stat_.st_mode))) { return false; }
 #endif
   file_size_ = stat_.st_size;
   packets_sum_ = file_size_ % 60 > 0 ? file_size_ / 60 + 1 : file_size_ / 60;
