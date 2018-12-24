@@ -1,0 +1,35 @@
+{
+  "name": "mynt-eye-d-sdk",
+  "version": "1.0.0",
+  "description": "[![](https://img.shields.io/badge/MYNT%20EYE%20D%20SDK-v1.6.2-brightgreen.svg?style=flat)](https://github.com/slightech/MYNT-EYE-D-SDK)",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://gitlab.mynt.com/mynteye/mynt-eye-d-sdk.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@commitlint/cli": "^7.2.1",
+    "@commitlint/config-conventional": "^7.1.2",
+    "cz-conventional-changelog": "^2.1.0",
+    "husky": "^1.2.1"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  }
+}
