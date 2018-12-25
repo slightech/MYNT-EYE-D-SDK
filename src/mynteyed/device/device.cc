@@ -56,6 +56,36 @@ std::string get_stream_format_string(const StreamFormat& stream_format) {
   }
 }
 
+int get_sensor_mode(const SensorMode &mode) {
+  switch (mode) {
+    case SensorMode::LEFT:
+      return 0;
+    case SensorMode::RIGHT:
+      return 1;
+    case SensorMode::ALL:
+      return 2;
+    default:
+      throw_error("Unknown sensor mode.");
+  }
+}
+
+int get_sensor_type(const SensorType &type) {
+  switch (type) {
+    case SensorType::SENSOR_TYPE_H22:
+      return 0;   // ETRONDI_SENSOR_TYPE_H22
+    case SensorType::SENSOR_TYPE_OV7740:
+      return 1;   // ETRONDI_SENSOR_TYPE_OV7740
+    case SensorType::SENSOR_TYPE_AR0134:
+      return 2;   // ETRONDI_SENSOR_TYPE_AR0134
+    case SensorType::SENSOR_TYPE_AR0135:
+      return 3;   // ETRONDI_SENSOR_TYPE_AR0135
+    case SensorType::SENSOR_TYPE_OV9714:
+      return 4;   // ETRONDI_SENSOR_TYPE_OV9714
+    default:
+      throw_error("Unknown sensor type.");
+  }
+}
+
 }  // namespace
 
 Device::Device()
@@ -267,7 +297,7 @@ void Device::SetInfraredDepthOnly(const OpenParams& params) {
   framerate_ *= 2;
 }
 
-void Device::SetInfraredIntensity(std::uint16_t value) {
+void Device::SetInfraredIntensity(const std::uint16_t &value) {
   if (value != 0) {
     EtronDI_SetIRMode(etron_di_, &dev_sel_info_, 0x03);
     EtronDI_SetCurrentIRValue(etron_di_, &dev_sel_info_, value);
@@ -952,4 +982,81 @@ int Device::GetStreamIndex(PETRONDI_STREAM_INFO stream_info_ptr,
   }
 
   return res_index;
+}
+
+bool Device::SetSensorType(const SensorType &type) {
+  int sensor_type = get_sensor_type(type);
+
+  if (EtronDI_SetSensorTypeName(
+      etron_di_, &dev_sel_info_,
+      (SENSOR_TYPE_NAME)sensor_type) == ETronDI_OK) {
+    return true;
+  } else {
+    LOGE("\nERROR:: Set sensor type name failed.\n");
+    return false;
+  }
+}
+
+bool Device::SetExposureTime(
+    const SensorMode &mode, const float &value) {
+  if (SetSensorType(SensorType::SENSOR_TYPE_AR0135))
+    return false;
+
+  int sensor_mode = get_sensor_mode(mode);
+  if (EtronDI_SetExposureTime(
+        etron_di_, &dev_sel_info_,
+        sensor_mode, value) == ETronDI_OK) {
+    return true;
+  } else {
+    LOGE("\nERROR:: Set exposure time failed.\n");
+    return false;
+  }
+}
+
+bool Device::GetExposureTime(
+    const SensorMode &mode, float &value) {
+  if (SetSensorType(SensorType::SENSOR_TYPE_AR0135))
+    return false;
+
+  int sensor_mode = get_sensor_mode(mode);
+  if (EtronDI_GetExposureTime(
+        etron_di_, &dev_sel_info_,
+        sensor_mode, &value) == ETronDI_OK) {
+    return true;
+  } else {
+    LOGE("\nERROR:: Get exposure time failed.\n");
+    return false;
+  }
+}
+
+bool Device::SetGlobalGain(
+    const SensorMode &mode, const float &value) {
+  if (SetSensorType(SensorType::SENSOR_TYPE_AR0135))
+    return false;
+
+  int sensor_mode = get_sensor_mode(mode);
+  if (EtronDI_SetGlobalGain(
+        etron_di_, &dev_sel_info_,
+        sensor_mode, value) == ETronDI_OK) {
+    return true;
+  } else {
+    LOGE("\nERROR:: Set global gain value failed.\n");
+    return false;
+  }
+}
+
+bool Device::GetGlobalGain(
+    const SensorMode &mode, float &value) {
+  if (SetSensorType(SensorType::SENSOR_TYPE_AR0135))
+    return false;
+
+  int sensor_mode = get_sensor_mode(mode);
+  if (EtronDI_GetGlobalGain(
+        etron_di_, &dev_sel_info_,
+        sensor_mode, &value) == ETronDI_OK) {
+    return true;
+  } else {
+    LOGE("\nERROR:: Get global gain value failed.\n");
+    return false;
+  }
 }
