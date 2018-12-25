@@ -944,6 +944,9 @@ bool Channels::HidFirmwareUpdate(const char *filepath) {
   std::uint8_t cmd[64];
 
 #ifdef MYNTEYE_OS_WIN
+  LOGE("\n%s %d:: This feature is not supported on Windows."
+      "You should use the feature on Ubuntu.\n");
+  return false;
   int fd = open(filepath, O_RDONLY | _O_BINARY);
 #else
   int fd = open(filepath, O_RDONLY);
