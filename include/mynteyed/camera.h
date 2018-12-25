@@ -175,35 +175,23 @@ class MYNTEYE_API Camera {
   /** Update hid device firmware */
   bool HidFirmwareUpdate(const char* filepath);
 
-  /** Set exposure time
-   * mode  -- LEFT  left   lens
-   *          RIGHT right  lens
-   *          ALL   all of lens
+  /** Set exposure time [1ms - 2000ms]
    * value -- exposure time value
    * */
-  bool SetExposureTime(const SensorMode &mode, const float &value);
+  void SetExposureTime(const float &value);
   /** Get exposure time
-   * mode  -- LEFT  left   lens
-   *          RIGHT right  lens
-   *          ALL   all of lens
    * value -- return exposure time value
    * */
-  bool GetExposureTime(const SensorMode &mode, float &value);
+  void GetExposureTime(float &value);
 
-  /** Set global gain
-   * mode  -- LEFT  left   lens
-   *          RIGHT right  lens
-   *          ALL   all of lens
+  /** Set global gain [1 - 16]
    * value -- global gain value
    * */
-  bool SetGlobalGain(const SensorMode &mode, const float &value);
+  void SetGlobalGain(const float &value);
   /** Get global gain
-   * mode  -- LEFT  left   lens
-   *          RIGHT right  lens
-   *          ALL   all of lens
    * value -- return global gain value
    * */
-  bool GetGlobalGain(const SensorMode &mode, float &value);
+  void GetGlobalGain(float &value);
 
   /** set infrared(IR) intensity [0, 10] default 0*/
   void SetIRIntensity(const std::uint16_t &value);

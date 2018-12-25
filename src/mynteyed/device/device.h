@@ -101,34 +101,22 @@ class Device {
   bool SetSensorType(const SensorType &type);
 
   /** Set exposure time
-   * mode  -- LEFT  left   lens
-   *          RIGHT right  lens
-   *          ALL   all of lens
    * value -- exposure time value
    * */
-  bool SetExposureTime(const SensorMode &mode, const float &value);
+  bool SetExposureTime(const float &value);
   /** Get exposure time
-   * mode  -- LEFT  left   lens
-   *          RIGHT right  lens
-   *          ALL   all of lens
    * value -- return exposure time value
    * */
-  bool GetExposureTime(const SensorMode &mode, float &value);
+  bool GetExposureTime(float &value);
 
   /** Set global gain
-   * mode  -- LEFT  left   lens
-   *          RIGHT right  lens
-   *          ALL   all of lens
    * value -- global gain value
    * */
-  bool SetGlobalGain(const SensorMode &mode, const float &value);
+  bool SetGlobalGain(const float &value);
   /** Get global gain
-   * mode  -- LEFT  left   lens
-   *          RIGHT right  lens
-   *          ALL   all of lens
    * value -- return global gain value
    * */
-  bool GetGlobalGain(const SensorMode &mode, float &value);
+  bool GetGlobalGain(float &value);
 
  protected:
   /** Get stream index for open */

@@ -992,71 +992,62 @@ bool Device::SetSensorType(const SensorType &type) {
       (SENSOR_TYPE_NAME)sensor_type) == ETronDI_OK) {
     return true;
   } else {
-    LOGE("\nERROR:: Set sensor type name failed.\n");
     return false;
   }
 }
 
-bool Device::SetExposureTime(
-    const SensorMode &mode, const float &value) {
-  if (SetSensorType(SensorType::SENSOR_TYPE_AR0135))
+bool Device::SetExposureTime(const float &value) {
+  if (!SetSensorType(SensorType::SENSOR_TYPE_AR0135))
     return false;
 
-  int sensor_mode = get_sensor_mode(mode);
+  int sensor_mode = get_sensor_mode(SensorMode::ALL);
   if (EtronDI_SetExposureTime(
         etron_di_, &dev_sel_info_,
         sensor_mode, value) == ETronDI_OK) {
     return true;
   } else {
-    LOGE("\nERROR:: Set exposure time failed.\n");
     return false;
   }
 }
 
-bool Device::GetExposureTime(
-    const SensorMode &mode, float &value) {
-  if (SetSensorType(SensorType::SENSOR_TYPE_AR0135))
+bool Device::GetExposureTime(float &value) {
+  if (!SetSensorType(SensorType::SENSOR_TYPE_AR0135))
     return false;
 
-  int sensor_mode = get_sensor_mode(mode);
+  int sensor_mode = get_sensor_mode(SensorMode::ALL);
   if (EtronDI_GetExposureTime(
         etron_di_, &dev_sel_info_,
         sensor_mode, &value) == ETronDI_OK) {
     return true;
   } else {
-    LOGE("\nERROR:: Get exposure time failed.\n");
     return false;
   }
 }
 
-bool Device::SetGlobalGain(
-    const SensorMode &mode, const float &value) {
-  if (SetSensorType(SensorType::SENSOR_TYPE_AR0135))
+bool Device::SetGlobalGain(const float &value) {
+  if (!SetSensorType(SensorType::SENSOR_TYPE_AR0135))
     return false;
 
-  int sensor_mode = get_sensor_mode(mode);
+  int sensor_mode = get_sensor_mode(SensorMode::ALL);
   if (EtronDI_SetGlobalGain(
         etron_di_, &dev_sel_info_,
         sensor_mode, value) == ETronDI_OK) {
     return true;
   } else {
-    LOGE("\nERROR:: Set global gain value failed.\n");
     return false;
   }
 }
 
-bool Device::GetGlobalGain(
-    const SensorMode &mode, float &value) {
-  if (SetSensorType(SensorType::SENSOR_TYPE_AR0135))
+bool Device::GetGlobalGain(float &value) {
+  if (!SetSensorType(SensorType::SENSOR_TYPE_AR0135))
     return false;
 
-  int sensor_mode = get_sensor_mode(mode);
+  int sensor_mode = get_sensor_mode(SensorMode::ALL);
   if (EtronDI_GetGlobalGain(
         etron_di_, &dev_sel_info_,
         sensor_mode, &value) == ETronDI_OK) {
     return true;
   } else {
-    LOGE("\nERROR:: Get global gain value failed.\n");
     return false;
   }
 }

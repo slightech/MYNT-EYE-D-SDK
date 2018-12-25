@@ -186,24 +186,20 @@ bool Camera::HidFirmwareUpdate(const char* filepath) {
   return p_->HidFirmwareUpdate(filepath);
 }
 
-bool Camera::SetExposureTime(
-    const SensorMode &mode, const float &value) {
-  return p_->SetExposureTime(mode, value);
+void Camera::SetExposureTime(const float &value) {
+  return p_->SetExposureTime(value);
 }
 
-bool Camera::GetExposureTime(
-    const SensorMode &mode, float &value) {
-  return p_->GetExposureTime(mode, value);
+void Camera::GetExposureTime(float &value) {
+  return p_->GetExposureTime(value);
 }
 
-bool Camera::SetGlobalGain(
-    const SensorMode &mode, const float &value) {
-  return p_->SetGlobalGain(mode, value);
+void Camera::SetGlobalGain(const float &value) {
+  return p_->SetGlobalGain(value);
 }
 
-bool Camera::GetGlobalGain(
-    const SensorMode &mode, float &value) {
-  return p_->GetGlobalGain(mode, value);
+void Camera::GetGlobalGain(float &value) {
+  return p_->GetGlobalGain(value);
 }
 
 void Camera::SetIRIntensity(

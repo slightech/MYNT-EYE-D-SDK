@@ -37,8 +37,8 @@ int main(int argc, char const* argv[]) {
 
   OpenParams params(dev_info.index);
   {
-    // Framerate: 10(default), [0,60], [0,30](STREAM_2560x720)
-    params.framerate = 10;
+    // Framerate: 30(default), [0,60], [30](STREAM_2560x720)
+    params.framerate = 30;
 
     // Device mode, default DEVICE_ALL
     //   DEVICE_COLOR: IMAGE_LEFT_COLOR ✓ IMAGE_RIGHT_COLOR ? IMAGE_DEPTH x
