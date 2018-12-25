@@ -13,7 +13,10 @@
 // limitations under the License.
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #include <pcl/visualization/cloud_viewer.h>
+#pragma GCC diagnostic pop
 
 #include <iostream>
 #include <opencv2/highgui/highgui.hpp>
