@@ -69,7 +69,8 @@ include(${PRO_DIR}/cmake/DetectOpenCV.cmake)
 set(OUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/_output")
 
 include_directories(
-  ${CMAKE_CURRENT_SOURCE_DIR}
+  ${OpenCV_INCLUDE_DIRS}
+  ${CMAKE_CURRENT_LIST_DIR}
 )
 
 set(MYNTEYE_DLL_SEARCH_PATHS

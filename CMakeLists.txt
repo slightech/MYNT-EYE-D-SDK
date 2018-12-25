@@ -66,8 +66,6 @@ string(STRIP "${CMAKE_CXX_FLAGS}" CMAKE_CXX_FLAGS)
 message(STATUS "C_FLAGS: ${CMAKE_C_FLAGS}")
 message(STATUS "CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
 
-set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib/3rdparty")
-
 # packages
 
 LIST(APPEND CMAKE_MODULE_PATH ${MYNTEYE_ROOT}/cmake)
@@ -79,6 +77,16 @@ set(JPEG_FIND_QUIET TRUE)
 include(${MYNTEYE_ROOT}/cmake/DetectJPEG.cmake)
 
 find_package(eSPDI REQUIRED)
+
+# rpath
+
+set(CMAKE_MACOSX_RPATH 1)
+set(MYNTEYE_CMAKE_RPATH "${CMAKE_INSTALL_PREFIX}/lib/3rdparty")
+if(WITH_OPENCV)
+  message(STATUS "OpenCV_LIB_PATH: ${OpenCV_LIB_PATH}")
+  list(APPEND MYNTEYE_CMAKE_RPATH ${OpenCV_LIB_PATH})
+endif()
+set(CMAKE_INSTALL_RPATH "${MYNTEYE_CMAKE_RPATH}")
 
 # targets
 
@@ -240,11 +248,7 @@ configure_file(
 
 # platforms/linux/sdk.cfg
 
-if(OpenCV_INCLUDE_DIRS MATCHES ".*/ros/.*")
-  set(SDK_OpenCV_LIB_DIR /opt/ros/kinetic/lib)
-else()
-  set(SDK_OpenCV_LIB_DIR /usr/local/lib)
-endif()
+set(SDK_OpenCV_LIB_DIR ${OpenCV_LIB_PATH})
 
 configure_file(
   "${MYNTEYE_ROOT}/cmake/templates/platforms/linux/sdk.cfg.in"
