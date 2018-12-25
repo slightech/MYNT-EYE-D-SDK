@@ -979,6 +979,7 @@ bool Channels::HidFirmwareUpdate(const char *filepath) {
     }
 
     hid_->droped();
+    hid_->droped();
     LOGI("\nPlease wait a moment, don't pull out device!\n");
 
     while (hid_->get_device_class() == -1) {
@@ -1044,7 +1045,7 @@ bool Channels::HidFirmwareUpdate(const char *filepath) {
         static_cast<std::uint8_t *>(cmd + 3), current_len);
 
     if (hid_->send(0, cmd, 64, 100) <= 0) {
-      LOGE("\n%s %d:: Update failed.\n" __FILE__, __LINE__);
+      LOGE("%s %d:: Update failed............\n", __FILE__, __LINE__);
       return false;
     }
 

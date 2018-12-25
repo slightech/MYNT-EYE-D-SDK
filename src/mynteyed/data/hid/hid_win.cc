@@ -245,6 +245,7 @@ int hid_device::open(int max, int usage_page, int usage) {
     }
 
     hid->handle = handle;
+    hid->VersionNumber = attrib.VersionNumber;
     hid->open = 1;
     add_hid(hid);
     count++;
