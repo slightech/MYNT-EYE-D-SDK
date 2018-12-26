@@ -795,10 +795,12 @@ INPUT                  = mainpage.md \
                          installation.md \
                          samples.md \
                          tools.md \
+                         projects.md \
                          product/ \
                          installation/ \
                          samples/ \
                          tools/ \
+                         projects/ \
                          ../../include
 
 # This tag can be used to specify the character encoding of the source files

@@ -20,9 +20,11 @@ Language: 简体中文
 
 p.s. "generate.bat" 运行结果，可以参考下方英文内容。
 
-3）如何于 Visual Studio 2017 下使用 SDK
+3）工程使用样例
 
-进入 "<SDK_ROOT_DIR>\projects\vs2017" ，见 "README.md" 说明。
+现有 `vs2017`, `qtcreator`, `cmake` 使用 SDK 的工程样例，在 "<SDK_ROOT_DIR>\projects" 目录。
+
+关于如何创建这些工程的教程，请见 SDK 文档。
 
 ################################################################################
 Language: English
@@ -34,7 +36,7 @@ Language: English
 
 After you install the win pack of SDK, there will be a shortcut to the SDK root directory on your desktop.
 
-First, you should plug the MYNT® EYE camera in a USB 3.0 port. 
+First, you should plug the MYNT® EYE camera in a USB 3.0 port.
 
 Second, goto the "<SDK_ROOT_DIR>\bin\samples" directory and click "get_image.exe" to run.
 
@@ -92,6 +94,8 @@ CMake Warning:
 Press any key to continue . . .
 ```
 
-3) Start using MYNT® EYE Depth SDK with Visual Studio 2017
+3）How to create a project with SDK.
 
-Goto the "<SDK_ROOT_DIR>\projects\vs2017", see the "README.md".
+There are some project demos, including `vs2017` `qtcreator` `cmake`, under "<SDK_ROOT_DIR>\projects" directory.
+
+If you wanna know how to create these projets, please see the SDK documentations.
