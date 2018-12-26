@@ -12,6 +12,19 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -march=native")
 
 # packages
 
+if(MSVC)
+  set(SDK_ROOT "$ENV{MYNTEYED_SDK_ROOT}")
+  if(SDK_ROOT)
+    message(STATUS "MYNTEYED_SDK_ROOT: ${SDK_ROOT}")
+    list(APPEND CMAKE_PREFIX_PATH
+      "${SDK_ROOT}/lib/cmake"
+      "${SDK_ROOT}/3rdparty/opencv/build"
+    )
+  else()
+    message(FATAL_ERROR "MYNTEYED_SDK_ROOT not found, please install SDK firstly")
+  endif()
+endif()
+
 ## mynteyed
 
 find_package(mynteyed REQUIRED)
@@ -42,3 +55,20 @@ include_directories(
 
 add_executable(mynteyed_demo mynteyed_demo.cc)
 target_link_libraries(mynteyed_demo mynteye_depth ${OpenCV_LIBS})
+
+
+# Build
+#   mkdir _build
+#   cd _build
+#
+#   # win 
+#   cmake -G "Visual Studio 15 2017 Win64" ..
+#   msbuild.exe ALL_BUILD.vcxproj /property:Configuration=Release
+#
+#   .\Release\mynteyed_demo.exe
+#   
+#   # unix
+#   cmake ..
+#   make
+#
+#   ./mynteyed_demo
