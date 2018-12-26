@@ -996,6 +996,14 @@ int Device::GetStreamIndex(PETRONDI_STREAM_INFO stream_info_ptr,
 bool Device::SetSensorType(const SensorType &type) {
   int sensor_type = get_sensor_type(type);
 
+#ifdef MYNTEYE_OS_WIN
+  if (EtronDI_SetSensorTypeName(
+      etron_di_, (SENSOR_TYPE_NAME)sensor_type) == ETronDI_OK) {
+    return true;
+  } else {
+    return false;
+  }
+#else
   if (EtronDI_SetSensorTypeName(
       etron_di_, &dev_sel_info_,
       (SENSOR_TYPE_NAME)sensor_type) == ETronDI_OK) {
@@ -1003,6 +1011,7 @@ bool Device::SetSensorType(const SensorType &type) {
   } else {
     return false;
   }
+#endif
 }
 
 bool Device::SetExposureTime(const float &value) {
