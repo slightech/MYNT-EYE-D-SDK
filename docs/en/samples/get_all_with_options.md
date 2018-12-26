@@ -17,7 +17,7 @@ Options:
     -i INDEX, --index=INDEX
                         Device index
     -f RATE, --rate=RATE
-                        Framerate, range [0,60], [0,30](STREAM_2560x720),
+                        Framerate, range [0,60], [30](STREAM_2560x720),
                         default: 10
     --dev-mode=MODE       Device mode, default 2 (DEVICE_ALL)
                           0: DEVICE_COLOR, left y right - depth n

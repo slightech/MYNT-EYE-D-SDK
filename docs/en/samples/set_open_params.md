@@ -23,13 +23,13 @@ Using the `params.framerate` parameter, you can set the frame rate of image.
 
 > Attention
 > - The effective fps of the image(0-60)
-> - The effective fps of the image in 2560x720 resolution (0-30)
+> - The effective fps of the image in 2560x720 resolution (30)
 
 Reference code snippet:
 
 ```bash
-// Framerate: 10(default), [0,60], [0,30](STREAM_2560x720)
-params.framerate = 10;
+// Framerate: 30(default), [0,60], [30](STREAM_2560x720)
+params.framerate = 30;
 ```
 
 ## Set color mode

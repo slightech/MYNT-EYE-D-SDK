@@ -24,13 +24,13 @@ params.stream_mode = StreamMode::STREAM_2560x720;  // hd
 
 > 注意
 > - 图像帧率有效值(0-60)
-> - 分辨率在2560X720时帧率有效值为(0-30)
+> - 分辨率在2560X720时帧率有效值为(30)
 
 参考代码片段:
 
 ```bash
-// Framerate: 10(default), [0,60], [0,30](STREAM_2560x720)
-params.framerate = 10;
+// Framerate: 10(default), [0,60], [30](STREAM_2560x720)
+params.framerate = 30;
 ```
 
 ## 设定图像模式
