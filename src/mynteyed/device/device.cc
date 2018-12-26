@@ -847,7 +847,6 @@ void Device::CompatibleUSB2(const OpenParams& params) {
       break;
   }
 
-  /*
   if (params.dev_mode == DeviceMode::DEVICE_ALL) {
   // color + depth
 
@@ -855,19 +854,19 @@ void Device::CompatibleUSB2(const OpenParams& params) {
       // color 2560x720 yuyv, depth 640x720 yuyv, 8 bits rectify, fail
       goto usb2_error;
     } else if (params.stream_mode == StreamMode::STREAM_1280x720) {
-      // color 1280x720 yuyv, depth 640x720 yuyv, 8 bits rectify, 5 ok
-      //   1 > 5, 10 fail
+      // color 1280x720 yuyv, depth 640x720 yuyv, 8 bits only 5 ok
+
       color_res_index_ =
           GetStreamIndex(stream_color_info_ptr_, 1280, 720, false);
       depth_res_index_ =
           GetStreamIndex(stream_depth_info_ptr_, 640, 720, false);
       framerate_ = 5;
     } else if (params.stream_mode == StreamMode::STREAM_1280x480) {
-      // color 1280x480 yuyv, depth 320x480 yuyv, 8 bits rectify, fail
+      // color 1280x480 yuyv, depth 320x480 yuyv, 8 bits only 15 fail
       goto usb2_error;
     } else if (params.stream_mode == StreamMode::STREAM_640x480) {
-      // color 640x480 yuyv, depth 320x480 yuyv, 8 bits rectify, 15 ok
-      //   1,5,10,20 > 15, 30 fail
+      // color 640x480 yuyv, depth 320x480 yuyv, 8 bits only 15 ok
+
       color_res_index_ =
           GetStreamIndex(stream_color_info_ptr_, 640, 480, false);
       depth_res_index_ =
@@ -882,25 +881,28 @@ void Device::CompatibleUSB2(const OpenParams& params) {
   } else if (params.dev_mode == DeviceMode::DEVICE_COLOR) {
   // color only
     if (params.stream_mode == StreamMode::STREAM_2560x720) {
-      // color 2560x720 yuyv, <=5 ok (auto change to 5)
+      // color 2560x720 yuyv, only 5 ok
       color_res_index_ =
           GetStreamIndex(stream_color_info_ptr_, 2560, 720, false);
       framerate_ = 5;
     } else if (params.stream_mode == StreamMode::STREAM_1280x720) {
-      // color 1280x720 yuyv, <=10 ok (auto change to 5,10)
+      // color 1280x720 yuyv, only 10 ok
+
       color_res_index_ =
           GetStreamIndex(stream_color_info_ptr_, 1280, 720, false);
-      framerate_ = (framerate_ > 5) ? 10 : 5;
+      framerate_ = 10;
     } else if (params.stream_mode == StreamMode::STREAM_1280x480) {
-      // color 1280x480 yuyv, <=15 ok (auto change to 15)
+      // color 1280x480 yuyv, only 15 ok
+
       color_res_index_ =
           GetStreamIndex(stream_color_info_ptr_, 1280, 480, false);
       framerate_ = 15;
     } else if (params.stream_mode == StreamMode::STREAM_640x480) {
-      // color 640x480 yuyv, <=30 ok (auto change to 15,30)
+      // color 640x480 yuyv, only 15 ok
+
       color_res_index_ =
           GetStreamIndex(stream_color_info_ptr_, 640, 480, false);
-      framerate_ = (framerate_ > 15) ? 30 : 15;
+      framerate_ = 15;
     } else {
       goto usb2_error;
     }
@@ -912,18 +914,16 @@ void Device::CompatibleUSB2(const OpenParams& params) {
 
     if (params.stream_mode == StreamMode::STREAM_2560x720 ||
         params.stream_mode == StreamMode::STREAM_1280x720) {
-      // depth 640x720 yuyv, 8 bits rectify, 5,10 ok
-      //   15,30 > 10, 1,20 fail
+      // depth 640x720 yuyv, 8 bits only 5 ok
       depth_res_index_ =
           GetStreamIndex(stream_depth_info_ptr_, 640, 720, false);
-      framerate_ = (framerate_ > 5) ? 10 : 5;
+      framerate_ = 5;
     } else if (params.stream_mode == StreamMode::STREAM_1280x480 ||
                params.stream_mode == StreamMode::STREAM_640x480) {
-      // depth 320x480 yuyv, 8 bits rectify, 15,30 ok
-      //   5,10,20 > 15, 40 > 30, 30 real is 15, 1 fail
+      // depth 320x480 yuyv, 8 bits only 15 ok
       depth_res_index_ =
           GetStreamIndex(stream_depth_info_ptr_, 320, 480, false);
-      framerate_ = (framerate_ > 15) ? 30 : 15;
+      framerate_ = 15;
     } else {
       goto usb2_error;
     }
@@ -944,28 +944,56 @@ usb2_error:
       " Current resolution or frame rate is not supported"
       " And you can refer to Resolution Support List"
       " in the documentation.\n");
-  */
 }
 
 void Device::CompatibleMJPG(const OpenParams& params) {
-  if (params.dev_mode == DeviceMode::DEVICE_ALL ||
-      params.dev_mode == DeviceMode::DEVICE_COLOR) {
-    if (!stream_color_info_ptr_[color_res_index_].bFormatMJPG) {
-      return;
-    }
-    // using 8 bits, if mjpg
-    switch (params.color_mode) {
-      case ColorMode::COLOR_RECTIFIED:
-        depth_data_type_ = ETronDI_DEPTH_DATA_8_BITS;
-        break;
-      case ColorMode::COLOR_RAW:
-      default:
-        depth_data_type_ = ETronDI_DEPTH_DATA_8_BITS_RAW;
-        break;
-    }
-  } else {
-    // depth only
+  if (!stream_color_info_ptr_[color_res_index_].bFormatMJPG)
+    return;
+
+  // using 8 bits, if mjpg
+  switch (params.color_mode) {
+    case ColorMode::COLOR_RECTIFIED:
+      depth_data_type_ = ETronDI_DEPTH_DATA_8_BITS;
+      break;
+    case ColorMode::COLOR_RAW:
+    default:
+      depth_data_type_ = ETronDI_DEPTH_DATA_8_BITS_RAW;
+      break;
   }
+
+  switch (params.dev_mode) {
+    case DeviceMode::DEVICE_ALL:
+      goto mjpg_error;
+      break;
+    case DeviceMode::DEVICE_COLOR:
+      if (params.stream_mode == StreamMode::STREAM_2560x720) {
+        // color 2560x720 mjpg only 5
+        framerate_ = 5;
+        break;
+      } else if (params.stream_mode == StreamMode::STREAM_1280x480) {
+        // color 1280x480 mjpg only 15
+        framerate_ = 15;
+        break;
+      } else if (params.stream_mode == StreamMode::STREAM_1280x720) {
+        // color 1280x720 mjpg only 5
+        framerate_ = 5;
+        break;
+      }
+      break;
+    case DeviceMode::DEVICE_DEPTH:
+      goto mjpg_error;
+      break;
+    default:
+      throw_error("Unknown DeviceMode.");
+  }
+
+  return;
+
+mjpg_error:
+  throw_error("\nNote:: You are using the mjpg mode."
+      " Current resolution or frame rate is not supported"
+      " And you can refer to Resolution Support List"
+      " in the documentation.\n");
 }
 
 bool Device::IsUSB2() {
