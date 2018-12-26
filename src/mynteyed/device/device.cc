@@ -832,13 +832,23 @@ void Device::ReleaseBuf() {
 }
 
 void Device::CompatibleUSB2(const OpenParams& params) {
-  if (!IsUSB2()) {
+  if (!IsUSB2() && params.color_stream_format
+      != StreamFormat::STREAM_MJPG) {
     return;
+  }
+
+  switch (params.color_mode) {
+    case ColorMode::COLOR_RECTIFIED:
+      depth_data_type_ = ETronDI_DEPTH_DATA_8_BITS;
+      break;
+    case ColorMode::COLOR_RAW:
+    default:
+      depth_data_type_ = ETronDI_DEPTH_DATA_8_BITS_RAW;
+      break;
   }
 
   if (params.dev_mode == DeviceMode::DEVICE_ALL) {
   // color + depth
-    depth_data_type_ = ETronDI_DEPTH_DATA_8_BITS;
 
     if (params.stream_mode == StreamMode::STREAM_2560x720) {
       // color 2560x720 yuyv, depth 640x720 yuyv, 8 bits rectify, fail
@@ -898,7 +908,6 @@ void Device::CompatibleUSB2(const OpenParams& params) {
     }
   } else if (params.dev_mode == DeviceMode::DEVICE_DEPTH) {
   // depth only
-    depth_data_type_ = ETronDI_DEPTH_DATA_8_BITS;
 
     if (params.stream_mode == StreamMode::STREAM_2560x720 ||
         params.stream_mode == StreamMode::STREAM_1280x720) {

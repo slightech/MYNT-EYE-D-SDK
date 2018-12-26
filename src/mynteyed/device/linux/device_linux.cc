@@ -113,7 +113,8 @@ Image::pointer Device::GetImageDepth() {
       dtc_ == DEPTH_IMG_GRAY_TRANSFER) {
     depth_raw = false;
 
-    if (depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS) {
+    if (depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS ||
+        depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS_RAW) {
       depth_img_width = depth_img_width * 2;
     }
 
@@ -176,7 +177,8 @@ Image::pointer Device::GetImageDepth() {
         ColorPaletteGenerator::UpdateD11DisplayImage_DIB24(
             m_ColorPaletteD11, depth_buf_, depth_image_buf_->data(),
             depth_img_width, depth_img_height);
-      } else if (depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS) {
+      } else if (depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS ||
+          depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS_RAW) {
         ColorPaletteGenerator::UpdateD8bitsDisplayImage_DIB24(
             m_ColorPalette, depth_buf_, depth_image_buf_->data(),
             depth_img_width, depth_img_height);
