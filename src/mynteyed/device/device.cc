@@ -847,6 +847,7 @@ void Device::CompatibleUSB2(const OpenParams& params) {
       break;
   }
 
+  /*
   if (params.dev_mode == DeviceMode::DEVICE_ALL) {
   // color + depth
 
@@ -943,6 +944,7 @@ usb2_error:
       " Current resolution or frame rate is not supported"
       " And you can refer to Resolution Support List"
       " in the documentation.\n");
+  */
 }
 
 void Device::CompatibleMJPG(const OpenParams& params) {
