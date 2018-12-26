@@ -832,8 +832,8 @@ void Device::ReleaseBuf() {
 }
 
 void Device::CompatibleUSB2(const OpenParams& params) {
-  if (!IsUSB2() && params.color_stream_format
-      != StreamFormat::STREAM_MJPG) {
+  if (!IsUSB2() || params.color_stream_format
+      == StreamFormat::STREAM_MJPG) {
     return;
   }
 
