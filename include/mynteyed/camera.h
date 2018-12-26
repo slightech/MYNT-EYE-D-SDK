@@ -193,7 +193,7 @@ class MYNTEYE_API Camera {
    * */
   void GetGlobalGain(float &value);
 
-  /** set infrared(IR) intensity [0, 10] default 0*/
+  /** set infrared(IR) intensity [0, 10] default 4*/
   void SetIRIntensity(const std::uint16_t &value);
 
   /** Auto-exposure enabled or not  default enabled*/
