@@ -161,3 +161,5 @@ if(PCL_FOUND)
     DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
   )
 endif()
+
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/src/example)

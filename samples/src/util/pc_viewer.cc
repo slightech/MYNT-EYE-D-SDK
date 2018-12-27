@@ -66,6 +66,7 @@ bool PCViewer::UpdateDirectly(const cv::Mat &rgb, const cv::Mat& depth) {
   pointcloud_t::Ptr cloud(new pointcloud_t);
   ConvertToPointCloud(rgb, depth, cloud);
   Update(cloud);
+  return true;
 }
 
 void PCViewer::Update(pointcloud_t::ConstPtr cloud) {
