@@ -89,6 +89,10 @@ int main(int argc, char const* argv[]) {
       .metavar("VALUE").help("IR intensity, range [0,10], default %default");
   op_group.add_option("--ir-depth").dest("ir_depth_only")
       .action("store_false").help("Enable ir-depth-only");
+  op_group.add_option("--cdv").dest("colour_depth_value")
+      .type("float").set_default(1000)
+      .metavar("VALUE").help("Colour depth value, "
+          "range [0, 16384], default %default");
   parser.add_option_group(op_group);
 
   // FeatureToggles
@@ -200,6 +204,8 @@ int main(int argc, char const* argv[]) {
     if (!in_range("ir_intensity", 0, 10, &val)) return 2;
     params.ir_intensity = val;
     params.ir_depth_only = options.get("ir_depth_only");
+    if (!in_range("colour_depth_value", 0, 16384, &val)) return 2;
+    params.colour_depth_value = val;
 
     if (params.stream_mode == StreamMode::STREAM_2560x720) {
       if (!in_range("framerate", 0, 30, &val)) return 2;

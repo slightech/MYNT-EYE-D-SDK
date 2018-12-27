@@ -97,6 +97,11 @@ struct MYNTEYE_API OpenParams {
    */
   bool ir_depth_only;
 
+  /**
+   * Colour depth image, default 5000. [0, 16384]
+   */
+  float colour_depth_value;
+
   /** Constructor. */
   OpenParams();
   explicit OpenParams(const std::int32_t& dev_index);
