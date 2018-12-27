@@ -92,7 +92,7 @@ struct MYNTEYE_API OpenParams {
   std::uint8_t ir_intensity;
 
   /**
-   * IR Depth Only mode, default true.
+   * IR Depth Only mode, default false.
    * Note: When frame rate less than 30fps, IR Depth Only will be not available.
    */
   bool ir_depth_only;
