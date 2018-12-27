@@ -222,6 +222,11 @@ void Device::GetStreamInfos(const std::int32_t& dev_index,
 }
 
 bool Device::SetAutoExposureEnabled(bool enabled) {
+  if (!IsOpened()) {
+    LOGE("\nERROR:: Device is not opened.\n");
+    return false;
+  }
+
   bool ok;
   if (enabled) {
     ok = ETronDI_OK == EtronDI_EnableAE(etron_di_, &dev_sel_info_);
@@ -237,6 +242,11 @@ bool Device::SetAutoExposureEnabled(bool enabled) {
 }
 
 bool Device::SetAutoWhiteBalanceEnabled(bool enabled) {
+  if (!IsOpened()) {
+    LOGE("\nERROR:: Device is not opened.\n");
+    return false;
+  }
+
   bool ok;
   if (enabled) {
     ok = ETronDI_OK == EtronDI_EnableAWB(etron_di_, &dev_sel_info_);
@@ -298,6 +308,11 @@ void Device::SetInfraredDepthOnly(const OpenParams& params) {
 }
 
 void Device::SetInfraredIntensity(const std::uint16_t &value) {
+  if (!IsOpened()) {
+    LOGE("\nERROR:: Device is not opened.\n");
+    return;
+  }
+
   if (value != 0) {
     EtronDI_SetIRMode(etron_di_, &dev_sel_info_, 0x03);
     EtronDI_SetCurrentIRValue(etron_di_, &dev_sel_info_, value);
@@ -1024,6 +1039,10 @@ int Device::GetStreamIndex(PETRONDI_STREAM_INFO stream_info_ptr,
 }
 
 bool Device::SetSensorType(const SensorType &type) {
+  if (!IsOpened()) {
+    LOGE("\nERROR:: Device is not opened.\n");
+    return false;
+  }
   int sensor_type = get_sensor_type(type);
 
 #ifdef MYNTEYE_OS_WIN
@@ -1045,6 +1064,10 @@ bool Device::SetSensorType(const SensorType &type) {
 }
 
 bool Device::SetExposureTime(const float &value) {
+  if (!IsOpened()) {
+    LOGE("\nERROR:: Device is not opened.\n");
+    return false;
+  }
   if (!SetSensorType(SensorType::SENSOR_TYPE_AR0135))
     return false;
 
@@ -1059,6 +1082,10 @@ bool Device::SetExposureTime(const float &value) {
 }
 
 bool Device::GetExposureTime(float &value) {
+  if (!IsOpened()) {
+    LOGE("\nERROR:: Device is not opened.\n");
+    return false;
+  }
   if (!SetSensorType(SensorType::SENSOR_TYPE_AR0135))
     return false;
 
@@ -1073,6 +1100,10 @@ bool Device::GetExposureTime(float &value) {
 }
 
 bool Device::SetGlobalGain(const float &value) {
+  if (!IsOpened()) {
+    LOGE("\nERROR:: Device is not opened.\n");
+    return false;
+  }
   if (!SetSensorType(SensorType::SENSOR_TYPE_AR0135))
     return false;
 
@@ -1087,6 +1118,10 @@ bool Device::SetGlobalGain(const float &value) {
 }
 
 bool Device::GetGlobalGain(float &value) {
+  if (!IsOpened()) {
+    LOGE("\nERROR:: Device is not opened.\n");
+    return false;
+  }
   if (!SetSensorType(SensorType::SENSOR_TYPE_AR0135))
     return false;
 
