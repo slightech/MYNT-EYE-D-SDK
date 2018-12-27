@@ -279,6 +279,18 @@ int ETRONDI_API EtronDI_ReleaseSwPostProc(void** handle);
 int ETRONDI_API EtronDI_DoSwPostProc(void* handle, unsigned char* colorBuf, bool isColorRgb24, 
     unsigned char* depthBuf, unsigned char* outputBuf, int width, int height);
 
+/*! \fn bool EtronDI_HasMultiDepth0ColorPlusDepthForColor(
+		void *pHandleEtronDI,
+		PDEVSELINFO pDevSelInfo,
+		int colorStreamIndex)
+	\brief check module support multi-base line w/ color+depth on depth 0(S0) pin
+	\param pHandleEtronDI	 the pointer to the initilized EtronDI SDK instance
+	\param pDevSelInfo	pointer of device select index
+	\param colorStreamIndex	color stream index to check
+	\return true: support S0 w/ color combine with depth,but its output is the only depth and depth is color stream, false: not support
+*/
+bool ETRONDI_API EtronDI_HasMultiDepth0ColorPlusDepthForColor(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int colorStreamIndex);
+
 /*! \fn bool EtronDI_HasMultiDepth0ColorPlusDepth(
 		void *pHandleEtronDI,
 		PDEVSELINFO pDevSelInfo,

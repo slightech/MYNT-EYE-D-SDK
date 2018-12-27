@@ -487,7 +487,7 @@ int  ETRONDI_API EtronDI_Init2( void **ppHandleEtronDI, bool bIsLogEnabled, bool
 \return none
 */
 #ifndef EtronDI_DeviceEventFn_
-typedef void(*EtronDI_DeviceEventFn)(unsigned int pid, unsigned int  vid, BOOL bAttached, void* pData);
+typedef void(*EtronDI_DeviceEventFn)(unsigned int pid, unsigned int vid, BOOL bAttached, void* pData);
 #define EtronDI_DeviceEventFn_
 #endif
 
@@ -1654,6 +1654,21 @@ int ETRONDI_API EtronDI_SetQuantizationTableData(void *pHandleEtronDI, PDEVSELIN
 \brief turn on/off image mirror
 */
 int ETRONDI_API EtronDI_EnableImageMirror(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, bool enable);
+
+/*! \fn bool ETRONDI_API EtronDI_EnableSecondaryColorStream(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int colorOption)
+\brief Enable SecondaryColorStream.
+*/
+bool ETRONDI_API EtronDI_EnableSecondaryColorStream(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int colorOption);
+
+/*! \fn int ETRONDI_API EtronDI_IsForUnre(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, colorOption)
+\brief Check the device name, is it for Unre ?
+*/
+bool ETRONDI_API EtronDI_IsForUnre(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo);
+
+/*! \fn int ETRONDI_API EtronDI_ForUnreColorStream(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo)
+\brief Check the device name, is it for Unre ? If true, get its color stream option.
+*/
+int ETRONDI_API EtronDI_ForUnreColorStream(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo);
 
 #ifdef __cplusplus
 }

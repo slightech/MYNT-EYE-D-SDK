@@ -465,3 +465,32 @@ void CameraPrivate::NotifyDataTrackStateChanged() {
 bool CameraPrivate::HidFirmwareUpdate(const char* filepath) {
   return channels_->HidFirmwareUpdate(filepath);
 }
+
+void CameraPrivate::SetExposureTime(const float &value) {
+  device_->SetExposureTime(value);
+}
+
+void CameraPrivate::GetExposureTime(float &value) {
+  device_->GetExposureTime(value);
+}
+
+void CameraPrivate::SetGlobalGain(const float &value) {
+  device_->SetGlobalGain(value);
+}
+
+void CameraPrivate::GetGlobalGain(float &value) {
+  device_->GetGlobalGain(value);
+}
+
+void CameraPrivate::SetIRIntensity(
+    const std::uint16_t &value) {
+  device_->SetInfraredIntensity(value);
+}
+
+bool CameraPrivate::AutoExposureControl(bool enable) {
+  return device_->SetAutoExposureEnabled(enable);
+}
+
+bool CameraPrivate::AutoWhiteBalanceControl(bool enable) {
+  return device_->SetAutoWhiteBalanceEnabled(enable);
+}

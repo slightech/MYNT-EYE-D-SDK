@@ -245,6 +245,7 @@ int hid_device::open(int max, int usage_page, int usage) {
     }
 
     hid->handle = handle;
+    hid->VersionNumber = attrib.VersionNumber;
     hid->open = 1;
     add_hid(hid);
     count++;
@@ -368,6 +369,16 @@ bool hid_device::find_device() {
 
   // CloseHandle(handle);
   return false;
+}
+
+int hid_device::get_version_number() {
+  if (!first_hid_) { return -1; }
+
+  return first_hid_->VersionNumber;
+}
+
+void hid_device::droped() {
+  free_all_hid();
 }
 
 } // namespace hid

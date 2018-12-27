@@ -24,9 +24,9 @@ namespace enc = sensor_msgs::image_encodings;
 class MYNTEYEListener {
  public:
   MYNTEYEListener() : it_(nh_), color_count_(0) {
-    color_sub_ =  it_.subscribe("mynteye/color", 1,
+    color_sub_ =  it_.subscribe("mynteye/left/image_color", 1,
         &MYNTEYEListener::colorCallback, this);
-    depth_sub_ =  it_.subscribe("mynteye/depth", 1,
+    depth_sub_ =  it_.subscribe("mynteye/depth/image_raw", 1,
         &MYNTEYEListener::depthCallback, this);
 
     cv::namedWindow("color", cv::WINDOW_AUTOSIZE);

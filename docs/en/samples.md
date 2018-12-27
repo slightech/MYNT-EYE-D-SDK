@@ -9,3 +9,4 @@
 * @subpage get_image_params
 * @subpage get_imu_params
 * @subpage set_open_params
+* @subpage manual_set_params

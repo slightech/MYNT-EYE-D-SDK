@@ -175,6 +175,33 @@ class MYNTEYE_API Camera {
   /** Update hid device firmware */
   bool HidFirmwareUpdate(const char* filepath);
 
+  /** Set exposure time [1ms - 2000ms]
+   * value -- exposure time value
+   * */
+  void SetExposureTime(const float &value);
+  /** Get exposure time
+   * value -- return exposure time value
+   * */
+  void GetExposureTime(float &value);
+
+  /** Set global gain [1 - 16]
+   * value -- global gain value
+   * */
+  void SetGlobalGain(const float &value);
+  /** Get global gain
+   * value -- return global gain value
+   * */
+  void GetGlobalGain(float &value);
+
+  /** set infrared(IR) intensity [0, 10] default 4*/
+  void SetIRIntensity(const std::uint16_t &value);
+
+  /** Auto-exposure enabled or not  default enabled*/
+  bool AutoExposureControl(bool enable);
+
+  /** Auto-white-balance enabled or not  default enabled*/
+  bool AutoWhiteBalanceControl(bool enable);
+
 #ifdef MYNTEYE_DEPRECATED_COMPAT
   /** @deprecated Replaced by OpenParams#device_mode */
   void EnableStreamData(const ImageType& type);

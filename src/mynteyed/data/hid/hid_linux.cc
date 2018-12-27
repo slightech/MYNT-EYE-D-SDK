@@ -157,9 +157,8 @@ void hid_device::close(int num) {
 }
 
 void hid_device::droped() {
+  free_all_hid();
   first_dev_ = nullptr;
-  first_hid_ = nullptr;
-  last_hid_ = nullptr;
 }
 
 /**
@@ -371,6 +370,12 @@ bool hid_device::find_device() {
   }
 
   return false;
+}
+
+int hid_device::get_version_number() {
+  if (!first_hid_) { return -1; }
+
+  return first_dev_->descriptor.bcdDevice;
 }
 
 }  // namespace hid

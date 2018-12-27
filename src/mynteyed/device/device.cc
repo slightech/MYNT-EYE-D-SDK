@@ -56,6 +56,36 @@ std::string get_stream_format_string(const StreamFormat& stream_format) {
   }
 }
 
+int get_sensor_mode(const SensorMode &mode) {
+  switch (mode) {
+    case SensorMode::LEFT:
+      return 0;
+    case SensorMode::RIGHT:
+      return 1;
+    case SensorMode::ALL:
+      return 2;
+    default:
+      throw_error("Unknown sensor mode.");
+  }
+}
+
+int get_sensor_type(const SensorType &type) {
+  switch (type) {
+    case SensorType::SENSOR_TYPE_H22:
+      return 0;   // ETRONDI_SENSOR_TYPE_H22
+    case SensorType::SENSOR_TYPE_OV7740:
+      return 1;   // ETRONDI_SENSOR_TYPE_OV7740
+    case SensorType::SENSOR_TYPE_AR0134:
+      return 2;   // ETRONDI_SENSOR_TYPE_AR0134
+    case SensorType::SENSOR_TYPE_AR0135:
+      return 3;   // ETRONDI_SENSOR_TYPE_AR0135
+    case SensorType::SENSOR_TYPE_OV9714:
+      return 4;   // ETRONDI_SENSOR_TYPE_OV9714
+    default:
+      throw_error("Unknown sensor type.");
+  }
+}
+
 }  // namespace
 
 Device::Device()
@@ -192,6 +222,11 @@ void Device::GetStreamInfos(const std::int32_t& dev_index,
 }
 
 bool Device::SetAutoExposureEnabled(bool enabled) {
+  if (!IsOpened()) {
+    LOGE("\nERROR:: Device is not opened.\n");
+    return false;
+  }
+
   bool ok;
   if (enabled) {
     ok = ETronDI_OK == EtronDI_EnableAE(etron_di_, &dev_sel_info_);
@@ -207,6 +242,11 @@ bool Device::SetAutoExposureEnabled(bool enabled) {
 }
 
 bool Device::SetAutoWhiteBalanceEnabled(bool enabled) {
+  if (!IsOpened()) {
+    LOGE("\nERROR:: Device is not opened.\n");
+    return false;
+  }
+
   bool ok;
   if (enabled) {
     ok = ETronDI_OK == EtronDI_EnableAWB(etron_di_, &dev_sel_info_);
@@ -267,7 +307,12 @@ void Device::SetInfraredDepthOnly(const OpenParams& params) {
   framerate_ *= 2;
 }
 
-void Device::SetInfraredIntensity(std::uint16_t value) {
+void Device::SetInfraredIntensity(const std::uint16_t &value) {
+  if (!IsOpened()) {
+    LOGE("\nERROR:: Device is not opened.\n");
+    return;
+  }
+
   if (value != 0) {
     EtronDI_SetIRMode(etron_di_, &dev_sel_info_, 0x03);
     EtronDI_SetCurrentIRValue(etron_di_, &dev_sel_info_, value);
@@ -802,31 +847,41 @@ void Device::ReleaseBuf() {
 }
 
 void Device::CompatibleUSB2(const OpenParams& params) {
-  if (!IsUSB2()) {
+  if (!IsUSB2() || params.color_stream_format
+      == StreamFormat::STREAM_MJPG) {
     return;
+  }
+
+  switch (params.color_mode) {
+    case ColorMode::COLOR_RECTIFIED:
+      depth_data_type_ = ETronDI_DEPTH_DATA_8_BITS;
+      break;
+    case ColorMode::COLOR_RAW:
+    default:
+      depth_data_type_ = ETronDI_DEPTH_DATA_8_BITS_RAW;
+      break;
   }
 
   if (params.dev_mode == DeviceMode::DEVICE_ALL) {
   // color + depth
-    depth_data_type_ = ETronDI_DEPTH_DATA_8_BITS;
 
     if (params.stream_mode == StreamMode::STREAM_2560x720) {
       // color 2560x720 yuyv, depth 640x720 yuyv, 8 bits rectify, fail
       goto usb2_error;
     } else if (params.stream_mode == StreamMode::STREAM_1280x720) {
-      // color 1280x720 yuyv, depth 640x720 yuyv, 8 bits rectify, 5 ok
-      //   1 > 5, 10 fail
+      // color 1280x720 yuyv, depth 640x720 yuyv, 8 bits only 5 ok
+
       color_res_index_ =
           GetStreamIndex(stream_color_info_ptr_, 1280, 720, false);
       depth_res_index_ =
           GetStreamIndex(stream_depth_info_ptr_, 640, 720, false);
       framerate_ = 5;
     } else if (params.stream_mode == StreamMode::STREAM_1280x480) {
-      // color 1280x480 yuyv, depth 320x480 yuyv, 8 bits rectify, fail
+      // color 1280x480 yuyv, depth 320x480 yuyv, 8 bits only 15 fail
       goto usb2_error;
     } else if (params.stream_mode == StreamMode::STREAM_640x480) {
-      // color 640x480 yuyv, depth 320x480 yuyv, 8 bits rectify, 15 ok
-      //   1,5,10,20 > 15, 30 fail
+      // color 640x480 yuyv, depth 320x480 yuyv, 8 bits only 15 ok
+
       color_res_index_ =
           GetStreamIndex(stream_color_info_ptr_, 640, 480, false);
       depth_res_index_ =
@@ -841,25 +896,28 @@ void Device::CompatibleUSB2(const OpenParams& params) {
   } else if (params.dev_mode == DeviceMode::DEVICE_COLOR) {
   // color only
     if (params.stream_mode == StreamMode::STREAM_2560x720) {
-      // color 2560x720 yuyv, <=5 ok (auto change to 5)
+      // color 2560x720 yuyv, only 5 ok
       color_res_index_ =
           GetStreamIndex(stream_color_info_ptr_, 2560, 720, false);
       framerate_ = 5;
     } else if (params.stream_mode == StreamMode::STREAM_1280x720) {
-      // color 1280x720 yuyv, <=10 ok (auto change to 5,10)
+      // color 1280x720 yuyv, only 10 ok
+
       color_res_index_ =
           GetStreamIndex(stream_color_info_ptr_, 1280, 720, false);
-      framerate_ = (framerate_ > 5) ? 10 : 5;
+      framerate_ = 10;
     } else if (params.stream_mode == StreamMode::STREAM_1280x480) {
-      // color 1280x480 yuyv, <=15 ok (auto change to 15)
+      // color 1280x480 yuyv, only 15 ok
+
       color_res_index_ =
           GetStreamIndex(stream_color_info_ptr_, 1280, 480, false);
       framerate_ = 15;
     } else if (params.stream_mode == StreamMode::STREAM_640x480) {
-      // color 640x480 yuyv, <=30 ok (auto change to 15,30)
+      // color 640x480 yuyv, only 15 ok
+
       color_res_index_ =
           GetStreamIndex(stream_color_info_ptr_, 640, 480, false);
-      framerate_ = (framerate_ > 15) ? 30 : 15;
+      framerate_ = 15;
     } else {
       goto usb2_error;
     }
@@ -868,22 +926,19 @@ void Device::CompatibleUSB2(const OpenParams& params) {
     }
   } else if (params.dev_mode == DeviceMode::DEVICE_DEPTH) {
   // depth only
-    depth_data_type_ = ETronDI_DEPTH_DATA_8_BITS;
 
     if (params.stream_mode == StreamMode::STREAM_2560x720 ||
         params.stream_mode == StreamMode::STREAM_1280x720) {
-      // depth 640x720 yuyv, 8 bits rectify, 5,10 ok
-      //   15,30 > 10, 1,20 fail
+      // depth 640x720 yuyv, 8 bits only 5 ok
       depth_res_index_ =
           GetStreamIndex(stream_depth_info_ptr_, 640, 720, false);
-      framerate_ = (framerate_ > 5) ? 10 : 5;
+      framerate_ = 5;
     } else if (params.stream_mode == StreamMode::STREAM_1280x480 ||
                params.stream_mode == StreamMode::STREAM_640x480) {
-      // depth 320x480 yuyv, 8 bits rectify, 15,30 ok
-      //   5,10,20 > 15, 40 > 30, 30 real is 15, 1 fail
+      // depth 320x480 yuyv, 8 bits only 15 ok
       depth_res_index_ =
           GetStreamIndex(stream_depth_info_ptr_, 320, 480, false);
-      framerate_ = (framerate_ > 15) ? 30 : 15;
+      framerate_ = 15;
     } else {
       goto usb2_error;
     }
@@ -907,24 +962,53 @@ usb2_error:
 }
 
 void Device::CompatibleMJPG(const OpenParams& params) {
-  if (params.dev_mode == DeviceMode::DEVICE_ALL ||
-      params.dev_mode == DeviceMode::DEVICE_COLOR) {
-    if (!stream_color_info_ptr_[color_res_index_].bFormatMJPG) {
-      return;
-    }
-    // using 8 bits, if mjpg
-    switch (params.color_mode) {
-      case ColorMode::COLOR_RECTIFIED:
-        depth_data_type_ = ETronDI_DEPTH_DATA_8_BITS;
-        break;
-      case ColorMode::COLOR_RAW:
-      default:
-        depth_data_type_ = ETronDI_DEPTH_DATA_8_BITS_RAW;
-        break;
-    }
-  } else {
-    // depth only
+  if (!stream_color_info_ptr_[color_res_index_].bFormatMJPG)
+    return;
+
+  // using 8 bits, if mjpg
+  switch (params.color_mode) {
+    case ColorMode::COLOR_RECTIFIED:
+      depth_data_type_ = ETronDI_DEPTH_DATA_8_BITS;
+      break;
+    case ColorMode::COLOR_RAW:
+    default:
+      depth_data_type_ = ETronDI_DEPTH_DATA_8_BITS_RAW;
+      break;
   }
+
+  switch (params.dev_mode) {
+    case DeviceMode::DEVICE_ALL:
+      goto mjpg_error;
+      break;
+    case DeviceMode::DEVICE_COLOR:
+      if (params.stream_mode == StreamMode::STREAM_2560x720) {
+        // color 2560x720 mjpg only 5
+        framerate_ = 5;
+        break;
+      } else if (params.stream_mode == StreamMode::STREAM_1280x480) {
+        // color 1280x480 mjpg only 15
+        framerate_ = 15;
+        break;
+      } else if (params.stream_mode == StreamMode::STREAM_1280x720) {
+        // color 1280x720 mjpg only 5
+        framerate_ = 5;
+        break;
+      }
+      break;
+    case DeviceMode::DEVICE_DEPTH:
+      goto mjpg_error;
+      break;
+    default:
+      throw_error("Unknown DeviceMode.");
+  }
+
+  return;
+
+mjpg_error:
+  throw_error("\nNote:: You are using the mjpg mode."
+      " Current resolution or frame rate is not supported"
+      " And you can refer to Resolution Support List"
+      " in the documentation.\n");
 }
 
 bool Device::IsUSB2() {
@@ -952,4 +1036,101 @@ int Device::GetStreamIndex(PETRONDI_STREAM_INFO stream_info_ptr,
   }
 
   return res_index;
+}
+
+bool Device::SetSensorType(const SensorType &type) {
+  if (!IsOpened()) {
+    LOGE("\nERROR:: Device is not opened.\n");
+    return false;
+  }
+  int sensor_type = get_sensor_type(type);
+
+#ifdef MYNTEYE_OS_WIN
+  if (EtronDI_SetSensorTypeName(
+      etron_di_, (SENSOR_TYPE_NAME)sensor_type) == ETronDI_OK) {
+    return true;
+  } else {
+    return false;
+  }
+#else
+  if (EtronDI_SetSensorTypeName(
+      etron_di_, &dev_sel_info_,
+      (SENSOR_TYPE_NAME)sensor_type) == ETronDI_OK) {
+    return true;
+  } else {
+    return false;
+  }
+#endif
+}
+
+bool Device::SetExposureTime(const float &value) {
+  if (!IsOpened()) {
+    LOGE("\nERROR:: Device is not opened.\n");
+    return false;
+  }
+  if (!SetSensorType(SensorType::SENSOR_TYPE_AR0135))
+    return false;
+
+  int sensor_mode = get_sensor_mode(SensorMode::ALL);
+  if (EtronDI_SetExposureTime(
+        etron_di_, &dev_sel_info_,
+        sensor_mode, value) == ETronDI_OK) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool Device::GetExposureTime(float &value) {
+  if (!IsOpened()) {
+    LOGE("\nERROR:: Device is not opened.\n");
+    return false;
+  }
+  if (!SetSensorType(SensorType::SENSOR_TYPE_AR0135))
+    return false;
+
+  int sensor_mode = get_sensor_mode(SensorMode::ALL);
+  if (EtronDI_GetExposureTime(
+        etron_di_, &dev_sel_info_,
+        sensor_mode, &value) == ETronDI_OK) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool Device::SetGlobalGain(const float &value) {
+  if (!IsOpened()) {
+    LOGE("\nERROR:: Device is not opened.\n");
+    return false;
+  }
+  if (!SetSensorType(SensorType::SENSOR_TYPE_AR0135))
+    return false;
+
+  int sensor_mode = get_sensor_mode(SensorMode::ALL);
+  if (EtronDI_SetGlobalGain(
+        etron_di_, &dev_sel_info_,
+        sensor_mode, value) == ETronDI_OK) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool Device::GetGlobalGain(float &value) {
+  if (!IsOpened()) {
+    LOGE("\nERROR:: Device is not opened.\n");
+    return false;
+  }
+  if (!SetSensorType(SensorType::SENSOR_TYPE_AR0135))
+    return false;
+
+  int sensor_mode = get_sensor_mode(SensorMode::ALL);
+  if (EtronDI_GetGlobalGain(
+        etron_di_, &dev_sel_info_,
+        sensor_mode, &value) == ETronDI_OK) {
+    return true;
+  } else {
+    return false;
+  }
 }

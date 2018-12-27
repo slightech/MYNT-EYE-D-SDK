@@ -127,6 +127,28 @@ enum class ImageFormat : std::int32_t {
   IMAGE_FORMAT_LAST
 };
 
+/**
+ * @ingroup enumerations
+ * @brief SensorType types.
+ */
+enum class SensorType : std::int32_t {
+  SENSOR_TYPE_H22 = 0,
+  SENSOR_TYPE_OV7740,
+  SENSOR_TYPE_AR0134,
+  SENSOR_TYPE_AR0135,
+  SENSOR_TYPE_OV9714
+};
+
+/**
+ * @ingroup enumerations
+ * @brief SensorMode modes.
+ */
+enum class SensorMode : std::int32_t {
+  LEFT = 0,
+  RIGHT,
+  ALL
+};
+
 MYNTEYE_END_NAMESPACE
 
 #endif  // MYNTEYE_DEVICE_TYPES_H_

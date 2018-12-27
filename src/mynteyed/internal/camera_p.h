@@ -164,6 +164,33 @@ class MYNTEYE_API CameraPrivate {
 
   bool HidFirmwareUpdate(const char* filepath);
 
+  /** Set exposure time
+   * value -- exposure time value
+   * */
+  void SetExposureTime(const float &value);
+  /** Get exposure time
+   * value -- return exposure time value
+   * */
+  void GetExposureTime(float &value);
+
+  /** Set global gain
+   * value -- global gain value
+   * */
+  void SetGlobalGain(const float &value);
+  /** Get global gain
+   * value -- return global gain value
+   * */
+  void GetGlobalGain(float &value);
+
+  /** set infrared(IR) intensity*/
+  void SetIRIntensity(const std::uint16_t &value);
+
+  /** Auto-exposure enabled or not */
+  bool AutoExposureControl(bool enable);
+
+  /** Auto-white-balance enabled or not */
+  bool AutoWhiteBalanceControl(bool enable);
+
  protected:
   std::shared_ptr<Channels> channels() const {
     return channels_;

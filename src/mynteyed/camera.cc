@@ -186,6 +186,35 @@ bool Camera::HidFirmwareUpdate(const char* filepath) {
   return p_->HidFirmwareUpdate(filepath);
 }
 
+void Camera::SetExposureTime(const float &value) {
+  return p_->SetExposureTime(value);
+}
+
+void Camera::GetExposureTime(float &value) {
+  return p_->GetExposureTime(value);
+}
+
+void Camera::SetGlobalGain(const float &value) {
+  return p_->SetGlobalGain(value);
+}
+
+void Camera::GetGlobalGain(float &value) {
+  return p_->GetGlobalGain(value);
+}
+
+void Camera::SetIRIntensity(
+    const std::uint16_t &value) {
+  return p_->SetIRIntensity(value);
+}
+
+bool Camera::AutoExposureControl(bool enable) {
+  return p_->AutoExposureControl(enable);
+}
+
+bool Camera::AutoWhiteBalanceControl(bool enable) {
+  return p_->AutoWhiteBalanceControl(enable);
+}
+
 #ifdef MYNTEYE_DEPRECATED_COMPAT
 void Camera::EnableStreamData(const ImageType& type) {
   LOGW("%s is deprecated, replaced by OpenParams#device_mode.", __func__);

@@ -67,7 +67,7 @@ class Device {
   void SetInfraredDepthOnly(const OpenParams& params);
 
   /** Set infrared intensity */
-  void SetInfraredIntensity(std::uint16_t value);
+  void SetInfraredIntensity(const std::uint16_t &value);
 
   /** Open device */
   bool Open(const OpenParams& params);
@@ -96,6 +96,27 @@ class Device {
 
   /** Close device */
   void Close();
+
+  /** Set sensor type */
+  bool SetSensorType(const SensorType &type);
+
+  /** Set exposure time
+   * value -- exposure time value
+   * */
+  bool SetExposureTime(const float &value);
+  /** Get exposure time
+   * value -- return exposure time value
+   * */
+  bool GetExposureTime(float &value);
+
+  /** Set global gain
+   * value -- global gain value
+   * */
+  bool SetGlobalGain(const float &value);
+  /** Get global gain
+   * value -- return global gain value
+   * */
+  bool GetGlobalGain(float &value);
 
  protected:
   /** Get stream index for open */
