@@ -109,6 +109,17 @@ params.ir_intensity = 4;
 // params.ir_depth_only = false;↩
 ```
 
+## 调整深度图着色值
+
+通过设置 `params.colour_depth_value` 参数, 默认值是 1000。
+
+参考代码片段:
+
+```bash
+// Colour depth image, default 1000. [0, 16384]
+// params.colour_depth_value = 1000;
+```
+
 以上功能参考运行结果，于 Linux 上：
 
 ```

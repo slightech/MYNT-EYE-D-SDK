@@ -107,6 +107,17 @@ Reference code snippet:
 // params.ir_depth_only = false;
 ```
 
+## Adjust colour depth value
+
+Using the `params.colour_depth_value` parameter, The value is 1000 by default.
+
+Reference code snippet:
+
+```bash
+// Colour depth image, default 1000. [0, 16384]
+// params.colour_depth_value = 1000;
+```
+
 Reference running results on Linux:
 
 ```
