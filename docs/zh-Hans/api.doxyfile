@@ -937,7 +937,10 @@ EXAMPLE_RECURSIVE      = NO
 # that contain images that are to be included in the documentation (see the
 # \image command).
 
-IMAGE_PATH             = ../static/images
+IMAGE_PATH             = ../static/images \
+                         ../static/images/zh-Hans \
+                         ../static/images/projects/qtcreator \
+                         ../static/images/projects/vs2017
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should
 # invoke to filter for each input file. Doxygen will invoke the filter program
@@ -1768,9 +1771,28 @@ LATEX_EXTRA_STYLESHEET =
 # This tag requires that the tag GENERATE_LATEX is set to YES.
 
 LATEX_EXTRA_FILES      = ../static/images/mynteye_d_imu_coord.jpg \
-                         ../static/images/mynteye_surface_zh-Hans.jpg \
                          ../static/images/imu_analytics.png \
-                         ../static/images/stamp_analytics.png
+                         ../static/images/stamp_analytics.png \
+                         ../static/images/zh-Hans/mynteye_surface.jpg \
+                         ../static/images/projects/qtcreator/new_project.png \
+                         ../static/images/projects/qtcreator/new_project2.png \
+                         ../static/images/projects/qtcreator/new_project3.png \
+                         ../static/images/projects/qtcreator/new_project4.png \
+                         ../static/images/projects/qtcreator/new_project5.png \
+                         ../static/images/projects/qtcreator/new_project6.png \
+                         ../static/images/projects/qtcreator/new_project7.png \
+                         ../static/images/projects/qtcreator/release_run.png \
+                         ../static/images/projects/qtcreator/run_win.png \
+                         ../static/images/projects/qtcreator/run_linux.png \
+                         ../static/images/projects/vs2017/1_new_pro.png \
+                         ../static/images/projects/vs2017/2_new_pro.png \
+                         ../static/images/projects/vs2017/3_new_pro.png \
+                         ../static/images/projects/vs2017/4_config.png \
+                         ../static/images/projects/vs2017/5_config_include.png \
+                         ../static/images/projects/vs2017/6_config_definition.png \
+                         ../static/images/projects/vs2017/7_config_lib_dir.png \
+                         ../static/images/projects/vs2017/8_config_lib.png \
+                         ../static/images/projects/vs2017/9_run_x64.png
 
 # If the PDF_HYPERLINKS tag is set to YES, the LaTeX that is generated is
 # prepared for conversion to PDF (using ps2pdf or pdflatex). The PDF file will

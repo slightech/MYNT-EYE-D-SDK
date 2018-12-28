@@ -15,27 +15,55 @@ Open Qt Creator, then `New Project`,
 
 ![](images/projects/qtcreator/new_project.png)
 
+\latexonly
+\includegraphics[width=0.6\textwidth]{new_project.png}
+\endlatexonly
+
 Choose `Qt Widgets Application`,
 
 ![](images/projects/qtcreator/new_project2.png)
+
+\latexonly
+\includegraphics[width=0.6\textwidth]{new_project2.png}
+\endlatexonly
 
 Set project location and its name,
 
 ![](images/projects/qtcreator/new_project3.png)
 
+\latexonly
+\includegraphics[width=0.6\textwidth]{new_project3.png}
+\endlatexonly
+
 Select the build kits,
 
 ![](images/projects/qtcreator/new_project4.png)
+
+\latexonly
+\includegraphics[width=0.6\textwidth]{new_project4.png}
+\endlatexonly
 
 Then, it will generate the skeleton source files,
 
 ![](images/projects/qtcreator/new_project5.png)
 
+\latexonly
+\includegraphics[width=0.6\textwidth]{new_project5.png}
+\endlatexonly
+
 ![](images/projects/qtcreator/new_project6.png)
+
+\latexonly
+\includegraphics[width=0.6\textwidth]{new_project6.png}
+\endlatexonly
 
 Finally, you will see the new project like this,
 
 ![](images/projects/qtcreator/new_project7.png)
+
+\latexonly
+\includegraphics[width=0.6\textwidth]{new_project7.png}
+\endlatexonly
 
 ## Config Project
 
@@ -69,12 +97,24 @@ Should select "Release" to run the project.
 
 ![](images/projects/qtcreator/release_run.png)
 
+\latexonly
+\includegraphics[width=0.6\textwidth]{release_run.png}
+\endlatexonly
+
 Then you will see the main window,
 
 ![](images/projects/qtcreator/run_win.png)
+
+\latexonly
+\includegraphics[width=0.6\textwidth]{run_win.png}
+\endlatexonly
 
 ### Linux
 
 Run the project and you will see the main window,
 
 ![](images/projects/qtcreator/run_linux.png)
+
+\latexonly
+\includegraphics[width=0.6\textwidth]{run_linux.png}
+\endlatexonly

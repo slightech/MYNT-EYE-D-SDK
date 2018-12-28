@@ -36,8 +36,7 @@ The analysis result graph will be saved in the data set directory. as follows:
 ![imu analytics](imu_analytics.png)
 
 \latexonly
-\includegraphics[width=0.3
-\textwidth,keepaspectratio]{../static/images/imu_analytics.png}
+\includegraphics[width=0.3\textwidth]{imu_analytics.png}
 \endlatexonly
 
 In addition, the script specific options can be executed -h:

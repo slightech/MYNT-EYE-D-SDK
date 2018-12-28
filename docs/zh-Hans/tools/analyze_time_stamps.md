@@ -48,8 +48,7 @@ stamp analytics done
 ![stamp analytics](stamp_analytics.png)
 
 \latexonly
-\includegraphics[width=0.3
-\textwidth,keepaspectratio]{../static/images/stamp_analytics.png}
+\includegraphics[width=0.3\textwidth]{stamp_analytics.png}
 \endlatexonly
 
 另外，可以使用 -h 参数查看工具详细参数选项.
