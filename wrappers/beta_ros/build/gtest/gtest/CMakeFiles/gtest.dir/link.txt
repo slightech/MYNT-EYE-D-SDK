@@ -1,0 +1,1 @@
+/usr/bin/c++  -fPIC   -shared -Wl,-soname,libgtest.so -o libgtest.so CMakeFiles/gtest.dir/src/gtest-all.cc.o  -L/home/mynt/mynt/mynt-eye-d-sdk/wrappers/beta_ros/build/gtest/gtest/src -lpthread -Wl,-rpath,/home/mynt/mynt/mynt-eye-d-sdk/wrappers/beta_ros/build/gtest/gtest/src 

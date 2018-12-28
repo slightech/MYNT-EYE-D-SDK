@@ -1,0 +1,8 @@
+prefix=/home/mynt/mynt/mynt-eye-d-sdk/wrappers/beta_ros/devel
+
+Name: mynteye_wrapper_d_beta
+Description: Description of mynteye_wrapper_d_beta
+Version: 0.0.0
+Cflags: -I/home/mynt/mynt/mynt-eye-d-sdk/wrappers/beta_ros/devel/include
+Libs: -L/home/mynt/mynt/mynt-eye-d-sdk/wrappers/beta_ros/devel/lib 
+Requires: cv_bridge image_transport message_runtime nodelet roscpp sensor_msgs std_msgs tf
