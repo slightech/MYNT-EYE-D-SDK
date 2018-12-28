@@ -407,6 +407,7 @@ bool Device::Open(const OpenParams& params) {
   int ret = OpenDevice(params.dev_mode);
 
   if (ETronDI_OK == ret) {
+    OnInitColorPalette(params.colour_depth_value);
     open_params_ = params;
     if (depth_device_opened_) {
       // depth device must be opened.

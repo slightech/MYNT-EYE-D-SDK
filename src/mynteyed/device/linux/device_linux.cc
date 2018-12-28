@@ -20,7 +20,7 @@
 #include "mynteyed/device/convertor.h"
 #include "mynteyed/util/log.h"
 
-#define Z14_FAR  1000
+// #define Z14_FAR  16383
 #define Z14_NEAR 0
 #define D11_FAR  0
 #define D11_NEAR 2047
@@ -31,31 +31,6 @@ MYNTEYE_USE_NAMESPACE
 
 void Device::OnInit() {
   dtc_ = DEPTH_IMG_NON_TRANSFER;
-
-  {
-    float m_zFar = Z14_FAR;
-    float m_zNear = Z14_NEAR;
-    float m_d11Far = D11_FAR;
-    float m_d11Near = D11_NEAR;
-    float m_d8Far = D8_FAR;
-    float m_d8Near = D8_NEAR;
-    int m_nDepthColorMapMode = 4;  // for customer
-
-    ColorPaletteGenerator::DmColorMode(
-        m_ColorPalette, m_nDepthColorMapMode, m_d8Far, m_d8Near);
-    ColorPaletteGenerator::DmGrayMode(
-        m_GrayPalette, m_nDepthColorMapMode, m_d8Far, m_d8Near);
-
-    ColorPaletteGenerator::DmColorMode11(
-        m_ColorPaletteD11, m_nDepthColorMapMode, m_d11Far, m_d11Near);
-    ColorPaletteGenerator::DmGrayMode11(
-        m_GrayPaletteD11, m_nDepthColorMapMode, m_d11Far, m_d11Near);
-    // SetBaseGrayPaletteD11(m_GrayPaletteD11);
-
-    ColorPaletteGenerator::DmColorMode14(m_ColorPaletteZ14, m_zFar, m_zNear);
-    ColorPaletteGenerator::DmGrayMode14(m_GrayPaletteZ14, m_zFar, m_zNear);
-    // SetBaseGrayPaletteZ14(m_GrayPaletteZ14, zFar);
-  }
 }
 
 // int ret = EtronDI_Get2Image(etron_di_, &dev_sel_info_,
@@ -240,6 +215,42 @@ int Device::OpenDevice(const DeviceMode& dev_mode) {
     default:
       throw_error("ERROR:: DeviceMode is unknown.");
   }
+}
+
+void Device::OnInitColorPalette(const float &z14_Far) {
+  float m_zFar = z14_Far;
+  float m_zNear = Z14_NEAR;
+  float m_d11Far = D11_FAR;
+  float m_d11Near = D11_NEAR;
+  float m_d8Far = D8_FAR;
+  float m_d8Near = D8_NEAR;
+  /*
+     float m_zFar = far_;
+     float m_zNear = near_;
+     float m_d11Far = far_;
+     float m_d11Near = near_;
+     float m_d8Far = far_;
+     float m_d8Near = near_;
+
+     float m_zFar = far_;
+     float m_zNear = near_;
+     */
+  int m_nDepthColorMapMode = 4;  // for customer
+
+  ColorPaletteGenerator::DmColorMode(
+      m_ColorPalette, m_nDepthColorMapMode, m_d8Far, m_d8Near);
+  ColorPaletteGenerator::DmGrayMode(
+      m_GrayPalette, m_nDepthColorMapMode, m_d8Far, m_d8Near);
+
+  ColorPaletteGenerator::DmColorMode11(
+      m_ColorPaletteD11, m_nDepthColorMapMode, m_d11Far, m_d11Near);
+  ColorPaletteGenerator::DmGrayMode11(
+      m_GrayPaletteD11, m_nDepthColorMapMode, m_d11Far, m_d11Near);
+  // SetBaseGrayPaletteD11(m_GrayPaletteD11);
+
+  ColorPaletteGenerator::DmColorMode14(m_ColorPaletteZ14, m_zFar, m_zNear);
+  ColorPaletteGenerator::DmGrayMode14(m_GrayPaletteZ14, m_zFar, m_zNear);
+  // SetBaseGrayPaletteZ14(m_GrayPaletteZ14, zFar);
 }
 
 #endif

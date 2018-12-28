@@ -161,6 +161,8 @@ class Device {
 
   bool IsUSB2();
 
+  void OnInitColorPalette(const float &z14_Far);
+
   int GetStreamIndex(PETRONDI_STREAM_INFO stream_info_ptr,
     int width, int height, bool mjpg);
 
