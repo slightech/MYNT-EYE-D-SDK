@@ -1,6 +1,6 @@
 # ROS Usage {#ros_usage}
 
-Compile and run the node according to [ROS Installation](https://github.com/slightech/MYNT-EYE-D-SDK/blob/master/docs/zh-Hans/guide_ros.md).
+Compile and run the node according to \link ros_install ROS Installation \endlink.
 
 `rostopic list` lists all released nodes:
 

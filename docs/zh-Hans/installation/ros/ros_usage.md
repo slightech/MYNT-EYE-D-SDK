@@ -1,6 +1,6 @@
 # ROS 如何使用 {#ros_usage}
 
-按照 [ROS 安装](https://github.com/slightech/MYNT-EYE-D-SDK/blob/master/docs/zh-Hans/guide_ros.md) ，编译再运行节点。
+按照 \link ros_install ROS 安装 \endlink ，编译再运行节点。
 
 `rostopic list` 可以列出发布的节点：
 

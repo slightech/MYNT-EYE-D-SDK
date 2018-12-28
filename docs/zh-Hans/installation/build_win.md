@@ -1,6 +1,6 @@
 # Windows SDK 用户指南 {#build_win}
 
-以下源码编译安装过程。如果只需使用预编译好的库，请参考 \link install_exe_win "Windows 预编译 exe 安装"\endlink 。
+以下源码编译安装过程。如果只需使用预编译好的库，请参考 \link install_exe_win Windows 预编译 exe 安装 \endlink 。
 
 ## 1. 安装编译工具
 
@@ -46,7 +46,7 @@ pacman -S make
 
 开启 cmd, 输入以下命令:
 
-*将 D:\OpenCV 替换为您自己的解压缩目录*
+*将 "D:\OpenCV" 替换为您自己的解压缩目录*
 
 ```
 setx -m OPENCV_DIR D:\OpenCV\Build\x64\vc14\lib     (suggested for Visual Studio 2015 - 64 bit Windows)

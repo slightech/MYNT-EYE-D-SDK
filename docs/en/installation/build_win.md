@@ -1,6 +1,6 @@
 # Quick Start Guide for Windows {#build_win}
 
-The following steps are how to install from source codes. If you wanna using prebuilt DLL, please see \link install_exe_win "Windows exe installation"\endlink.
+The following steps are how to install from source codes. If you wanna using prebuilt DLL, please see \link install_exe_win Windows exe installation \endlink.
 
 ## 1. Install Build Tools
 
@@ -46,7 +46,7 @@ pacman -S make
 
 Start up a command window and enter:
 
-*Change the D:\OpenCV to your opencv unpack path*
+*Change the "D:\OpenCV" to your opencv unpack path*
 
 ```
 setx -m OPENCV_DIR D:\OpenCV\Build\x64\vc14\lib     (suggested for Visual Studio 2015 - 64 bit Windows)
