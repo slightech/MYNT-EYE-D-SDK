@@ -202,6 +202,13 @@ class Device {
   std::condition_variable depth_condition_;
   std::mutex color_mtx_;
   std::mutex depth_mtx_;
+  unsigned char m_ColorPalette[256][4];
+  unsigned char m_GrayPalette[256][4];
+  RGBQUAD m_ColorPaletteD11[2048];
+  RGBQUAD m_GrayPaletteD11[2048];
+  RGBQUAD m_ColorPaletteZ14[16384];
+  RGBQUAD m_GrayPaletteZ14[16384];
+
   RGBQUAD color_palette_z14_[16384];
   RGBQUAD gray_palette_z14_[16384];
 #else  // MYNTEYE_OS_LINUX

@@ -17,16 +17,177 @@
 
 #include "mynteyed/device/convertor.h"
 #include "mynteyed/util/log.h"
+#include "color_palette_generator.h"
 
 MYNTEYE_USE_NAMESPACE
 
 namespace {
 
+#define Z14_NEAR 0
+#define D11_FAR  0
+#define D11_NEAR 2047
+#define D8_FAR   0
+#define D8_NEAR  255
+
+void generatePaletteColor(RGBQUAD* palette, int size, int mode, int customROI1, int customROI2, bool reverseRedToBlue) {
+	float ROI2 = 1.0f;
+	float ROI1 = 0.0f;
+
+	//The value ranges from 0.0f ~ 1.0f as hue angle
+	float ROI2Value = 1.0f;
+	float ROI1Value = 0.0f;
+
+	BYTE* buf = (BYTE*)malloc(sizeof(BYTE) * 4 * size);
+	//BYTE buf[(size) * 4];
+	//Set ROI by mode setting.The bigger the disparity the nearer the distance
+	switch (mode) {
+	case 1: //near
+		ROI2 = 0.8f;
+		ROI1 = 0.5f;
+		ROI2Value = 0.9f;
+		ROI1Value = 0.1f;
+		break;
+	case 2: //midle
+		ROI2 = 0.7f;
+		ROI1 = 0.3f;
+		ROI2Value = 0.9f;
+		ROI1Value = 0.1f;
+		break;
+	case 3: //far
+		ROI2 = 0.6f;
+		ROI1 = 0.2f;
+		ROI2Value = 0.9f;
+		ROI1Value = 0.1f;
+		break;
+	case 4: //custom
+		ROI2 = 1.0f*customROI2 / size;
+		ROI1 = 1.0f*customROI1 / size;
+		ROI2Value = 1.0f;
+		ROI1Value = 0.0f;
+		break;
+	default: //normal 
+		ROI2 = 1.0f;
+		ROI1 = 0.0f;
+		ROI2Value = 1.0f;
+		ROI1Value = 0.0f;
+		break;
+	}
+
+	ColorPaletteGenerator::generatePalette(buf, size, ROI1 * size, ROI1Value, ROI2 * size, ROI2Value, reverseRedToBlue);
+	for (int i = 0; i < size; i++) {
+		palette[i].rgbBlue		= buf[i * 4 + 2];
+		palette[i].rgbGreen		= buf[i * 4 + 1];
+		palette[i].rgbRed		= buf[i * 4 + 0];
+		palette[i].rgbReserved	= buf[i * 4 + 3];
+	}
+}
+
+
+void generatePaletteGray(RGBQUAD* palette, int size, int mode, int customROI1, int customROI2, bool reverseGraylevel){
+	float ROI1 = 0.0f;
+	float ROI2 = 1.0f;
+	
+
+	//The value ranges from 0.0f ~ 1.0f as hue angle
+	float ROI1Value = 0.0f;
+	float ROI2Value = 1.0f;
+	
+
+	BYTE* buf = (BYTE*)malloc(sizeof(BYTE) * 4 * size);
+	//BYTE buf[(size) * 4];
+	//Set ROI by mode setting.The bigger the disparity the nearer the distance
+	switch (mode) {
+	case 1: //near
+		ROI2 = 0.8f;
+		ROI1 = 0.5f;
+		ROI2Value = 0.9f;
+		ROI1Value = 0.1f;
+		break;
+	case 2: //midle
+		ROI2 = 0.7f;
+		ROI1 = 0.3f;
+		ROI2Value = 0.9f;
+		ROI1Value = 0.1f;
+		break;
+	case 3: //far
+		ROI2 = 0.6f;
+		ROI1 = 0.2f;
+		ROI2Value = 0.9f;
+		ROI1Value = 0.1f;
+		break;
+	case 4: //custom
+		ROI2 = 1.0f*customROI2 / size;
+		ROI1 = 1.0f*customROI1 / size;
+		ROI2Value = 1.0f;
+		ROI1Value = 0.0f;
+		break;
+	default: //normal 
+		ROI2 = 1.0f;
+		ROI1 = 0.0f;
+		ROI2Value = 1.0f;
+		ROI1Value = 0.0f;
+		break;
+	}
+
+	ColorPaletteGenerator::generatePaletteGray(buf, size, ROI1 * size, ROI1Value, ROI2 * size, ROI2Value, reverseGraylevel);
+	for (int i = 0; i < size; i++) {
+		palette[i].rgbBlue = buf[i * 4 + 2];
+		palette[i].rgbGreen = buf[i * 4 + 1];
+		palette[i].rgbRed = buf[i * 4 + 0];
+		palette[i].rgbReserved = buf[i * 4 + 3];
+	}
+}
+
+void DmColorMode(unsigned char palette[256][4], int mode,int d8Far, int d8Near)
+{
+		
+	const int size = 1 << 8; // 8bits = 256
+	bool reverseRedtoBlue = true;
+	RGBQUAD RGBpalette[size];
+	generatePaletteColor(RGBpalette, size, mode, d8Far, d8Near, reverseRedtoBlue);
+
+	for (int i = 0; i < size; i++) {
+		palette[i][0] = RGBpalette[i].rgbBlue;
+		palette[i][1] = RGBpalette[i].rgbGreen;
+		palette[i][2] = RGBpalette[i].rgbRed;
+		palette[i][3] = RGBpalette[i].rgbReserved;
+	}
+}
+#ifdef ENABLE_LONG_DEPTHCOLOR_MAP
+void DmColorMode11(RGBQUAD palette[2048], int mode,int d11Far,int d11Near)
+{
+	const int size = 1 << 11; // 11 bits = 2048
+	bool reverseRedtoBlue = true;
+	generatePaletteColor(palette, size, mode, d11Far, d11Near, reverseRedtoBlue);
+}
+
+void DmGrayMode11(RGBQUAD palette[2048], int mode,int d11Far,int d11Near)
+{
+
+	const int size = 1 << 11; // 11 bits = 2048
+	bool reverseGraylevel = false;
+	generatePaletteGray(palette, size, mode, d11Far, d11Near, reverseGraylevel);
+}
+void DmColorMode14(RGBQUAD palette[16384],float zFar,float zNear)
+{
+	const int size = 1 << 14; // 14 bits  
+	bool reverseRedtoBlue = false;
+	int mode = 4; //custom
+	generatePaletteColor(palette, size,mode, zNear, zFar, reverseRedtoBlue);
+}
+
+void DmGrayMode14(RGBQUAD *palette,  float zFar,float zNear)
+{
+	const int size = 1 << 14; // 14bit 16384
+	int mode = 4;//custom
+	bool reverseGraylevel = true;
+	generatePaletteGray(palette, size, mode, zNear, zFar, reverseGraylevel);
+}
+#else//not ENABLE_LONG_DEPTHCOLOR_MAP
 // k= 0~1.00
 // maps k to a pixel color RGB
 void ColorMap(double k, double& R, double& G, double& B) {  // NOLINT
   double r;
-
   if (k < 0.0) k = 0.0;
   if (k > 1.0) k = 1.0;
   if (k < 0.1) {
@@ -78,62 +239,6 @@ void ColorMap(double k, double& R, double& G, double& B) {  // NOLINT
     r = k / .1;
     R = B = (1 - r) * 128;  // B 128~0
     G = 0;  // G
-  }
-}
-
-// ENABLE_LONG_DEPTHCOLOR_MAP
-void DmColorMode14(RGBQUAD* pallete, int mode = 0) {
-#define CP1 0.75
-#define CP2 0.25
-  int length = 16384;
-  int i;
-  double R, G, B;
-  int t1, t2;  // focus region, 0.25~0.75 mapping area
-  switch (mode) {
-  case 1:  // near
-    t1 = 512*8;
-    t2 = 1024 * 8;
-    break;
-  case 2:  // midle
-    t1 = 200 * 8;
-    t2 = 512 * 8;
-    break;
-  case 3:  // far
-    t1 = 5 * 8;
-    t2 = 256 * 8;
-    break;
-  default:  // normal
-    t1 = 256 * 8;
-    t2 = 512 * 8;
-    break;
-  }
-  double m, b;  // y=mx+b
-  m = (CP1 - 1.0) / (double)t1;  // NOLINT
-  b = 1.0;
-  for (i = 0; i < t1; i++) {
-    ColorMap(m * (double)i + b, R, G, B);  // NOLINT
-    pallete[i].rgbBlue = (BYTE)B;
-    pallete[i].rgbGreen = (BYTE)G;
-    pallete[i].rgbRed = (BYTE)R;
-    pallete[i].rgbReserved = 0;
-  }
-  m = (CP2 - CP1) / (double)(t2 - t1);  // NOLINT
-  b = CP1 - m * (double)t1;  // NOLINT
-  for (; i < t2; i++) {
-    ColorMap(m * (double)i + b, R, G, B);  // NOLINT
-    pallete[i].rgbBlue = (BYTE)B;
-    pallete[i].rgbGreen = (BYTE)G;
-    pallete[i].rgbRed = (BYTE)R;
-    pallete[i].rgbReserved = 0;
-  }
-  m = (0 - CP2) / (double)(2048 - t2);  // NOLINT
-  b = CP2 - m * (double)t2;  // NOLINT
-  for (; i < length; i++) {
-    ColorMap(m * (double)i + b, R, G, B);  // NOLINT
-    pallete[i].rgbBlue = (BYTE)B;
-    pallete[i].rgbGreen = (BYTE)G;
-    pallete[i].rgbRed = (BYTE)R;
-    pallete[i].rgbReserved = 0;
   }
 }
 
@@ -226,6 +331,64 @@ void SetBaseGrayPaletteZ14(RGBQUAD *pGrayPaletteZ14) {
   }
 }
 
+void DmColorMode11(RGBQUAD pallete[2048], int mode)
+{
+	double R, G, B;
+	for (int i = 0; i<2048; i++) {
+		HSV_to_RGB((double)(i >> 3), 1.0, 1.0, R, G, B);
+
+		pallete[i].rgbBlue = (BYTE)B;
+		pallete[i].rgbGreen = (BYTE)G;
+		pallete[i].rgbRed = (BYTE)R;
+		pallete[i].rgbReserved = 0;
+	}
+}
+void DmColorMode14(RGBQUAD *pColorPaletteZ14, int mode)
+{
+	int i;
+	double R, G, B;
+	double fx, fy;
+	//
+	double fCV = 180;
+	int nCenter = 1500;
+	double r1 = 0.35;
+	double r2 = 0.55;
+	//
+	for (i = 1; i<16384; i++) {
+		if (i == nCenter) {
+			fy = fCV;
+		}
+		else if (i<nCenter) {
+			fx = (double)(nCenter - i) / nCenter;
+			fy = fCV - pow(fx, r1)*fCV;
+		}
+		else {
+			fx = (double)(i - nCenter) / (16384 - nCenter);
+			fy = fCV + pow(fx, r2)*(256 - fCV);
+		}
+		HSV_to_RGB(fy, 1.0, 1.0, R, G, B);
+		pColorPaletteZ14[i].rgbBlue = (BYTE)B;
+		pColorPaletteZ14[i].rgbGreen = (BYTE)G;
+		pColorPaletteZ14[i].rgbRed = (BYTE)R;
+		pColorPaletteZ14[i].rgbReserved = 0;
+	}
+	{
+		i = 0;
+		pColorPaletteZ14[i].rgbBlue = (BYTE)0;
+		pColorPaletteZ14[i].rgbGreen = (BYTE)0;
+		pColorPaletteZ14[i].rgbRed = (BYTE)0;
+		pColorPaletteZ14[i].rgbReserved = 0;
+	}
+	{
+		i = 16383;
+		pColorPaletteZ14[i].rgbBlue = (BYTE)255;
+		pColorPaletteZ14[i].rgbGreen = (BYTE)255;
+		pColorPaletteZ14[i].rgbRed = (BYTE)255;
+		pColorPaletteZ14[i].rgbReserved = 0;
+	}
+}
+#endif //ENABLE_LONG_DEPTHCOLOR_MAP
+
 void UpdateZ14DisplayImage_DIB24(RGBQUAD* pColorPaletteZ14, BYTE* pDepthZ14,
     BYTE* pDepthDIB24, int cx, int cy) {
   int x, y, nBPS;
@@ -260,8 +423,6 @@ void UpdateZ14DisplayImage_DIB24(RGBQUAD* pColorPaletteZ14, BYTE* pDepthZ14,
 void Device::OnInit() {
   is_color_ok_ = false;
   is_depth_ok_ = false;
-  DmColorMode14(color_palette_z14_, 0/*normal*/);
-  SetBaseGrayPaletteZ14(gray_palette_z14_);
 }
 
 void Device::ImgCallback(EtronDIImageType::Value imgType, int imgId,
@@ -377,7 +538,7 @@ Image::pointer Device::GetImageDepth() {
             depth_img_width, depth_img_height, true);
         depth_gray_buf->ResetBuffer();
         depth_gray_buf->set_frame_id(depth_image_buf_->frame_id());
-        UpdateZ14DisplayImage_DIB24(gray_palette_z14_,
+        UpdateZ14DisplayImage_DIB24(m_GrayPaletteZ14,
             depth_image_buf_->data(), depth_gray_buf->data(),
             depth_img_width, depth_img_height);
         return depth_gray_buf;
@@ -387,7 +548,7 @@ Image::pointer Device::GetImageDepth() {
             depth_img_width, depth_img_height, true);
         depth_rgb_buf->ResetBuffer();
         depth_rgb_buf->set_frame_id(depth_image_buf_->frame_id());
-        UpdateZ14DisplayImage_DIB24(color_palette_z14_,
+        UpdateZ14DisplayImage_DIB24(m_ColorPaletteZ14,
             depth_image_buf_->data(), depth_rgb_buf->data(),
             depth_img_width, depth_img_height);
         return depth_rgb_buf;
@@ -454,6 +615,20 @@ int Device::OpenDevice(const DeviceMode& dev_mode) {
 }
 
 void Device::OnInitColorPalette(const float &z14_Far) {
+  float m_zFar = z14_Far;
+  float m_zNear = Z14_NEAR;
+  int m_d11Far = D11_FAR;
+  int m_d11Near = D11_NEAR;
+  int m_d8Far = D8_FAR;
+  int m_d8Near = D8_NEAR;
+
+  int m_nDepthColorMapMode = 0;
+
+  DmColorMode(m_ColorPalette, m_nDepthColorMapMode, m_d8Far, m_d8Near);
+  DmColorMode11(m_ColorPaletteD11, m_nDepthColorMapMode, m_d11Far, m_d11Near);
+	DmGrayMode11(m_GrayPaletteD11, m_nDepthColorMapMode, m_d11Far, m_d11Near);
+  DmColorMode14(m_ColorPaletteZ14, m_zFar, m_zNear);
+  DmGrayMode14(m_GrayPaletteZ14, m_zFar, m_zNear);
   // ToDo
 }
 

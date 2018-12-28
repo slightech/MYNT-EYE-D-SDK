@@ -1,3 +1,5 @@
+#ifndef MYNTEYE_DEVICE_COLOR_PALETTE_GENERATOR_H_
+#define MYNTEYE_DEVICE_COLOR_PALETTE_GENERATOR_H_
 #pragma once
 #define ENABLE_LONG_DEPTHCOLOR_MAP
 
@@ -48,3 +50,5 @@ private:
     static void getRGB(double value, double &R, double &G, double &B, bool reverseRedToBlue = true);
     static void HSV_to_RGB(double H, double S, double V, double &R, double &G, double &B);
 };
+
+#endif // MYNTEYE_DEVICE_COLOR_PALETTE_GENERATOR_H_

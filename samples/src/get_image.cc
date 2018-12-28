@@ -80,7 +80,7 @@ int main(int argc, char const* argv[]) {
     params.ir_intensity = 4;
 
     // Colour depth image, default 1000. [0, 16384]
-    // params.colour_depth_value = 1000;
+    params.colour_depth_value = 5000;
   }
 
   // Enable what process logics
