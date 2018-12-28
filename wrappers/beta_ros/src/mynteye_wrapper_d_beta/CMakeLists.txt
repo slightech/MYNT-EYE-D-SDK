@@ -56,7 +56,6 @@ if(NOT mynteyed_WITH_OPENCV)
 endif()
 
 include(${SDK_DIR}/cmake/DetectOpenCV.cmake)
-message(STATUS "SDK_DIR: ${SDK_DIR}/cmake/DetectOpenCV.cmake")
 
 # targets
 
