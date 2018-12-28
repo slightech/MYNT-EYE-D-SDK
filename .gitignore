@@ -22,6 +22,11 @@ _install/
 /wrappers/ros/install
 /wrappers/ros/.catkin_workspace
 /wrappers/ros/src/CMakeLists.txt
+/wrappers/beta_ros/build
+/wrappers/beta_ros/devel
+/wrappers/beta_ros/install
+/wrappers/beta_ros/.catkin_workspace
+/wrappers/beta_ros/src/CMakeLists.txt
 
 # others
 
