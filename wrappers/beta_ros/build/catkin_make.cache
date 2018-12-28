@@ -1,2 +1,0 @@
-mynteye_wrapper_d_beta
--DCATKIN_DEVEL_PREFIX=/home/mynt/mynt/mynt-eye-d-sdk/wrappers/beta_ros/devel -DCMAKE_INSTALL_PREFIX=/home/mynt/mynt/mynt-eye-d-sdk/wrappers/beta_ros/install -G Unix Makefiles
