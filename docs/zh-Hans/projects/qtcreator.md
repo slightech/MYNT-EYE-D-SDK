@@ -16,7 +16,7 @@
 ![](images/projects/qtcreator/new_project.png)
 
 \latexonly
-\includegraphics[width=0.6\textwidth]{new_project.png}
+\includegraphics[width=1\textwidth]{new_project.png}
 \endlatexonly
 
 选择 `Qt Widgets Application` ，
@@ -24,7 +24,7 @@
 ![](images/projects/qtcreator/new_project2.png)
 
 \latexonly
-\includegraphics[width=0.6\textwidth]{new_project2.png}
+\includegraphics[width=1\textwidth]{new_project2.png}
 \endlatexonly
 
 设置项目位置和名字，
@@ -32,7 +32,7 @@
 ![](images/projects/qtcreator/new_project3.png)
 
 \latexonly
-\includegraphics[width=0.6\textwidth]{new_project3.png}
+\includegraphics[width=1\textwidth]{new_project3.png}
 \endlatexonly
 
 选择 build kits ，
@@ -40,7 +40,7 @@
 ![](images/projects/qtcreator/new_project4.png)
 
 \latexonly
-\includegraphics[width=0.6\textwidth]{new_project4.png}
+\includegraphics[width=1\textwidth]{new_project4.png}
 \endlatexonly
 
 然后他将会生成框架源文件，
@@ -48,13 +48,13 @@
 ![](images/projects/qtcreator/new_project5.png)
 
 \latexonly
-\includegraphics[width=0.6\textwidth]{new_project5.png}
+\includegraphics[width=1\textwidth]{new_project5.png}
 \endlatexonly
 
 ![](images/projects/qtcreator/new_project6.png)
 
 \latexonly
-\includegraphics[width=0.6\textwidth]{new_project6.png}
+\includegraphics[width=1\textwidth]{new_project6.png}
 \endlatexonly
 
 最后，你将会看到这样的新项目工程，
@@ -62,7 +62,7 @@
 ![](images/projects/qtcreator/new_project7.png)
 
 \latexonly
-\includegraphics[width=0.6\textwidth]{new_project7.png}
+\includegraphics[width=1\textwidth]{new_project7.png}
 \endlatexonly
 
 ## 配置项目
@@ -98,7 +98,7 @@ unix {
 ![](images/projects/qtcreator/release_run.png)
 
 \latexonly
-\includegraphics[width=0.6\textwidth]{release_run.png}
+\includegraphics[width=0.5\textwidth]{release_run.png}
 \endlatexonly
 
 然后你将看到主窗口，
@@ -106,7 +106,7 @@ unix {
 ![](images/projects/qtcreator/run_win.png)
 
 \latexonly
-\includegraphics[width=0.6\textwidth]{run_win.png}
+\includegraphics[width=1\textwidth]{run_win.png}
 \endlatexonly
 
 ### Linux
@@ -116,5 +116,5 @@ unix {
 ![](images/projects/qtcreator/run_linux.png)
 
 \latexonly
-\includegraphics[width=0.6\textwidth]{run_linux.png}
+\includegraphics[width=1\textwidth]{run_linux.png}
 \endlatexonly

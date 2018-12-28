@@ -7,7 +7,7 @@
 ![](zh-Hans/mynteye_surface.jpg)
 
 \latexonly
-\includegraphics[width=0.6\textwidth]{mynteye_surface.jpg}
+\includegraphics[width=1\textwidth]{mynteye_surface.jpg}
 \endlatexonly
 
 A. 摄像头：摄像头传感器镜头，在使用中请注意保护，以避免成像质量下降。

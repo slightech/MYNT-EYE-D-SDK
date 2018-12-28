@@ -36,7 +36,7 @@ imu analytics done
 ![imu analytics](imu_analytics.png)
 
 \latexonly
-\includegraphics[width=0.3\textwidth]{imu_analytics.png}
+\includegraphics[width=1\textwidth]{imu_analytics.png}
 \endlatexonly
 
 另外，可以使用 -h 参数查看工具详细参数选项.
