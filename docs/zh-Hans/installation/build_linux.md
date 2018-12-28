@@ -166,6 +166,39 @@ source ./wrappers/ros/devel/setup.bash
 rosrun mynteye_wrapper_d mynteye_listener_d
 ```
 
+### 4.3 编译内测版设备 ROS Wrapper
+
+```
+make ros
+```
+
+**Core:**
+
+```
+roscore
+```
+
+**RViz Display:**
+
+```
+source ./wrappers/beta_ros/devel/setup.bash
+roslaunch mynteye_wrapper_d_beta display.launch
+```
+
+**Publish:**
+
+```
+source ./wrappers/beta_ros/devel/setup.bash
+roslaunch mynteye_wrapper_d_beta mynteye.launch
+```
+
+**Subscribe:**
+
+```
+source ./wrappers/beta_ros/devel/setup.bash
+rosrun mynteye_wrapper_d_beta mynteye_listener_d_beta
+```
+
 ## 5. 打包
 
 如果打包指定版本OpenCV的包：

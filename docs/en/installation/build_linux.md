@@ -156,11 +156,43 @@ source ./wrappers/ros/devel/setup.bash
 roslaunch mynteye_wrapper_d mynteye.launch
 ```
 
+### 4.3 Build Beta Device ROS Wrapper
+
+```
+make ros
+```
+
+**Core:**
+
+```
+roscore
+```
+
+**RViz Display:**
+
+```
+source ./wrappers/beta_ros/devel/setup.bash
+roslaunch mynteye_wrapper_d_beta display.launch
+```
+
+**Publish:**
+
+```
+source ./wrappers/beta_ros/devel/setup.bash
+roslaunch mynteye_wrapper_d_beta mynteye.launch
+```
+
 **Subscribe:**
 
 ```
-source ./wrappers/ros/devel/setup.bash
-rosrun mynteye_wrapper_d mynteye_listener_d
+source ./wrappers/beta_ros/devel/setup.bash
+rosrun mynteye_wrapper_d_beta mynteye_listener_d_beta
+```
+**Subscribe:**
+
+```
+source ./wrappers/beta_ros/devel/setup.bash
+rosrun mynteye_wrapper_d_beta mynteye_listener_d_beta
 ```
 
 ## 5. Package
