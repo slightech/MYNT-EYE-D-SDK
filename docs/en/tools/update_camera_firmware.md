@@ -1,5 +1,7 @@
 # Update Camera Firmware {#update_camera_firmware}
 
+Note:: This tool does not support beta device upgrade.
+
 ## Get Firmware
 
 Latest firmware: SICI-B12-B0135P-016-005-ISO_Plugout2M(Interleave).bin [Google Drive](https://drive.google.com/open?id=1JFqGW8Mz03sceevy64lbVDZd7hBvO7JX), [Baidu Pan](https://pan.baidu.com/s/1kq5mSccVzly-XH4hHrHOTA)

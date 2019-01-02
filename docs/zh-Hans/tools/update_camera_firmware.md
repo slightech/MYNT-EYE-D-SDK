@@ -1,5 +1,7 @@
 # 升级相机固件 {#update_camera_firmware}
 
+注意:: 此工具不支持内测版设备升级
+
 ## 获取固件
 
 Latest firmware: SICI-B12-B0135P-016-005-ISO_Plugout2M(Interleave).bin [Google Drive](https://drive.google.com/open?id=1JFqGW8Mz03sceevy64lbVDZd7hBvO7JX), [Baidu Pan](https://pan.baidu.com/s/1kq5mSccVzly-XH4hHrHOTA)
