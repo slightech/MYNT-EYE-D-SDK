@@ -6,3 +6,4 @@
 * @subpage save_all_infos
 * @subpage write_imu_params
 * @subpage update_hid_firmware
+* @subpage update_camera_firmware

@@ -511,7 +511,7 @@ bool Channels::PullFileData(bool device_desc,
   }
 
   if (hid_->send(0, buffer, 64, 200) <= 0) {
-    LOGE("%s %d:: Send commend of imu instrinsics failed.",
+    LOGE("%s %d:: Send command of imu instrinsics failed.",
         __FILE__, __LINE__);
     return false;
   }
