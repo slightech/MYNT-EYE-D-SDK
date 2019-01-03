@@ -1,4 +1,4 @@
-# Manual setting parameters {#manual_set_params}
+# Camera control parameters API {#camera_control_params}
 
 ## Open or close auto exposure
 

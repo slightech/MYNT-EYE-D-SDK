@@ -1,4 +1,4 @@
-# 手动设置参数 {#manual_set_params}
+# 相机控制参数API {#camera_control_params}
 
 ## 打开或关闭自动曝光
 
@@ -23,7 +23,7 @@ void SetIRIntensity(const std::uint16_t &value);     see "camera.h"
 
 ## 设置全局增益
 
-Note:: You have to close auto exposure first.
+注意:: 需要关闭自动曝光
 
 ```
 /** Set global gain [1 - 16]
@@ -34,7 +34,7 @@ void SetGlobalGain(const float &value);    see "camera.h"
 
 ## 设置曝光时间
 
-Note:: You have to close auto exposure first.
+注意:: 需要关闭自动曝光
 
 ```
 /** Set exposure time [1ms - 2000ms]
