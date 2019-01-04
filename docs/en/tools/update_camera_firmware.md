@@ -12,6 +12,18 @@ Latest tool: eSPWriter_1.0.0.72a.zip [Google Drive](https://drive.google.com/ope
 
 ## Update Firmware
 
+Note:: Please follow the steps to upgrade firmware.(Otherwise, the camera calibration parameters will be lost.)
+
+ 1, Select camera device.
+
+ 2, Select data type(256KB).
+
+ 3, Select camera firmware.
+
+ 4, Select `Keep tables` (in order to keep calibration parameters).
+
+ 5, Click `Write`.
+
 Use the tool according to diagram:
 
 ![update tool](update_camera_tool.png)
