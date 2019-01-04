@@ -3,8 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.14"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
 <title>MYNT EYE D SDK: ROS 安装</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
@@ -14,16 +13,14 @@
 <script type="text/javascript" src="navtreedata.js"></script>
 <script type="text/javascript" src="navtree.js"></script>
 <script type="text/javascript">
-/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
   $(document).ready(initResizable);
-/* @license-end */</script>
+  $(window).load(resizeHeight);
+</script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
-/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
   $(document).ready(function() { init_search(); });
-/* @license-end */
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="custom.css" rel="stylesheet" type="text/css"/>
@@ -37,7 +34,7 @@
   <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">MYNT EYE D SDK
-   &#160;<span id="projectnumber">1.6.2</span>
+   &#160;<span id="projectnumber">1.7.0</span>
    </div>
    <div id="projectbrief">http://www.myntai.com/mynteye/depth</div>
   </td>
@@ -61,11 +58,9 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.14 -->
+<!-- 制作者 Doxygen 1.8.11 -->
 <script type="text/javascript">
-/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
-/* @license-end */
 </script>
 </div><!-- top -->
 <div id="side-nav" class="ui-resizable side-nav-resizable">
@@ -79,9 +74,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
   </div>
 </div>
 <script type="text/javascript">
-/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
 $(document).ready(function(){initNavTree('ros_install.html','');});
-/* @license-end */
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -104,22 +97,27 @@ $(document).ready(function(){initNavTree('ros_install.html','');});
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><h3>4.1 安装 ROS Kinectic 版本</h3>
-<div class="fragment"><div class="line">cd ~</div><div class="line">wget https://raw.githubusercontent.com/oroca/oroca-ros-pkg/master/ros_install.sh &amp;&amp; \</div><div class="line">chmod 755 ./ros_install.sh &amp;&amp; bash ./ros_install.sh catkin_ws kinetic</div></div><!-- fragment --><blockquote class="doxtable">
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;cd ~</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;wget https://raw.githubusercontent.com/oroca/oroca-ros-pkg/master/ros_install.sh &amp;&amp; \</div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;chmod 755 ./ros_install.sh &amp;&amp; bash ./ros_install.sh catkin_ws kinetic</div></div><!-- fragment --><blockquote class="doxtable">
 <p>ROS Kinetic 会自动安装 OpenCV, JPEG. </p>
 </blockquote>
 <h3>4.2 编译 ROS Wrapper</h3>
-<div class="fragment"><div class="line">make ros</div></div><!-- fragment --><p><b>Core:</b></p>
-<div class="fragment"><div class="line">roscore</div></div><!-- fragment --><p><b>RViz Display:</b></p>
-<div class="fragment"><div class="line">source ./wrappers/ros/devel/setup.bash</div><div class="line">roslaunch mynteye_wrapper_d display.launch</div></div><!-- fragment --><p><b>Publish:</b></p>
-<div class="fragment"><div class="line">source ./wrappers/ros/devel/setup.bash</div><div class="line">roslaunch mynteye_wrapper_d mynteye.launch</div></div><!-- fragment --><p><b>Subscribe:</b></p>
-<div class="fragment"><div class="line">source ./wrappers/ros/devel/setup.bash</div><div class="line">rosrun mynteye_wrapper_d mynteye_listener_d</div></div><!-- fragment --> </div></div><!-- contents -->
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;make ros</div></div><!-- fragment --><p><b>Core:</b></p>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;roscore</div></div><!-- fragment --><p><b>RViz Display:</b></p>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;source ./wrappers/ros/devel/setup.bash</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;roslaunch mynteye_wrapper_d display.launch</div></div><!-- fragment --><p><b>Publish:</b></p>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;source ./wrappers/ros/devel/setup.bash</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;roslaunch mynteye_wrapper_d mynteye.launch</div></div><!-- fragment --><p><b>Subscribe:</b></p>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;source ./wrappers/ros/devel/setup.bash</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;rosrun mynteye_wrapper_d mynteye_listener_d</div></div><!-- fragment --><h3>4.3 编译内测版设备 ROS Wrapper</h3>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;make ros</div></div><!-- fragment --><p><b>Core:</b></p>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;roscore</div></div><!-- fragment --><p><b>RViz Display:</b></p>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;source ./wrappers/beta_ros/devel/setup.bash</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;roslaunch mynteye_wrapper_d_beta display.launch</div></div><!-- fragment --><p><b>Publish:</b></p>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;source ./wrappers/beta_ros/devel/setup.bash</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;roslaunch mynteye_wrapper_d_beta mynteye.launch</div></div><!-- fragment --><p><b>Subscribe:</b></p>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;source ./wrappers/beta_ros/devel/setup.bash</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;rosrun mynteye_wrapper_d_beta mynteye_listener_d_beta</div></div><!-- fragment --> </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="footer">制作者
     <a href="http://www.doxygen.org/index.html">
-    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.14 </li>
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.11 </li>
   </ul>
 </div>
 </body>

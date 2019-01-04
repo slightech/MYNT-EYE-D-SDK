@@ -3,8 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.14"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
 <title>MYNT EYE D SDK: 获取双目图像</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
@@ -14,16 +13,14 @@
 <script type="text/javascript" src="navtreedata.js"></script>
 <script type="text/javascript" src="navtree.js"></script>
 <script type="text/javascript">
-/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
   $(document).ready(initResizable);
-/* @license-end */</script>
+  $(window).load(resizeHeight);
+</script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
-/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
   $(document).ready(function() { init_search(); });
-/* @license-end */
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="custom.css" rel="stylesheet" type="text/css"/>
@@ -37,7 +34,7 @@
   <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">MYNT EYE D SDK
-   &#160;<span id="projectnumber">1.6.2</span>
+   &#160;<span id="projectnumber">1.7.0</span>
    </div>
    <div id="projectbrief">http://www.myntai.com/mynteye/depth</div>
   </td>
@@ -61,11 +58,9 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.14 -->
+<!-- 制作者 Doxygen 1.8.11 -->
 <script type="text/javascript">
-/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
-/* @license-end */
 </script>
 </div><!-- top -->
 <div id="side-nav" class="ui-resizable side-nav-resizable">
@@ -79,9 +74,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
   </div>
 </div>
 <script type="text/javascript">
-/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
 $(document).ready(function(){initNavTree('get_image.html','');});
-/* @license-end */
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -106,7 +99,7 @@ $(document).ready(function(){initNavTree('get_image.html','');});
 <div class="textblock"><p>API 通过 <code>DeviceMode::DEVICE_COLOR</code> 参数获取图像数据，或者 <code>DeviceMode::DEVICE_ALL</code> 同时捕获图像和深度数据。</p>
 <p>通过 <code>GetStreamData()</code> 函数，就能获取想要的数据。</p>
 <p>参考代码片段：</p>
-<div class="fragment"><div class="line">// Device mode, default DEVICE_ALL</div><div class="line">//   DEVICE_COLOR: IMAGE_LEFT_COLOR y IMAGE_RIGHT_COLOR - IMAGE_DEPTH n</div><div class="line">//   DEVICE_DEPTH: IMAGE_LEFT_COLOR n IMAGE_RIGHT_COLOR n IMAGE_DEPTH y</div><div class="line">//   DEVICE_ALL:   IMAGE_LEFT_COLOR y IMAGE_RIGHT_COLOR - IMAGE_DEPTH y</div><div class="line">// Note: y: available, n: unavailable, -: depends on #stream_mode</div><div class="line">params.dev_mode = DeviceMode::DEVICE_DEPTH;</div><div class="line"></div><div class="line"></div><div class="line">auto left_color = cam.GetStreamData(ImageType::IMAGE_LEFT_COLOR);</div><div class="line">    if (left_color.img) {</div><div class="line">    cv::Mat left = left_color.img-&gt;To(ImageFormat::COLOR_BGR)-&gt;ToMat();</div><div class="line">    painter.DrawSize(left, CVPainter::TOP_LEFT);</div><div class="line">    painter.DrawStreamData(left, left_color, CVPainter::TOP_RIGHT);</div><div class="line">    painter.DrawInformation(left, util::to_string(counter.fps()),</div><div class="line">        CVPainter::BOTTOM_RIGHT);</div><div class="line">    cv::imshow(&quot;left color&quot;, left);</div></div><!-- fragment --><p>完整代码样例，请见<a href="https://github.com/slightech/MYNT-EYE-D-SDK/blob/master/samples/src/get_image.cc">get_image.cc</a> 。 </p>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;// Device mode, default DEVICE_ALL</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;//   DEVICE_COLOR: IMAGE_LEFT_COLOR y IMAGE_RIGHT_COLOR - IMAGE_DEPTH n</div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;//   DEVICE_DEPTH: IMAGE_LEFT_COLOR n IMAGE_RIGHT_COLOR n IMAGE_DEPTH y</div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;//   DEVICE_ALL:   IMAGE_LEFT_COLOR y IMAGE_RIGHT_COLOR - IMAGE_DEPTH y</div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;// Note: y: available, n: unavailable, -: depends on #stream_mode</div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;params.dev_mode = DeviceMode::DEVICE_DEPTH;</div><div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div><div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;</div><div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;auto left_color = cam.GetStreamData(ImageType::IMAGE_LEFT_COLOR);</div><div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;    if (left_color.img) {</div><div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;    cv::Mat left = left_color.img-&gt;To(ImageFormat::COLOR_BGR)-&gt;ToMat();</div><div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;    painter.DrawSize(left, CVPainter::TOP_LEFT);</div><div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;    painter.DrawStreamData(left, left_color, CVPainter::TOP_RIGHT);</div><div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;    painter.DrawInformation(left, util::to_string(counter.fps()),</div><div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;        CVPainter::BOTTOM_RIGHT);</div><div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;    cv::imshow(&quot;left color&quot;, left);</div></div><!-- fragment --><p>完整代码样例，请见<a href="https://github.com/slightech/MYNT-EYE-D-SDK/blob/master/samples/src/get_image.cc">get_image.cc</a> 。 </p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
@@ -114,7 +107,7 @@ $(document).ready(function(){initNavTree('get_image.html','');});
   <ul>
     <li class="footer">制作者
     <a href="http://www.doxygen.org/index.html">
-    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.14 </li>
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.11 </li>
   </ul>
 </div>
 </body>

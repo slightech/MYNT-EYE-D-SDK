@@ -3,8 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.14"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
 <title>MYNT EYE D SDK: 获取图像标定参数</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
@@ -14,16 +13,14 @@
 <script type="text/javascript" src="navtreedata.js"></script>
 <script type="text/javascript" src="navtree.js"></script>
 <script type="text/javascript">
-/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
   $(document).ready(initResizable);
-/* @license-end */</script>
+  $(window).load(resizeHeight);
+</script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
-/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
   $(document).ready(function() { init_search(); });
-/* @license-end */
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="custom.css" rel="stylesheet" type="text/css"/>
@@ -37,7 +34,7 @@
   <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">MYNT EYE D SDK
-   &#160;<span id="projectnumber">1.6.2</span>
+   &#160;<span id="projectnumber">1.7.0</span>
    </div>
    <div id="projectbrief">http://www.myntai.com/mynteye/depth</div>
   </td>
@@ -61,11 +58,9 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.14 -->
+<!-- 制作者 Doxygen 1.8.11 -->
 <script type="text/javascript">
-/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
-/* @license-end */
 </script>
 </div><!-- top -->
 <div id="side-nav" class="ui-resizable side-nav-resizable">
@@ -79,9 +74,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
   </div>
 </div>
 <script type="text/javascript">
-/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
 $(document).ready(function(){initNavTree('get_image_params.html','');});
-/* @license-end */
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -105,8 +98,8 @@ $(document).ready(function(){initNavTree('get_image_params.html','');});
 <div class="contents">
 <div class="textblock"><p>通过获取API <code>GetStreamIntrinsics()</code>,<code>GetStreamExtrinsics()</code>函数，可以获取当前打开设备的图像标定参数。</p>
 <p>参考代码片段：</p>
-<div class="fragment"><div class="line">auto vga_intrinsics = cam.GetStreamIntrinsics(StreamMode::STREAM_1280x480, &amp;in_ok);</div><div class="line">auto vga_extrinsics = cam.GetStreamExtrinsics(StreamMode::STREAM_1280x480, &amp;ex_ok);</div><div class="line">std::cout &lt;&lt; &quot;VGA Intrinsics left: {&quot; &lt;&lt; vga_intrinsics.left &lt;&lt; &quot;}&quot; &lt;&lt; std::endl;</div><div class="line">std::cout &lt;&lt; &quot;VGA Intrinsics right: {&quot; &lt;&lt; vga_intrinsics.right &lt;&lt; &quot;}&quot; &lt;&lt; std::endl;</div><div class="line">std::cout &lt;&lt; &quot;VGA Extrinsics left to right: {&quot; &lt;&lt; vga_extrinsics &lt;&lt; &quot;}&quot; &lt;&lt; std::endl;</div><div class="line">out &lt;&lt; &quot;VGA Intrinsics left: {&quot; &lt;&lt; vga_intrinsics.left &lt;&lt; &quot;}&quot; &lt;&lt; std::endl;</div><div class="line">out &lt;&lt; &quot;VGA Intrinsics right: {&quot; &lt;&lt; vga_intrinsics.right &lt;&lt; &quot;}&quot; &lt;&lt; std::endl;</div><div class="line">out &lt;&lt; &quot;VGA Extrinsics left to right: {&quot; &lt;&lt; vga_extrinsics &lt;&lt; &quot;}&quot; &lt;&lt; std::endl;</div></div><!-- fragment --><p>运行结果保存在当前目录下，参考运行结果：</p>
-<div class="fragment"><div class="line">VGA Intrinsics left: {width: [640], height: [480], fx: [358.45721435546875000], fy: [359.53115844726562500], cx: [311.12109375000000000], cy: [242.63494873046875000]coeffs: [-0.28297042846679688, 0.06178283691406250, -0.00030517578125000, 0.00218200683593750, 0.00000000000000000]}</div><div class="line">VGA Intrinsics right: {width: [640], height: [480], fx: [360.13885498046875000], fy: [360.89624023437500000], cx: [325.11029052734375000], cy: [251.46371459960937500]coeffs: [-0.30667877197265625, 0.08611679077148438, -0.00030136108398438, 0.00155639648437500, 0.00000000000000000]}</div><div class="line">VGA Extrinsics left to right: {rotation: [0.99996054172515869, 0.00149095058441162, 0.00875246524810791, -0.00148832798004150, 0.99999880790710449, -0.00030362606048584, -0.00875294208526611, 0.00029063224792480, 0.99996161460876465], translation: [-120.36341094970703125, 0.00000000000000000, 0.00000000000000000]}</div></div><!-- fragment --><p>完整代码样例，请见<a href="https://github.com/slightech/MYNT-EYE-D-SDK/blob/master/samples/src/get_img_params.cc">get_img_params.cc</a> 。 </p>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;auto vga_intrinsics = cam.GetStreamIntrinsics(StreamMode::STREAM_1280x480, &amp;in_ok);</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;auto vga_extrinsics = cam.GetStreamExtrinsics(StreamMode::STREAM_1280x480, &amp;ex_ok);</div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;std::cout &lt;&lt; &quot;VGA Intrinsics left: {&quot; &lt;&lt; vga_intrinsics.left &lt;&lt; &quot;}&quot; &lt;&lt; std::endl;</div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;std::cout &lt;&lt; &quot;VGA Intrinsics right: {&quot; &lt;&lt; vga_intrinsics.right &lt;&lt; &quot;}&quot; &lt;&lt; std::endl;</div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;std::cout &lt;&lt; &quot;VGA Extrinsics left to right: {&quot; &lt;&lt; vga_extrinsics &lt;&lt; &quot;}&quot; &lt;&lt; std::endl;</div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;out &lt;&lt; &quot;VGA Intrinsics left: {&quot; &lt;&lt; vga_intrinsics.left &lt;&lt; &quot;}&quot; &lt;&lt; std::endl;</div><div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;out &lt;&lt; &quot;VGA Intrinsics right: {&quot; &lt;&lt; vga_intrinsics.right &lt;&lt; &quot;}&quot; &lt;&lt; std::endl;</div><div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;out &lt;&lt; &quot;VGA Extrinsics left to right: {&quot; &lt;&lt; vga_extrinsics &lt;&lt; &quot;}&quot; &lt;&lt; std::endl;</div></div><!-- fragment --><p>运行结果保存在当前目录下，参考运行结果：</p>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;VGA Intrinsics left: {width: [640], height: [480], fx: [358.45721435546875000], fy: [359.53115844726562500], cx: [311.12109375000000000], cy: [242.63494873046875000]coeffs: [-0.28297042846679688, 0.06178283691406250, -0.00030517578125000, 0.00218200683593750, 0.00000000000000000]}</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;VGA Intrinsics right: {width: [640], height: [480], fx: [360.13885498046875000], fy: [360.89624023437500000], cx: [325.11029052734375000], cy: [251.46371459960937500]coeffs: [-0.30667877197265625, 0.08611679077148438, -0.00030136108398438, 0.00155639648437500, 0.00000000000000000]}</div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;VGA Extrinsics left to right: {rotation: [0.99996054172515869, 0.00149095058441162, 0.00875246524810791, -0.00148832798004150, 0.99999880790710449, -0.00030362606048584, -0.00875294208526611, 0.00029063224792480, 0.99996161460876465], translation: [-120.36341094970703125, 0.00000000000000000, 0.00000000000000000]}</div></div><!-- fragment --><p>完整代码样例，请见<a href="https://github.com/slightech/MYNT-EYE-D-SDK/blob/master/samples/src/get_img_params.cc">get_img_params.cc</a> 。 </p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
@@ -114,7 +107,7 @@ $(document).ready(function(){initNavTree('get_image_params.html','');});
   <ul>
     <li class="footer">制作者
     <a href="http://www.doxygen.org/index.html">
-    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.14 </li>
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.11 </li>
   </ul>
 </div>
 </body>

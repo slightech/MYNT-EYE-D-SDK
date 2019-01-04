@@ -8,5 +8,6 @@ var samples =
     [ "通过设置参数获取不同类型的数据", "get_all_with_options.html", null ],
     [ "获取图像标定参数", "get_image_params.html", null ],
     [ "获取IMU标定参数", "get_imu_params.html", null ],
-    [ "设定打开参数", "set_open_params.html", null ]
+    [ "设定打开参数", "set_open_params.html", null ],
+    [ "相机控制参数API", "camera_control_params.html", null ]
 ];

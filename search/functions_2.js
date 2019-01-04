@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['enableimageinfo',['EnableImageInfo',['../classmynteyed_1_1_camera.html#a7769c7a8b0805bc0bd03886bbe4b987f',1,'mynteyed::Camera']]],
-  ['enablemotiondatas',['EnableMotionDatas',['../classmynteyed_1_1_camera.html#ae803009c37d783b8b30529ff8a9ab435',1,'mynteyed::Camera']]],
-  ['enableprocessmode',['EnableProcessMode',['../classmynteyed_1_1_camera.html#acbaa3cb2624d985b61d0e67472b727c9',1,'mynteyed::Camera::EnableProcessMode(const ProcessMode &amp;mode)'],['../classmynteyed_1_1_camera.html#a18d3b096788171564e5439b32c640c8f',1,'mynteyed::Camera::EnableProcessMode(const std::int32_t &amp;mode)']]]
+  ['disableimageinfo',['DisableImageInfo',['../classmynteyed_1_1_camera.html#ada38cff96e2f5f6e4eb009bf65b79dd2',1,'mynteyed::Camera']]],
+  ['disablemotiondatas',['DisableMotionDatas',['../classmynteyed_1_1_camera.html#a9fecffe1b92115429a3081a0b3c271dc',1,'mynteyed::Camera']]]
 ];

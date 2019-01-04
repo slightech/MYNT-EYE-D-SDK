@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['imu_20坐标系统',['IMU 坐标系统',['../imu_coord.html',1,'product']]]
+  ['cmake_20如何使用_20sdk',['CMake 如何使用 SDK',['../cmake.html',1,'projects']]]
 ];

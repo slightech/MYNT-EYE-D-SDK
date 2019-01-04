@@ -3,8 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.14"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="generator" content="Doxygen 1.8.11"/>
 <title>MYNT EYE D SDK: 录制数据集</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
@@ -14,16 +13,14 @@
 <script type="text/javascript" src="navtreedata.js"></script>
 <script type="text/javascript" src="navtree.js"></script>
 <script type="text/javascript">
-/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
   $(document).ready(initResizable);
-/* @license-end */</script>
+  $(window).load(resizeHeight);
+</script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
-/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
   $(document).ready(function() { init_search(); });
-/* @license-end */
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="custom.css" rel="stylesheet" type="text/css"/>
@@ -37,7 +34,7 @@
   <td id="projectlogo"><img alt="Logo" src="icon.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">MYNT EYE D SDK
-   &#160;<span id="projectnumber">1.6.2</span>
+   &#160;<span id="projectnumber">1.7.0</span>
    </div>
    <div id="projectbrief">http://www.myntai.com/mynteye/depth</div>
   </td>
@@ -61,11 +58,9 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.14 -->
+<!-- 制作者 Doxygen 1.8.11 -->
 <script type="text/javascript">
-/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
-/* @license-end */
 </script>
 </div><!-- top -->
 <div id="side-nav" class="ui-resizable side-nav-resizable">
@@ -79,9 +74,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
   </div>
 </div>
 <script type="text/javascript">
-/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
 $(document).ready(function(){initNavTree('record_data.html','');});
-/* @license-end */
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -105,11 +98,11 @@ $(document).ready(function(){initNavTree('record_data.html','');});
 <div class="contents">
 <div class="textblock"><p>SDK 提供了录制数据集的工具 record. 工具的详细信息见 tools/README.md</p>
 <p>Linux 系统运行命令:</p>
-<div class="fragment"><div class="line">./tools/_output/bin/dataset/record</div></div><!-- fragment --><p>Windows 系统运行命令:</p>
-<div class="fragment"><div class="line">.\tools\_output\bin\dataset\record.bat</div></div><!-- fragment --><p>Linux 系统上的结果参考:</p>
-<div class="fragment"><div class="line">$ ./tools/_output/bin/dataset/record</div><div class="line">Saved 1007 imgs, 20040 imus to ./dataset</div><div class="line">I0513 21:29:38.608772 11487 record.cc:118] Time beg: 2018-05-13 21:28:58.255395, end: 2018-05-13 21:29:38.578696, cost: 40323.3ms</div><div class="line">I0513 21:29:38.608853 11487 record.cc:121] Img count: 1007, fps: 24.9732</div><div class="line">I0513 21:29:38.608873 11487 record.cc:123] Imu count: 20040, hz: 496.983</div></div><!-- fragment --><p>结果默认保存在 <code>&lt;workdir&gt;/dataset</code> 中. 您也可以使用参数指定自定义目录存放结果.</p>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;./tools/_output/bin/dataset/record</div></div><!-- fragment --><p>Windows 系统运行命令:</p>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;.\tools\_output\bin\dataset\record.bat</div></div><!-- fragment --><p>Linux 系统上的结果参考:</p>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;$ ./tools/_output/bin/dataset/record</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;Saved 1007 imgs, 20040 imus to ./dataset</div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;I0513 21:29:38.608772 11487 record.cc:118] Time beg: 2018-05-13 21:28:58.255395, end: 2018-05-13 21:29:38.578696, cost: 40323.3ms</div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;I0513 21:29:38.608853 11487 record.cc:121] Img count: 1007, fps: 24.9732</div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;I0513 21:29:38.608873 11487 record.cc:123] Imu count: 20040, hz: 496.983</div></div><!-- fragment --><p>结果默认保存在 <code>&lt;workdir&gt;/dataset</code> 中. 您也可以使用参数指定自定义目录存放结果.</p>
 <p>录制结果目录详情:</p>
-<div class="fragment"><div class="line">&lt;workdir&gt;/</div><div class="line">└─dataset/</div><div class="line">   ├─left/</div><div class="line">   │  ├─stream.txt  # Image infomation</div><div class="line">   │  ├─000000.png  # Image，index 0</div><div class="line">   │  └─...</div><div class="line">   ├─right/</div><div class="line">   │  ├─stream.txt  # Image information</div><div class="line">   │  ├─000000.png  # Image，index 0</div><div class="line">   │  └─...</div><div class="line">   └─motion.txt  # IMU information</div></div><!-- fragment --><p>Copyright 2018. MYNTEYE </p>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;&lt;workdir&gt;/</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;└─dataset/</div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;   ├─left/</div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;   │  ├─stream.txt  # Image infomation</div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;   │  ├─000000.png  # Image，index 0</div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;   │  └─...</div><div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;   ├─right/</div><div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;   │  ├─stream.txt  # Image information</div><div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;   │  ├─000000.png  # Image，index 0</div><div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;   │  └─...</div><div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;   └─motion.txt  # IMU information</div></div><!-- fragment --><p>Copyright 2018. MYNTEYE </p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
@@ -117,7 +110,7 @@ $(document).ready(function(){initNavTree('record_data.html','');});
   <ul>
     <li class="footer">制作者
     <a href="http://www.doxygen.org/index.html">
-    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.14 </li>
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.11 </li>
   </ul>
 </div>
 </body>

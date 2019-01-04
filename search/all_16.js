@@ -1,9 +1,8 @@
 var searchData=
 [
-  ['分析imu数据',['分析IMU数据',['../analyze_imu.html',1,'tools']]],
-  ['分析时间戳',['分析时间戳',['../analyze_time_stamps.html',1,'tools']]],
-  ['录制数据集',['录制数据集',['../record_data.html',1,'tools']]],
-  ['图像分辨率支持列表',['图像分辨率支持列表',['../support_resolutions.html',1,'product']]],
-  ['升级_20hid_20设备固件',['升级 HID 设备固件',['../update_hid_firmware.html',1,'tools']]],
-  ['写入imu标定参数',['写入IMU标定参数',['../write_imu_params.html',1,'tools']]]
+  ['从回调接口获取数据',['从回调接口获取数据',['../get_from_callbacks.html',1,'samples']]],
+  ['产品说明',['产品说明',['../product.html',1,'index']]],
+  ['产品介绍',['产品介绍',['../product_description.html',1,'product']]],
+  ['产品外观',['产品外观',['../product_surface.html',1,'product']]],
+  ['保存设备信息和参数',['保存设备信息和参数',['../save_all_infos.html',1,'tools']]]
 ];

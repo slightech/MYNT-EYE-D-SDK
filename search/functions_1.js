@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['disableimageinfo',['DisableImageInfo',['../classmynteyed_1_1_camera.html#ada38cff96e2f5f6e4eb009bf65b79dd2',1,'mynteyed::Camera']]],
-  ['disablemotiondatas',['DisableMotionDatas',['../classmynteyed_1_1_camera.html#a9fecffe1b92115429a3081a0b3c271dc',1,'mynteyed::Camera']]]
+  ['close',['Close',['../classmynteyed_1_1_camera.html#a8824cafc079668aace1c80b3b755c044',1,'mynteyed::Camera']]]
 ];

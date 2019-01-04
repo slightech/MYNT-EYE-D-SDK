@@ -4,6 +4,7 @@ var structmynteyed_1_1_open_params =
     [ "~OpenParams", "structmynteyed_1_1_open_params.html#ab82d7ba295b25af51278faede2b330ae", null ],
     [ "color_mode", "structmynteyed_1_1_open_params.html#ad653784db7249017dbacdfc5d67692c2", null ],
     [ "color_stream_format", "structmynteyed_1_1_open_params.html#aa8d158586597d95704c25ef5751c6dcb", null ],
+    [ "colour_depth_value", "structmynteyed_1_1_open_params.html#a87b1fc4bf24eff392ea6485847d18505", null ],
     [ "depth_mode", "structmynteyed_1_1_open_params.html#a863e389abfa7f415f7a04e88bf3682d0", null ],
     [ "depth_stream_format", "structmynteyed_1_1_open_params.html#af8d7b698f8c648368cc0b9cab31df806", null ],
     [ "dev_index", "structmynteyed_1_1_open_params.html#a3852dcbad60d4b97f96c012b506524b1", null ],

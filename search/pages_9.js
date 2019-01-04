@@ -1,10 +1,8 @@
 var searchData=
 [
-  ['获取深度图像',['获取深度图像',['../get_depth.html',1,'samples']]],
-  ['获取双目图像',['获取双目图像',['../get_image.html',1,'samples']]],
-  ['获取图像标定参数',['获取图像标定参数',['../get_image_params.html',1,'samples']]],
-  ['获取imu数据',['获取IMU数据',['../get_imu.html',1,'samples']]],
-  ['获取imu标定参数',['获取IMU标定参数',['../get_imu_params.html',1,'samples']]],
-  ['获取点云图像',['获取点云图像',['../get_points.html',1,'samples']]],
-  ['设定打开参数',['设定打开参数',['../set_open_params.html',1,'samples']]]
+  ['从回调接口获取数据',['从回调接口获取数据',['../get_from_callbacks.html',1,'samples']]],
+  ['产品说明',['产品说明',['../product.html',1,'index']]],
+  ['产品介绍',['产品介绍',['../product_description.html',1,'product']]],
+  ['产品外观',['产品外观',['../product_surface.html',1,'product']]],
+  ['保存设备信息和参数',['保存设备信息和参数',['../save_all_infos.html',1,'tools']]]
 ];

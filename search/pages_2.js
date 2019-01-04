@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['mynt_20eye_20d_20sdk',['MYNT EYE D SDK',['../index.html',1,'']]]
+  ['linux_20sdk_20用户指南',['Linux SDK 用户指南',['../build_linux.html',1,'installation']]]
 ];
