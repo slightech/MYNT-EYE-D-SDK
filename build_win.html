@@ -3,7 +3,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.11"/>
+<meta name="generator" content="Doxygen 1.8.14"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>MYNT EYE D SDK: Windows SDK 用户指南</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
@@ -13,14 +14,16 @@
 <script type="text/javascript" src="navtreedata.js"></script>
 <script type="text/javascript" src="navtree.js"></script>
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
   $(document).ready(initResizable);
-  $(window).load(resizeHeight);
-</script>
+/* @license-end */</script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
   $(document).ready(function() { init_search(); });
+/* @license-end */
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="custom.css" rel="stylesheet" type="text/css"/>
@@ -58,9 +61,11 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.11 -->
+<!-- 制作者 Doxygen 1.8.14 -->
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+/* @license-end */
 </script>
 </div><!-- top -->
 <div id="side-nav" class="ui-resizable side-nav-resizable">
@@ -74,7 +79,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
   </div>
 </div>
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
 $(document).ready(function(){initNavTree('build_win.html','');});
+/* @license-end */
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -105,8 +112,8 @@ $(document).ready(function(){initNavTree('build_win.html','');});
 <h3>1.3 安装 MSYS2</h3>
 <p>1) 从 <a href="http://mirrors.ustc.edu.cn/msys2/distrib/x86_64/">http://mirrors.ustc.edu.cn/msys2/distrib/x86_64/</a> 下载并安装</p>
 <p>2) 将 bin 目录的路径添加到系统变量的 PATH 变量列表中</p>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;C:\msys64\usr\bin</div></div><!-- fragment --><p>3) 安装 make</p>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;pacman -Syu</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;pacman -S make</div></div><!-- fragment --><h2>2. 安装 SDK 依赖</h2>
+<div class="fragment"><div class="line">C:\msys64\usr\bin</div></div><!-- fragment --><p>3) 安装 make</p>
+<div class="fragment"><div class="line">pacman -Syu</div><div class="line">pacman -S make</div></div><!-- fragment --><h2>2. 安装 SDK 依赖</h2>
 <h3>2.1 安装 OpenCV</h3>
 <h4>2.1.1 用预先建立的库安装OpenCV (Recommend)</h4>
 <p><em>更多信息您可以参考 OpenCV 官方文档</em> (<a href="https://docs.opencv.org/3.4.2/d3/d52/tutorial_windows_install.html">https://docs.opencv.org/3.4.2/d3/d52/tutorial_windows_install.html</a>)</p>
@@ -114,35 +121,35 @@ $(document).ready(function(){initNavTree('build_win.html','');});
 <h4>2.1.2 设置环境变量</h4>
 <p>开启 cmd, 输入以下命令:</p>
 <p>*将 "D:\OpenCV" 替换为您自己的解压缩目录*</p>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;setx -m OPENCV_DIR D:\OpenCV\Build\x64\vc14\lib     (suggested for Visual Studio 2015 - 64 bit Windows)</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;setx -m OPENCV_DIR D:\OpenCV\Build\x64\vc15\lib     (suggested for Visual Studio 2017 - 64 bit Windows)</div></div><!-- fragment --><p> 将 OpenCV bin 路径添加到系统环境变量的 PATH 变量列表中</p>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;D:\OpenCV\Build\x64\vc14\bin     (suggested for Visual Studio 2015 - 64 bit Windows)</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;D:\OpenCV\Build\x64\vc15\bin     (suggested for Visual Studio 2017 - 64 bit Windows)</div></div><!-- fragment --><h3>2.2 安装 libjpeg-turbo</h3>
+<div class="fragment"><div class="line">setx -m OPENCV_DIR D:\OpenCV\Build\x64\vc14\lib     (suggested for Visual Studio 2015 - 64 bit Windows)</div><div class="line">setx -m OPENCV_DIR D:\OpenCV\Build\x64\vc15\lib     (suggested for Visual Studio 2017 - 64 bit Windows)</div></div><!-- fragment --><p> 将 OpenCV bin 路径添加到系统环境变量的 PATH 变量列表中</p>
+<div class="fragment"><div class="line">D:\OpenCV\Build\x64\vc14\bin     (suggested for Visual Studio 2015 - 64 bit Windows)</div><div class="line">D:\OpenCV\Build\x64\vc15\bin     (suggested for Visual Studio 2017 - 64 bit Windows)</div></div><!-- fragment --><h3>2.2 安装 libjpeg-turbo</h3>
 <p>1) 从 <a href="https://sourceforge.net/projects/libjpeg-turbo/files/">https://sourceforge.net/projects/libjpeg-turbo/files/</a> 下载 libjpeg-turbo 并安装</p>
 <p>2) 将 bin 目录的路径添加到系统变量的 PATH 变量列表中</p>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;C:\libjpeg-turbo64\bin</div></div><!-- fragment --><h3>2.3 安装点云例程依赖的 PCL 库 (可选)</h3>
+<div class="fragment"><div class="line">C:\libjpeg-turbo64\bin</div></div><!-- fragment --><h3>2.3 安装点云例程依赖的 PCL 库 (可选)</h3>
 <p>从 <a href="https://github.com/PointCloudLibrary/pcl/releases">https://github.com/PointCloudLibrary/pcl/releases</a> 下载集成安装程序(PCL + dependencies)</p>
 <h2>3. 编译 SDK</h2>
 <p>打开 "x64 Native Tools Command Prompt for VS 2017"(适用于 VS 2017 的 x64 本机工具命令提示) 命令行界面</p>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;git clone https://github.com/slightech/MYNT-EYE-D-SDK.git</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;cd MYNT-EYE-D-SDK</div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;make all</div></div><!-- fragment --><h2>4. 运行例程</h2>
+<div class="fragment"><div class="line">git clone https://github.com/slightech/MYNT-EYE-D-SDK.git</div><div class="line">cd MYNT-EYE-D-SDK</div><div class="line">make all</div></div><!-- fragment --><h2>4. 运行例程</h2>
 <blockquote class="doxtable">
 <p>Note: 默认打开矫正后的图像。(跑vio时需要使用原图，跑深度或者点云使用矫正后的图像) </p>
 </blockquote>
 <p>1) get_image 显示左右目的图像和彩色深度图</p>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;.\samples\_output\bin\get_image.bat</div></div><!-- fragment --><p>2) get_depth 显示左目的图像，16UC1的深度图和鼠标选中的像素的深度值(mm)</p>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;.\samples\_output\bin\get_depth.bat</div></div><!-- fragment --><p>3) get_points 显示左目的图像，16UC1的深度图和点云</p>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;.\samples\_output\bin\get_points.bat</div></div><!-- fragment --><p>4) get_imu 打印 imu 数据</p>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;.\samples\_output\bin\get_imu</div></div><!-- fragment --><p>5) get_img_params 打印相机参数并保存在文件中</p>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;.\samples\_output\bin\get_img_params</div></div><!-- fragment --><p>6) get_imu_params 打印 imu 参数并保存在文件中</p>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;.\samples\_output\bin\get_imu_params</div></div><!-- fragment --><p>7) get_from_callbacks 使用回调方式获取图像和 imu 数据</p>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;.\samples\_output\bin\get_from_callbacks</div></div><!-- fragment --><p>8) get_all_with_options 使用不同参数打开设备</p>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;.\samples\_output\bin\get_all_with_options</div></div><!-- fragment --><h2>5. 清理</h2>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;cd &lt;sdk&gt;</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;make cleanall</div></div><!-- fragment --> </div></div><!-- contents -->
+<div class="fragment"><div class="line">.\samples\_output\bin\get_image.bat</div></div><!-- fragment --><p>2) get_depth 显示左目的图像，16UC1的深度图和鼠标选中的像素的深度值(mm)</p>
+<div class="fragment"><div class="line">.\samples\_output\bin\get_depth.bat</div></div><!-- fragment --><p>3) get_points 显示左目的图像，16UC1的深度图和点云</p>
+<div class="fragment"><div class="line">.\samples\_output\bin\get_points.bat</div></div><!-- fragment --><p>4) get_imu 打印 imu 数据</p>
+<div class="fragment"><div class="line">.\samples\_output\bin\get_imu</div></div><!-- fragment --><p>5) get_img_params 打印相机参数并保存在文件中</p>
+<div class="fragment"><div class="line">.\samples\_output\bin\get_img_params</div></div><!-- fragment --><p>6) get_imu_params 打印 imu 参数并保存在文件中</p>
+<div class="fragment"><div class="line">.\samples\_output\bin\get_imu_params</div></div><!-- fragment --><p>7) get_from_callbacks 使用回调方式获取图像和 imu 数据</p>
+<div class="fragment"><div class="line">.\samples\_output\bin\get_from_callbacks</div></div><!-- fragment --><p>8) get_all_with_options 使用不同参数打开设备</p>
+<div class="fragment"><div class="line">.\samples\_output\bin\get_all_with_options</div></div><!-- fragment --><h2>5. 清理</h2>
+<div class="fragment"><div class="line">cd &lt;sdk&gt;</div><div class="line">make cleanall</div></div><!-- fragment --> </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="footer">制作者
     <a href="http://www.doxygen.org/index.html">
-    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.11 </li>
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.14 </li>
   </ul>
 </div>
 </body>

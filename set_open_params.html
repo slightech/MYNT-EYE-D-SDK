@@ -3,7 +3,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.11"/>
+<meta name="generator" content="Doxygen 1.8.14"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>MYNT EYE D SDK: 设定打开参数</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
@@ -13,14 +14,16 @@
 <script type="text/javascript" src="navtreedata.js"></script>
 <script type="text/javascript" src="navtree.js"></script>
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
   $(document).ready(initResizable);
-  $(window).load(resizeHeight);
-</script>
+/* @license-end */</script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
   $(document).ready(function() { init_search(); });
+/* @license-end */
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="custom.css" rel="stylesheet" type="text/css"/>
@@ -58,9 +61,11 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.11 -->
+<!-- 制作者 Doxygen 1.8.14 -->
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+/* @license-end */
 </script>
 </div><!-- top -->
 <div id="side-nav" class="ui-resizable side-nav-resizable">
@@ -74,7 +79,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
   </div>
 </div>
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
 $(document).ready(function(){initNavTree('set_open_params.html','');});
+/* @license-end */
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -104,7 +111,7 @@ $(document).ready(function(){initNavTree('set_open_params.html','');});
 </ul>
 </blockquote>
 <p>参考代码片段:</p>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;// Stream mode: left color only</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;// params.stream_mode = StreamMode::STREAM_640x480;  // vga</div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;// params.stream_mode = StreamMode::STREAM_1280x720;  // hd</div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;// Stream mode: left+right color</div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;// params.stream_mode = StreamMode::STREAM_1280x480;  // vga</div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;params.stream_mode = StreamMode::STREAM_2560x720;  // hd</div></div><!-- fragment --><h2>设定图像帧率</h2>
+<div class="fragment"><div class="line">// Stream mode: left color only</div><div class="line">// params.stream_mode = StreamMode::STREAM_640x480;  // vga</div><div class="line">// params.stream_mode = StreamMode::STREAM_1280x720;  // hd</div><div class="line">// Stream mode: left+right color</div><div class="line">// params.stream_mode = StreamMode::STREAM_1280x480;  // vga</div><div class="line">params.stream_mode = StreamMode::STREAM_2560x720;  // hd</div></div><!-- fragment --><h2>设定图像帧率</h2>
 <p>通过设置 <code>params.framerate</code> 参数，就可以设定图像的帧率。</p>
 <blockquote class="doxtable">
 <p>注意</p><ul>
@@ -113,23 +120,23 @@ $(document).ready(function(){initNavTree('set_open_params.html','');});
 </ul>
 </blockquote>
 <p>参考代码片段:</p>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;// Framerate: 10(default), [0,60], [30](STREAM_2560x720)</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;params.framerate = 30;</div></div><!-- fragment --><h2>设定图像模式</h2>
+<div class="fragment"><div class="line">// Framerate: 10(default), [0,60], [30](STREAM_2560x720)</div><div class="line">params.framerate = 30;</div></div><!-- fragment --><h2>设定图像模式</h2>
 <p>通过 <code>params.color_mode</code> 参数，就可以设定图像的模式。</p>
 <p><code>COLOR_RAW</code> 为原图， <code>COLOR_RECTIFIED</code> 为矫正图。</p>
 <p>参考代码片段:</p>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;// Color mode: raw(default), rectified</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;// params.color_mode = ColorMode::COLOR_RECTIFIED;</div></div><!-- fragment --><h2>设定深度图模式</h2>
+<div class="fragment"><div class="line">// Color mode: raw(default), rectified</div><div class="line">// params.color_mode = ColorMode::COLOR_RECTIFIED;</div></div><!-- fragment --><h2>设定深度图模式</h2>
 <p>通过 <code>params.depth_mode</code> 参数，就可以设定深度图的模式。</p>
 <p><code>DEPTH_COLORFUL</code> 为着色后的深度图，<code>DEPTH_GRAY</code> 为灰色深度图， <code>DEPTH_GRAY</code> 为原始深度图。</p>
 <p>参考代码片段:</p>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;// Depth mode: colorful(default), gray, raw</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;// params.depth_mode = DepthMode::DEPTH_GRAY;</div></div><!-- fragment --><h2>启用自动曝光及自动白平衡</h2>
+<div class="fragment"><div class="line">// Depth mode: colorful(default), gray, raw</div><div class="line">// params.depth_mode = DepthMode::DEPTH_GRAY;</div></div><!-- fragment --><h2>启用自动曝光及自动白平衡</h2>
 <p>通过设置 <code>params.state_ae</code> 和 <code>params.state_awb</code> 为 <code>true</code> ，就可以启动自动曝光和自动白平衡。</p>
 <p>默认自动曝光和自动白平衡是启用的，如果想关闭，可以设置参数值为 <code>false</code> 。</p>
 <p>参考代码片段：</p>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;// Auto-exposure: true(default), false</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;// params.state_ae = false;</div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;</div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;// Auto-white balance: true(default), false</div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;// params.state_awb = false;</div></div><!-- fragment --><h2>启用IR及其调节</h2>
+<div class="fragment"><div class="line">// Auto-exposure: true(default), false</div><div class="line">// params.state_ae = false;</div><div class="line"></div><div class="line">// Auto-white balance: true(default), false</div><div class="line">// params.state_awb = false;</div></div><!-- fragment --><h2>启用IR及其调节</h2>
 <p>通过设置 <code>params.ir_intensity</code> 参数，就可以设定图像的IR强度。</p>
 <p>启用IR，就是设定 <code>params.ir_intensity</code> 大于0的值。值越大，强度越高(最大为10)。</p>
 <p>参考代码片段：</p>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;// Infrared intensity: 0(default), [0,10]</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;params.ir_intensity = 4;</div></div><!-- fragment --><h2>启用IR Depth Only</h2>
+<div class="fragment"><div class="line">// Infrared intensity: 0(default), [0,10]</div><div class="line">params.ir_intensity = 4;</div></div><!-- fragment --><h2>启用IR Depth Only</h2>
 <p>通过设置 <code>params.ir_depth_only</code> 参数，就可以设定IR Depth Only功能。默认关闭。</p>
 <blockquote class="doxtable">
 <p>注意</p><ul>
@@ -137,11 +144,11 @@ $(document).ready(function(){initNavTree('set_open_params.html','');});
 </ul>
 </blockquote>
 <p>参考代码片段：</p>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;// IR Depth Only: true, false(default)↩↩</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;// Note: IR Depth Only mode support frame rate between 15fps and 30fps.↩↩</div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;//     When dev_mode != DeviceMode::DEVICE_ALL,↩↩</div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;//       IR Depth Only mode not be supported.↩↩</div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;//     When stream_mode == StreamMode::STREAM_2560x720,↩↩</div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;//       frame rate only be 15fps in this mode.↩↩</div><div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;//     When frame rate less than 15fps or greater than 30fps,↩↩</div><div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;//       IR Depth Only mode will be not available.↩↩</div><div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;// params.ir_depth_only = false;↩</div></div><!-- fragment --><h2>调整深度图着色值</h2>
+<div class="fragment"><div class="line">// IR Depth Only: true, false(default)↩↩</div><div class="line">// Note: IR Depth Only mode support frame rate between 15fps and 30fps.↩↩</div><div class="line">//     When dev_mode != DeviceMode::DEVICE_ALL,↩↩</div><div class="line">//       IR Depth Only mode not be supported.↩↩</div><div class="line">//     When stream_mode == StreamMode::STREAM_2560x720,↩↩</div><div class="line">//       frame rate only be 15fps in this mode.↩↩</div><div class="line">//     When frame rate less than 15fps or greater than 30fps,↩↩</div><div class="line">//       IR Depth Only mode will be not available.↩↩</div><div class="line">// params.ir_depth_only = false;↩</div></div><!-- fragment --><h2>调整深度图着色值</h2>
 <p>通过设置 <code>params.colour_depth_value</code> 参数, 默认值是 1000。</p>
 <p>参考代码片段:</p>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;// Colour depth image, default 1000. [0, 16384]</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;// params.colour_depth_value = 1000;</div></div><!-- fragment --><p>以上功能参考运行结果，于 Linux 上：</p>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;Open device: 0, /dev/video1</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;</div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;D/eSPDI_API: SetPropertyValue control=7 value=0D/eSPDI_API: SetPropertyValue control=7 value=35D/eSPDI_API: SetPropertyValue control=7 value=1-- Auto-exposure state: enabled</div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;D/eSPDI_API: SetPropertyValue control=7 value=0D/eSPDI_API: SetPropertyValue control=7 value=12D/eSPDI_API: SetPropertyValue control=7 value=1-- Auto-white balance state: enabled</div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;-- Framerate: 5</div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;D/eSPDI_API: SetPropertyValue control=7 value=4 SetDepthDataType: 4</div><div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;-- Color Stream: 1280x720 YUYV</div><div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;-- Depth Stream: 1280x720 YUYV</div><div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;</div><div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;D/eSPDI_API: SetPropertyValue control=7 value=0D/eSPDI_API: SetPropertyValue control=7 value=3D/eSPDI_API: SetPropertyValue control=7 value=4</div><div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;-- IR intensity: 4</div><div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;D/eSPDI_API: CVideoDevice::OpenDevice 1280x720 fps=5</div><div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;</div><div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;Open device success</div></div><!-- fragment --><p>完整代码样例 <a href="https://github.com/slightech/MYNT-EYE-D-SDK/blob/master/samples/src/get_image.cc">get_image</a> 。 </p>
+<div class="fragment"><div class="line">// Colour depth image, default 1000. [0, 16384]</div><div class="line">// params.colour_depth_value = 1000;</div></div><!-- fragment --><p>以上功能参考运行结果，于 Linux 上：</p>
+<div class="fragment"><div class="line">Open device: 0, /dev/video1</div><div class="line"></div><div class="line">D/eSPDI_API: SetPropertyValue control=7 value=0D/eSPDI_API: SetPropertyValue control=7 value=35D/eSPDI_API: SetPropertyValue control=7 value=1-- Auto-exposure state: enabled</div><div class="line">D/eSPDI_API: SetPropertyValue control=7 value=0D/eSPDI_API: SetPropertyValue control=7 value=12D/eSPDI_API: SetPropertyValue control=7 value=1-- Auto-white balance state: enabled</div><div class="line">-- Framerate: 5</div><div class="line">D/eSPDI_API: SetPropertyValue control=7 value=4 SetDepthDataType: 4</div><div class="line">-- Color Stream: 1280x720 YUYV</div><div class="line">-- Depth Stream: 1280x720 YUYV</div><div class="line"></div><div class="line">D/eSPDI_API: SetPropertyValue control=7 value=0D/eSPDI_API: SetPropertyValue control=7 value=3D/eSPDI_API: SetPropertyValue control=7 value=4</div><div class="line">-- IR intensity: 4</div><div class="line">D/eSPDI_API: CVideoDevice::OpenDevice 1280x720 fps=5</div><div class="line"></div><div class="line">Open device success</div></div><!-- fragment --><p>完整代码样例 <a href="https://github.com/slightech/MYNT-EYE-D-SDK/blob/master/samples/src/get_image.cc">get_image</a> 。 </p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
@@ -149,7 +156,7 @@ $(document).ready(function(){initNavTree('set_open_params.html','');});
   <ul>
     <li class="footer">制作者
     <a href="http://www.doxygen.org/index.html">
-    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.11 </li>
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.14 </li>
   </ul>
 </div>
 </body>

@@ -3,7 +3,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.11"/>
+<meta name="generator" content="Doxygen 1.8.14"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>MYNT EYE D SDK: ROS 如何使用</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
@@ -13,14 +14,16 @@
 <script type="text/javascript" src="navtreedata.js"></script>
 <script type="text/javascript" src="navtree.js"></script>
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
   $(document).ready(initResizable);
-  $(window).load(resizeHeight);
-</script>
+/* @license-end */</script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
   $(document).ready(function() { init_search(); });
+/* @license-end */
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="custom.css" rel="stylesheet" type="text/css"/>
@@ -58,9 +61,11 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.11 -->
+<!-- 制作者 Doxygen 1.8.14 -->
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+/* @license-end */
 </script>
 </div><!-- top -->
 <div id="side-nav" class="ui-resizable side-nav-resizable">
@@ -74,7 +79,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
   </div>
 </div>
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
 $(document).ready(function(){initNavTree('ros_usage.html','');});
+/* @license-end */
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -98,18 +105,18 @@ $(document).ready(function(){initNavTree('ros_usage.html','');});
 <div class="contents">
 <div class="textblock"><p>按照 <a class="el" href="ros_install.html">ROS 安装 </a> ，编译再运行节点。</p>
 <p><code>rostopic list</code> 可以列出发布的节点：</p>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;/mynteye/depth/camera_info</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;/mynteye/depth/image_raw</div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;/mynteye/depth/image_raw/compressed</div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;/mynteye/depth/image_raw/compressed/parameter_descriptions</div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;/mynteye/depth/image_raw/compressed/parameter_updates</div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;/mynteye/depth/image_raw/compressedDepth</div><div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;/mynteye/depth/image_raw/compressedDepth/parameter_descriptions</div><div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;/mynteye/depth/image_raw/compressedDepth/parameter_updates</div><div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;/mynteye/depth/image_raw/theora</div><div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;/mynteye/depth/image_raw/theora/parameter_descriptions</div><div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;/mynteye/depth/image_raw/theora/parameter_updates</div><div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;/mynteye/imu/data_raw</div><div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;/mynteye/imu/data_raw_processed</div><div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;/mynteye/left/camera_info</div><div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;/mynteye/left/image_color</div><div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;/mynteye/left/image_color/compressed</div><div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;...</div></div><!-- fragment --><p><code>rostopic hz &lt;topic&gt;</code> 可以检查是否有数据：</p>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;subscribed to [/mynteye/imu/data_raw]</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;average rate: 202.806</div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;  min: 0.000s max: 0.021s std dev: 0.00819s window: 174</div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;average rate: 201.167</div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;  min: 0.000s max: 0.021s std dev: 0.00819s window: 374</div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;average rate: 200.599</div><div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;  min: 0.000s max: 0.021s std dev: 0.00819s window: 574</div><div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;average rate: 200.461</div><div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;  min: 0.000s max: 0.021s std dev: 0.00818s window: 774</div><div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;average rate: 200.310</div><div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;  min: 0.000s max: 0.021s std dev: 0.00818s window: 974</div><div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;  ...</div></div><!-- fragment --><p><code>rostopic echo &lt;topic&gt;</code> 可以打印发布数据等。了解更多，请阅读 <a href="http://wiki.ros.org/rostopic">rostopic</a>。</p>
+<div class="fragment"><div class="line">/mynteye/depth/camera_info</div><div class="line">/mynteye/depth/image_raw</div><div class="line">/mynteye/depth/image_raw/compressed</div><div class="line">/mynteye/depth/image_raw/compressed/parameter_descriptions</div><div class="line">/mynteye/depth/image_raw/compressed/parameter_updates</div><div class="line">/mynteye/depth/image_raw/compressedDepth</div><div class="line">/mynteye/depth/image_raw/compressedDepth/parameter_descriptions</div><div class="line">/mynteye/depth/image_raw/compressedDepth/parameter_updates</div><div class="line">/mynteye/depth/image_raw/theora</div><div class="line">/mynteye/depth/image_raw/theora/parameter_descriptions</div><div class="line">/mynteye/depth/image_raw/theora/parameter_updates</div><div class="line">/mynteye/imu/data_raw</div><div class="line">/mynteye/imu/data_raw_processed</div><div class="line">/mynteye/left/camera_info</div><div class="line">/mynteye/left/image_color</div><div class="line">/mynteye/left/image_color/compressed</div><div class="line">...</div></div><!-- fragment --><p><code>rostopic hz &lt;topic&gt;</code> 可以检查是否有数据：</p>
+<div class="fragment"><div class="line">subscribed to [/mynteye/imu/data_raw]</div><div class="line">average rate: 202.806</div><div class="line">  min: 0.000s max: 0.021s std dev: 0.00819s window: 174</div><div class="line">average rate: 201.167</div><div class="line">  min: 0.000s max: 0.021s std dev: 0.00819s window: 374</div><div class="line">average rate: 200.599</div><div class="line">  min: 0.000s max: 0.021s std dev: 0.00819s window: 574</div><div class="line">average rate: 200.461</div><div class="line">  min: 0.000s max: 0.021s std dev: 0.00818s window: 774</div><div class="line">average rate: 200.310</div><div class="line">  min: 0.000s max: 0.021s std dev: 0.00818s window: 974</div><div class="line">  ...</div></div><!-- fragment --><p><code>rostopic echo &lt;topic&gt;</code> 可以打印发布数据等。了解更多，请阅读 <a href="http://wiki.ros.org/rostopic">rostopic</a>。</p>
 <p>ROS 封装的文件结构，如下所示：</p>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;&lt;sdk&gt;/wrappers/ros/</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;├─src/</div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;  └─mynteye_wrapper_d/</div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;     ├─launch/</div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;     │  ├─display.launch</div><div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;     │  └─mynteye.launch</div><div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;     ├─msg/</div><div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;     ├─rviz/</div><div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;     ├─src/</div><div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;     │  ├─mynteye_listener.cc</div><div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;     │  └─mynteye_wrapper_nodelet.cc</div><div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;     │  └─mynteye_wrapper_node.cc</div><div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;     │  └─pointcloud_generatort.cc</div><div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;     │  └─pointcloud_generator.h</div><div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;     ├─CMakeLists.txt</div><div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;     ├─nodelet_plugins.xml</div><div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;     └─package.xml</div></div><!-- fragment --><p>其中 <code>mynteye.launch</code> 里，可以配置发布的 topics 与 frame_ids 、决定启用哪些数据、以及设定控制选项。其中，<code>gravity</code> 请配置成当地重力加速度。</p>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;&lt;arg name=&quot;gravity&quot; default=&quot;9.8&quot; /&gt;</div></div><!-- fragment --> </div></div><!-- contents -->
+<div class="fragment"><div class="line">&lt;sdk&gt;/wrappers/ros/</div><div class="line">├─src/</div><div class="line">  └─mynteye_wrapper_d/</div><div class="line">     ├─launch/</div><div class="line">     │  ├─display.launch</div><div class="line">     │  └─mynteye.launch</div><div class="line">     ├─msg/</div><div class="line">     ├─rviz/</div><div class="line">     ├─src/</div><div class="line">     │  ├─mynteye_listener.cc</div><div class="line">     │  └─mynteye_wrapper_nodelet.cc</div><div class="line">     │  └─mynteye_wrapper_node.cc</div><div class="line">     │  └─pointcloud_generatort.cc</div><div class="line">     │  └─pointcloud_generator.h</div><div class="line">     ├─CMakeLists.txt</div><div class="line">     ├─nodelet_plugins.xml</div><div class="line">     └─package.xml</div></div><!-- fragment --><p>其中 <code>mynteye.launch</code> 里，可以配置发布的 topics 与 frame_ids 、决定启用哪些数据、以及设定控制选项。其中，<code>gravity</code> 请配置成当地重力加速度。</p>
+<div class="fragment"><div class="line">&lt;arg name=&quot;gravity&quot; default=&quot;9.8&quot; /&gt;</div></div><!-- fragment --> </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="footer">制作者
     <a href="http://www.doxygen.org/index.html">
-    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.11 </li>
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.14 </li>
   </ul>
 </div>
 </body>

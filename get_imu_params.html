@@ -3,7 +3,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.11"/>
+<meta name="generator" content="Doxygen 1.8.14"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>MYNT EYE D SDK: 获取IMU标定参数</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
@@ -13,14 +14,16 @@
 <script type="text/javascript" src="navtreedata.js"></script>
 <script type="text/javascript" src="navtree.js"></script>
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
   $(document).ready(initResizable);
-  $(window).load(resizeHeight);
-</script>
+/* @license-end */</script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
   $(document).ready(function() { init_search(); });
+/* @license-end */
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="custom.css" rel="stylesheet" type="text/css"/>
@@ -58,9 +61,11 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.11 -->
+<!-- 制作者 Doxygen 1.8.14 -->
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+/* @license-end */
 </script>
 </div><!-- top -->
 <div id="side-nav" class="ui-resizable side-nav-resizable">
@@ -74,7 +79,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
   </div>
 </div>
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
 $(document).ready(function(){initNavTree('get_imu_params.html','');});
+/* @license-end */
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -98,8 +105,8 @@ $(document).ready(function(){initNavTree('get_imu_params.html','');});
 <div class="contents">
 <div class="textblock"><p>通过API <code>GetMotionIntrinsics()</code>,<code>GetMotionExtrinsics</code>函数，可以获取当前打开设备的IMU标定参数。</p>
 <p>参考代码片段：</p>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;auto intrinsics = cam.GetMotionIntrinsics(&amp;in_ok);</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;std::cout &lt;&lt; &quot;Motion Intrinsics: {&quot; &lt;&lt; intrinsics &lt;&lt; &quot;}&quot; &lt;&lt; std::endl;</div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;out &lt;&lt; &quot;Motion Intrinsics: {&quot; &lt;&lt; intrinsics &lt;&lt; &quot;}&quot; &lt;&lt; std::endl;</div></div><!-- fragment --><p>运行结果保存在当前目录下，参考运行结果：</p>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;Motion Intrinsics: {accel: {scale: [1.00205999990004191, 0.00000000000000000, 0.00000000000000000, 0.00000000000000000, 1.00622999999999996, 0.00000000000000000, 0.00000000000000000, 0.00000000000000000, 1.00171999999999994], assembly: [1.00000000000000000, 0.00672262000000000, -0.00364474000000000, 0.00000000000000000, 1.00000000000000000, 0.00101348000000000, -0.00000000000000000, 0.00000000000000000, 1.00000000000000000, 1.00000000000000000], drift: [0.00000000000000000, 0.00000000000000000, 0.00000000000000000], noise: [0.00000000000000000, 0.00000000000000000, 0.00000000000000000], bias: [0.00000000000000000, 0.00000000000000000, 0.00000000000000000], x: [0.00856165620000000, -0.00009840052800000], y: [0.05968393300000000, -0.00130967680000000], z: [0.01861442050000000, -0.00016033523000000]}, gyro: {scale: [1.00008999999999992, 0.00000000000000000, 0.00000000000000000, 0.00000000000000000, 0.99617599999999995, 0.00000000000000000, 0.00000000000000000, 0.00000000000000000, 1.00407000000000002], assembly: [1.00000000000000000, -0.00700362000000000, -0.00326206000000000, 0.00549571000000000, 1.00000000000000000, 0.00224867000000000, 0.00236088000000000, 0.00044507800000000, 1.00000000000000000, 1.00000000000000000], drift: [0.00000000000000000, 0.00000000000000000, 0.00000000000000000], noise: [0.00000000000000000, 0.00000000000000000, 0.00000000000000000], bias: [0.00000000000000000, 0.00000000000000000, 0.00000000000000000], x: [0.18721455299999998, 0.00077411070000000], y: [0.60837032000000002, -0.00939702710000000], z: [-0.78549276000000001, 0.02584820200000000]}}</div></div><!-- fragment --><p>完整代码样例，请见<a href="https://github.com/slightech/MYNT-EYE-D-SDK/blob/master/samples/src/get_imu_params.cc">get_imu_params.cc</a> 。 </p>
+<div class="fragment"><div class="line">auto intrinsics = cam.GetMotionIntrinsics(&amp;in_ok);</div><div class="line">std::cout &lt;&lt; &quot;Motion Intrinsics: {&quot; &lt;&lt; intrinsics &lt;&lt; &quot;}&quot; &lt;&lt; std::endl;</div><div class="line">out &lt;&lt; &quot;Motion Intrinsics: {&quot; &lt;&lt; intrinsics &lt;&lt; &quot;}&quot; &lt;&lt; std::endl;</div></div><!-- fragment --><p>运行结果保存在当前目录下，参考运行结果：</p>
+<div class="fragment"><div class="line">Motion Intrinsics: {accel: {scale: [1.00205999990004191, 0.00000000000000000, 0.00000000000000000, 0.00000000000000000, 1.00622999999999996, 0.00000000000000000, 0.00000000000000000, 0.00000000000000000, 1.00171999999999994], assembly: [1.00000000000000000, 0.00672262000000000, -0.00364474000000000, 0.00000000000000000, 1.00000000000000000, 0.00101348000000000, -0.00000000000000000, 0.00000000000000000, 1.00000000000000000, 1.00000000000000000], drift: [0.00000000000000000, 0.00000000000000000, 0.00000000000000000], noise: [0.00000000000000000, 0.00000000000000000, 0.00000000000000000], bias: [0.00000000000000000, 0.00000000000000000, 0.00000000000000000], x: [0.00856165620000000, -0.00009840052800000], y: [0.05968393300000000, -0.00130967680000000], z: [0.01861442050000000, -0.00016033523000000]}, gyro: {scale: [1.00008999999999992, 0.00000000000000000, 0.00000000000000000, 0.00000000000000000, 0.99617599999999995, 0.00000000000000000, 0.00000000000000000, 0.00000000000000000, 1.00407000000000002], assembly: [1.00000000000000000, -0.00700362000000000, -0.00326206000000000, 0.00549571000000000, 1.00000000000000000, 0.00224867000000000, 0.00236088000000000, 0.00044507800000000, 1.00000000000000000, 1.00000000000000000], drift: [0.00000000000000000, 0.00000000000000000, 0.00000000000000000], noise: [0.00000000000000000, 0.00000000000000000, 0.00000000000000000], bias: [0.00000000000000000, 0.00000000000000000, 0.00000000000000000], x: [0.18721455299999998, 0.00077411070000000], y: [0.60837032000000002, -0.00939702710000000], z: [-0.78549276000000001, 0.02584820200000000]}}</div></div><!-- fragment --><p>完整代码样例，请见<a href="https://github.com/slightech/MYNT-EYE-D-SDK/blob/master/samples/src/get_imu_params.cc">get_imu_params.cc</a> 。 </p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
@@ -107,7 +114,7 @@ $(document).ready(function(){initNavTree('get_imu_params.html','');});
   <ul>
     <li class="footer">制作者
     <a href="http://www.doxygen.org/index.html">
-    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.11 </li>
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.14 </li>
   </ul>
 </div>
 </body>
