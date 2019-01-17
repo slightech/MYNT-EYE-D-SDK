@@ -113,6 +113,11 @@ int main(int argc, char const* argv[]) {
   parser.add_option("-m", "--imu").dest("imu")
       .action("store_true").help("Enable imu datas");
 
+  // Others
+  parser.add_option("--show-secs").dest("show_secs")
+      .type("int").set_default(0)
+      .metavar("SECONDS").help("The show seconds, default: %default");
+
   auto&& options = parser.parse_args(argc, argv);
   // auto&& args = parser.args();
 
@@ -172,6 +177,8 @@ int main(int argc, char const* argv[]) {
 
   std::cout << "Open device: " << dev_info.index << ", "
       << dev_info.name << std::endl << std::endl;
+
+  int show_ms = 0;
 
   auto in_range = [&options](const std::string& name, int min, int max,
       int* val) {
@@ -253,6 +260,8 @@ int main(int argc, char const* argv[]) {
         std::cout << std::flush;
       });
     }
+
+    show_ms = static_cast<int>(options.get("show_secs")) * 1000;
   }
   {
     cam.SetStreamCallback(ImageType::IMAGE_LEFT_COLOR, [&counter](
@@ -328,6 +337,10 @@ int main(int argc, char const* argv[]) {
     char key = static_cast<char>(cv::waitKey(1));
     if (key == 27 || key == 'q' || key == 'Q') {  // ESC/Q
       break;
+    }
+
+    if (show_ms > 0 && counter.ElapsedMillis() > show_ms) {
+      break;  // timeout
     }
   }
 

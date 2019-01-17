@@ -34,7 +34,14 @@ class Counter {
   explicit Counter(std::size_t fps_frame_count = 10)
     : count_(0), fps_(0), fps_frame_count_(fps_frame_count),
       color_count_(0), depth_count_(0), accel_count_(0), gyro_count_(0) {
+    Init();
+  }
+
+  void Init() {
     time_beg_ = times::now();
+    while (!fps_frame_times_.empty()) {
+      fps_frame_times_.pop();
+    }
     if (fps_frame_count_ >= 2) {
       fps_frame_times_.push(time_beg_);
     }
@@ -111,6 +118,10 @@ class Counter {
       std::cout << "Gryo count: " << gyro_count_
         << ", hz: " << (1000.f * gyro_count_ / elapsed_ms) << std::endl;
     }
+  }
+
+  int64_t ElapsedMillis() const {
+    return times::count<times::milliseconds>(times::now() - time_beg_);
   }
 
  private:
