@@ -544,7 +544,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     if (params.depth_mode == DepthMode::DEPTH_RAW) {
       auto&& mat = data.img->To(ImageFormat::DEPTH_RAW)->ToMat();
       pub_depth.publish(
-          cv_bridge::CvImage(header, enc::MONO16, mat).toImageMsg(), info);
+          cv_bridge::CvImage(header, enc::TYPE_16UC1, mat).toImageMsg(), info);
       if (sub_result.points) {
         points_depth = mat;
         publishPoints(header.stamp);
@@ -683,6 +683,12 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     //     [fx'  0  cx' Tx]
     // P = [ 0  fy' cy' Ty]
     //     [ 0   0   1   0]
+    camera_info->P.at(0) = in.p[0];
+    camera_info->P.at(2) = in.p[2];
+    camera_info->P.at(3) = in.p[3];
+    camera_info->P.at(5) = in.p[5];
+    camera_info->P.at(6) = in.p[6];
+    camera_info->P.at(10) = in.p[10];
 
     camera_info->distortion_model = "plumb_bob";
 

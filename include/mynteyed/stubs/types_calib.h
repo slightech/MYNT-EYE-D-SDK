@@ -40,6 +40,11 @@ struct MYNTEYE_API CameraIntrinsics {
   double cy;
   /** The distortion coefficients: k1,k2,p1,p2,k3 */
   double coeffs[5];
+  /** 3x4 projection matrix in the (rectified) coordinate systems 
+   *  left: fx' cx' fy' cy' 1
+   *  right: fx' cx' tx fy' cy' 1
+   *  */
+  double p[12];
 };
 
 MYNTEYE_API
