@@ -441,7 +441,13 @@ def analyze(dataset, profile):
       os.makedirs(outdir)
     fig_1.savefig(figpath, dpi=100)
 
-  plt.show()
+  show_secs = profile.show_secs
+  if show_secs > 0:
+    plt.show(block=False)
+    plt.pause(show_secs)
+    plt.close()
+  else:
+    plt.show()
 
 
 def _parse_args():
@@ -581,6 +587,13 @@ def _parse_args():
       action='store_true',
       help='save large dataset to binary files'
       ', and plot them with numpy.memmap()')
+  parser.add_argument(
+      '--show-secs',
+      dest='show_secs',
+      metavar='SECONDS',
+      default=0,
+      type=int,
+      help='the show seconds (default: %(default)s)')
   return parser.parse_args()
 
 
@@ -609,6 +622,8 @@ def _main():
   print('  outdir: %s' % outdir)
 
   profile = {
+      'outdir': outdir,
+      'show_secs': args.show_secs,
       'auto': False,
       'time_unit': None,
       'gyro_data_unit': None,
@@ -685,7 +700,6 @@ def _main():
   print('  timebeg: {:f}, timeend: {:f}, duration: {:f}'.format(
       dataset.timebeg, dataset.timeend, dataset.duration))
 
-  profile['outdir'] = outdir
   analyze(dataset, _dict2obj(profile))
 
   print('imu analytics done')

@@ -116,8 +116,6 @@ class BinDataset(object):
     self._has_imu = has_imu
 
   def stamp_analytics(self, args):
-    outdir = args.outdir
-
     import numpy as np
     if self.has_img:
       # pd.cut fails on readonly arrays
@@ -179,15 +177,9 @@ class BinDataset(object):
       cats = pd.cut(imus_t, bins)
       return cats.value_counts()
 
-    self._plot(
-        outdir,
-        imgs_t_diff,
-        accel_t_diff,
-        _cut_by_imgs_t(
-            accel['t']),
-        gyro_t_diff,
-        _cut_by_imgs_t(
-            gyro['t']))
+    self._plot(args.outdir, args.show_secs, imgs_t_diff,
+        accel_t_diff, _cut_by_imgs_t(accel['t']),
+        gyro_t_diff, _cut_by_imgs_t(gyro['t']))
 
   def _print_t_diff_where(self, name, t_diff, period, factor):
     import numpy as np
@@ -204,7 +196,7 @@ class BinDataset(object):
     for x in where:
       print('  {:8d}: {:.16f}'.format(x[0], t_diff[x][0]))
 
-  def _plot(self, outdir, imgs_t_diff,
+  def _plot(self, outdir, show_secs, imgs_t_diff,
             accel_t_diff, accel_counts, gyro_t_diff, gyro_counts):
     import matplotlib.pyplot as plt
     import numpy as np
@@ -261,7 +253,12 @@ class BinDataset(object):
         os.makedirs(outdir)
       fig_1.savefig(figpath, dpi=100)
 
-    plt.show()
+    if show_secs > 0:
+      plt.show(block=False)
+      plt.pause(show_secs)
+      plt.close()
+    else:
+      plt.show()
 
   @property
   def has_img(self):
@@ -320,6 +317,13 @@ def _parse_args():
       default=200,
       type=int,
       help='the imu rate (default: %(default)s)')
+  parser.add_argument(
+      '--show-secs',
+      dest='show_secs',
+      metavar='SECONDS',
+      default=0,
+      type=int,
+      help='the show seconds (default: %(default)s)')
   return parser.parse_args()
 
 
