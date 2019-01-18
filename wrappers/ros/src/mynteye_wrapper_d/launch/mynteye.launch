@@ -19,6 +19,11 @@
   <arg name="stream_mjpg"       default="0" />
   <arg name="stream_yuyv"       default="1" />
 
+  <!-- 0 --> MONO16 -->
+  <!-- 1 --> TYPE_16UC1 -->
+  <arg name="type_mono16"        default="0" />
+  <arg name="type_16uc1"         default="1" />
+
   <!-- Camera Params -->
 
   <!-- Device index -->
@@ -41,6 +46,7 @@
   <arg name="stream_mode" default="$(arg stream_2560x720)" />
   <arg name="color_stream_format" default="$(arg stream_yuyv)" />
   <arg name="depth_stream_format" default="$(arg stream_yuyv)" />
+  <arg name="depth_type" default="$(arg type_mono16)" />
 
   <!-- Auto-exposure -->
   <arg name="state_ae" default="true" />
@@ -137,6 +143,8 @@
     <param name="points_frequency" value="$(arg points_frequency)" />
 
     <param name="gravity" value="$(arg gravity)" />
+
+    <param name="depth_type" value="$(arg type_mono16)" />
 
     <!-- Frame ids -->
     <param name="base_frame"   value="$(arg base_frame)" />

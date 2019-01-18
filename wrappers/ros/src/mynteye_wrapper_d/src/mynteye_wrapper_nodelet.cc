@@ -109,6 +109,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   // MYNTEYE objects
   OpenParams params;
   std::unique_ptr<Camera> mynteye;
+  int depth_type = 0;
 
   // Others
 
@@ -181,6 +182,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     nh_ns.getParam("state_awb", state_awb);
     nh_ns.getParam("ir_intensity", ir_intensity);
     nh_ns.getParam("ir_depth_only", ir_depth_only);
+    nh_ns.getParam("depth_type", depth_type);
 
     points_frequency = DEFAULT_POINTS_FREQUENCE;
     points_factor = DEFAULT_POINTS_FACTOR;
@@ -543,8 +545,13 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     if (info) info->header.stamp = header.stamp;
     if (params.depth_mode == DepthMode::DEPTH_RAW) {
       auto&& mat = data.img->To(ImageFormat::DEPTH_RAW)->ToMat();
-      pub_depth.publish(
-          cv_bridge::CvImage(header, enc::TYPE_16UC1, mat).toImageMsg(), info);
+      if (depth_type == 0) {
+        pub_depth.publish(
+            cv_bridge::CvImage(header, enc::MONO16, mat).toImageMsg(), info);
+      } else if (depth_type == 1) {
+        pub_depth.publish(
+            cv_bridge::CvImage(header, enc::TYPE_16UC1, mat).toImageMsg(), info);
+      }
       if (sub_result.points) {
         points_depth = mat;
         publishPoints(header.stamp);
