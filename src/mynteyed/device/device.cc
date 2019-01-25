@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #include "mynteyed/device/device.h"
+#include <unistd.h>
 #include <cstring>
 #include <fstream>
 #include <string>
@@ -133,8 +134,26 @@ void Device::GetDeviceInfos(std::vector<DeviceInfo>* dev_infos) {
   }
   dev_infos->clear();
 
-  int count = EtronDI_GetDeviceNumber(etron_di_);
-  DBG_LOGD("GetDevices: %d", count);
+  int num = 0;
+  int count = 0;
+  while (true) {
+    if (num > 0 && num < 3) {
+      sleep(1);
+      EtronDI_Release(&etron_di_);
+      sleep(1);
+      EtronDI_Init(&etron_di_, false);
+      LOGI("\n");
+    } else if (num >= 3) {
+      break;
+    }
+    count = EtronDI_GetDeviceNumber(etron_di_);
+    if (count <= 0) {
+      num++;
+    } else {
+      break;
+    }
+    DBG_LOGD("GetDevices: %d", count);
+  }
 
   DEVSELINFO dev_sel_info;
   DEVINFORMATION* p_dev_info =
