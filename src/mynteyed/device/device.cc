@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #include "mynteyed/device/device.h"
-#include <unistd.h>
 #include <cstring>
 #include <fstream>
 #include <string>
@@ -138,9 +137,7 @@ void Device::GetDeviceInfos(std::vector<DeviceInfo>* dev_infos) {
   int count = 0;
   while (true) {
     if (num > 0 && num < 3) {
-      sleep(1);
       EtronDI_Release(&etron_di_);
-      sleep(1);
       EtronDI_Init(&etron_di_, false);
       LOGI("\n");
     } else if (num >= 3) {
