@@ -15,6 +15,13 @@
 #define MYNTEYE_DATA_CHANNELS_H_
 #pragma once
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 #include <functional>
 #include <map>
 #include <memory>
@@ -22,13 +29,6 @@
 #include <vector>
 
 #include "mynteyed/stubs/global.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 
 #ifdef MYNTEYE_OS_WIN
 #include <conio.h>
@@ -59,14 +59,26 @@ class MYNTEYE_API Channels {
     FID_LAST,
   } file_id_t;
 
+  typedef enum DataId {
+    ACCEL = 0,
+    GYRO,
+    FRAME,
+    DISTANCE,
+    LOCATION,
+  } data_id_t;
+
   using device_desc_t = device::Descriptors;
   using imu_params_t = device::ImuParams;
 
   using imu_packets_t = std::vector<ImuDataPacket>;
   using img_packets_t = std::vector<ImgInfoPacket>;
+  using gps_packets_t = std::vector<GPSDataPacket>;
+  using dis_packets_t = std::vector<ObstacleDisPacket>;
 
   using imu_callback_t = std::function<void(const ImuDataPacket &packet)>;
   using img_callback_t = std::function<void(const ImgInfoPacket &packet)>;
+  using gps_callback_t = std::function<void(const GPSDataPacket &packet)>;
+  using dis_callback_t = std::function<void(const ObstacleDisPacket &packet)>;
 
   Channels();
   virtual ~Channels();
@@ -76,6 +88,8 @@ class MYNTEYE_API Channels {
 
   void SetImuDataCallback(imu_callback_t callback);
   void SetImgInfoCallback(img_callback_t callback);
+  void SetGPSDataCallback(gps_callback_t callback);
+  void SetDisCallback(dis_callback_t callback);
 
   bool IsHidAvaliable() const;
   bool IsHidOpened() const;
@@ -107,7 +121,8 @@ class MYNTEYE_API Channels {
 
  private:
   void DoHidTrack();
-  bool DoHidDataExtract(imu_packets_t &imu, img_packets_t &img);  // NOLINT
+  bool DoHidDataExtract(imu_packets_t &imu, img_packets_t &img,
+      gps_packets_t &gps, dis_packets_t &dis);  // NOLINT
 
   bool PullFileData(bool device_info,
       bool reserve,
@@ -124,6 +139,8 @@ class MYNTEYE_API Channels {
 
   imu_callback_t imu_callback_;
   img_callback_t img_callback_;
+  gps_callback_t gps_callback_;
+  dis_callback_t dis_callback_;
 
   std::thread hid_track_thread_;
 

@@ -140,6 +140,7 @@ set(MYNTEYE_DEPTH_SRCS
   src/mynteyed/internal/image_utils.cc
   src/mynteyed/internal/motions.cc
   src/mynteyed/internal/streams.cc
+  src/mynteyed/internal/location.cc
 )
 if(OS_WIN)
   list(APPEND MYNTEYE_DEPTH_SRCS

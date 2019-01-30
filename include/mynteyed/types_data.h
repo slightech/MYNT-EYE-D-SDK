@@ -105,6 +105,42 @@ struct MYNTEYE_API ImuData {
 
 /**
  * @ingroup datatypes
+ * GPS data.
+ */
+struct MYNTEYE_API GPSData {
+  std::uint64_t device_time;
+  double latitude;
+  double longitude;
+  std::uint64_t latitude_degree;
+  std::uint64_t latitude_cent;
+  std::uint64_t latitude_second;
+  std::uint64_t longitude_degree;;
+  std::uint64_t longitude_cent;;
+  std::uint64_t longitude_second;;
+  std::uint64_t satellite;;
+  std::uint8_t NS;
+  std::uint8_t EW;
+
+  std::uint16_t year;
+  std::uint8_t month;
+  std::uint8_t day;
+  std::uint8_t hour;
+  std::uint8_t minute;
+  std::uint8_t second;
+};
+
+/**
+ * @ingroup datatypes
+ * ObstacleDistance data.
+ */
+struct MYNTEYE_API ObstacleDis {
+  std::uint64_t detection_time;
+  /* unit (mm) */
+  std::uint16_t distance;
+};
+
+/**
+ * @ingroup datatypes
  * Stream data.
  */
 struct MYNTEYE_API StreamData {
@@ -139,6 +175,38 @@ struct MYNTEYE_API MotionData {
   }
 };
 
+/**
+ * @ingroup datatypes
+ * Location data.
+ */
+struct MYNTEYE_API LocationData {
+  std::shared_ptr<GPSData> gps;
+
+  bool operator==(const LocationData &other) const {
+    if (gps && other.gps) {
+      return gps->device_time == other.gps->device_time;
+    }
+
+    return false;
+  }
+};
+
+/**
+ * @ingroup datatypes
+ * Location data.
+ */
+struct MYNTEYE_API DistanceData {
+  std::shared_ptr<ObstacleDis> dis;
+
+  bool operator==(const DistanceData &other) const {
+    if (dis && other.dis) {
+      return dis->detection_time ==
+        other.dis->detection_time;
+    }
+
+    return false;
+  }
+};
 
 #define MYNTEYE_PROPERTY(TYPE, NAME) \
  public:                             \
