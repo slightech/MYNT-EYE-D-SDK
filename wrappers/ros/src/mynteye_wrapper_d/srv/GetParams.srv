@@ -1,0 +1,7 @@
+uint32 IMG_INTRINSICS=0
+uint32 IMG_EXTRINSICS_RTOL=1
+uint32 IMU_INTRINSICS=2
+uint32 IMU_EXTRINSICS=3
+uint32 key
+---
+string value
