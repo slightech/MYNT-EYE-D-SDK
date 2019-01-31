@@ -590,8 +590,73 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     points_depth.release();
   }
 
+  void timestampAlign() {
+    static bool get_first_acc = false;
+    static bool get_first_gyro = false;
+    static bool has_gyro = false;
+    static ImuData acc;
+    static ImuData gyro;
+
+    if (!get_first_acc && imu_accel != nullptr) {
+      acc = *imu_accel;
+      imu_accel = nullptr;
+      get_first_acc = true;
+      return;
+    }
+
+    if (!get_first_gyro && imu_gyro != nullptr) {
+      gyro = *imu_gyro;
+      imu_gyro = nullptr;
+      get_first_gyro = true;
+      return;
+    }
+
+    if (imu_accel != nullptr) {
+      if (!has_gyro) {
+        acc = *imu_accel;
+        imu_accel = nullptr;
+        return;
+      }
+
+      if (acc.timestamp <= gyro.timestamp) {
+        ImuData acc_temp;
+        acc_temp = *imu_accel;
+        acc_temp.timestamp = gyro.timestamp;
+
+        double k = static_cast<double>(imu_accel->timestamp - acc.timestamp);
+        k = static_cast<double>(gyro.timestamp - acc.timestamp) / k;
+
+        acc_temp.accel[0] = acc.accel[0] +
+          (imu_accel->accel[0] - acc.accel[0]) * k;
+        acc_temp.accel[1] = acc.accel[1] +
+          (imu_accel->accel[1] - acc.accel[1]) * k;
+        acc_temp.accel[2] = acc.accel[2] +
+          (imu_accel->accel[2] - acc.accel[2]) * k;
+
+        acc = *imu_accel;
+        *imu_accel = acc_temp;
+        imu_gyro.reset(new ImuData(gyro));
+        has_gyro = false;
+        return;
+      } else {
+        acc = *imu_accel;
+        imu_accel = nullptr;
+        return;
+      }
+    }
+
+    if (imu_gyro != nullptr) {
+      has_gyro = true;
+      gyro = *imu_gyro;
+      imu_gyro = nullptr;
+      return;
+    }
+  }
+
   void publishImu(bool imu_sub,
       bool imu_processed_sub, bool temp_sub) {
+    timestampAlign();
+
     if (imu_accel == nullptr || imu_gyro == nullptr) {
       return;
     }

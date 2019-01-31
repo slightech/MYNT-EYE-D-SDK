@@ -41,17 +41,17 @@ class DepthRegion {
    * 鼠标事件：默认不选中区域，随鼠标移动而显示。单击后，则会选中区域来显示。你可以再单击已选中区域或双击未选中区域，取消选中。
    */
   void OnMouse(const int& event, const int& x, const int& y, const int& flags) {
-    if (event != CV_EVENT_MOUSEMOVE && event != CV_EVENT_LBUTTONDOWN) {
+    if (event != cv::EVENT_MOUSEMOVE && event != cv::EVENT_LBUTTONDOWN) {
       return;
     }
     show_ = true;
 
-    if (event == CV_EVENT_MOUSEMOVE) {
+    if (event == cv::EVENT_MOUSEMOVE) {
       if (!selected_) {
         point_.x = x;
         point_.y = y;
       }
-    } else if (event == CV_EVENT_LBUTTONDOWN) {
+    } else if (event == cv::EVENT_LBUTTONDOWN) {
       if (selected_) {
         if (x >= static_cast<int>(point_.x - n_) &&
             x <= static_cast<int>(point_.x + n_) &&
