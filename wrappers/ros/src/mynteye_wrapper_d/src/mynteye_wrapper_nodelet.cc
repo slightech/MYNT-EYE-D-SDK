@@ -1022,28 +1022,6 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
         } else {
           res.value = "null";
         }
-        if (ex_ok_1 && ex_ok_2) {
-          Config extrinsics{
-            {"vga", {
-              {"rotation",     Config::array({vga_extrinsics.rotation[0][0], vga_extrinsics.rotation[0][1], vga_extrinsics.rotation[0][2],   // NOLINT
-                                              vga_extrinsics.rotation[1][0], vga_extrinsics.rotation[1][1], vga_extrinsics.rotation[1][2],   // NOLINT
-                                              vga_extrinsics.rotation[2][0], vga_extrinsics.rotation[2][1], vga_extrinsics.rotation[2][2]})},// NOLINT
-              {"translation",  Config::array({vga_extrinsics.translation[0], vga_extrinsics.translation[1], vga_extrinsics.translation[2]})} // NOLINT
-              }
-            },
-            {"hd", {
-              {"rotation",     Config::array({hd_extrinsics.rotation[0][0], hd_extrinsics.rotation[0][1], hd_extrinsics.rotation[0][2],   // NOLINT
-                                              hd_extrinsics.rotation[1][0], hd_extrinsics.rotation[1][1], hd_extrinsics.rotation[1][2],   // NOLINT
-                                              hd_extrinsics.rotation[2][0], hd_extrinsics.rotation[2][1], hd_extrinsics.rotation[2][2]})},// NOLINT
-              {"translation",  Config::array({hd_extrinsics.translation[0], hd_extrinsics.translation[1], hd_extrinsics.translation[2]})} // NOLINT
-              }
-            }
-          };
-          std::string json = dump_string(extrinsics, configuru::JSON);
-          res.value = json;
-        } else {
-          res.value = "null";
-        }
       }
       break;
       case Request::IMU_INTRINSICS:
