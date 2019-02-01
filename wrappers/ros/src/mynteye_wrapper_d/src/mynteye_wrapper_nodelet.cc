@@ -900,102 +900,128 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     switch (req.key) {
       case Request::IMG_INTRINSICS: {
         bool in_ok;
-        auto&& in_vga = mynteye->GetStreamIntrinsics(StreamMode::STREAM_1280x480, &in_ok_1);
-        auto&& in_hd = mynteye->GetStreamIntrinsics(StreamMode::STREAM_2560x720, &in_ok_2);
-        if (in_ok_1 && in_ok_2) {
+        auto&& in_vga = mynteye->GetStreamIntrinsics(StreamMode::STREAM_1280x480, &in_ok_1);  // NOLINT
+        auto&& in_hd = mynteye->GetStreamIntrinsics(StreamMode::STREAM_2560x720, &in_ok_2);  // NOLINT
+        if (params.stream_mode == StreamMode::STREAM_1280x480 && in_ok_1) {
           Config intrinsics {
             {"calib_model", "pinhole"},
-              {"vga", {
-                  {"left", {
-                  {"width", in_vga.left.width},
-                  {"height", in_vga.left.height},
-                  {"fx", in_vga.left.fx},
-                  {"fy", in_vga.left.fy},
-                  {"cx", in_vga.left.cx},
-                  {"cy", in_vga.left.cy},
-                  {"coeffs", Config::array(
-                      {in_vga.left.coeffs[0],
-                      in_vga.left.coeffs[1],
-                      in_vga.left.coeffs[2],
-                      in_vga.left.coeffs[3],
-                      in_vga.left.coeffs[4]})},
-                  {"p", Config::array(
-                      {in_vga.left.p[0],in_vga.left.p[1],in_vga.left.p[2],
-                      in_vga.left.p[3],in_vga.left.p[4],in_vga.left.p[5],
-                      in_vga.left.p[6],in_vga.left.p[7],in_vga.left.p[8],
-                      in_vga.left.p[9],in_vga.left.p[10],in_vga.left.p[11]})}
-                }},
-                {"right", {
-                  {"width", in_vga.right.width},
-                  {"height", in_vga.right.height},
-                  {"fx", in_vga.right.fx},
-                  {"fy", in_vga.right.fy},
-                  {"cx", in_vga.right.cx},
-                  {"cy", in_vga.right.cy},
-                  {"coeffs", Config::array(
-                      {in_vga.right.coeffs[0],
-                      in_vga.right.coeffs[1],
-                      in_vga.right.coeffs[2],
-                      in_vga.right.coeffs[3],
-                      in_vga.right.coeffs[4]})},
-                  {"p", Config::array(
-                      {in_vga.right.p[0],in_vga.right.p[1],in_vga.right.p[2],
-                      in_vga.right.p[3],in_vga.right.p[4],in_vga.right.p[5],
-                      in_vga.right.p[6],in_vga.right.p[7],in_vga.right.p[8],
-                      in_vga.right.p[9],in_vga.right.p[10],in_vga.right.p[11]})}
-                }}
-              }},
-              {"hd", {
-                  {"left", {
-                  {"width", in_hd.left.width},
-                  {"height", in_hd.left.height},
-                  {"fx", in_hd.left.fx},
-                  {"fy", in_hd.left.fy},
-                  {"cx", in_hd.left.cx},
-                  {"cy", in_hd.left.cy},
-                  {"coeffs", Config::array(
-                      {in_hd.left.coeffs[0],
-                      in_hd.left.coeffs[1],
-                      in_hd.left.coeffs[2],
-                      in_hd.left.coeffs[3],
-                      in_hd.left.coeffs[4]})},
-                  {"p", Config::array(
-                      {in_hd.left.p[0],in_hd.left.p[1],in_hd.left.p[2],
-                      in_hd.left.p[3],in_hd.left.p[4],in_hd.left.p[5],
-                      in_hd.left.p[6],in_hd.left.p[7],in_hd.left.p[8],
-                      in_hd.left.p[9],in_hd.left.p[10],in_hd.left.p[11]})}
-                }},
-                {"right", {
-                  {"width", in_hd.right.width},
-                  {"height", in_hd.right.height},
-                  {"fx", in_hd.right.fx},
-                  {"fy", in_hd.right.fy},
-                  {"cx", in_hd.right.cx},
-                  {"cy", in_hd.right.cy},
-                  {"coeffs", Config::array(
-                      {in_hd.right.coeffs[0],
-                      in_hd.right.coeffs[1],
-                      in_hd.right.coeffs[2],
-                      in_hd.right.coeffs[3],
-                      in_hd.right.coeffs[4]})},
-                  {"p", Config::array(
-                      {in_hd.right.p[0],in_hd.right.p[1],in_hd.right.p[2],
-                      in_hd.right.p[3],in_hd.right.p[4],in_hd.right.p[5],
-                      in_hd.right.p[6],in_hd.right.p[7],in_hd.right.p[8],
-                      in_hd.right.p[9],in_hd.right.p[10],in_hd.right.p[11]})}
-                }
-              }
-            }
-          }
-        };
-        std::string json = dump_string(intrinsics, JSON);
-        res.value = json;
-      }}
+            {"left", {
+              {"width", in_vga.left.width},
+              {"height", in_vga.left.height},
+              {"fx", in_vga.left.fx},
+              {"fy", in_vga.left.fy},
+              {"cx", in_vga.left.cx},
+              {"cy", in_vga.left.cy},
+              {"coeffs", Config::array(
+                  {in_vga.left.coeffs[0],
+                  in_vga.left.coeffs[1],
+                  in_vga.left.coeffs[2],
+                  in_vga.left.coeffs[3],
+                  in_vga.left.coeffs[4]})},
+              {"p", Config::array(
+                  {in_vga.left.p[0],in_vga.left.p[1],in_vga.left.p[2],  // NOLINT
+                  in_vga.left.p[3],in_vga.left.p[4],in_vga.left.p[5],  // NOLINT
+                  in_vga.left.p[6],in_vga.left.p[7],in_vga.left.p[8],  // NOLINT
+                  in_vga.left.p[9],in_vga.left.p[10],in_vga.left.p[11]})}  // NOLINT
+            }},
+            {"right", {
+              {"width", in_vga.right.width},
+              {"height", in_vga.right.height},
+              {"fx", in_vga.right.fx},
+              {"fy", in_vga.right.fy},
+              {"cx", in_vga.right.cx},
+              {"cy", in_vga.right.cy},
+              {"coeffs", Config::array(
+                  {in_vga.right.coeffs[0],
+                  in_vga.right.coeffs[1],
+                  in_vga.right.coeffs[2],
+                  in_vga.right.coeffs[3],
+                  in_vga.right.coeffs[4]})},
+              {"p", Config::array(
+                  {in_vga.right.p[0],in_vga.right.p[1],in_vga.right.p[2],  // NOLINT
+                  in_vga.right.p[3],in_vga.right.p[4],in_vga.right.p[5],  // NOLINT
+                  in_vga.right.p[6],in_vga.right.p[7],in_vga.right.p[8],  // NOLINT
+                  in_vga.right.p[9],in_vga.right.p[10],in_vga.right.p[11]})}  // NOLINT
+            }}
+          };
+          std::string json = dump_string(intrinsics, JSON);
+          res.value = json;
+        } else if (params.stream_mode == StreamMode::STREAM_2560x720 &&
+            in_ok_2) {
+          Config intrinsics {
+            {"calib_model", "pinhole"},
+            {"left", {
+              {"width", in_hd.left.width},
+              {"height", in_hd.left.height},
+              {"fx", in_hd.left.fx},
+              {"fy", in_hd.left.fy},
+              {"cx", in_hd.left.cx},
+              {"cy", in_hd.left.cy},
+              {"coeffs", Config::array(
+                  {in_hd.left.coeffs[0],
+                  in_hd.left.coeffs[1],
+                  in_hd.left.coeffs[2],
+                  in_hd.left.coeffs[3],
+                  in_hd.left.coeffs[4]})},
+              {"p", Config::array(
+                  {in_hd.left.p[0],in_hd.left.p[1],in_hd.left.p[2],  // NOLINT
+                  in_hd.left.p[3],in_hd.left.p[4],in_hd.left.p[5],  // NOLINT
+                  in_hd.left.p[6],in_hd.left.p[7],in_hd.left.p[8],  // NOLINT
+                  in_hd.left.p[9],in_hd.left.p[10],in_hd.left.p[11]})}  // NOLINT
+            }},
+            {"right", {
+              {"width", in_hd.right.width},
+              {"height", in_hd.right.height},
+              {"fx", in_hd.right.fx},
+              {"fy", in_hd.right.fy},
+              {"cx", in_hd.right.cx},
+              {"cy", in_hd.right.cy},
+              {"coeffs", Config::array(
+                  {in_hd.right.coeffs[0],
+                  in_hd.right.coeffs[1],
+                  in_hd.right.coeffs[2],
+                  in_hd.right.coeffs[3],
+                  in_hd.right.coeffs[4]})},
+              {"p", Config::array(
+                  {in_hd.right.p[0],in_hd.right.p[1],in_hd.right.p[2],  // NOLINT
+                  in_hd.right.p[3],in_hd.right.p[4],in_hd.right.p[5],  // NOLINT
+                  in_hd.right.p[6],in_hd.right.p[7],in_hd.right.p[8],  // NOLINT
+                  in_hd.right.p[9],in_hd.right.p[10],in_hd.right.p[11]})}  // NOLINT
+            }}
+          };
+          std::string json = dump_string(intrinsics, JSON);
+          res.value = json;
+        } else {
+          res.value = "null";
+        }
+      }
       break;
       case Request::IMG_EXTRINSICS_RTOL: {
         bool ex_ok_1, ex_ok_2;
-        auto vga_extrinsics = mynteye->GetStreamExtrinsics(StreamMode::STREAM_1280x480, &ex_ok_1);
-        auto hd_extrinsics = mynteye->GetStreamExtrinsics(StreamMode::STREAM_2560x720, &ex_ok_2);
+        auto vga_extrinsics = mynteye->GetStreamExtrinsics(StreamMode::STREAM_1280x480, &ex_ok_1);  // NOLINT
+        auto hd_extrinsics = mynteye->GetStreamExtrinsics(StreamMode::STREAM_2560x720, &ex_ok_2);  // NOLINT
+        if (params.stream_mode == StreamMode::STREAM_1280x480 && ex_ok_1) {
+          Config extrinsics{
+            {"rotation",     Config::array({vga_extrinsics.rotation[0][0], vga_extrinsics.rotation[0][1], vga_extrinsics.rotation[0][2],   // NOLINT
+                                            vga_extrinsics.rotation[1][0], vga_extrinsics.rotation[1][1], vga_extrinsics.rotation[1][2],   // NOLINT
+                                            vga_extrinsics.rotation[2][0], vga_extrinsics.rotation[2][1], vga_extrinsics.rotation[2][2]})},// NOLINT
+            {"translation",  Config::array({vga_extrinsics.translation[0], vga_extrinsics.translation[1], vga_extrinsics.translation[2]})} // NOLINT
+          };
+          std::string json = dump_string(extrinsics, configuru::JSON);
+          res.value = json;
+        } else if (params.stream_mode == StreamMode::STREAM_2560x720 &&
+            ex_ok_2) {
+          Config extrinsics{
+            {"rotation",     Config::array({hd_extrinsics.rotation[0][0], hd_extrinsics.rotation[0][1], hd_extrinsics.rotation[0][2],   // NOLINT
+                                            hd_extrinsics.rotation[1][0], hd_extrinsics.rotation[1][1], hd_extrinsics.rotation[1][2],   // NOLINT
+                                            hd_extrinsics.rotation[2][0], hd_extrinsics.rotation[2][1], hd_extrinsics.rotation[2][2]})},// NOLINT
+            {"translation",  Config::array({hd_extrinsics.translation[0], hd_extrinsics.translation[1], hd_extrinsics.translation[2]})} // NOLINT
+          };
+          std::string json = dump_string(extrinsics, configuru::JSON);
+          res.value = json;
+        } else {
+          res.value = "null";
+        }
         if (ex_ok_1 && ex_ok_2) {
           Config extrinsics{
             {"vga", {
@@ -1021,10 +1047,10 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       }
       break;
       case Request::IMU_INTRINSICS:
-        res.value = "todo";
+        res.value = "TODO";
       break;
       case Request::IMU_EXTRINSICS:
-        res.value = "todo";
+        res.value = "TODO";
       break;
       default:
         res.value = "null";
