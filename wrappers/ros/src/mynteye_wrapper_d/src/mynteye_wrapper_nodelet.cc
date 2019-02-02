@@ -1025,10 +1025,66 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       }
       break;
       case Request::IMU_INTRINSICS:
-        res.value = "TODO";
+      {
+        bool is_ok;
+        auto intri = mynteye->GetMotionIntrinsics(&is_ok);
+        if (is_ok) {
+          Config intrinsics {
+            {"accel", {
+              {"scale",     Config::array({ intri.accel.scale[0][0], intri.accel.scale[0][1],  intri.accel.scale[0][2],   // NOLINT
+                                            intri.accel.scale[1][0], intri.accel.scale[1][1],  intri.accel.scale[1][2],   // NOLINT
+                                            intri.accel.scale[2][0], intri.accel.scale[2][1],  intri.accel.scale[2][2]})},// NOLINT
+              {"assembly",  Config::array({ intri.accel.assembly[0][0], intri.accel.assembly[0][1],  intri.accel.assembly[0][2],   // NOLINT
+                                            intri.accel.assembly[1][0], intri.accel.assembly[1][1],  intri.accel.assembly[1][2],   // NOLINT
+                                            intri.accel.assembly[2][0], intri.accel.assembly[2][1],  intri.accel.assembly[2][2]})},// NOLINT
+              {"drift",     Config::array({ intri.accel.drift[0],    intri.accel.drift[1],     intri.accel.drift[2]})}, // NOLINT
+              {"noise",     Config::array({ intri.accel.noise[0],    intri.accel.noise[1],     intri.accel.noise[2]})}, // NOLINT
+              {"bias",      Config::array({ intri.accel.bias[0],     intri.accel.bias[1],      intri.accel.bias[2]})}, // NOLINT
+              {"x",         Config::array({ intri.accel.x[0],        intri.accel.x[1]})}, // NOLINT
+              {"y",         Config::array({ intri.accel.y[0],        intri.accel.y[1]})}, // NOLINT
+              {"z",         Config::array({ intri.accel.z[0],        intri.accel.z[1]})} // NOLINT
+            }},
+            {"gyro", {
+              {"scale",     Config::array({ intri.gyro.scale[0][0], intri.gyro.scale[0][1],  intri.gyro.scale[0][2],   // NOLINT
+                                            intri.gyro.scale[1][0], intri.gyro.scale[1][1],  intri.gyro.scale[1][2],   // NOLINT
+                                            intri.gyro.scale[2][0], intri.gyro.scale[2][1],  intri.gyro.scale[2][2]})},// NOLINT
+              {"assembly",  Config::array({ intri.gyro.assembly[0][0], intri.gyro.assembly[0][1],  intri.gyro.assembly[0][2],   // NOLINT
+                                            intri.gyro.assembly[1][0], intri.gyro.assembly[1][1],  intri.gyro.assembly[1][2],   // NOLINT
+                                            intri.gyro.assembly[2][0], intri.gyro.assembly[2][1],  intri.gyro.assembly[2][2]})},// NOLINT
+              {"drift",     Config::array({ intri.gyro.drift[0],    intri.gyro.drift[1],     intri.gyro.drift[2]})}, // NOLINT
+              {"noise",     Config::array({ intri.gyro.noise[0],    intri.gyro.noise[1],     intri.gyro.noise[2]})}, // NOLINT
+              {"bias",      Config::array({ intri.gyro.bias[0],     intri.gyro.bias[1],      intri.gyro.bias[2]})}, // NOLINT
+              {"x",         Config::array({ intri.gyro.x[0],        intri.gyro.x[1]})}, // NOLINT
+              {"y",         Config::array({ intri.gyro.y[0],        intri.gyro.y[1]})}, // NOLINT
+              {"z",         Config::array({ intri.gyro.z[0],        intri.gyro.z[1]})} // NOLINT
+            }}
+          };
+          std::string json = dump_string(intrinsics, JSON);
+          res.value = json;
+        } else {
+          NODELET_INFO_STREAM("INVALID IMU INTRINSICS");
+          res.value = "null";
+        }
+      }
       break;
       case Request::IMU_EXTRINSICS:
-        res.value = "TODO";
+      {
+        bool is_ok;
+        auto extri = mynteye->GetMotionExtrinsics(&is_ok);
+        if (is_ok) {
+          Config extrinsics{
+            {"rotation",     Config::array({extri.rotation[0][0], extri.rotation[0][1], extri.rotation[0][2],   // NOLINT
+                                            extri.rotation[1][0], extri.rotation[1][1], extri.rotation[1][2],   // NOLINT
+                                            extri.rotation[2][0], extri.rotation[2][1], extri.rotation[2][2]})},// NOLINT
+            {"translation",  Config::array({extri.translation[0], extri.translation[1], extri.translation[2]})} // NOLINT
+          };
+          std::string json = dump_string(extrinsics, configuru::JSON);
+          res.value = json;
+        } else {
+          NODELET_INFO_STREAM("INVALID IMU EXTRINSICS");
+          res.value = "null";
+        }
+      }
       break;
       default:
         res.value = "null";
