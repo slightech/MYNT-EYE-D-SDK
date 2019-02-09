@@ -70,13 +70,13 @@ class MYNTEYE_API Channels {
   using device_desc_t = device::Descriptors;
   using imu_params_t = device::ImuParams;
 
-  using imu_packets_t = std::vector<ImuDataPacket>;
   using img_packets_t = std::vector<ImgInfoPacket>;
+  using imu_packets_t = std::vector<ImuDataPacket>;
   using gps_packets_t = std::vector<GPSDataPacket>;
   using dis_packets_t = std::vector<ObstacleDisPacket>;
 
-  using imu_callback_t = std::function<void(const ImuDataPacket &packet)>;
   using img_callback_t = std::function<void(const ImgInfoPacket &packet)>;
+  using imu_callback_t = std::function<void(const ImuDataPacket &packet)>;
   using gps_callback_t = std::function<void(const GPSDataPacket &packet)>;
   using dis_callback_t = std::function<void(const ObstacleDisPacket &packet)>;
 
@@ -86,10 +86,10 @@ class MYNTEYE_API Channels {
   bool IsAvaliable() const;
   bool IsOpened() const;
 
-  void SetImuDataCallback(imu_callback_t callback);
   void SetImgInfoCallback(img_callback_t callback);
+  void SetImuDataCallback(imu_callback_t callback);
   void SetGPSDataCallback(gps_callback_t callback);
-  void SetDisCallback(dis_callback_t callback);
+  void SetDisDataCallback(dis_callback_t callback);
 
   bool IsHidAvaliable() const;
   bool IsHidOpened() const;
@@ -137,8 +137,8 @@ class MYNTEYE_API Channels {
   bool is_hid_opened_ = false;
   bool is_hid_tracking_ = false;
 
-  imu_callback_t imu_callback_;
   img_callback_t img_callback_;
+  imu_callback_t imu_callback_;
   gps_callback_t gps_callback_;
   dis_callback_t dis_callback_;
 

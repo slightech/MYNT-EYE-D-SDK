@@ -180,6 +180,7 @@ struct MYNTEYE_API MotionData {
  * Location data.
  */
 struct MYNTEYE_API LocationData {
+  /** GPSData */
   std::shared_ptr<GPSData> gps;
 
   bool operator==(const LocationData &other) const {
@@ -196,6 +197,7 @@ struct MYNTEYE_API LocationData {
  * Location data.
  */
 struct MYNTEYE_API DistanceData {
+  /** ObstacleDis */
   std::shared_ptr<ObstacleDis> dis;
 
   bool operator==(const DistanceData &other) const {

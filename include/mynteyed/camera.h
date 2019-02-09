@@ -38,6 +38,8 @@ class MYNTEYE_API Camera {
         std::function<void(const std::shared_ptr<ImgInfo>& info)>;
   using stream_callback_t = std::function<void(const StreamData& data)>;
   using motion_callback_t = std::function<void(const MotionData& data)>;
+  using location_callback_t = std::function<void(const LocationData& data)>;
+  using distance_callback_t = std::function<void(const DistanceData& data)>;
 
   Camera();
   ~Camera();
@@ -208,6 +210,50 @@ class MYNTEYE_API Camera {
   /** @deprecated Replaced by OpenParams#device_mode */
   void DisableStreamData(const ImageType& type);
 #endif
+
+  /** Whethor location datas supported or not */
+  bool IsLocationDatasSupported() const;
+  /**↩
+   * Enable location datas.
+   *
+   * If max_size <= 0, indicates only can get datas from callback.
+   * If max_size > 0, indicates can get datas from callback or using GetLocationDatas().
+   *
+   * Note: if max_size > 0, the distance datas will be cached until you call GetLocationDatas().
+  */
+  void EnableLocationDatas(std::size_t max_size);
+  /** Disable location datas. */
+  void DisableLocationDatas();
+  /** Whethor location datas enabled or not */
+  bool IsLocationDatasEnabled() const;
+
+  /** Get cached location datas. Besides, you can also get them from callback */
+  std::vector<LocationData> GetLocationDatas();
+
+  /** Set location data callback. */
+  void SetLocationCallback(location_callback_t callback, bool async = true);
+
+  /** Whethor distance datas supported or not */
+  bool IsDistanceDatasSupported() const;
+  /**
+   * Enable distance datas.
+   *
+   * If max_size <= 0, indicates only can get datas from callback.
+   * If max_size > 0, indicates can get datas from callback or using GetDistanceDatas().
+   *
+   * Note: if max_size > 0, the distance datas will be cached until you call GetDistanceDatas().
+   */
+  void EnableDistanceDatas(std::size_t max_size);
+  /** Disable distance datas. */
+  void DisableDistanceDatas();
+  /** Whethor distance datas enabled or not */
+  bool IsDistanceDatasEnabled() const;
+
+  /** Get cached distance datas. Besides, you can also get them from callback */
+  std::vector<DistanceData> GetDistanceDatas();
+
+  /** Set distance data callback. */
+  void SetDistanceCallback(distance_callback_t callback, bool async = true);
 
  private:
   std::unique_ptr<CameraPrivate> p_;

@@ -20,17 +20,17 @@ class Location {
   Location();
   ~Location();
 
-  /**
+  /**↩
    * Enable location datas.
    *
    * If max_size <= 0, indicates only can get datas from callback.
    * If max_size > 0, indicates can get datas from callback or using GetLocationDatas().
    *
-   * Note: if max_size > 0, the location datas will be cached until you call GetLocationDatas().
-   */
+   * Note: if max_size > 0, the distance datas will be cached until you call GetLocationDatas().
+  */
   void EnableLocationDatas(std::size_t max_size);
   void DisableLocationDatas();
-  bool IsLocationDatas() const;
+  bool IsLocationDatasEnabled() const;
 
   datas_t GetLocationDatas();
 

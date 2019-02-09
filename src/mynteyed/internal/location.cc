@@ -34,7 +34,7 @@ void Location::DisableLocationDatas() {
   location_datas_.clear();
 }
 
-bool Location::IsLocationDatas() const {
+bool Location::IsLocationDatasEnabled() const {
   return is_location_datas_enabled_;
 }
 

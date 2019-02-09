@@ -68,8 +68,8 @@ void CheckSpecVersion(const Version *spec_version) {
 
 }  // namespace
 
-Channels::Channels() : imu_callback_(nullptr),
-  img_callback_(nullptr),
+Channels::Channels() : img_callback_(nullptr),
+  imu_callback_(nullptr),
   gps_callback_(nullptr),
   dis_callback_(nullptr) {
   hid_ = std::make_shared<hid::hid_device>();
@@ -104,7 +104,7 @@ void Channels::SetGPSDataCallback(gps_callback_t callback) {
   gps_callback_ = callback;
 }
 
-void Channels::SetDisCallback(dis_callback_t callback) {
+void Channels::SetDisDataCallback(dis_callback_t callback) {
   dis_callback_ = callback;
 }
 
@@ -1050,8 +1050,7 @@ bool Channels::HidFirmwareUpdate(const char *filepath) {
     }
     cmd[0] = 0xAB;
   } else {
-    if (hid_->receive(0, cmd, 64, 20000) <= 0)
-    {
+    if (hid_->receive(0, cmd, 64, 20000) <= 0) {
       LOGE("\n%s %d:: Update failed. maybe device went offline\n", __FILE__, __LINE__);
       return false;
     }

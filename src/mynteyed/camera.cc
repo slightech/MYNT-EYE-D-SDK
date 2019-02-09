@@ -146,7 +146,7 @@ std::vector<StreamData> Camera::GetStreamDatas(const ImageType& type) {
 }
 
 bool Camera::IsMotionDatasSupported() const {
-  return p_->IsMotionDatasSupported();
+  return p_->IsExSensorDatasSupported();
 }
 
 void Camera::EnableMotionDatas(std::size_t max_size) {
@@ -224,3 +224,43 @@ void Camera::DisableStreamData(const ImageType& type) {
   LOGW("%s is deprecated, replaced by OpenParams#device_mode.", __func__);
 }
 #endif
+
+bool Camera::IsLocationDatasSupported() const {
+  return p_->IsExSensorDatasSupported();
+}
+
+void Camera::EnableLocationDatas(std::size_t max_size) {
+  p_->EnableLocationDatas(std::move(max_size));
+}
+
+void Camera::DisableLocationDatas() {
+  p_->DisableLocationDatas();
+}
+
+bool Camera::IsLocationDatasEnabled() const {
+  return p_->IsLocationDatasEnabled();
+}
+
+std::vector<LocationData> Camera::GetLocationDatas() {
+  return std::move(p_->GetLocationDatas());
+}
+
+bool Camera::IsDistanceDatasSupported() const {
+  return p_->IsExSensorDatasSupported();
+}
+
+void Camera::EnableDistanceDatas(std::size_t max_size) {
+  p_->EnableDistanceDatas(std::move(max_size));
+}
+
+void Camera::DisableDistanceDatas() {
+  p_->DisableDistanceDatas();
+}
+
+bool Camera::IsDistanceDatasEnabled() const {
+  return p_->IsDistanceDatasEnabled();
+}
+
+std::vector<DistanceData> Camera::GetDistanceDatas() {
+  return std::move(p_->GetDistanceDatas());
+}
