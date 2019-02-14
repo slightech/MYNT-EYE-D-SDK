@@ -18,6 +18,10 @@
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <mynteye_wrapper_d/GetParams.h>
+#define CONFIGURU_IMPLEMENTATION 1
+#include "configuru.hpp"
+using namespace configuru;  // NOLINT
 
 namespace enc = sensor_msgs::image_encodings;
 
@@ -29,12 +33,39 @@ class MYNTEYEListener {
     depth_sub_ =  it_.subscribe("mynteye/depth/image_raw", 1,
         &MYNTEYEListener::depthCallback, this);
 
+    std::string img_intri = getCameraCalibInfo(0u);
+    std::string img_extri = getCameraCalibInfo(1u);
+    std::string imu_intri = getCameraCalibInfo(2u);
+    std::string imu_extri = getCameraCalibInfo(3u);
+
+    auto img_intri_info = parse_string(img_intri.c_str(), JSON, "log");
+    auto img_extri_info = parse_string(img_extri.c_str(), JSON, "log");
+    auto imu_intri_info = parse_string(imu_intri.c_str(), JSON, "log");
+    auto imu_extri_info = parse_string(imu_extri.c_str(), JSON, "log");
+    std::cout << "IMG_INTRINSICS:" << img_intri_info << std::endl
+              << "IMG_EXTRINSICS_RTOL:" << img_extri_info << std::endl
+              << "IMU_INTRINSICS:" << imu_intri_info << std::endl
+              << "IMU_EXTRINSICS:" << imu_extri_info << std::endl;
+
     cv::namedWindow("color", cv::WINDOW_AUTOSIZE);
     cv::namedWindow("depth", cv::WINDOW_AUTOSIZE);
   }
 
   ~MYNTEYEListener() {
     cv::destroyAllWindows();
+  }
+
+  std::string getCameraCalibInfo(unsigned int type_) {
+    ros::ServiceClient client =
+        nh_.serviceClient<mynteye_wrapper_d::GetParams>("/mynteye_wrapper_d_node/get_params");
+    mynteye_wrapper_d::GetParams srv;
+    srv.request.key = type_;
+    if (client.call(srv)) {
+      return srv.response.value;
+    } else {
+      ROS_ERROR("Failed to call service GetParams, make sure you have launch mynteye device SDK nodelet");
+      return "null";
+    }
   }
 
   void colorCallback(const sensor_msgs::ImageConstPtr& msg) {
