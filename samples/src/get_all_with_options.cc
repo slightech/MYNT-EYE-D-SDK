@@ -214,7 +214,8 @@ int main(int argc, char const* argv[]) {
     if (!in_range("colour_depth_value", 0, 16384, &val)) return 2;
     params.colour_depth_value = val;
 
-    if (params.stream_mode == StreamMode::STREAM_2560x720) {
+    if (params.stream_mode == StreamMode::STREAM_2560x720 &&
+        params.dev_mode == DeviceMode::DEVICE_ALL) {
       if (!in_range("framerate", 0, 30, &val)) return 2;
     } else {
       if (!in_range("framerate", 0, 60, &val)) return 2;
