@@ -114,10 +114,10 @@ struct MYNTEYE_API GPSData {
   std::uint64_t latitude_degree;
   std::uint64_t latitude_cent;
   std::uint64_t latitude_second;
-  std::uint64_t longitude_degree;;
-  std::uint64_t longitude_cent;;
-  std::uint64_t longitude_second;;
-  std::uint64_t satellite;;
+  std::uint64_t longitude_degree;
+  std::uint64_t longitude_cent;
+  std::uint64_t longitude_second;
+  std::uint64_t satellite;
   std::uint8_t NS;
   std::uint8_t EW;
 

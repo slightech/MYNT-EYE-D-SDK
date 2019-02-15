@@ -221,7 +221,7 @@ class MYNTEYE_API Camera {
    *
    * Note: if max_size > 0, the distance datas will be cached until you call GetLocationDatas().
   */
-  void EnableLocationDatas(std::size_t max_size);
+  void EnableLocationDatas(std::size_t max_size = std::numeric_limits<std::size_t>::max());
   /** Disable location datas. */
   void DisableLocationDatas();
   /** Whethor location datas enabled or not */
@@ -243,7 +243,7 @@ class MYNTEYE_API Camera {
    *
    * Note: if max_size > 0, the distance datas will be cached until you call GetDistanceDatas().
    */
-  void EnableDistanceDatas(std::size_t max_size);
+  void EnableDistanceDatas(std::size_t max_size = std::numeric_limits<std::size_t>::max());
   /** Disable distance datas. */
   void DisableDistanceDatas();
   /** Whethor distance datas enabled or not */

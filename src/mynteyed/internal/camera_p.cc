@@ -433,7 +433,10 @@ bool CameraPrivate::StartDataTracking() {
     // ensure start after opened
     return false;
   }
-  if (!motions_->IsMotionDatasEnabled() && !streams_->IsImageInfoEnabled()) {
+  if (!motions_->IsMotionDatasEnabled() &&
+      !streams_->IsImageInfoEnabled() &&
+      !location_->IsLocationDatasEnabled() &&
+      !distance_->IsDistanceDatasEnabled()) {
     // Not tracking if data & info both disabled
     return false;
   }
