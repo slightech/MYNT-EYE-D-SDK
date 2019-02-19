@@ -24,6 +24,9 @@
   <arg name="type_mono16"        default="0" />
   <arg name="type_16uc1"         default="1" />
 
+  <!-- IMU timestamp align -->
+  <arg name="imu_timestamp_align" default="true" />
+
   <!-- Camera Params -->
 
   <!-- Device index -->
@@ -138,6 +141,7 @@
     <param name="state_awb"     value="$(arg state_awb)" />
     <param name="ir_intensity"  value="$(arg ir_intensity)" />
     <param name="ir_depth_only" value="$(arg ir_depth_only)" />
+    <param name="imu_timestamp_align" value="$(arg imu_timestamp_align)" />
 
     <param name="points_factor"    value="$(arg points_factor)" />
     <param name="points_frequency" value="$(arg points_frequency)" />

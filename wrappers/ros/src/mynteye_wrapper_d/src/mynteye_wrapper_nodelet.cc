@@ -116,6 +116,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   OpenParams params;
   std::unique_ptr<Camera> mynteye;
   int depth_type = 0;
+  bool imu_timestamp_align = false;
 
   // Others
 
@@ -189,6 +190,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     nh_ns.getParam("ir_intensity", ir_intensity);
     nh_ns.getParam("ir_depth_only", ir_depth_only);
     nh_ns.getParam("depth_type", depth_type);
+    nh_ns.getParam("imu_timestamp_align", imu_timestamp_align);
 
     points_frequency = DEFAULT_POINTS_FREQUENCE;
     points_factor = DEFAULT_POINTS_FACTOR;
@@ -439,10 +441,19 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
                        sub_result.temp)) {
         if (data.imu->flag == MYNTEYE_IMU_ACCEL) {
           imu_accel = data.imu;
-          publishImu(sub_result.imu, sub_result.imu_processed, sub_result.temp);
+          if (imu_timestamp_align) {
+            publishAlignImu(sub_result.imu, sub_result.imu_processed, sub_result.temp);
+          } else {
+            std::cout << "------" << std::endl;
+            publishImu(sub_result.imu, sub_result.imu_processed, sub_result.temp);
+          }
         } else if (data.imu->flag == MYNTEYE_IMU_GYRO) {
           imu_gyro = data.imu;
-          publishImu(sub_result.imu, sub_result.imu_processed, sub_result.temp);
+          if (imu_timestamp_align) {
+            publishAlignImu(sub_result.imu, sub_result.imu_processed, sub_result.temp);
+          } else {
+            publishImu(sub_result.imu, sub_result.imu_processed, sub_result.temp);
+          }
         }
       }
       pthread_mutex_unlock(&mutex_sub_result);
@@ -653,10 +664,47 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     }
   }
 
-  void publishImu(bool imu_sub,
+  void publishAlignImu(bool imu_sub,
       bool imu_processed_sub, bool temp_sub) {
     timestampAlign();
 
+    if (imu_accel == nullptr || imu_gyro == nullptr) {
+      return;
+    }
+
+    ros::Time stamp = hardTimeToSoftTime(imu_accel->timestamp);
+
+    if (imu_sub) {
+      auto msg = getImuMsgFromData(ros::Time::now(),
+          imu_frame_id, *imu_accel, *imu_gyro);
+      msg.header.stamp = stamp;
+      pub_imu.publish(msg);
+    }
+
+    if (motion_intrinsics_enabled && imu_processed_sub) {
+      auto data_acc1 = ProcImuTempDrift(*imu_accel);
+      auto data_gyr1 = ProcImuTempDrift(*imu_gyro);
+      auto data_acc2 = ProcImuAssembly(data_acc1);
+      auto data_gyr2 = ProcImuAssembly(data_gyr1);
+      auto msg = getImuMsgFromData(ros::Time::now(), imu_frame_processed_id,
+          data_acc2, data_gyr2);
+      msg.header.stamp = stamp;
+      pub_imu_processed.publish(msg);
+    }
+
+    if (temp_sub) {
+      auto msg = getTempMsgFromData(ros::Time::now(), temp_frame_id,
+                                    *imu_accel);
+      msg.header.stamp = stamp;
+      pub_temp.publish(msg);
+    }
+
+    imu_accel = nullptr;
+    imu_gyro = nullptr;
+  }
+
+  void publishImu(bool imu_sub,
+      bool imu_processed_sub, bool temp_sub) {
     if (imu_accel == nullptr || imu_gyro == nullptr) {
       return;
     }
