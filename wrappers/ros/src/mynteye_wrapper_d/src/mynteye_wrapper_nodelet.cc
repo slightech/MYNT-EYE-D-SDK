@@ -444,7 +444,6 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
           if (imu_timestamp_align) {
             publishAlignImu(sub_result.imu, sub_result.imu_processed, sub_result.temp);
           } else {
-            std::cout << "------" << std::endl;
             publishImu(sub_result.imu, sub_result.imu_processed, sub_result.temp);
           }
         } else if (data.imu->flag == MYNTEYE_IMU_GYRO) {
