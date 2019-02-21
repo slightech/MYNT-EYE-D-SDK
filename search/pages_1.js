@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['camera_20control_20parameters_20api',['Camera control parameters API',['../camera_control_params.html',1,'samples']]]
+  ['imu_20坐标系统',['IMU 坐标系统',['../imu_coord.html',1,'product']]]
 ];

@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['product_20introduction',['Product Introduction',['../product.html',1,'index']]],
-  ['product_20description',['Product Description',['../product_description.html',1,'product']]],
-  ['product_20surface',['Product Surface',['../product_surface.html',1,'product']]],
-  ['project_20demos',['Project Demos',['../projects.html',1,'index']]]
+  ['sdk_20安装',['SDK 安装',['../installation.html',1,'index']]],
+  ['sdk_20样例',['SDK 样例',['../samples.html',1,'index']]],
+  ['sdk_20工具',['SDK 工具',['../tools.html',1,'index']]]
 ];

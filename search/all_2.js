@@ -1,10 +1,10 @@
 var searchData=
 [
   ['camera',['Camera',['../classmynteyed_1_1_camera.html',1,'mynteyed']]],
-  ['camera_20control_20parameters_20api',['Camera control parameters API',['../camera_control_params.html',1,'samples']]],
   ['cameraintrinsics',['CameraIntrinsics',['../structmynteyed_1_1_camera_intrinsics.html',1,'mynteyed']]],
   ['chip_5fid',['chip_id',['../structmynteyed_1_1_device_info.html#ad9f7a919668c8820fcd7f266c20f8044',1,'mynteyed::DeviceInfo']]],
   ['close',['Close',['../classmynteyed_1_1_camera.html#a8824cafc079668aace1c80b3b755c044',1,'mynteyed::Camera']]],
+  ['cmake_20如何使用_20sdk',['CMake 如何使用 SDK',['../cmake.html',1,'projects']]],
   ['coeffs',['coeffs',['../structmynteyed_1_1_camera_intrinsics.html#a46232f3f3d8f086d3a063276c1d3aa90',1,'mynteyed::CameraIntrinsics']]],
   ['color_5fmode',['color_mode',['../structmynteyed_1_1_open_params.html#ad653784db7249017dbacdfc5d67692c2',1,'mynteyed::OpenParams']]],
   ['color_5fstream_5fformat',['color_stream_format',['../structmynteyed_1_1_open_params.html#aa8d158586597d95704c25ef5751c6dcb',1,'mynteyed::OpenParams']]],

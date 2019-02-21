@@ -1,13 +1,13 @@
 var samples =
 [
-    [ "Get camera image", "get_image.html", null ],
-    [ "Get depth image", "get_depth.html", null ],
-    [ "Get point image", "get_points.html", null ],
-    [ "Get IMU data", "get_imu.html", null ],
-    [ "Get data from callbacks", "get_from_callbacks.html", null ],
-    [ "Get different types of image by options", "get_all_with_options.html", null ],
-    [ "Get image calibration parameters", "get_image_params.html", null ],
-    [ "Get IMU calibration parameters", "get_imu_params.html", null ],
-    [ "Set open parameters", "set_open_params.html", null ],
-    [ "Camera control parameters API", "camera_control_params.html", null ]
+    [ "获取双目图像", "get_image.html", null ],
+    [ "获取深度图像", "get_depth.html", null ],
+    [ "获取点云图像", "get_points.html", null ],
+    [ "获取IMU数据", "get_imu.html", null ],
+    [ "从回调接口获取数据", "get_from_callbacks.html", null ],
+    [ "通过设置参数获取不同类型的数据", "get_all_with_options.html", null ],
+    [ "获取图像标定参数", "get_image_params.html", null ],
+    [ "获取IMU标定参数", "get_imu_params.html", null ],
+    [ "设定打开参数", "set_open_params.html", null ],
+    [ "相机控制参数API", "camera_control_params.html", null ]
 ];

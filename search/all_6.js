@@ -1,13 +1,5 @@
 var searchData=
 [
-  ['get_20different_20types_20of_20image_20by_20options',['Get different types of image by options',['../get_all_with_options.html',1,'samples']]],
-  ['get_20depth_20image',['Get depth image',['../get_depth.html',1,'samples']]],
-  ['get_20data_20from_20callbacks',['Get data from callbacks',['../get_from_callbacks.html',1,'samples']]],
-  ['get_20camera_20image',['Get camera image',['../get_image.html',1,'samples']]],
-  ['get_20image_20calibration_20parameters',['Get image calibration parameters',['../get_image_params.html',1,'samples']]],
-  ['get_20imu_20data',['Get IMU data',['../get_imu.html',1,'samples']]],
-  ['get_20imu_20calibration_20parameters',['Get IMU calibration parameters',['../get_imu_params.html',1,'samples']]],
-  ['get_20point_20image',['Get point image',['../get_points.html',1,'samples']]],
   ['getdescriptor',['GetDescriptor',['../classmynteyed_1_1_camera.html#ae98d1f3645a8c91edd665aef86b4e0ae',1,'mynteyed::Camera']]],
   ['getdescriptors',['GetDescriptors',['../classmynteyed_1_1_camera.html#a2950e9ad15387fb60e81c7b670d3c65a',1,'mynteyed::Camera']]],
   ['getdeviceinfos',['GetDeviceInfos',['../classmynteyed_1_1_camera.html#a336bdef5a92600b8ac34f2fcd08c0ecc',1,'mynteyed::Camera::GetDeviceInfos() const '],['../classmynteyed_1_1_camera.html#a52b0d57d4b7ff8c1695399734f0acfa7',1,'mynteyed::Camera::GetDeviceInfos(std::vector&lt; DeviceInfo &gt; *dev_infos) const ']]],

@@ -7,7 +7,7 @@ var searchData=
   ['img_5finfo',['img_info',['../structmynteyed_1_1_stream_data.html#a4b26a3f4fd8cc89af453a31b2c84bf3c',1,'mynteyed::StreamData']]],
   ['imginfo',['ImgInfo',['../structmynteyed_1_1_img_info.html',1,'mynteyed']]],
   ['imu',['imu',['../structmynteyed_1_1_motion_data.html#a0e73450efac406d50400ce209f2a4e16',1,'mynteyed::MotionData']]],
-  ['imu_20coordinata_20system',['IMU Coordinata System',['../imu_coord.html',1,'product']]],
+  ['imu_20坐标系统',['IMU 坐标系统',['../imu_coord.html',1,'product']]],
   ['imudata',['ImuData',['../structmynteyed_1_1_imu_data.html',1,'mynteyed']]],
   ['imuintrinsics',['ImuIntrinsics',['../structmynteyed_1_1_imu_intrinsics.html',1,'mynteyed']]],
   ['imuparams',['ImuParams',['../structmynteyed_1_1device_1_1_imu_params.html',1,'mynteyed::device']]],

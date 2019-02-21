@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['imu_20coordinata_20system',['IMU Coordinata System',['../imu_coord.html',1,'product']]]
+  ['qt_20creator_20如何使用_20sdk',['Qt Creator 如何使用 SDK',['../qtcreator.html',1,'projects']]]
 ];
