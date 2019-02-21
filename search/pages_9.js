@@ -1,8 +1,10 @@
 var searchData=
 [
-  ['从回调接口获取数据',['从回调接口获取数据',['../get_from_callbacks.html',1,'samples']]],
-  ['产品说明',['产品说明',['../product.html',1,'index']]],
-  ['产品介绍',['产品介绍',['../product_description.html',1,'product']]],
-  ['产品外观',['产品外观',['../product_surface.html',1,'product']]],
-  ['保存设备信息和参数',['保存设备信息和参数',['../save_all_infos.html',1,'tools']]]
+  ['sdk_20installation',['SDK Installation',['../installation.html',1,'index']]],
+  ['sdk_20samples',['SDK Samples',['../samples.html',1,'index']]],
+  ['save_20device_20infomation_20and_20parameters',['Save device infomation and parameters',['../save_all_infos.html',1,'tools']]],
+  ['set_20open_20parameters',['Set open parameters',['../set_open_params.html',1,'samples']]],
+  ['supported_20platforms',['Supported Platforms',['../support_platforms.html',1,'installation']]],
+  ['support_20resolutions',['Support Resolutions',['../support_resolutions.html',1,'product']]],
+  ['sdk_20tools',['SDK Tools',['../tools.html',1,'index']]]
 ];

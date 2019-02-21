@@ -1,5 +1,9 @@
 var searchData=
 [
-  ['open',['Open',['../classmynteyed_1_1_camera.html#a8f088ced93a4f1d734ca84aef8120598',1,'mynteyed::Camera::Open()'],['../classmynteyed_1_1_camera.html#adfb443ba08e9bc613aef364cdb8a5137',1,'mynteyed::Camera::Open(const OpenParams &amp;params)']]],
-  ['openparams',['OpenParams',['../structmynteyed_1_1_open_params.html',1,'mynteyed::OpenParams'],['../structmynteyed_1_1_open_params.html#a830b91a62f5a6026c3ee38f637362000',1,'mynteyed::OpenParams::OpenParams()']]]
+  ['p',['p',['../structmynteyed_1_1_camera_intrinsics.html#a8bcf890ec64751210f5b52ce14990133',1,'mynteyed::CameraIntrinsics']]],
+  ['pid',['pid',['../structmynteyed_1_1_device_info.html#a0d009df4dfcf019b53a852b7e7f399eb',1,'mynteyed::DeviceInfo']]],
+  ['product_20introduction',['Product Introduction',['../product.html',1,'index']]],
+  ['product_20description',['Product Description',['../product_description.html',1,'product']]],
+  ['product_20surface',['Product Surface',['../product_surface.html',1,'product']]],
+  ['project_20demos',['Project Demos',['../projects.html',1,'index']]]
 ];

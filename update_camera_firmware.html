@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.11"/>
-<title>MYNT EYE D SDK: Write IMU parameters</title>
+<title>MYNT EYE D SDK: Update Camera Firmware</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -74,7 +74,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   </div>
 </div>
 <script type="text/javascript">
-$(document).ready(function(){initNavTree('write_imu_params.html','');});
+$(document).ready(function(){initNavTree('update_camera_firmware.html','');});
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -93,20 +93,27 @@ $(document).ready(function(){initNavTree('write_imu_params.html','');});
 
 <div class="header">
   <div class="headertitle">
-<div class="title">Write IMU parameters </div>  </div>
+<div class="title">Update Camera Firmware </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>SDK provides the tool <code>imu_params_writer</code> to write IMU parameters.</p>
-<p>Information about how to get IMU parameters, please read [Get IMU calibration parameters]() .</p>
-<p>Reference commands:</p>
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;./tools/_output/bin/writer/imu_params_writer tools/writer/config/imu.params</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;</div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;# Windows</div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;.\tools\_output\bin\writer\imu_params_writer.bat tools\writer\config\imu.params</div></div><!-- fragment --><p>The path of parameters file can be found in <a href="https://github.com/slightech/MYNT-EYE-D-SDK/blob/master/tools/writer/config/imu.params">tools/writer/config/imu.params</a> . If you calibrated the parameters yourself, you can edit the file and run above commands to write them into the device.</p>
-<blockquote class="doxtable">
-<p>Warning</p><ul>
-<li>Please don’t override parameters, you can use <code>save_all_infos</code> to backup parameters. </li>
-</ul>
-</blockquote>
-<p>Complete code samples，see <a href="https://github.com/slightech/MYNT-EYE-D-SDK/blob/master/tools/writer/imu_params_writer.cc">imu_params_writer</a> . </p>
-</div></div><!-- contents -->
+<div class="textblock"><p>Note:: This tool does not support beta device upgrade.</p>
+<h2>Get Firmware</h2>
+<p>Latest firmware: SICI-B12-B0135P-016-005-ISO_Plugout2M(Interleave).bin <a href="https://drive.google.com/open?id=1gAbTf6W10a8iwT7L9TceMVgxQCWKnEsx">Google Drive</a>, <a href="https://pan.baidu.com/s/1sZKxugg5P8Dk5QgneA9ttw">Baidu Pan</a></p>
+<h2>Get Update Tool</h2>
+<p>Latest tool: EtronWriter_1.0.6.zip <a href="https://drive.google.com/open?id=1gAbTf6W10a8iwT7L9TceMVgxQCWKnEsx">Google Drive</a>, <a href="https://pan.baidu.com/s/1sZKxugg5P8Dk5QgneA9ttw">Baidu Pan</a></p>
+<h2>Update Firmware</h2>
+<p>Note:: Please follow the steps to upgrade firmware.(Otherwise, the camera calibration parameters will be lost.)</p>
+<p>1, Select camera device.</p>
+<p>2, Select data type(256KB).</p>
+<p>3, Select camera firmware.</p>
+<p>4, Select <code>Keep tables</code> (in order to keep calibration parameters).</p>
+<p>5, Click <code>Write</code>.</p>
+<p>Use the tool according to diagram:</p>
+<div class="image">
+<img src="update_camera_tool.png" alt="update_camera_tool.png"/>
+<div class="caption">
+update tool</div></div>
+  </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
