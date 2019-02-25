@@ -88,49 +88,55 @@ make all
 
 > Note: Open the rectified image by default (Run vio need to raw image, run depth or points cloud need to rectified image.)
 
-1) get_image shows the left and right camera image and colorful depthmap
+1) get_image shows the left camera image and colorful depthmap (compatible with USB2.0)
 
 ```
 .\samples\_output\bin\get_image.bat
 ```
 
-2) get_depth shows the left camera image, 16UC1 depthmap and depth value(mm) on mouse pointed pixel
+2) get_stereo_image shows the left camera image and colorful depthmap
+
+```
+./samples/_output/bin/get_stereo_image.bat
+```
+
+3) get_depth shows the left camera image, 16UC1 depthmap and depth value(mm) on mouse pointed pixel
 
 ```
 .\samples\_output\bin\get_depth.bat
 ```
 
-3) get_points shows the left camera image, 16UC1 depthmap and point cloud view
+4) get_points shows the left camera image, 16UC1 depthmap and point cloud view
 
 ```
 .\samples\_output\bin\get_points.bat
 ```
 
-4) get_imu shows motion datas
+5) get_imu shows motion datas
 
 ```
 .\samples\_output\bin\get_imu
 ```
 
-5) get_img_params show camera intrinsics and save in file
+6) get_img_params show camera intrinsics and save in file
 
 ```
 .\samples\_output\bin\get_img_params
 ```
 
-6) get_imu_params show imu intrinsics and save in file
+7) get_imu_params show imu intrinsics and save in file
 
 ```
 .\samples\_output\bin\get_imu_params
 ```
 
-7) get_from_callbacks show image and imu data by callback
+8) get_from_callbacks show image and imu data by callback
 
 ```
 .\samples\_output\bin\get_from_callbacks
 ```
 
-8) get_all_with_options open device with different options
+9) get_all_with_options open device with different options
 
 ```
 .\samples\_output\bin\get_all_with_options

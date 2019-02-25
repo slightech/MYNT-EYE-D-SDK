@@ -1,5 +1,6 @@
 # Get camera image {#get_image}
 
+Compatible with USB2.0
 Using the `DeviceMode::DEVICE_COLOR` function of the API, you can get color image，or use `DeviceMode::DEVICE_ALL` to get color and depth image.
 
 Using `GetStreamData()` to get your data.

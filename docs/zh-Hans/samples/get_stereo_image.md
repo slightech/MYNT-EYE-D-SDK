@@ -1,6 +1,5 @@
-# 获取双目图像 {#get_image}
+# 获取双目图像 {#get_stereo_image}
 
-兼容 USB2.0
 API 通过 `DeviceMode::DEVICE_COLOR` 参数获取图像数据，或者 `DeviceMode::DEVICE_ALL` 同时捕获图像和深度数据。
 
 通过 `GetStreamData()` 函数，就能获取想要的数据。
@@ -26,4 +25,4 @@ auto left_color = cam.GetStreamData(ImageType::IMAGE_LEFT_COLOR);
     cv::imshow("left color", left);
 ```
 
-完整代码样例，请见[get_image.cc](https://github.com/slightech/MYNT-EYE-D-SDK/blob/master/samples/src/get_image.cc) 。
+完整代码样例，请见[get_stereo_image.cc](https://github.com/slightech/MYNT-EYE-D-SDK/blob/master/samples/src/get_stereo_image.cc) 。

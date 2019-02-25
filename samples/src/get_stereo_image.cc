@@ -37,8 +37,8 @@ int main(int argc, char const* argv[]) {
 
   OpenParams params(dev_info.index);
   {
-    // Framerate: 10(default), [0,60], [30](STREAM_2560x720)
-    params.framerate = 10;
+    // Framerate: 30(default), [0,60], [30](STREAM_2560x720)
+    params.framerate = 30;
 
     // Device mode, default DEVICE_ALL
     //   DEVICE_COLOR: IMAGE_LEFT_COLOR ✓ IMAGE_RIGHT_COLOR ? IMAGE_DEPTH x
@@ -55,10 +55,10 @@ int main(int argc, char const* argv[]) {
 
     // Stream mode: left color only
     // params.stream_mode = StreamMode::STREAM_640x480;  // vga
-    params.stream_mode = StreamMode::STREAM_1280x720;  // hd
+    // params.stream_mode = StreamMode::STREAM_1280x720;  // hd
     // Stream mode: left+right color
     // params.stream_mode = StreamMode::STREAM_1280x480;  // vga
-    // params.stream_mode = StreamMode::STREAM_2560x720;  // hd
+    params.stream_mode = StreamMode::STREAM_2560x720;  // hd
 
     // Auto-exposure: true(default), false
     // params.state_ae = false;
@@ -101,9 +101,11 @@ int main(int argc, char const* argv[]) {
   std::cout << "Press ESC/Q on Windows to terminate" << std::endl;
 
   bool is_left_ok = cam.IsStreamDataEnabled(ImageType::IMAGE_LEFT_COLOR);
+  bool is_right_ok = cam.IsStreamDataEnabled(ImageType::IMAGE_RIGHT_COLOR);
   bool is_depth_ok = cam.IsStreamDataEnabled(ImageType::IMAGE_DEPTH);
 
   if (is_left_ok) cv::namedWindow("left color");
+  if (is_right_ok) cv::namedWindow("right color");
   if (is_depth_ok) cv::namedWindow("depth");
 
   CVPainter painter;
@@ -120,6 +122,16 @@ int main(int argc, char const* argv[]) {
         painter.DrawInformation(left, util::to_string(counter.fps()),
             CVPainter::BOTTOM_RIGHT);
         cv::imshow("left color", left);
+      }
+    }
+
+    if (is_right_ok) {
+      auto right_color = cam.GetStreamData(ImageType::IMAGE_RIGHT_COLOR);
+      if (right_color.img) {
+        cv::Mat right = right_color.img->To(ImageFormat::COLOR_BGR)->ToMat();
+        painter.DrawSize(right, CVPainter::TOP_LEFT);
+        painter.DrawStreamData(right, right_color, CVPainter::TOP_RIGHT);
+        cv::imshow("right color", right);
       }
     }
 
