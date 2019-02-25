@@ -37,7 +37,7 @@ int main(int argc, char const* argv[]) {
 
   OpenParams params(dev_info.index);
   {
-    // Framerate: 10(default), [0,60], [30](STREAM_2560x720)
+    // Framerate: 10(default usb3.0) 5(default usb2.0), [0,60], [30](STREAM_2560x720)
     params.framerate = 10;
 
     // Device mode, default DEVICE_ALL
