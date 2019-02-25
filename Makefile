@@ -68,7 +68,7 @@ endif
 
 # install
 
-install: build
+install: uninstall build
 	@$(call echo,Make $@)
 ifeq ($(HOST_OS),Win)
 ifneq ($(HOST_NAME),MinGW)
