@@ -81,9 +81,9 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
   pthread_mutex_t mutex_sub_result;
 
-  image_transport::CameraPublisher pub_left_mono;
+  image_transport::Publisher pub_left_mono;
   image_transport::CameraPublisher pub_left_color;
-  image_transport::CameraPublisher pub_right_mono;
+  image_transport::Publisher pub_right_mono;
   image_transport::CameraPublisher pub_right_color;
   image_transport::CameraPublisher pub_depth;
   ros::Publisher pub_points;
@@ -314,12 +314,12 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
     image_transport::ImageTransport it_mynteye(nh);
     // left
-    pub_left_mono = it_mynteye.advertiseCamera(left_mono_topic, 1);
+    pub_left_mono = it_mynteye.advertise(left_mono_topic, 1);
     NODELET_INFO_STREAM("Advertized on topic " << left_mono_topic);
     pub_left_color = it_mynteye.advertiseCamera(left_color_topic, 1);
     NODELET_INFO_STREAM("Advertized on topic " << left_color_topic);
     // right
-    pub_right_mono = it_mynteye.advertiseCamera(right_mono_topic, 1);
+    pub_right_mono = it_mynteye.advertise(right_mono_topic, 1);
     NODELET_INFO_STREAM("Advertized on topic " << right_mono_topic);
     pub_right_color = it_mynteye.advertiseCamera(right_color_topic, 1);
     NODELET_INFO_STREAM("Advertized on topic " << right_color_topic);
@@ -522,7 +522,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       const sensor_msgs::CameraInfoPtr& info,
       const image_transport::CameraPublisher& pub_color, bool color_sub,
       const std::string color_frame_id,
-      const image_transport::CameraPublisher& pub_mono, bool mono_sub,
+      const image_transport::Publisher& pub_mono, bool mono_sub,
       const std::string mono_frame_id, bool is_left) {
     auto timestamp = data.img_info
           ? hardTimeToSoftTime(data.img_info->timestamp)
@@ -546,8 +546,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       cv::Mat dst;
       cv::cvtColor(mat, dst, CV_RGB2GRAY);
       auto&& msg = cv_bridge::CvImage(header, enc::MONO8, dst).toImageMsg();
-      if (info) info->header.stamp = msg->header.stamp;
-      pub_mono.publish(msg, info);
+      pub_mono.publish(msg);
     }
 
     if (is_left && sub_result.points) {
