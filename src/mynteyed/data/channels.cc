@@ -122,11 +122,15 @@ bool Channels::StartHidTracking() {
   is_hid_tracking_ = true;
   hid_track_thread_ = std::thread([this]() {
     while (is_hid_tracking_) {
-      DoHidTrack();
+      if (!DoHidTrack())
+        is_hid_tracking_ = false;
     }
   });
 
-  return true;
+  if (is_hid_tracking_)
+    return true;
+  else
+    return false;
 }
 
 bool Channels::StopHidTracking() {
@@ -188,14 +192,14 @@ void Channels::CloseHid() {
   is_hid_opened_ = false;
 }
 
-void Channels::DoHidTrack() {
+bool Channels::DoHidTrack() {
   static imu_packets_t imu_packets;
   static img_packets_t img_packets;
   imu_packets.clear();
   img_packets.clear();
 
   if (!DoHidDataExtract(imu_packets, img_packets)) {
-    return;
+    return false;
   }
 
   if (imu_callback_) {
@@ -208,6 +212,8 @@ void Channels::DoHidTrack() {
       img_callback_(img_packet);
     }
   }
+
+  return true;
 }
 
 #ifdef PACKET_PRINT
@@ -282,7 +288,7 @@ bool Channels::DoHidDataExtract(imu_packets_t &imu, img_packets_t &img) {
 
   int size = hid_->receive(0, data, PACKET_SIZE * 2, 220);
   if (size < 0) {
-    LOGE("Error:: Reading, device went offline !");
+    LOGE("%s, %d:: Error Reading, device went offline !", __FILE__, __LINE__);
     return false;
   }
 
@@ -828,8 +834,8 @@ bool Channels::PushFileData(
   while (0x8B != cmd[0]) {
     hid_->receive(0, cmd, 64, 2000);
     if (++req_count > 5) {
-      LOGE("%s %d:: Error reading, device went offline.",
-          __FILE__, __LINE__);
+      // LOGE("%s %d:: Error reading, device went offline.",
+      //     __FILE__, __LINE__);
       return false;
     }
   }
@@ -1016,8 +1022,7 @@ bool Channels::HidFirmwareUpdate(const char *filepath) {
     }
     cmd[0] = 0xAB;
   } else {
-    if (hid_->receive(0, cmd, 64, 20000) <= 0)
-    {
+    if (hid_->receive(0, cmd, 64, 20000) <= 0) {
       LOGE("\n%s %d:: Update failed. maybe device went offline\n", __FILE__, __LINE__);
       return false;
     }

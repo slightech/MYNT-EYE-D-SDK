@@ -15,6 +15,13 @@
 #define MYNTEYE_DATA_CHANNELS_H_
 #pragma once
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 #include <functional>
 #include <map>
 #include <memory>
@@ -22,13 +29,6 @@
 #include <vector>
 
 #include "mynteyed/stubs/global.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 
 #ifdef MYNTEYE_OS_WIN
 #include <conio.h>
@@ -106,7 +106,7 @@ class MYNTEYE_API Channels {
   void CloseHid();
 
  private:
-  void DoHidTrack();
+  bool DoHidTrack();
   bool DoHidDataExtract(imu_packets_t &imu, img_packets_t &img);  // NOLINT
 
   bool PullFileData(bool device_info,

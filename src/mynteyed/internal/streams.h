@@ -130,8 +130,8 @@ class Streams {
       const Image::pointer& stream,
       const img_info_ptr_t& stream_info);
 
-  void CaptureStreamColor();
-  void CaptureStreamDepth();
+  bool CaptureStreamColor();
+  bool CaptureStreamDepth();
 
   void DoImageColorCaptured(const Image::pointer& color,
       const img_info_ptr_t& info);

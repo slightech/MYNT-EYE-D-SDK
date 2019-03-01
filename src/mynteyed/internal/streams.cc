@@ -247,8 +247,9 @@ void Streams::StartStreamCapturing() {
     // Rate rate(device_->GetOpenParams().framerate);
     Rate rate(100);
     while (is_stream_capturing_) {
-      CaptureStreamColor();
-      CaptureStreamDepth();
+      if (!CaptureStreamColor() || !CaptureStreamDepth())
+        is_stream_capturing_ = false;
+
       SyncStreamWithInfo(true);
       rate.Sleep();
     }
@@ -366,11 +367,17 @@ void Streams::OnStreamSyncedInfoCaptured(const StreamType& type,
   }
 }
 
-void Streams::CaptureStreamColor() {
-  if (!IsStreamEnabled(STREAM_COLOR)) return;
+bool Streams::CaptureStreamColor() {
+  if (!IsStreamEnabled(STREAM_COLOR)) return true;
 
   auto color = device_->GetImageColor();
-  if (!color) return;
+  static std::uint8_t null_count = 0;
+  if (!color) {
+    null_count++;
+    if (null_count > 500)
+      return false;
+    return true;
+  }
   // LOGI("%s: %d", __func__, color->frame_id());
 
   color->set_is_dual(is_right_color_supported_);
@@ -385,13 +392,21 @@ void Streams::CaptureStreamColor() {
   } else {
     DoImageColorCaptured(color, nullptr);
   }
+
+  return true;
 }
 
-void Streams::CaptureStreamDepth() {
-  if (!IsStreamEnabled(STREAM_DEPTH)) return;
+bool Streams::CaptureStreamDepth() {
+  if (!IsStreamEnabled(STREAM_DEPTH)) return true;
 
   auto depth = device_->GetImageDepth();
-  if (!depth) return;
+  static std::uint8_t null_count = 0;
+  if (!depth) {
+    null_count++;
+    if (null_count > 500)
+      return false;
+    return true;
+  }
   // LOGI("%s: %d", __func__, depth->frame_id());
 
   // Ensure not buffer to user, as it may changed when captured again.
@@ -405,6 +420,8 @@ void Streams::CaptureStreamDepth() {
   } else {
     DoImageDepthCaptured(depth, nullptr);
   }
+
+  return true;
 }
 
 void Streams::DoImageColorCaptured(const Image::pointer& color,
