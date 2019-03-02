@@ -5,13 +5,12 @@ SDK is built on CMake and can be used cross multiple platforms such as Linux, WI
 These are the platforms that can be used:
 
     * Windows 10
-    * Ubuntu 18.04/16.04/14.04
+    * Ubuntu 18.04/16.04
     * Jetson TX2
     * RK3399
 
 > Tip:
 > * Ubuntu only support source installation mode.
-> * Ubuntu 14.04 need to be upgraded to gcc5.
 
 > Warning:
 > Due to the requirement of hardware transmission rate, please use the USB 3 interface. In addition, virtual machines have USB driver compatibility problems, thus they are not recommended.
