@@ -431,8 +431,6 @@ bool Device::Open(const OpenParams& params) {
       SyncCameraCalibrations();
     }
     return true;
-  } else if (ETronDI_NoDevice == ret) {
-    LOGI("device offline...........................................\n");
   } else {
     dev_sel_info_.index = -1;  // reset flag
     return false;

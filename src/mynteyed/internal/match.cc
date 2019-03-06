@@ -1,33 +1,41 @@
 #include "mynteyed/internal/match.h"
+#include "mynteyed/util/log.h"
+#include "mynteyed/util/rate.h"
 
-Match::Match(const std::shared_ptr<Streams> streams) :
-  streams_(streams),
-  who_first_(0) {
+static const std::size_t MAX_CACHE_TOTAL = 4;
+
+MYNTEYE_USE_NAMESPACE
+
+Match::Match() : is_matching_(false) {
 }
 
 Match::~Match() {
+  is_matching_ = false;
+  if (match_thread_.joinable()) {
+    match_thread_.join();
+  }
 }
 
-void Match::OnStreamDataCallback(const ImageType& type, const img_data_t& data) {
-  std::lock_guard<std::mutex> _(mutex);
+void Match::OnStreamDataCallback(const ImageType &type, const img_data_t &data) {
+  std::lock_guard<std::mutex> _(match_mutex_);
   stream_datas_[type].push_back(data);
 }
 
 Match::img_data_t Match::GetStreamData(const ImageType& type) {
-  auto datas = GetSteamdatas(type);
+  auto datas = GetStreamDatas(type);
   if (datas.empty()) return {};
   return std::move(datas.back());
 }
 
 Match::img_datas_t Match::GetStreamDatas(const ImageType& type) {
-  InitFirstCalled(type);
-
-  std::lock_guard<std::mutex> _(retrieve_mutex);
+  std::lock_guard<std::mutex> _(retrieve_mutex_);
   if (!stream_matched_datas_[type].empty()) {
     auto datas = stream_matched_datas_[type];
     stream_matched_datas_[type].clear();
     return datas;
   }
+
+  return {};
 }
 
 /** match */
@@ -35,7 +43,7 @@ void Match::MatchStreamDatas() {
   std::lock_guard<std::mutex> _(match_mutex_);
 
   auto&& left_datas = stream_datas_[ImageType::IMAGE_LEFT_COLOR];
-  auto&& right_datas = stream_datas_[ImageType::IMAGE_RIGHT_COLOR]
+  auto&& right_datas = stream_datas_[ImageType::IMAGE_RIGHT_COLOR];
   auto&& depth_datas = stream_datas_[ImageType::IMAGE_DEPTH];
 
   if (left_datas.empty() || depth_datas.empty()) {
@@ -45,12 +53,12 @@ void Match::MatchStreamDatas() {
   bool next = false;
   int offset = 0;
   /** start matching (only left match with depth)*/
-  for (auto left_it = left_datas.begin(); left_it != left_datas.end()) {
+  for (auto left_it = left_datas.begin(); left_it != left_datas.end();) {
     next = true;
     offset++;
-    auto left_frame_id = (*left_it)->frame_id();
-    for (auto depth_it = depth_datas.begin(); depth_it != depth_datas.end()) {
-      if (left_frame_id == (*depth_it)->frame_id()) {
+    auto left_frame_id = (*left_it).img->frame_id();
+    for (auto depth_it = depth_datas.begin(); depth_it != depth_datas.end();) {
+      if (left_frame_id == (*depth_it).img->frame_id()) {
         next = false;
         OnUpdateMatchedDatas(ImageType::IMAGE_LEFT_COLOR, (*left_it));
         if (!right_datas.empty()) {
@@ -78,7 +86,26 @@ void Match::MatchStreamDatas() {
 
 void Match::OnUpdateMatchedDatas(const ImageType& type, const StreamData& data) {
   std::lock_guard<std::mutex> _(retrieve_mutex_);
+  if (stream_matched_datas_[type].size() > MAX_CACHE_TOTAL)
+    stream_matched_datas_[type].clear();
+
   stream_matched_datas_[type].push_back(data);
+}
+
+void Match::Start() {
+  if (is_matching_) {
+    LOGW("%s, %d: Matching is started.\n", __FILE__, __LINE__);
+    return;
+  }
+
+  is_matching_ = true;
+  match_thread_ = std::thread([this](){
+    Rate rate(10);
+    while (is_matching_) {
+      MatchStreamDatas();
+      rate.Sleep();
+    }
+  });
 }
 
 

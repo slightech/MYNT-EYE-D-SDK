@@ -53,6 +53,9 @@ class Streams {
   // img info callback
   using img_info_callback_t = std::function<void(const img_info_ptr_t& info)>;
 
+  // stream data listener
+  using stream_datas_listener_t = std::function<void(const ImageType &type, const img_data_t &data)>;
+
   // stream types
   typedef enum StreamType {
     STREAM_COLOR,  // left or left+right
@@ -99,6 +102,7 @@ class Streams {
   img_datas_t GetStreamDatas(const ImageType& type);
 
   void SetStreamCallback(const ImageType& type, img_data_callback_t callback);
+  void SetStreamDataListener(stream_datas_listener_t listener);
 
   void OnCameraOpen();
   void OnCameraClose();
@@ -106,6 +110,8 @@ class Streams {
   void OnImageInfoCallback(const ImgInfoPacket& packet);
 
  private:
+  void NotifyStreamData(const ImageType &type, const StreamData &data);
+
   bool IsStreamColor(const ImageType& type) const {
     return type == ImageType::IMAGE_LEFT_COLOR
         || type == ImageType::IMAGE_RIGHT_COLOR;
@@ -168,6 +174,8 @@ class Streams {
 
   img_info_callback_t img_info_callback_;
   std::map<ImageType, img_data_callback_t> img_data_callbacks_;
+
+  stream_datas_listener_t stream_datas_listener_;
 };
 
 MYNTEYE_END_NAMESPACE

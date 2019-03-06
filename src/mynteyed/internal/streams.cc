@@ -433,7 +433,19 @@ void Streams::DoStreamDataCaptured(const Image::pointer& image,
   auto&& type = image->type();
   StreamData data{image, info};
   img_data_queue_map_[type]->Put(data);
+  NotifyStreamData(type, data);
   if (img_data_callbacks_[type]) {
     img_data_callbacks_[type](data);
+  }
+}
+
+void Streams::SetStreamDataListener(stream_datas_listener_t listener) {
+  stream_datas_listener_ = listener;
+}
+
+void Streams::NotifyStreamData(const ImageType &type,
+    const StreamData &data) {
+  if (stream_datas_listener_) {
+    stream_datas_listener_(type, data);
   }
 }
