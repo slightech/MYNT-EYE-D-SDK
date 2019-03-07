@@ -202,8 +202,6 @@ class MYNTEYE_API Camera {
   /** Auto-white-balance enabled or not  default enabled*/
   bool AutoWhiteBalanceControl(bool enable);
 
-  void EnableMatchFrameId();
-
 #ifdef MYNTEYE_DEPRECATED_COMPAT
   /** @deprecated Replaced by OpenParams#device_mode */
   void EnableStreamData(const ImageType& type);
