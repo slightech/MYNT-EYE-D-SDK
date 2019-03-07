@@ -86,10 +86,12 @@ void Location::OnGPSDataCallback(const GPSDataPacket& packet) {
   longitude_second_tmp = (longitude_cent_tmp - gps->longitude_cent) * 60;
   gps->longitude_second = static_cast<std::uint64_t>(longitude_second_tmp);
 
+  /*
   if (location_count_ < 20) {
     ++location_count_;
     return;
   }
+  */
 
   std::lock_guard<std::mutex> _(mutex_);
 

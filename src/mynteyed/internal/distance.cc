@@ -59,10 +59,12 @@ void Distance::OnDisDataCallback(const ObstacleDisPacket& packet) {
   dis->detection_time = packet.detection_time;
   dis->distance = packet.distance;
 
+  /*
   if (distance_count_ < 20) {
     ++distance_count_;
     return;
   }
+  */
 
   std::lock_guard<std::mutex> _(mutex_);
 
