@@ -22,8 +22,6 @@ class Match {
 
   void OnStreamDataCallback(const ImageType &type, const img_data_t& data);
 
-  img_data_t GetStreamData(const ImageType& type);
-
   img_datas_t GetStreamDatas(const ImageType& type);
 
   void Start();

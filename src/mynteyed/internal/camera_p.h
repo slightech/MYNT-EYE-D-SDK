@@ -22,7 +22,6 @@
 #include <map>
 #include <memory>
 #include <vector>
-#include <thread>
 
 #include "mynteyed/data/types_internal.h"
 #include "mynteyed/device/types_internal.h"
@@ -35,7 +34,6 @@ class Device;
 class Channels;
 class Motions;
 class Streams;
-class Match;
 
 class MYNTEYE_API CameraPrivate {
  public:
@@ -225,8 +223,6 @@ class MYNTEYE_API CameraPrivate {
   std::shared_ptr<device::Descriptors> descriptors_;
   std::shared_ptr<MotionIntrinsics> motion_intrinsics_;
   std::shared_ptr<MotionExtrinsics> motion_extrinsics_;
-
-  std::shared_ptr<Match> match_;
 };
 
 MYNTEYE_END_NAMESPACE

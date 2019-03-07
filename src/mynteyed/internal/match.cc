@@ -2,7 +2,7 @@
 #include "mynteyed/util/log.h"
 #include "mynteyed/util/rate.h"
 
-static const std::size_t MAX_CACHE_TOTAL = 4;
+static const std::size_t MAX_CACHE_TOTAL = 40;
 
 MYNTEYE_USE_NAMESPACE
 
@@ -19,12 +19,6 @@ Match::~Match() {
 void Match::OnStreamDataCallback(const ImageType &type, const img_data_t &data) {
   std::lock_guard<std::mutex> _(match_mutex_);
   stream_datas_[type].push_back(data);
-}
-
-Match::img_data_t Match::GetStreamData(const ImageType& type) {
-  auto datas = GetStreamDatas(type);
-  if (datas.empty()) return {};
-  return std::move(datas.back());
 }
 
 Match::img_datas_t Match::GetStreamDatas(const ImageType& type) {
@@ -107,5 +101,46 @@ void Match::Start() {
     }
   });
 }
+
+/*
+void Match::UpdateCalledNumbers(const ImageType& type) {
+  if (type == ImageType::IMAGE_LEFT_COLOR ||
+      type == ImageType::IMAGE_RIGHT_COLOR) {
+    color_called_num_++;
+    depth_called_num_ = 0;
+  } else if (type == ImageType::IMAGE_DEPTH) {
+    depth_called_num_++;
+    color_called_num_ = 0;
+  }
+
+  if (color_called_num_ > depth_called_num_ &&
+      color_called_num_ - depth_called_num_ > 1 &&
+      type == ImageType::IMAGE_DEPTH) {
+  }
+}
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

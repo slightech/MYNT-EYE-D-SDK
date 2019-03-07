@@ -24,7 +24,6 @@
 #include "mynteyed/internal/motions.h"
 #include "mynteyed/internal/streams.h"
 #include "mynteyed/util/log.h"
-#include "mynteyed/internal/match.h"
 
 #define IMG_INFO_ASYNC_MAX_SIZE 120  // 60fps, 2s
 #define STREAM_ASYNC_MAX_SIZE 1  // latest
@@ -95,7 +94,6 @@ ErrorCode CameraPrivate::Open(const OpenParams& params) {
         break;
     }
     streams_->OnCameraOpen();
-    EnableMatchFrameId();
     return ErrorCode::SUCCESS;
   } else {
     return ErrorCode::ERROR_CAMERA_OPEN_FAILED;
@@ -290,19 +288,11 @@ bool CameraPrivate::HasStreamDataEnabled() const {
 }
 
 StreamData CameraPrivate::GetStreamData(const ImageType& type) {
-  if (match_) {
-    return match_->GetStreamData(type);
-  } else {
-    return streams_->GetStreamData(type);
-  }
+  return streams_->GetStreamData(type);
 }
 
 std::vector<StreamData> CameraPrivate::GetStreamDatas(const ImageType& type) {
-  if (match_) {
-    return match_->GetStreamDatas(type);
-  } else {
-    return streams_->GetStreamDatas(type);
-  }
+  return streams_->GetStreamDatas(type);
 }
 
 bool CameraPrivate::IsMotionDatasSupported() const {
@@ -511,13 +501,3 @@ bool CameraPrivate::AutoWhiteBalanceControl(bool enable) {
   return device_->SetAutoWhiteBalanceEnabled(enable);
 }
 
-void CameraPrivate::EnableMatchFrameId() {
-  if (match_ == nullptr) {
-    match_.reset(new Match());
-    streams_->SetStreamDataListener(
-        std::bind(&Match::OnStreamDataCallback,
-        match_.get(), std::placeholders::_1,
-        std::placeholders::_2));
-    match_->Start();
-  }
-}
