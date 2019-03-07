@@ -27,9 +27,3 @@ make_executable(record
   LINK_LIBS  mynteye_depth ${OpenCV_LIBS}
   DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
 )
-
-make_executable(analytics_image_imu
-  SRCS analytics_image_imu.cc analytics_image_imu.cc
-  LINK_LIBS  mynteye_depth ${OpenCV_LIBS}
-  DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
-)
