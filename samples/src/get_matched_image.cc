@@ -110,8 +110,8 @@ int main(int argc, char const* argv[]) {
 
   CVPainter painter;
   util::Counter counter;
-  std::uint16_t left_id = 0;
-  std::uint16_t depth_id = 0;
+  std::uint16_t left_frame_id = 0;
+  std::uint16_t depth_frame_id = 0;
   std::uint32_t left_total = 0;
   std::uint32_t depth_total = 0;
   std::uint32_t matched_total = 0;
@@ -127,7 +127,7 @@ int main(int argc, char const* argv[]) {
         painter.DrawInformation(left, util::to_string(counter.fps()),
             CVPainter::BOTTOM_RIGHT);
         cv::imshow("left color", left);
-        left_id = left_color.img_info->frame_id;
+        left_frame_id = left_color.img_info->frame_id;
         left_total++;
       }
     }
@@ -154,14 +154,15 @@ int main(int argc, char const* argv[]) {
         painter.DrawSize(depth, CVPainter::TOP_LEFT);
         painter.DrawStreamData(depth, image_depth, CVPainter::TOP_RIGHT);
         cv::imshow("depth", depth);
-        depth_id = image_depth.img_info->frame_id;
+        depth_frame_id = image_depth.img_info->frame_id;
         depth_total++;
       }
     }
 
-    if (depth_id == left_id && depth_id != 0) {
+    if (depth_frame_id == left_frame_id && depth_frame_id != 0 && left_frame_id != 0) {
       matched_total++;
-      depth_id = 0;
+      depth_frame_id = 0;
+      left_frame_id = 0;
     }
 
     char key = static_cast<char>(cv::waitKey(1));

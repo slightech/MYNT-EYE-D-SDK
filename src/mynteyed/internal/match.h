@@ -24,21 +24,24 @@ class Match {
 
   img_datas_t GetStreamDatas(const ImageType& type);
 
-  void Start();
-
  protected:
   void OnUpdateMatchedDatas(const ImageType& type, const StreamData& data);
-  void MatchStreamDatas();
+  img_datas_t MatchStreamDatas(const ImageType& type);
+  void InitOrder(const ImageType& type);
 
  private:
   std::map<ImageType, img_datas_t> stream_datas_;
-  std::map<ImageType, img_datas_t> stream_matched_datas_;
 
-  std::mutex match_mutex_;
-  std::mutex retrieve_mutex_;
+  std::recursive_mutex match_mutex_;
 
-  bool is_matching_;
-  std::thread match_thread_;
+  std::uint16_t base_frame_id_ = 0;
+
+  /**
+   * 1 -- left
+   * 2 -- right
+   * 3 -- depth
+   * */
+  int is_called_ = 0;
 };
 
 MYNTEYE_END_NAMESPACE

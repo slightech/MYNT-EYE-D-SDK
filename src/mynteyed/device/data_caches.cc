@@ -81,9 +81,11 @@ DataCaches::data_ptr_t DataCaches::Get(const size_t& size) {
       return data;
     }
   }
+  /*
   if (caches.size() > CACHES_EACH_MAX_SIZE) {
     LOGW("Caches(%d) is too large", size);
   }
+  */
   auto&& data = Create(size);
   caches.push_back(data);
   return data;

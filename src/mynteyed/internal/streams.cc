@@ -21,7 +21,7 @@
 #include "mynteyed/internal/match.h"
 
 // set 1 only for the latest stream data
-#define STREAM_DATAS_MAX_SIZE 10
+#define STREAM_DATAS_MAX_SIZE 4
 #define IMG_INFO_QUEUE_MAX_SIZE 120  // 60fps, 2s
 #define IMG_INFO_SYNC_FREQUENCY 100  // 100hz
 
@@ -171,7 +171,6 @@ void Streams::SetStreamCallback(const ImageType& type,
 void Streams::OnCameraOpen() {
   is_right_color_supported_ = device_->IsRightColorSupported();
   StartStreamCapturing();
-  match_->Start();
 }
 
 void Streams::OnCameraClose() {
