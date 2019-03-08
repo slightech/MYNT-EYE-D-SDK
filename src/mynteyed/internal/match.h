@@ -5,7 +5,6 @@
 #include <vector>
 #include <map>
 #include <mutex>
-#include <thread>
 
 #include "mynteyed/data/types_internal.h"
 #include "mynteyed/types.h"

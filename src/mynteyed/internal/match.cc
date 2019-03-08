@@ -1,6 +1,5 @@
 #include "mynteyed/internal/match.h"
 #include "mynteyed/util/log.h"
-#include "mynteyed/util/rate.h"
 
 MYNTEYE_USE_NAMESPACE
 
