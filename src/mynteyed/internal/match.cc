@@ -45,20 +45,21 @@ void Match::MatchStreamDatas() {
   }
 
   bool next = false;
-  int offset = 0;
   /** start matching (only left match with depth)*/
   for (auto left_it = left_datas.begin(); left_it != left_datas.end();) {
     next = true;
-    offset++;
     auto left_frame_id = (*left_it).img->frame_id();
     for (auto depth_it = depth_datas.begin(); depth_it != depth_datas.end();) {
       if (left_frame_id == (*depth_it).img->frame_id()) {
         next = false;
         OnUpdateMatchedDatas(ImageType::IMAGE_LEFT_COLOR, (*left_it));
-        if (!right_datas.empty()) {
-          auto data = right_datas[offset - 1];
-          v_offset_.push_back(offset);
-          OnUpdateMatchedDatas(ImageType::IMAGE_RIGHT_COLOR, data);
+        for (auto right_it = right_datas.begin(); right_it != right_datas.end();) {
+          if (left_frame_id == (*right_it).img->frame_id()) {
+            OnUpdateMatchedDatas(ImageType::IMAGE_RIGHT_COLOR, (*right_it));
+            right_it = right_datas.erase(right_it);
+            break;
+          }
+          ++right_it;
         }
         OnUpdateMatchedDatas(ImageType::IMAGE_DEPTH, (*depth_it));
         left_it = left_datas.erase(left_it);
@@ -69,13 +70,6 @@ void Match::MatchStreamDatas() {
     }
     if (next) ++left_it;
   }
-
-  /** erase right color */
-  for (auto i : v_offset_) {
-    right_datas.erase(right_datas.begin() + i - 1,
-        right_datas.begin() + i);
-  }
-  v_offset_.clear();
 }
 
 void Match::OnUpdateMatchedDatas(const ImageType& type, const StreamData& data) {

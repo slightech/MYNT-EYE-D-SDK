@@ -34,8 +34,6 @@ class Match {
   std::map<ImageType, img_datas_t> stream_datas_;
   std::map<ImageType, img_datas_t> stream_matched_datas_;
 
-  std::vector<int> v_offset_;
-
   std::mutex match_mutex_;
   std::mutex retrieve_mutex_;
 
