@@ -144,9 +144,16 @@ make_executable(get_imu_params
   DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
 )
 
-make_executable(get_extended_sensor
+make_executable(get_gps
   SRCS
-    src/get_extended_sensor.cc
+    src/get_gps.cc
+  LINK_LIBS mynteye_depth ${OpenCV_LIBS}
+  DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
+)
+
+make_executable(get_ultrasonic
+  SRCS
+    src/get_ultrasonic.cc
   LINK_LIBS mynteye_depth ${OpenCV_LIBS}
   DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
 )

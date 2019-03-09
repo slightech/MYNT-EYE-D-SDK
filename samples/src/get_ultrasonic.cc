@@ -64,80 +64,16 @@ int main(int argc, char const* argv[]) {
   for (;;) {
     counter.Update();
 
-    auto location_datas = cam.GetLocationDatas();
-    if (location_datas.size() > 0) {
-      std::cout << "GPS count: " << location_datas.size() << std::endl;
-      for (auto data : location_datas) {
-        if (data.gps) {
-          std::cout << "[GPS] device_time: " << data.gps->device_time
-            << ", latitude: " << data.gps->latitude
-            << ", longitude: " << data.gps->longitude
-            << ", latitude_degree: " << data.gps->latitude_degree
-            << ", latitude_cent: " << data.gps->latitude_cent
-            << ", latitude_second: " << data.gps->latitude_second
-            << ", longitude_degree: " << data.gps->longitude_degree
-            << ", longitude_cent: " << data.gps->longitude_cent
-            << ", longitude_second: " << data.gps->longitude_second
-            << ", satellite: " << data.gps->satellite
-            << ", NS: " << data.gps->NS
-            << ", EW: " << data.gps->EW
-            << ", year: " << data.gps->year
-            << ", month: " << data.gps->month
-            << ", day: " << data.gps->month
-            << ", hour: " << data.gps->hour
-            << ", minute: " << data.gps->minute
-            << ", second: " << data.gps->second << std::endl;
-        }
-      }
-    } else {
-      std::cout << "not gps data." << std::endl;
-    }
-
     auto distance_datas = cam.GetDistanceDatas();
     if (distance_datas.size() > 0) {
-      std::cout << "Ultrasonic count: " << distance_datas.size() << std::endl;
+      std::cout << "Distance count: " << distance_datas.size() << std::endl;
       for (auto data : distance_datas) {
         if (data.dis) {
           std::cout << "[Distance] detection_time: " << data.dis->detection_time
             << ", distance: " << data.dis->distance << std::endl;
         }
       }
-    } else {
-      std::cout << "not ultrasonic data." << std::endl;
     }
-
-    /*
-    auto motion_datas = cam.GetMotionDatas();
-    if (motion_datas.size() > 0) {
-      std::cout << "Imu count: " << motion_datas.size() << std::endl;
-      for (auto data : motion_datas) {
-        if (data.imu) {
-          if (data.imu->flag == MYNTEYE_IMU_ACCEL) {
-            counter.IncrAccelCount();
-            std::cout << "[accel] stamp: " << data.imu->timestamp
-              << ", x: " << data.imu->accel[0]
-              << ", y: " << data.imu->accel[1]
-              << ", z: " << data.imu->accel[2]
-              << ", temp: " << data.imu->temperature
-              << std::endl;
-          } else if (data.imu->flag == MYNTEYE_IMU_GYRO) {
-            counter.IncrGyroCount();
-            std::cout << "[gyro] stamp: " << data.imu->timestamp
-              << ", x: " << data.imu->gyro[0]
-              << ", y: " << data.imu->gyro[1]
-              << ", z: " << data.imu->gyro[2]
-              << ", temp: " << data.imu->temperature
-              << std::endl;
-          } else {
-            std::cerr << "Imu type is unknown" << std::endl;
-          }
-        } else {
-          std::cerr << "Motion data is empty" << std::endl;
-        }
-      }
-      std::cout << std::endl;
-    }
-    */
 
     if (_kbhit()) break;
 
