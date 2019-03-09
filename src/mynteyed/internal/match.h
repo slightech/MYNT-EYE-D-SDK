@@ -11,6 +11,13 @@
 
 MYNTEYE_BEGIN_NAMESPACE
 
+enum class Order : std::int32_t {
+  LEFT_IMAGE = 1,
+  RIGHT_IMAGE,
+  DEPTH_IMAGE,
+  NONE,
+};
+
 class Match {
  public:
   using img_data_t = StreamData;
@@ -35,12 +42,7 @@ class Match {
 
   std::uint16_t base_frame_id_ = 0;
 
-  /**
-   * 1 -- left
-   * 2 -- right
-   * 3 -- depth
-   * */
-  int is_called_ = 0;
+  Order order_;
 };
 
 MYNTEYE_END_NAMESPACE

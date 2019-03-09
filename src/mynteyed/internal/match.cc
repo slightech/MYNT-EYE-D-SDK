@@ -3,7 +3,8 @@
 
 MYNTEYE_USE_NAMESPACE
 
-Match::Match() {
+Match::Match() :
+  order_(Order::NONE) {
 }
 
 Match::~Match() {
@@ -15,31 +16,33 @@ void Match::OnStreamDataCallback(const ImageType &type, const img_data_t &data) 
 }
 
 Match::img_datas_t Match::GetStreamDatas(const ImageType& type) {
-  if (is_called_ == 0)
+  if (order_ == Order::NONE)
     InitOrder(type);
 
   std::lock_guard<std::recursive_mutex> _(match_mutex_);
   if (!stream_datas_[type].empty()) {
     auto&& datas = stream_datas_[type];
-    switch (is_called_) {
-      case 1:
+    switch (order_) {
+      case Order::LEFT_IMAGE:
         if (type == ImageType::IMAGE_LEFT_COLOR) {
           base_frame_id_ = datas.back().img->frame_id();
           return {datas.begin(), datas.end()};
         }
         return MatchStreamDatas(type);
-      case 2:
+      case Order::RIGHT_IMAGE:
         if (type == ImageType::IMAGE_RIGHT_COLOR) {
           base_frame_id_ = stream_datas_[type].back().img->frame_id();
           return {datas.begin(), datas.end()};
         }
         return MatchStreamDatas(type);
-      case 3:
+      case Order::DEPTH_IMAGE:
         if (type == ImageType::IMAGE_DEPTH) {
           base_frame_id_ = stream_datas_[type].back().img->frame_id();
           return {datas.begin(), datas.end()};
         }
         return MatchStreamDatas(type);
+      default:
+        throw_error("Unknow order of get datas.");
     }
   }
 
@@ -70,13 +73,13 @@ Match::img_datas_t Match::MatchStreamDatas(const ImageType& type) {
 void Match::InitOrder(const ImageType& type) {
   switch (type) {
     case ImageType::IMAGE_LEFT_COLOR:
-      is_called_ = 1;
+      order_ = Order::LEFT_IMAGE;
       return;
     case ImageType::IMAGE_RIGHT_COLOR:
-      is_called_ = 2;
+      order_ = Order::RIGHT_IMAGE;
       return;
     case ImageType::IMAGE_DEPTH:
-      is_called_ = 3;
+      order_ = Order::DEPTH_IMAGE;
       return;
     default:
       return;
