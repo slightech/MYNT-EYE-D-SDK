@@ -194,7 +194,7 @@ struct MYNTEYE_API LocationData {
 
 /**
  * @ingroup datatypes
- * Location data.
+ * Distance data.
  */
 struct MYNTEYE_API DistanceData {
   /** ObstacleDis */
