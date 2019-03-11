@@ -10,8 +10,8 @@
 | L+D | USB3.0 | 640x480 | 60/30 | 640x480 | 60/30 |
 | L+R+D | USB3.0 | 2560x720 | 30 | 1280x720 | 30 |
 | L+R+D | USB3.0 | 1280x480 | 60/30 | 640x480 | 60/30 |
-| L+R | USB3.0 | 2560x720 | 60/30 | not open | null |
-| L'+R' | USB3.0 | 2560x720 | 60/30 | not open | null |
+| L+R | USB3.0 | 2560x720 | 30 | not open | null |
+| L'+R' | USB3.0 | 2560x720 | 30 | not open | null |
 | D | USB3.0 | not open | null | 1280x720 | 60/30 |
 | D | USB3.0 | not open | null | 640x480 | 60/30 |
 | L+R | USB2.0 | 2560x720 | 5 | not open | null |
