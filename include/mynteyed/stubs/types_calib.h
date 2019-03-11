@@ -45,6 +45,11 @@ struct MYNTEYE_API CameraIntrinsics {
    *  right: fx' cx' tx fy' cy' 1
    *  */
   double p[12];
+
+  /**
+   * 3x3 rectification transform (rotation matrix) for the left camera.
+   */
+  double r[9];
 };
 
 MYNTEYE_API

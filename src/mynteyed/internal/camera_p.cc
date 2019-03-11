@@ -160,6 +160,9 @@ StreamIntrinsics CameraPrivate::GetStreamIntrinsics(
   for (int i = 0; i < 12; i++) {
     in.left.p[i] = calib->NewCamMat1[i];
   }
+  for (int i = 0; i < 9; i++) {
+    in.left.r[i] = calib->LRotaMat[i];
+  }
   in.right.width = calib->InImgWidth/2;
   in.right.height = calib->InImgHeight;
   in.right.fx = calib->CamMat2[0];
@@ -171,6 +174,9 @@ StreamIntrinsics CameraPrivate::GetStreamIntrinsics(
   }
   for (int i = 0; i < 12; i++) {
     in.right.p[i] = calib->NewCamMat2[i];
+  }
+  for (int i = 0; i < 9; i++) {
+    in.right.r[i] = calib->RRotaMat[i];
   }
   *ok = true;
   return std::move(in);

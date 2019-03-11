@@ -34,10 +34,15 @@ std::ostream &operator<<(std::ostream &os, const CameraIntrinsics &in) {
     os << in.coeffs[i] << ", ";
   os << in.coeffs[4] << "]";
 
-  os << "p: [";
+  os << ", p: [";
   for (int i = 0; i < 11; i++)
     os << in.p[i] << ", ";
   os << in.p[11] << "]";
+
+  os << ", r: [";
+  for (int i = 0; i < 8; i++)
+    os << in.r[i] << ", ";
+  os << in.r[8] << "]";
 
   return os;
 }
