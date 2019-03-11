@@ -12,6 +12,8 @@ Match::~Match() {
 
 void Match::OnStreamDataCallback(const ImageType &type, const img_data_t &data) {
   std::lock_guard<std::recursive_mutex> _(match_mutex_);
+  if (stream_datas_[type].size() > 10)
+    stream_datas_[type].clear();
   stream_datas_[type].push_back(data);
 }
 
