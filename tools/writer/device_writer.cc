@@ -171,6 +171,8 @@ void DeviceWriter::SaveAllDatas(const std::string &dir) {
   } else {
     std::cerr << "Get imu params failed" << std::endl;
   }
+
+  std::cout << "\nSaved to " << dir << " folder" << std::endl;
 }
 
 namespace {
@@ -239,8 +241,8 @@ DeviceWriter::device_desc_t DeviceWriter::LoadDescriptors(
     std::cout << "Failed to load file: " << filepath << std::endl;
   }
   device_desc_t desc;
-  fs["device_name"] >> desc.name;
-  fs["serial_number"] >> desc.serial_number;
+  desc.name = std::string(fs["device_name"]);
+  desc.serial_number = std::string(fs["serial_number"]);
   desc.firmware_version = Version(std::string(fs["firmware_version"]));
   desc.hardware_version = HardwareVersion(std::string(fs["hardware_version"]));
   desc.spec_version = Version(std::string(fs["spec_version"]));
