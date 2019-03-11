@@ -4,6 +4,8 @@ _build/
 _output/
 _install/
 
+/docs/_doxygen/
+
 .vs/
 .vscode/
 
