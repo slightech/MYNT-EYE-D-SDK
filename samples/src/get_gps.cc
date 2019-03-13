@@ -81,12 +81,12 @@ int main(int argc, char const* argv[]) {
             << ", satellite: " << data.gps->satellite
             << ", NS: " << data.gps->NS
             << ", EW: " << data.gps->EW
-            << ", year: " << data.gps->year
-            << ", month: " << data.gps->month
-            << ", day: " << data.gps->month
-            << ", hour: " << data.gps->hour
-            << ", minute: " << data.gps->minute
-            << ", second: " << data.gps->second << std::endl;
+            << ", year: " << unsigned(data.gps->year)
+            << ", month: " << unsigned(data.gps->month)
+            << ", day: " << unsigned(data.gps->day)
+            << ", hour: " << unsigned(data.gps->hour)
+            << ", minute: " << unsigned(data.gps->minute)
+            << ", second: " << unsigned(data.gps->second) << std::endl;
         }
       }
     }

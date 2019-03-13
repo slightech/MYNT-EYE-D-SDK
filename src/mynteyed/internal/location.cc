@@ -73,18 +73,18 @@ void Location::OnGPSDataCallback(const GPSDataPacket& packet) {
   float longitude_cent_tmp, longitude_second_tmp;
 
   gps->latitude_degree =
-    static_cast<std::int64_t>(gps->latitude / 100); // separate latitude
+    fabs(gps->latitude / 100); // separate latitude
   latitude_cent_tmp = gps->latitude - gps->latitude_degree * 100;
-  gps->latitude_cent = static_cast<std::int64_t>(latitude_cent_tmp);
+  gps->latitude_cent = fabs(latitude_cent_tmp);
   latitude_second_tmp = (latitude_cent_tmp - gps->latitude_cent) * 60;
-  gps->latitude_second = static_cast<std::int64_t>(latitude_second_tmp);
+  gps->latitude_second = fabs(latitude_second_tmp);
 
   gps->longitude_degree =
-    static_cast<std::int64_t>(gps->longitude / 100); // separate latitude
+    fabs(gps->longitude / 100); // separate latitude
   longitude_cent_tmp = gps->latitude - gps->longitude_degree * 100;
-  gps->longitude_cent = static_cast<std::int64_t>(longitude_cent_tmp);
+  gps->longitude_cent = fabs(longitude_cent_tmp);
   longitude_second_tmp = (longitude_cent_tmp - gps->longitude_cent) * 60;
-  gps->longitude_second = static_cast<std::int64_t>(longitude_second_tmp);
+  gps->longitude_second = fabs(longitude_second_tmp);
 
   /*
   if (location_count_ < 20) {
