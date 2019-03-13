@@ -340,7 +340,6 @@ void Device::SetInfraredIntensity(const std::uint16_t &value) {
 
 bool Device::Open(const OpenParams& params) {
   if (params.stream_mode == StreamMode::STREAM_2560x720 &&
-      params.dev_mode == DeviceMode::DEVICE_ALL &&
       params.framerate > 30) {
     LOGW("The framerate is too large, please use a smaller value (<=30).");
     return false;

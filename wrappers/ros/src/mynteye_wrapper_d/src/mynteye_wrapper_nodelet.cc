@@ -828,15 +828,15 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     }
 
     // R to identity matrix
-    camera_info->R.at(0) = 1.0;
-    camera_info->R.at(1) = 0.0;
-    camera_info->R.at(2) = 0.0;
-    camera_info->R.at(3) = 0.0;
-    camera_info->R.at(4) = 1.0;
-    camera_info->R.at(5) = 0.0;
-    camera_info->R.at(6) = 0.0;
-    camera_info->R.at(7) = 0.0;
-    camera_info->R.at(8) = 1.0;
+    camera_info->R.at(0) = in.r[0];
+    camera_info->R.at(1) = in.r[1];
+    camera_info->R.at(2) = in.r[2];
+    camera_info->R.at(3) = in.r[3];
+    camera_info->R.at(4) = in.r[4];
+    camera_info->R.at(5) = in.r[5];
+    camera_info->R.at(6) = in.r[6];
+    camera_info->R.at(7) = in.r[7];
+    camera_info->R.at(8) = in.r[8];
 
     return camera_info_ptr;
   }

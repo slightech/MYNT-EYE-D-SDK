@@ -1,111 +1,122 @@
 #include "mynteyed/internal/match.h"
 #include "mynteyed/util/log.h"
-#include "mynteyed/util/rate.h"
-
-static const std::size_t MAX_CACHE_TOTAL = 4;
 
 MYNTEYE_USE_NAMESPACE
 
-Match::Match() : is_matching_(false) {
+Match::Match() :
+  order_(Order::NONE) {
 }
 
 Match::~Match() {
-  is_matching_ = false;
-  if (match_thread_.joinable()) {
-    match_thread_.join();
-  }
 }
 
 void Match::OnStreamDataCallback(const ImageType &type, const img_data_t &data) {
-  std::lock_guard<std::mutex> _(match_mutex_);
+  std::lock_guard<std::recursive_mutex> _(match_mutex_);
+  if (stream_datas_[type].size() > 10)
+    stream_datas_[type].clear();
   stream_datas_[type].push_back(data);
 }
 
-Match::img_data_t Match::GetStreamData(const ImageType& type) {
-  auto datas = GetStreamDatas(type);
-  if (datas.empty()) return {};
-  return std::move(datas.back());
-}
-
 Match::img_datas_t Match::GetStreamDatas(const ImageType& type) {
-  std::lock_guard<std::mutex> _(retrieve_mutex_);
-  if (!stream_matched_datas_[type].empty()) {
-    auto datas = stream_matched_datas_[type];
-    stream_matched_datas_[type].clear();
-    return datas;
+  if (order_ == Order::NONE)
+    InitOrder(type);
+
+  std::lock_guard<std::recursive_mutex> _(match_mutex_);
+  if (!stream_datas_[type].empty()) {
+    auto datas = stream_datas_[type];
+    switch (order_) {
+      case Order::LEFT_IMAGE:
+        if (type == ImageType::IMAGE_LEFT_COLOR) {
+          base_frame_id_ = datas.back().img->frame_id();
+          stream_datas_[type].clear();
+          return datas;
+        }
+        return MatchStreamDatas(type);
+      case Order::RIGHT_IMAGE:
+        if (type == ImageType::IMAGE_RIGHT_COLOR) {
+          base_frame_id_ = stream_datas_[type].back().img->frame_id();
+          stream_datas_[type].clear();
+          return datas;
+        }
+        return MatchStreamDatas(type);
+      case Order::DEPTH_IMAGE:
+        if (type == ImageType::IMAGE_DEPTH) {
+          base_frame_id_ = stream_datas_[type].back().img->frame_id();
+          stream_datas_[type].clear();
+          return datas;
+        }
+        return MatchStreamDatas(type);
+      default:
+        throw_error("Unknow order of get datas.");
+    }
   }
 
   return {};
 }
 
 /** match */
-void Match::MatchStreamDatas() {
-  std::lock_guard<std::mutex> _(match_mutex_);
+Match::img_datas_t Match::MatchStreamDatas(const ImageType& type) {
+  std::lock_guard<std::recursive_mutex> _(match_mutex_);
 
-  auto&& left_datas = stream_datas_[ImageType::IMAGE_LEFT_COLOR];
-  auto&& right_datas = stream_datas_[ImageType::IMAGE_RIGHT_COLOR];
-  auto&& depth_datas = stream_datas_[ImageType::IMAGE_DEPTH];
+  std::vector<StreamData> result;
 
-  if (left_datas.empty() || depth_datas.empty()) {
-    return;
-  }
-
-  bool next = false;
-  int offset = 0;
-  /** start matching (only left match with depth)*/
-  for (auto left_it = left_datas.begin(); left_it != left_datas.end();) {
-    next = true;
-    offset++;
-    auto left_frame_id = (*left_it).img->frame_id();
-    for (auto depth_it = depth_datas.begin(); depth_it != depth_datas.end();) {
-      if (left_frame_id == (*depth_it).img->frame_id()) {
-        next = false;
-        OnUpdateMatchedDatas(ImageType::IMAGE_LEFT_COLOR, (*left_it));
-        if (!right_datas.empty()) {
-          auto data = right_datas[offset - 1];
-          v_offset_.push_back(offset);
-          OnUpdateMatchedDatas(ImageType::IMAGE_RIGHT_COLOR, data);
-        }
-        OnUpdateMatchedDatas(ImageType::IMAGE_DEPTH, (*depth_it));
-        left_it = left_datas.erase(left_it);
-        depth_it = depth_datas.erase(depth_it);
-        break;
+  auto&& datas = stream_datas_[type];
+  if (base_frame_id_ == datas.back().img->frame_id()) {
+    result = {datas.begin(), datas.end()};
+    datas.clear();
+    return result;
+  } else {
+    for (auto it = datas.begin(); it != datas.end();) {
+      if (base_frame_id_ == (*it).img->frame_id()) {
+        result = {datas.begin(), ++it};
+        datas.erase(datas.begin(), it);
+        return result;
       }
-      ++depth_it;
+      ++it;
     }
-    if (next) ++left_it;
   }
 
-  /** erase right color */
-  for (auto i : v_offset_) {
-    right_datas.erase(right_datas.begin() + i - 1,
-        right_datas.begin() + i);
+  return {};
+}
+
+void Match::InitOrder(const ImageType& type) {
+  switch (type) {
+    case ImageType::IMAGE_LEFT_COLOR:
+      order_ = Order::LEFT_IMAGE;
+      return;
+    case ImageType::IMAGE_RIGHT_COLOR:
+      order_ = Order::RIGHT_IMAGE;
+      return;
+    case ImageType::IMAGE_DEPTH:
+      order_ = Order::DEPTH_IMAGE;
+      return;
+    default:
+      return;
   }
-  v_offset_.clear();
 }
 
-void Match::OnUpdateMatchedDatas(const ImageType& type, const StreamData& data) {
-  std::lock_guard<std::mutex> _(retrieve_mutex_);
-  if (stream_matched_datas_[type].size() > MAX_CACHE_TOTAL)
-    stream_matched_datas_[type].clear();
 
-  stream_matched_datas_[type].push_back(data);
-}
 
-void Match::Start() {
-  if (is_matching_) {
-    LOGW("%s, %d: Matching is started.\n", __FILE__, __LINE__);
-    return;
-  }
 
-  is_matching_ = true;
-  match_thread_ = std::thread([this](){
-    Rate rate(10);
-    while (is_matching_) {
-      MatchStreamDatas();
-      rate.Sleep();
-    }
-  });
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

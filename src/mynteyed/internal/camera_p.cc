@@ -26,7 +26,6 @@
 #include "mynteyed/internal/distance.h"
 #include "mynteyed/internal/streams.h"
 #include "mynteyed/util/log.h"
-#include "mynteyed/internal/match.h"
 
 #define IMG_INFO_ASYNC_MAX_SIZE 120  // 60fps, 2s
 #define STREAM_ASYNC_MAX_SIZE 1  // latest
@@ -167,6 +166,9 @@ StreamIntrinsics CameraPrivate::GetStreamIntrinsics(
   for (int i = 0; i < 12; i++) {
     in.left.p[i] = calib->NewCamMat1[i];
   }
+  for (int i = 0; i < 9; i++) {
+    in.left.r[i] = calib->LRotaMat[i];
+  }
   in.right.width = calib->InImgWidth/2;
   in.right.height = calib->InImgHeight;
   in.right.fx = calib->CamMat2[0];
@@ -178,6 +180,9 @@ StreamIntrinsics CameraPrivate::GetStreamIntrinsics(
   }
   for (int i = 0; i < 12; i++) {
     in.right.p[i] = calib->NewCamMat2[i];
+  }
+  for (int i = 0; i < 9; i++) {
+    in.right.r[i] = calib->RRotaMat[i];
   }
   *ok = true;
   return std::move(in);
@@ -295,19 +300,11 @@ bool CameraPrivate::HasStreamDataEnabled() const {
 }
 
 StreamData CameraPrivate::GetStreamData(const ImageType& type) {
-  if (match_) {
-    return match_->GetStreamData(type);
-  } else {
-    return streams_->GetStreamData(type);
-  }
+  return streams_->GetStreamData(type);
 }
 
 std::vector<StreamData> CameraPrivate::GetStreamDatas(const ImageType& type) {
-  if (match_) {
-    return match_->GetStreamDatas(type);
-  } else {
-    return streams_->GetStreamDatas(type);
-  }
+  return streams_->GetStreamDatas(type);
 }
 
 bool CameraPrivate::IsExSensorDatasSupported() const {

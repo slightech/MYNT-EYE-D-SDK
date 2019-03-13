@@ -18,6 +18,7 @@
 #include "mynteyed/util/rate.h"
 #include "mynteyed/util/strings.h"
 #include "mynteyed/util/times.h"
+#include "mynteyed/internal/match.h"
 
 // set 1 only for the latest stream data
 #define STREAM_DATAS_MAX_SIZE 4
@@ -48,19 +49,13 @@ Streams::Streams(std::shared_ptr<Device> device)
       {STREAM_DEPTH,
           std::make_shared<img_info_queue_t>(IMG_INFO_QUEUE_MAX_SIZE)},
     }),
-    img_data_queue_map_({
-      {ImageType::IMAGE_LEFT_COLOR,
-          std::make_shared<img_data_queue_t>(stream_datas_max_size_)},
-      {ImageType::IMAGE_RIGHT_COLOR,
-          std::make_shared<img_data_queue_t>(stream_datas_max_size_)},
-      {ImageType::IMAGE_DEPTH,
-          std::make_shared<img_data_queue_t>(stream_datas_max_size_)}
-    }),
     img_info_callback_(nullptr),
     img_data_callbacks_({
       {ImageType::IMAGE_LEFT_COLOR, nullptr},
       {ImageType::IMAGE_RIGHT_COLOR, nullptr},
       {ImageType::IMAGE_DEPTH, nullptr}}) {
+
+    match_.reset(new Match());
 }
 
 Streams::~Streams() {
@@ -146,10 +141,6 @@ void Streams::EnableStreamDatas(std::size_t max_size) {
   for (auto&& type : all_stream_types_) {
     stream_queue_map_[type] = std::make_shared<stream_queue_t>(size);
   }
-  // Limit the img data queue
-  for (auto&& type : all_image_types_) {
-    img_data_queue_map_[type] = std::make_shared<img_data_queue_t>(size);
-  }
 }
 
 Streams::img_data_t Streams::GetStreamData(const ImageType& type) {
@@ -169,14 +160,7 @@ Streams::img_datas_t Streams::GetStreamDatas(const ImageType& type) {
     return {};
   }
 
-  if (IsStreamDatasEnabled()) {
-    // auto&& datas = img_data_queue_map_[type]->TakeAll();  // Block
-    auto&& datas = img_data_queue_map_[type]->MoveAll();  // Not block
-    return {datas.begin(), datas.end()};
-  } else {
-    // Block to get the latest one
-    return {img_data_queue_map_[type]->Take()};
-  }
+  return match_->GetStreamDatas(type);
 }
 
 void Streams::SetStreamCallback(const ImageType& type,
@@ -290,7 +274,6 @@ void Streams::OnStreamDataStateChanged(const ImageType& type, bool enabled) {
     auto&& stream_type = GetStreamType(type);
     stream_queue_map_[stream_type]->Clear();
     stream_info_queue_map_[stream_type]->Clear();
-    img_data_queue_map_[type]->Clear();
   }
 }
 
@@ -432,20 +415,15 @@ void Streams::DoStreamDataCaptured(const Image::pointer& image,
     const img_info_ptr_t& info) {
   auto&& type = image->type();
   StreamData data{image, info};
-  img_data_queue_map_[type]->Put(data);
   NotifyStreamData(type, data);
   if (img_data_callbacks_[type]) {
     img_data_callbacks_[type](data);
   }
 }
 
-void Streams::SetStreamDataListener(stream_datas_listener_t listener) {
-  stream_datas_listener_ = listener;
-}
-
 void Streams::NotifyStreamData(const ImageType &type,
     const StreamData &data) {
-  if (stream_datas_listener_) {
-    stream_datas_listener_(type, data);
+  if (match_) {
+    match_->OnStreamDataCallback(type, data);
   }
 }

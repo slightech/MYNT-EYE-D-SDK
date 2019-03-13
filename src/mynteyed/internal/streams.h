@@ -30,6 +30,7 @@
 MYNTEYE_BEGIN_NAMESPACE
 
 class Device;
+class Match;
 
 class Streams {
  public:
@@ -40,10 +41,6 @@ class Streams {
   using img_datas_t = std::vector<img_data_t>;
   using img_info_ptr_t = std::shared_ptr<ImgInfo>;
 
-  // img datas
-  using img_data_queue_t = queue_t<img_data_t>;
-  using img_data_queue_ptr_t = std::shared_ptr<img_data_queue_t>;
-
   // img infos
   using img_info_queue_t = queue_t<img_info_ptr_t>;
   using img_info_queue_ptr_t = std::shared_ptr<img_info_queue_t>;
@@ -52,9 +49,6 @@ class Streams {
   using img_data_callback_t = std::function<void(const img_data_t& data)>;
   // img info callback
   using img_info_callback_t = std::function<void(const img_info_ptr_t& info)>;
-
-  // stream data listener
-  using stream_datas_listener_t = std::function<void(const ImageType &type, const img_data_t &data)>;
 
   // stream types
   typedef enum StreamType {
@@ -102,7 +96,6 @@ class Streams {
   img_datas_t GetStreamDatas(const ImageType& type);
 
   void SetStreamCallback(const ImageType& type, img_data_callback_t callback);
-  void SetStreamDataListener(stream_datas_listener_t listener);
 
   void OnCameraOpen();
   void OnCameraClose();
@@ -169,13 +162,10 @@ class Streams {
   // stream info queue, only for sync
   std::map<stream_type_t, img_info_queue_ptr_t> stream_info_queue_map_;
 
-  // img data queue
-  std::map<ImageType, img_data_queue_ptr_t> img_data_queue_map_;
-
   img_info_callback_t img_info_callback_;
   std::map<ImageType, img_data_callback_t> img_data_callbacks_;
 
-  stream_datas_listener_t stream_datas_listener_;
+  std::shared_ptr<Match> match_;
 };
 
 MYNTEYE_END_NAMESPACE

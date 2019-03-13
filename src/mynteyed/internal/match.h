@@ -5,12 +5,18 @@
 #include <vector>
 #include <map>
 #include <mutex>
-#include <thread>
 
 #include "mynteyed/data/types_internal.h"
 #include "mynteyed/types.h"
 
 MYNTEYE_BEGIN_NAMESPACE
+
+enum class Order : std::int32_t {
+  LEFT_IMAGE = 1,
+  RIGHT_IMAGE,
+  DEPTH_IMAGE,
+  NONE,
+};
 
 class Match {
  public:
@@ -22,27 +28,21 @@ class Match {
 
   void OnStreamDataCallback(const ImageType &type, const img_data_t& data);
 
-  img_data_t GetStreamData(const ImageType& type);
-
   img_datas_t GetStreamDatas(const ImageType& type);
-
-  void Start();
 
  protected:
   void OnUpdateMatchedDatas(const ImageType& type, const StreamData& data);
-  void MatchStreamDatas();
+  img_datas_t MatchStreamDatas(const ImageType& type);
+  void InitOrder(const ImageType& type);
 
  private:
   std::map<ImageType, img_datas_t> stream_datas_;
-  std::map<ImageType, img_datas_t> stream_matched_datas_;
 
-  std::vector<int> v_offset_;
+  std::recursive_mutex match_mutex_;
 
-  std::mutex match_mutex_;
-  std::mutex retrieve_mutex_;
+  std::uint16_t base_frame_id_ = 0;
 
-  bool is_matching_;
-  std::thread match_thread_;
+  Order order_;
 };
 
 MYNTEYE_END_NAMESPACE
