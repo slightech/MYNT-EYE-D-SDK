@@ -69,9 +69,11 @@ int main(int argc, char const* argv[]) {
       std::cout << "Distance count: " << distance_datas.size() << std::endl;
       for (auto data : distance_datas) {
         if (data.dis) {
+          counter.IncrUltrasonicCount();
           std::cout << "[Distance] detection_time: " << data.dis->detection_time
             << ", distance: " << data.dis->distance << std::endl;
         }
+        std::cout << std::endl;
       }
     }
 

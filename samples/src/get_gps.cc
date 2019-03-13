@@ -69,6 +69,7 @@ int main(int argc, char const* argv[]) {
       std::cout << "GPS count: " << location_datas.size() << std::endl;
       for (auto data : location_datas) {
         if (data.gps) {
+          counter.IncrGPSCount();
           std::cout << "[GPS] device_time: " << data.gps->device_time
             << ", latitude: " << data.gps->latitude
             << ", longitude: " << data.gps->longitude
@@ -78,7 +79,6 @@ int main(int argc, char const* argv[]) {
             << ", longitude_degree: " << data.gps->longitude_degree
             << ", longitude_cent: " << data.gps->longitude_cent
             << ", longitude_second: " << data.gps->longitude_second
-            << ", satellite: " << data.gps->satellite
             << ", NS: " << data.gps->NS
             << ", EW: " << data.gps->EW
             << ", year: " << unsigned(data.gps->year)
@@ -88,6 +88,7 @@ int main(int argc, char const* argv[]) {
             << ", minute: " << unsigned(data.gps->minute)
             << ", second: " << unsigned(data.gps->second) << std::endl;
         }
+        std::cout << std::endl;
       }
     }
 

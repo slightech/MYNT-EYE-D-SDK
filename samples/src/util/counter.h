@@ -33,7 +33,8 @@ class Counter {
 
   explicit Counter(std::size_t fps_frame_count = 10)
     : count_(0), fps_(0), fps_frame_count_(fps_frame_count),
-      color_count_(0), depth_count_(0), accel_count_(0), gyro_count_(0) {
+      color_count_(0), depth_count_(0), accel_count_(0), gyro_count_(0),
+      gps_count_(0), ultrasonic_count_(0) {
     Init();
   }
 
@@ -93,6 +94,14 @@ class Counter {
     gyro_count_ += count;
   }
 
+  void IncrGPSCount(const std::size_t& count = 1) {
+    gps_count_ += count;
+  }
+
+  void IncrUltrasonicCount(const std::size_t& count = 1) {
+    ultrasonic_count_ += count;
+  }
+
   void PrintCountInfo() {
     auto &&time_end = times::now();
     float elapsed_ms =
@@ -117,6 +126,14 @@ class Counter {
     if (gyro_count_ > 0) {
       std::cout << "Gryo count: " << gyro_count_
         << ", hz: " << (1000.f * gyro_count_ / elapsed_ms) << std::endl;
+    }
+    if (gps_count_ > 0) {
+      std::cout << "GPS count: " << gps_count_
+        << ", hz: " << (1000.f * gps_count_ / elapsed_ms) << std::endl;
+    }
+    if (ultrasonic_count_ > 0) {
+      std::cout << "Ultrasonic count: " << ultrasonic_count_
+        << ", hz: " << (1000.f * ultrasonic_count_ / elapsed_ms) << std::endl;
     }
   }
 
@@ -164,6 +181,8 @@ class Counter {
   std::size_t depth_count_;
   std::size_t accel_count_;
   std::size_t gyro_count_;
+  std::size_t gps_count_;
+  std::size_t ultrasonic_count_;
 
   // std::mutex mtx_;
 };

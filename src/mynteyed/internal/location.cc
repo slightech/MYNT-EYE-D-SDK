@@ -81,7 +81,7 @@ void Location::OnGPSDataCallback(const GPSDataPacket& packet) {
 
   gps->longitude_degree =
     fabs(gps->longitude / 100); // separate latitude
-  longitude_cent_tmp = gps->latitude - gps->longitude_degree * 100;
+  longitude_cent_tmp = gps->longitude - gps->longitude_degree * 100;
   gps->longitude_cent = fabs(longitude_cent_tmp);
   longitude_second_tmp = (longitude_cent_tmp - gps->longitude_cent) * 60;
   gps->longitude_second = fabs(longitude_second_tmp);

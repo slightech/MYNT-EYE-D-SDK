@@ -15,8 +15,10 @@
 #define MYNTEYE_DATA_TYPES_INTERNAL_H_
 #pragma once
 
+#include <string.h>
 #include <cstdint>
 #include <vector>
+#include <iostream>
 
 #include "mynteyed/stubs/global.h"
 
@@ -84,7 +86,6 @@ struct GPSDataPacket {
   std::uint64_t device_time;
   double latitude;
   double longitude;
-  std::uint64_t satellite;;
   std::uint8_t NS;
   std::uint8_t EW;
 
@@ -111,19 +112,9 @@ struct GPSDataPacket {
     month = *(data + 11);
     day = *(data + 12);
     NS = *(data + 13);
-    latitude = *(data + 14) | *(data + 15) << 8 |
-      *(data + 16) << 16 | *(data + 17) << 24 |
-      static_cast<std::uint64_t>(*(data + 18)) << 32 |
-      static_cast<std::uint64_t>(*(data + 19)) << 40 |
-      static_cast<std::uint64_t>(*(data + 20)) << 48 |
-      static_cast<std::uint64_t>(*(data + 21)) << 56;
+    memcpy(&latitude, data + 14, 8);
     EW = *(data + 22);
-    longitude = *(data + 23) | *(data + 24) << 8 |
-      *(data + 25) << 16 | *(data + 26) << 24 |
-      static_cast<std::uint64_t>(*(data + 27)) << 32 |
-      static_cast<std::uint64_t>(*(data + 28)) << 40 |
-      static_cast<std::uint64_t>(*(data + 29)) << 48 |
-      static_cast<std::uint64_t>(*(data + 30)) << 56;
+    memcpy(&longitude, data + 23, 8);
   }
 };
 #pragma pack(pop)
