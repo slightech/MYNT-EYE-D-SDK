@@ -138,9 +138,11 @@ set(MYNTEYE_DEPTH_SRCS
   src/mynteyed/utils.cc
   src/mynteyed/internal/camera_p.cc
   src/mynteyed/internal/image_utils.cc
-  src/mynteyed/internal/motions.cc
   src/mynteyed/internal/streams.cc
   src/mynteyed/internal/match.cc
+  src/mynteyed/internal/motions.cc
+  src/mynteyed/internal/location.cc
+  src/mynteyed/internal/distance.cc
 )
 if(OS_WIN)
   list(APPEND MYNTEYE_DEPTH_SRCS

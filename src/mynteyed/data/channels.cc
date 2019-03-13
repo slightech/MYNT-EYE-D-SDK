@@ -68,7 +68,10 @@ void CheckSpecVersion(const Version *spec_version) {
 
 }  // namespace
 
-Channels::Channels() : imu_callback_(nullptr), img_callback_(nullptr) {
+Channels::Channels() : img_callback_(nullptr),
+  imu_callback_(nullptr),
+  gps_callback_(nullptr),
+  dis_callback_(nullptr) {
   hid_ = std::make_shared<hid::hid_device>();
   Detect();
   Open();
@@ -95,6 +98,14 @@ void Channels::SetImuDataCallback(imu_callback_t callback) {
 
 void Channels::SetImgInfoCallback(img_callback_t callback) {
   img_callback_ = callback;
+}
+
+void Channels::SetGPSDataCallback(gps_callback_t callback) {
+  gps_callback_ = callback;
+}
+
+void Channels::SetDisDataCallback(dis_callback_t callback) {
+  dis_callback_ = callback;
 }
 
 bool Channels::IsHidAvaliable() const {
@@ -195,10 +206,15 @@ void Channels::CloseHid() {
 bool Channels::DoHidTrack() {
   static imu_packets_t imu_packets;
   static img_packets_t img_packets;
+  static gps_packets_t gps_packets;
+  static dis_packets_t dis_packets;
   imu_packets.clear();
   img_packets.clear();
+  gps_packets.clear();
+  dis_packets.clear();
 
-  if (!DoHidDataExtract(imu_packets, img_packets)) {
+  if (!DoHidDataExtract(imu_packets, img_packets,
+        gps_packets, dis_packets)) {
     return false;
   }
 
@@ -210,6 +226,16 @@ bool Channels::DoHidTrack() {
   if (img_callback_) {
     for (auto &&img_packet : img_packets) {
       img_callback_(img_packet);
+    }
+  }
+  if (gps_callback_) {
+    for (auto &&gps_packet : gps_packets) {
+      gps_callback_(gps_packet);
+    }
+  }
+  if (dis_callback_) {
+    for (auto &&dis_packet : dis_packets) {
+      dis_callback_(dis_packet);
     }
   }
 
@@ -282,7 +308,8 @@ void detect_img_info_stamp(const ImgInfoPacket& img_info) {
 }
 #endif
 
-bool Channels::DoHidDataExtract(imu_packets_t &imu, img_packets_t &img) {
+bool Channels::DoHidDataExtract(imu_packets_t &imu, img_packets_t &img,
+    gps_packets_t &gps, dis_packets_t &dis) {
   std::uint8_t data[PACKET_SIZE * 2]{};
   std::fill(data, data + PACKET_SIZE * 2, 0);
 
@@ -323,7 +350,7 @@ bool Channels::DoHidDataExtract(imu_packets_t &imu, img_packets_t &img) {
 #endif
 
       std::uint8_t header = *(packet + offset);
-      if (header == 0 || header == 1) {
+      if (header == ACCEL || header == GYRO) {
         auto&& imu_data = ImuDataPacket(packet + offset);
         imu.push_back(imu_data);
 #ifdef PACKET_PRINT
@@ -332,7 +359,7 @@ bool Channels::DoHidDataExtract(imu_packets_t &imu, img_packets_t &img) {
 #ifdef PACKET_STAMP_DETECTION
         detect_imu_data_stamp(imu_data);
 #endif
-      } else if (header == 2) {
+      } else if (header == FRAME) {
         auto&& img_info = ImgInfoPacket(packet + offset);
         img.push_back(img_info);
 #ifdef PACKET_PRINT
@@ -341,6 +368,13 @@ bool Channels::DoHidDataExtract(imu_packets_t &imu, img_packets_t &img) {
 #ifdef PACKET_STAMP_DETECTION
         detect_img_info_stamp(img_info);
 #endif
+      } else if (header == DISTANCE) {
+        auto&& obstacle_dis = ObstacleDisPacket(packet + offset);
+        dis.push_back(obstacle_dis);
+      } else if (header == LOCATION) {
+        auto&& gps_data = GPSDataPacket(packet + offset);
+        gps.push_back(gps_data);
+        break;
       }
     }
   }

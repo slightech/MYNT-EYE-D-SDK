@@ -22,6 +22,8 @@
 #include "mynteyed/device/device.h"
 #include "mynteyed/internal/image_utils.h"
 #include "mynteyed/internal/motions.h"
+#include "mynteyed/internal/location.h"
+#include "mynteyed/internal/distance.h"
 #include "mynteyed/internal/streams.h"
 #include "mynteyed/util/log.h"
 #include "mynteyed/internal/match.h"
@@ -29,6 +31,8 @@
 #define IMG_INFO_ASYNC_MAX_SIZE 120  // 60fps, 2s
 #define STREAM_ASYNC_MAX_SIZE 1  // latest
 #define MOTION_ASYNC_MAX_SIZE 800  // 400hz, 2s
+#define LOCATION_ASYNC_MAX_SIZE 800  // 400hz, 2s
+#define DISTANCE_ASYNC_MAX_SIZE 800  // 400hz, 2s
 
 MYNTEYE_USE_NAMESPACE
 
@@ -40,6 +44,8 @@ CameraPrivate::CameraPrivate() : device_(std::make_shared<Device>()) {
 void CameraPrivate::Init() {
   channels_ = std::make_shared<Channels>();
   motions_ = std::make_shared<Motions>();
+  location_ = std::make_shared<Location>();
+  distance_ = std::make_shared<Distance>();
   streams_ = std::make_shared<Streams>(device_);
 
   if (channels_->IsAvaliable()) {
@@ -95,7 +101,6 @@ ErrorCode CameraPrivate::Open(const OpenParams& params) {
         break;
     }
     streams_->OnCameraOpen();
-    EnableMatchFrameId();
     return ErrorCode::SUCCESS;
   } else {
     return ErrorCode::ERROR_CAMERA_OPEN_FAILED;
@@ -305,7 +310,7 @@ std::vector<StreamData> CameraPrivate::GetStreamDatas(const ImageType& type) {
   }
 }
 
-bool CameraPrivate::IsMotionDatasSupported() const {
+bool CameraPrivate::IsExSensorDatasSupported() const {
   return channels_->IsAvaliable();
 }
 
@@ -437,7 +442,10 @@ bool CameraPrivate::StartDataTracking() {
     // ensure start after opened
     return false;
   }
-  if (!motions_->IsMotionDatasEnabled() && !streams_->IsImageInfoEnabled()) {
+  if (!motions_->IsMotionDatasEnabled() &&
+      !streams_->IsImageInfoEnabled() &&
+      !location_->IsLocationDatasEnabled() &&
+      !distance_->IsDistanceDatasEnabled()) {
     // Not tracking if data & info both disabled
     return false;
   }
@@ -449,6 +457,16 @@ bool CameraPrivate::StartDataTracking() {
   if (motions_->IsMotionDatasEnabled()) {
     channels_->SetImuDataCallback(std::bind(&Motions::OnImuDataCallback,
         motions_, std::placeholders::_1));
+  }
+
+  if (location_->IsLocationDatasEnabled()) {
+    channels_->SetGPSDataCallback(std::bind(&Location::OnGPSDataCallback,
+        location_, std::placeholders::_1));
+  }
+
+  if (distance_->IsDistanceDatasEnabled()) {
+    channels_->SetDisDataCallback(std::bind(&Distance::OnDisDataCallback,
+        distance_, std::placeholders::_1));
   }
 
   if (streams_->IsImageInfoEnabled()) {
@@ -470,6 +488,8 @@ void CameraPrivate::StopDataTracking() {
 
 void CameraPrivate::NotifyDataTrackStateChanged() {
   bool expect_track = motions_->IsMotionDatasEnabled()
+      || location_->IsLocationDatasEnabled()
+      || distance_->IsDistanceDatasEnabled()
       || streams_->IsImageInfoEnabled();
   if (expect_track) {
     StartDataTracking();
@@ -511,13 +531,66 @@ bool CameraPrivate::AutoWhiteBalanceControl(bool enable) {
   return device_->SetAutoWhiteBalanceEnabled(enable);
 }
 
-void CameraPrivate::EnableMatchFrameId() {
-  if (match_ == nullptr) {
-    match_.reset(new Match());
-    streams_->SetStreamDataListener(
-        std::bind(&Match::OnStreamDataCallback,
-        match_.get(), std::placeholders::_1,
-        std::placeholders::_2));
-    match_->Start();
+void CameraPrivate::EnableLocationDatas(std::size_t max_size) {
+  if (!channels_->IsAvaliable()) {
+    LOGW("Data channel is unavaliable, could not track location datas.");
+    return;
+  }
+  location_->EnableLocationDatas(std::move(max_size));
+  NotifyDataTrackStateChanged();
+}
+
+void CameraPrivate::DisableLocationDatas() {
+  location_->DisableLocationDatas();
+  NotifyDataTrackStateChanged();
+}
+
+bool CameraPrivate::IsLocationDatasEnabled() const {
+  return location_->IsLocationDatasEnabled();
+}
+
+std::vector<LocationData> CameraPrivate::GetLocationDatas() {
+  return std::move(location_->GetLocationDatas());
+}
+
+void CameraPrivate::SetLocationCallback(location_callback_t callback, bool async) {
+  if (async) {
+    auto location_async_callback =
+        AsyncCallback<LocationData>::Create(callback, LOCATION_ASYNC_MAX_SIZE);
+    location_->SetLocationCallback((*location_async_callback)());
+  } else {
+    location_->SetLocationCallback(callback);
+  }
+}
+
+void CameraPrivate::EnableDistanceDatas(std::size_t max_size) {
+  if (!channels_->IsAvaliable()) {
+    LOGW("Data channel is unavaliable, could not track distance datas.");
+    return;
+  }
+  distance_->EnableDistanceDatas(std::move(max_size));
+  NotifyDataTrackStateChanged();
+}
+
+void CameraPrivate::DisableDistanceDatas() {
+  distance_->DisableDistanceDatas();
+  NotifyDataTrackStateChanged();
+}
+
+bool CameraPrivate::IsDistanceDatasEnabled() const {
+  return distance_->IsDistanceDatasEnabled();
+}
+
+std::vector<DistanceData> CameraPrivate::GetDistanceDatas() {
+  return std::move(distance_->GetDistanceDatas());
+}
+
+void CameraPrivate::SetDistanceCallback(distance_callback_t callback, bool async) {
+  if (async) {
+    auto distance_async_callback =
+        AsyncCallback<DistanceData>::Create(callback, DISTANCE_ASYNC_MAX_SIZE);
+    distance_->SetDistanceCallback((*distance_async_callback)());
+  } else {
+    distance_->SetDistanceCallback(callback);
   }
 }

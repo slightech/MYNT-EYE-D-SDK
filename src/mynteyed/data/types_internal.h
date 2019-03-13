@@ -74,6 +74,84 @@ struct ImuDataPacket {
 };
 #pragma pack(pop)
 
+/**
+ * @ingroup datatypes
+ * GPS data packet.
+ */
+#pragma pack(push, 1)
+struct GPSDataPacket {
+  std::uint8_t flag;
+  std::uint64_t device_time;
+  double latitude;
+  double longitude;
+  std::uint64_t satellite;;
+  std::uint8_t NS;
+  std::uint8_t EW;
+
+  std::uint16_t year;
+  std::uint8_t month;
+  std::uint8_t day;
+  std::uint8_t hour;
+  std::uint8_t minute;
+  std::uint8_t second;
+
+  GPSDataPacket() = default;
+  explicit GPSDataPacket(std::uint8_t *data) {
+    from_data(data);
+  }
+
+  void from_data(std::uint8_t *data) {
+    flag = *data + 1;
+    device_time = *(data + 2) | *(data + 3) << 8 |
+      *(data + 4) << 16 | *(data + 5) << 24;
+    hour = *(data + 6);
+    minute = *(data + 7);
+    second = *(data + 8);
+    year = *(data + 9) | *(data + 10) << 8;
+    month = *(data + 11);
+    day = *(data + 12);
+    NS = *(data + 13);
+    latitude = *(data + 14) | *(data + 15) << 8 |
+      *(data + 16) << 16 | *(data + 17) << 24 |
+      static_cast<std::uint64_t>(*(data + 18)) << 32 |
+      static_cast<std::uint64_t>(*(data + 19)) << 40 |
+      static_cast<std::uint64_t>(*(data + 20)) << 48 |
+      static_cast<std::uint64_t>(*(data + 21)) << 56;
+    EW = *(data + 22);
+    longitude = *(data + 23) | *(data + 24) << 8 |
+      *(data + 25) << 16 | *(data + 26) << 24 |
+      static_cast<std::uint64_t>(*(data + 27)) << 32 |
+      static_cast<std::uint64_t>(*(data + 28)) << 40 |
+      static_cast<std::uint64_t>(*(data + 29)) << 48 |
+      static_cast<std::uint64_t>(*(data + 30)) << 56;
+  }
+};
+#pragma pack(pop)
+
+/**
+ * @ingroup datatypes
+ * ObstacleDistance data packet.
+ */
+#pragma pack(push, 1)
+struct ObstacleDisPacket {
+  std::uint8_t flag;
+  std::uint64_t detection_time;
+  std::uint16_t distance;
+
+  ObstacleDisPacket() = default;
+  explicit ObstacleDisPacket(std::uint8_t *data) {
+    from_data(data);
+  }
+
+  void from_data(std::uint8_t *data) {
+    flag = *data + 1;
+    detection_time = *(data + 2) | *(data + 3) << 8 |
+      *(data + 4) << 16 | *(data + 5) << 24;
+    distance = *(data + 6) | *(data + 7) << 8;
+  }
+};
+#pragma pack(pop)
+
 MYNTEYE_END_NAMESPACE
 
 #endif  // MYNTEYE_DATA_TYPES_INTERNAL_H_

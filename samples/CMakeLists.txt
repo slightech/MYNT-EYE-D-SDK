@@ -162,6 +162,20 @@ make_executable(get_matched_image
   DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
 )
 
+make_executable(get_gps
+  SRCS
+    src/get_gps.cc
+  LINK_LIBS mynteye_depth ${OpenCV_LIBS}
+  DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
+)
+
+make_executable(get_ultrasonic
+  SRCS
+    src/get_ultrasonic.cc
+  LINK_LIBS mynteye_depth ${OpenCV_LIBS}
+  DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
+)
+
 find_package(PCL QUIET)
 if(PCL_FOUND)
   list(REMOVE_ITEM PCL_LIBRARIES "vtkproj4")
