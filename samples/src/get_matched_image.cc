@@ -127,7 +127,7 @@ int main(int argc, char const* argv[]) {
         painter.DrawInformation(left, util::to_string(counter.fps()),
             CVPainter::BOTTOM_RIGHT);
         cv::imshow("left color", left);
-        left_frame_id = left_color.img_info->frame_id;
+        left_frame_id = left_color.img->frame_id();
         left_total++;
       }
     }
@@ -154,7 +154,7 @@ int main(int argc, char const* argv[]) {
         painter.DrawSize(depth, CVPainter::TOP_LEFT);
         painter.DrawStreamData(depth, image_depth, CVPainter::TOP_RIGHT);
         cv::imshow("depth", depth);
-        depth_frame_id = image_depth.img_info->frame_id;
+        depth_frame_id = image_depth.img->frame_id();
         depth_total++;
       }
     }
