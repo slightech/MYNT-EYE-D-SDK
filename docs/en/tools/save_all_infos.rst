@@ -12,6 +12,8 @@ Reference commands:
 
    ./tools/_output/bin/writer/save_all_infos
 
+.. code-block:: bat
+
    # Windows
    .\tools\_output\bin\writer\save_all_infos.bat
 
@@ -44,5 +46,5 @@ Saved contents:
          └─imu.params
 
 Complete code samples，see
-`save_all_infos <https://github.com/slightech/MYNT-EYE-D-SDK/blob/master/tools/writer/save_all_infos.cc>`__
+`save_all_infos.cc <https://github.com/slightech/MYNT-EYE-D-SDK/blob/master/tools/writer/save_all_infos.cc>`__
 .

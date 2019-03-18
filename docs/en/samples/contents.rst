@@ -1,5 +1,5 @@
-SDK SAMPLES
-=============
+MYNT® EYE SDK SAMPLES
+======================
 
 .. toctree::
    :maxdepth: 2

@@ -25,5 +25,5 @@ run above commands to write them into the device.
    ``save_all_infos`` to backup parameters.
 
 Complete code samples，see
-`imu_params_writer <https://github.com/slightech/MYNT-EYE-D-SDK/blob/master/tools/writer/imu_params_writer.cc>`__
+`imu_params_writer.cc <https://github.com/slightech/MYNT-EYE-D-SDK/blob/master/tools/writer/imu_params_writer.cc>`__
 .

@@ -40,7 +40,7 @@ Alternatively, refer to the command below:
 
    git clone https://github.com/opencv/opencv.git
    cd opencv/
-   git checkout tags/3.4.0
+   git checkout tags/3.4.5
 
    cd opencv/
    mkdir build
@@ -261,7 +261,7 @@ Packaging:
 
 .. code-block:: bash
 
-   cd <sdk>
+   cd <sdk>  #local path of MYNT-EYE-D-SDK
    make pkg
 
 6. Clean
@@ -269,5 +269,6 @@ Packaging:
 
 .. code-block:: bash
 
-   cd <sdk>
+   cd <sdk>   #local path of MYNT-EYE-D-SDK
    make cleanall
+   make uninstall

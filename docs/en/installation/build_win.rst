@@ -19,6 +19,10 @@ using prebuilt DLL, please see :ref:`install_exe_win` .
 Download Visual Studio 2017 from https://visualstudio.microsoft.com/ and
 install
 
+.. tip::
+
+   support Visual Studio 2015 and Visual Studio 2017.
+
 1.2 Install CMake
 ~~~~~~~~~~~~~~~~~
 
@@ -43,6 +47,13 @@ Download CMake from https://cmake.org/ and install
    pacman -Syu
    pacman -S make
 
+Finally, the CMD (Command Prompt) can run the following command:
+
+.. code-block:: bat
+
+  >make --version
+  GNU Make 4.2.1
+
 2. Install SDK dependencies
 ---------------------------
 
@@ -66,7 +77,7 @@ Download CMake from https://cmake.org/ and install
 2.1.2 Set up environment variable
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Start up a command window and enter:
+Start up a command window as admin and enter following command to add ``OPENCV_DIR`` environment variable:
 
 *Change the “D:\OpenCV” to your opencv unpack path*
 
@@ -111,6 +122,31 @@ Open “x64 Native Tools Command Prompt for VS 2017”(适用于 VS 2017 的 x64
    git clone https://github.com/slightech/MYNT-EYE-D-SDK.git
    cd MYNT-EYE-D-SDK
    make all
+
+.. tip::
+
+  Visual Studio Command Prompt can be opened from the Start menu,
+
+  .. image:: ../../static/images/vs_cmd_menu.png
+    :width: 30%
+
+  You can also open it from the Visual Studio Tools menu.
+
+  .. image:: ../../static/images/vs_cmd.png
+    :width: 40%
+
+  However, if you do not have the Visual Studio 2015 Tools menu, you can add one yourself.
+
+  Open Tools's External Tools... and Add the following:
+
+  ================= =======================================================================================
+  Field             Value
+  ================= =======================================================================================
+  Title             Visual Studio Command Prompt
+  Command           ``C:\Windows\System32\cmd.exe``
+  Arguments         ``/k "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools\VsDevCmd.bat"``
+  Initial Directory ``$(SolutionDir)``
+  ================= =======================================================================================
 
 4. Run Samples
 --------------
@@ -180,5 +216,5 @@ Open “x64 Native Tools Command Prompt for VS 2017”(适用于 VS 2017 的 x64
 
 .. code-block:: bat
 
-   cd <sdk>
+   cd <sdk>  #local path of MYNT-EYE-D-SDK
    make cleanall

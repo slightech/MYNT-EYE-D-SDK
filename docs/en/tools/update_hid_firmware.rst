@@ -15,7 +15,7 @@ Compile SDK Tools
 
 .. code-block:: bash
 
-   cd <sdk>
+   cd <sdk> #local path of MYNT-EYE-D-SDK
    make tools
 
 Update Firmware

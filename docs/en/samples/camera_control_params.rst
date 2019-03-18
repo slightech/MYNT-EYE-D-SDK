@@ -60,3 +60,12 @@ Reference code snippet:
   cam.AutoExposureControl(false);
   cam.SetGlobalGain(1);
   cam.SetExposureTime(0.3);
+
+.. note::
+  After changing the parameters, you need to run in the sdk directory
+
+  .. code-block:: bash
+
+    make samples
+
+  to make the set parameters take effect.

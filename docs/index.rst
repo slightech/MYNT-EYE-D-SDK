@@ -15,7 +15,9 @@ MYNT® EYE D SDK
    en/samples/contents
    en/tools/contents
    en/projects/contents
+   en/slam/contents
    api/contents
+
 ..
   Indices and tables
   ==================

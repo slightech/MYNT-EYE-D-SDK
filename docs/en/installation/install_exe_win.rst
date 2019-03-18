@@ -78,8 +78,12 @@ p.s. The example result of “generate.bat”,
    -- Build files have been written to: C:/Users/John/AppData/Roaming/Slightech/MYNTEYED/SDK/1.3.6/samples/_build
    Press any key to continue . . .
 
+.. tip::
+
+  Right click sample and select ``Set as StartUp Project``，then launch with Release x64 mode.
+
 Start using MYNT® EYE Depth SDK with Visual Studio 2017
 -------------------------------------------------------
 
-Goto the :ref:`vs2017`, see the
+Goto the ``<SDK_ROOT_DIR>\projects\vs2017``, see the
 “README.md”.

@@ -69,5 +69,5 @@ e.g. \ ``./samples/_output/bin/get_all_with_options -f 60 --dev-mode=0 --sm=2``
 displays 1280x720 60fps left unrectified image.
 
 Complete code samples，see
-`get_all_with_options <https://github.com/slightech/MYNT-EYE-D-SDK/blob/master/samples/src/get_all_with_options.cc>`__
+`get_all_with_options.cc <https://github.com/slightech/MYNT-EYE-D-SDK/blob/master/samples/src/get_all_with_options.cc>`__
 .

@@ -45,4 +45,8 @@ Record contents:
       │  └─...
       └─motion.txt  # IMU information
 
+.. tip::
+
+  When recording data, ``dataset.cc`` has annotated display image inside ``cv::imwrite()`` . Because these operations are time-consuming, they can cause images to be discarded. In other words, consumption can't keep up with production, so some images are discarded. ``GetStreamDatas()`` used in ``record.cc`` only caches the latest 4 images.
+
 

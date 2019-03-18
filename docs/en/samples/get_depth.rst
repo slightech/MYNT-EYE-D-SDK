@@ -36,5 +36,9 @@ Reference code snippet:
 The above code uses OpenCV to display the image. When the display window
 is selected, pressing ESC/Q will end the program.
 
+.. note::
+
+  `get_depth` sample only support  `DEPTH_RAW` mode.You can modify ``depth_mode`` parameter of other samples to get depth images 。
+
 Complete code examples, see
 `get_depth.cc <https://github.com/slightech/MYNT-EYE-D-SDK/blob/master/samples/src/get_depth.cc>`__.

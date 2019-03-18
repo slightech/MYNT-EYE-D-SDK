@@ -3,7 +3,8 @@
 Get camera image(Compatible with USB2.0)
 ===========================================
 
-Compatible with USB2.0 Using the ``DeviceMode::DEVICE_COLOR`` function
+Compatible with USB2.0 ,change to the resolution and frame rate for
+USB 2.0 automatically.Using the ``DeviceMode::DEVICE_COLOR`` function
 of the API, you can get color image，or use ``DeviceMode::DEVICE_ALL``
 to get color and depth image.
 

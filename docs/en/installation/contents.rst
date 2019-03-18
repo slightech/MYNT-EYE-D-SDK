@@ -1,9 +1,10 @@
-SDK INSTALLATION
-==================
+MYNT® EYE SDK INSTALLATION
+===========================
 
 .. toctree::
    :maxdepth: 2
 
+   change_log
    support_platforms
    build_linux
    build_win

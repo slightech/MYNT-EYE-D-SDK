@@ -104,14 +104,24 @@ Reference code snippet:
    // Infrared intensity: 0(default), [0,10]
    params.ir_intensity = 4;
 
+.. note::
+
+  After turning this fuction on, you can see ir pattern:
+
+  .. image:: ../../static/images/ir.png
+
 Enable IR Depth Only
 --------------------
 
 Using the ``params.ir_depth_only`` parameter，you can set IR Depth Only
-function. This is disabled by default.
+function. This is disabled by default. After turning this function on, IR
+only works on depth images. IR pattern will not show in color images.
 
 .. note::
   This function doesn’t work on 15 frame rate below.
+  After turning this function on, frame rate will be divided equally.For
+  example,when set frame rate of image to 30 fps, the frame rate of color
+  image is 15 fps. The frame rate of depth image is 15 fps too.
 
 Reference code snippet:
 
@@ -159,6 +169,15 @@ Reference running results on Linux:
 
    Open device success
 
+.. note::
+  After changing the parameters, you need to run in the sdk directory
+
+  .. code-block:: bash
+
+    make samples
+
+  to make the set parameters take effect.
+
 Complete code samples，see
-`get_image <https://github.com/slightech/MYNT-EYE-D-SDK/blob/master/samples/src/get_image.cc>`__
+`get_image.cc <https://github.com/slightech/MYNT-EYE-D-SDK/blob/master/samples/src/get_image.cc>`__
 .

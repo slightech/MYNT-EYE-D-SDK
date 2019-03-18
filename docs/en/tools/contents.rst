@@ -1,5 +1,5 @@
-SDK TOOLS
-=============
+MYNT® EYE SDK TOOLS
+====================
 
 .. toctree::
    :maxdepth: 2
