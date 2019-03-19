@@ -16,7 +16,7 @@ MYNT® EYE D SDK is a library for MYNT® EYE Depth cameras.
 API reference and the guide documentations.
 
 * en: [![](https://img.shields.io/badge/Download-PDF-blue.svg?style=flat)](https://github.com/slightech/MYNT-EYE-D-SDK/files/2981398/mynteye-d-sdk-docs-en-1.7.3.pdf) [![](https://img.shields.io/badge/Download-HTML-blue.svg?style=flat)](https://github.com/slightech/MYNT-EYE-D-SDK/files/2981399/mynt-eye-d-sdk-apidoc-1.7.3-en.zip) [![](https://img.shields.io/badge/Online-HTML-lightgray.svg?style=flat)]()
-* zh-Hans: [![](https://img.shields.io/badge/Download-PDF-blue.svg?style=flat)]() [![](https://img.shields.io/badge/Download-HTML-blue.svg?style=flat)](https://github.com/slightech/MYNT-EYE-D-SDK/files/2981400/mynt-eye-d-sdk-apidoc-1.7.3-zh-Hans.zip) [![](https://img.shields.io/badge/Online-HTML-blue.svg?style=flat)](https://slightech.github.io/MYNT-EYE-D-SDK/)
+* zh-Hans: [![](https://img.shields.io/badge/Download-PDF-lightgray.svg?style=flat)]() [![](https://img.shields.io/badge/Download-HTML-blue.svg?style=flat)](https://github.com/slightech/MYNT-EYE-D-SDK/files/2981400/mynt-eye-d-sdk-apidoc-1.7.3-zh-Hans.zip) [![](https://img.shields.io/badge/Online-HTML-blue.svg?style=flat)](https://slightech.github.io/MYNT-EYE-D-SDK/)
 
 ### Quick Start Guide
 
