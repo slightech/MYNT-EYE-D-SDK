@@ -1,6 +1,6 @@
 .. _params_d1000_120:
 
-D1000-50/Color specification
+D1000-120/Color specification
 =============================
 
 
