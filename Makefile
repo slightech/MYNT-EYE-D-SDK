@@ -140,22 +140,21 @@ cleanros:
 
 # doc
 
-apidoc:
+doc: apidoc
+
+apidoc: cleandoc
 	@$(call echo,Make $@)
-	@$(SH) ./docs/build.sh
+	@cd docs; make html
 
 opendoc: apidoc
 	@$(call echo,Make $@)
-	@$(shell $(SH) ./docs/langs.sh 1); \
-	for lang in "$${LANGS[@]}"; do \
-		html=./docs/_output/$$lang/html/index.html; \
-		[ -f "$$html" ] && $(SH) ./scripts/open.sh $$html; \
-	done
+	@$(SH) ./scripts/open.sh docs/_build/html/index.html
 
 cleandoc:
-	@$(call rm,./docs/_output/)
+	@$(call rm,./docs/_build/)
+	@$(call rm,./docs/_doxygen/)
 
-.PHONY: apidoc opendoc cleandoc
+.PHONY: doc apidoc opendoc cleandoc
 
 # pkg
 
