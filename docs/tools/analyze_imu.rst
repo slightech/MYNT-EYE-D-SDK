@@ -42,7 +42,7 @@ Reference to results on Linux:
 The analysis result graph will be saved in the data set directory. as
 follows:
 
-.. figure:: ../../static/images/imu_analytics.png
+.. figure:: ../static/images/imu_analytics.png
    :alt: imu analytics
 
 

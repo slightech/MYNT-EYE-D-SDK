@@ -127,12 +127,12 @@ Open “x64 Native Tools Command Prompt for VS 2017”(适用于 VS 2017 的 x64
 
   Visual Studio Command Prompt can be opened from the Start menu,
 
-  .. image:: ../../static/images/vs_cmd_menu.png
+  .. image:: ../static/images/vs_cmd_menu.png
     :width: 30%
 
   You can also open it from the Visual Studio Tools menu.
 
-  .. image:: ../../static/images/vs_cmd.png
+  .. image:: ../static/images/vs_cmd.png
     :width: 40%
 
   However, if you do not have the Visual Studio 2015 Tools menu, you can add one yourself.

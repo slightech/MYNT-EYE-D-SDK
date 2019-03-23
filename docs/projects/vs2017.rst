@@ -150,12 +150,12 @@ Include the headers of SDK and start using its APIs,
 
 Select “Release x64” to run the project.
 
-.. |image0| image:: ../../static/images/projects/vs2017/1_new_pro.png
-.. |image1| image:: ../../static/images/projects/vs2017/2_new_pro.png
-.. |image2| image:: ../../static/images/projects/vs2017/3_new_pro.png
-.. |image3| image:: ../../static/images/projects/vs2017/4_config.png
-.. |image4| image:: ../../static/images/projects/vs2017/5_config_include.png
-.. |image5| image:: ../../static/images/projects/vs2017/6_config_definition.png
-.. |image6| image:: ../../static/images/projects/vs2017/7_config_lib_dir.png
-.. |image7| image:: ../../static/images/projects/vs2017/8_config_lib.png
-.. |image8| image:: ../../static/images/projects/vs2017/9_run_x64.png
+.. |image0| image:: ../static/images/projects/vs2017/1_new_pro.png
+.. |image1| image:: ../static/images/projects/vs2017/2_new_pro.png
+.. |image2| image:: ../static/images/projects/vs2017/3_new_pro.png
+.. |image3| image:: ../static/images/projects/vs2017/4_config.png
+.. |image4| image:: ../static/images/projects/vs2017/5_config_include.png
+.. |image5| image:: ../static/images/projects/vs2017/6_config_definition.png
+.. |image6| image:: ../static/images/projects/vs2017/7_config_lib_dir.png
+.. |image7| image:: ../static/images/projects/vs2017/8_config_lib.png
+.. |image8| image:: ../static/images/projects/vs2017/9_run_x64.png

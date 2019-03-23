@@ -165,13 +165,13 @@ Run the project and you will see the main window,
 :raw-latex:`\includegraphics[width=1\textwidth]{run_linux.png}`
 :raw-latex:`\endlatexonly`
 
-.. |image0| image:: ../../static/images/projects/qtcreator/new_project.png
-.. |image1| image:: ../../static/images/projects/qtcreator/new_project2.png
-.. |image2| image:: ../../static/images/projects/qtcreator/new_project3.png
-.. |image3| image:: ../../static/images/projects/qtcreator/new_project4.png
-.. |image4| image:: ../../static/images/projects/qtcreator/new_project5.png
-.. |image5| image:: ../../static/images/projects/qtcreator/new_project6.png
-.. |image6| image:: ../../static/images/projects/qtcreator/new_project7.png
-.. |image7| image:: ../../static/images/projects/qtcreator/release_run.png
-.. |image8| image:: ../../static/images/projects/qtcreator/run_win.png
-.. |image9| image:: ../../static/images/projects/qtcreator/run_linux.png
+.. |image0| image:: ../static/images/projects/qtcreator/new_project.png
+.. |image1| image:: ../static/images/projects/qtcreator/new_project2.png
+.. |image2| image:: ../static/images/projects/qtcreator/new_project3.png
+.. |image3| image:: ../static/images/projects/qtcreator/new_project4.png
+.. |image4| image:: ../static/images/projects/qtcreator/new_project5.png
+.. |image5| image:: ../static/images/projects/qtcreator/new_project6.png
+.. |image6| image:: ../static/images/projects/qtcreator/new_project7.png
+.. |image7| image:: ../static/images/projects/qtcreator/release_run.png
+.. |image8| image:: ../static/images/projects/qtcreator/run_win.png
+.. |image9| image:: ../static/images/projects/qtcreator/run_linux.png

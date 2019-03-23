@@ -19,4 +19,4 @@ follows:
 :raw-latex:`\includegraphics[width=1\textwidth]{mynteye_d_imu_coord.jpg}`
 :raw-latex:`\endlatexonly`
 
-.. |image0| image:: ../../static/images/mynteye_d_imu_coord.jpg
+.. |image0| image:: ../static/images/mynteye_d_imu_coord.jpg

@@ -10,12 +10,12 @@ MYNT® EYE D SDK
    :titlesonly:
    :maxdepth: 2
 
-   en/product/contents
-   en/installation/contents
-   en/samples/contents
-   en/tools/contents
-   en/projects/contents
-   en/slam/contents
+   product/contents
+   installation/contents
+   samples/contents
+   tools/contents
+   projects/contents
+   slam/contents
    api/contents
 
 ..

@@ -108,7 +108,7 @@ Reference code snippet:
 
   After turning this fuction on, you can see ir pattern:
 
-  .. image:: ../../static/images/ir.png
+  .. image:: ../static/images/ir.png
 
 Enable IR Depth Only
 --------------------

@@ -44,7 +44,7 @@ Update Firmware
 
 Use the tool according to diagram:
 
-.. figure:: ../../static/images/update_camera_tool.png
+.. figure:: ../static/images/update_camera_tool.png
    :alt: update tool
 
 

@@ -54,7 +54,7 @@ Reference to results on Linux:
 The analysis result graph will be saved in the dataset directory. as
 follow:
 
-.. figure:: ../../static/images/stamp_analytics.png
+.. figure:: ../static/images/stamp_analytics.png
    :alt: stamp analytics
 
 

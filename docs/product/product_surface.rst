@@ -13,7 +13,7 @@ Shell(mm)     PCBA board(mm)
 165x31.5x29.6 149x24
 ============= ==============
 
-.. image:: ../../static/images/en/mynteye_surface.png
+.. image:: ../static/images/mynteye_surface.png
 
 .. raw:: latex
 
@@ -38,4 +38,3 @@ damage to the interface and to ensure stability in connection.
 D. ¼ inch standardized set screw hole: for fixing the stereo camera to
 tripods or other devices.
 
-.. |image0| image:: zh-Hans/mynteye_surface.jpg
