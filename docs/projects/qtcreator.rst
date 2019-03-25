@@ -1,7 +1,3 @@
-.. role:: raw-latex(raw)
-   :format: latex
-..
-
 .. _qtcreator:
 
 How to use SDK with Qt Creator
@@ -24,78 +20,29 @@ Create Project
 
 Open Qt Creator, then ``New Project``,
 
-|image0|
-
-.. raw:: latex
-
-   \latexonly
-
-:raw-latex:`\includegraphics[width=1\textwidth]{new_project.png}`
-:raw-latex:`\endlatexonly`
+.. image:: ../static/images/projects/qtcreator/new_project.png
 
 Choose ``Qt Widgets Application``,
 
-|image1|
-
-.. raw:: latex
-
-   \latexonly
-
-:raw-latex:`\includegraphics[width=1\textwidth]{new_project2.png}`
-:raw-latex:`\endlatexonly`
+.. image:: ../static/images/projects/qtcreator/new_project2.png
 
 Set project location and its name,
 
-|image2|
-
-.. raw:: latex
-
-   \latexonly
-
-:raw-latex:`\includegraphics[width=1\textwidth]{new_project3.png}`
-:raw-latex:`\endlatexonly`
+.. image:: ../static/images/projects/qtcreator/new_project3.png
 
 Select the build kits,
 
-|image3|
-
-.. raw:: latex
-
-   \latexonly
-
-:raw-latex:`\includegraphics[width=1\textwidth]{new_project4.png}`
-:raw-latex:`\endlatexonly`
+.. image:: ../static/images/projects/qtcreator/new_project4.png
 
 Then, it will generate the skeleton source files,
 
-|image4|
+.. image:: ../static/images/projects/qtcreator/new_project5.png
 
-.. raw:: latex
-
-   \latexonly
-
-:raw-latex:`\includegraphics[width=1\textwidth]{new_project5.png}`
-:raw-latex:`\endlatexonly`
-
-|image5|
-
-.. raw:: latex
-
-   \latexonly
-
-:raw-latex:`\includegraphics[width=1\textwidth]{new_project6.png}`
-:raw-latex:`\endlatexonly`
+.. image:: ../static/images/projects/qtcreator/new_project6.png
 
 Finally, you will see the new project like this,
 
-|image6|
-
-.. raw:: latex
-
-   \latexonly
-
-:raw-latex:`\includegraphics[width=1\textwidth]{new_project7.png}`
-:raw-latex:`\endlatexonly`
+.. image:: ../static/images/projects/qtcreator/new_project7.png
 
 Config Project
 --------------
@@ -131,47 +78,16 @@ Windows
 
 Should select “Release” to run the project.
 
-|image7|
-
-.. raw:: latex
-
-   \latexonly
-
-:raw-latex:`\includegraphics[width=0.5\textwidth]{release_run.png}`
-:raw-latex:`\endlatexonly`
+.. image:: ../static/images/projects/qtcreator/release_run.png
 
 Then you will see the main window,
 
-|image8|
-
-.. raw:: latex
-
-   \latexonly
-
-:raw-latex:`\includegraphics[width=1\textwidth]{run_win.png}`
-:raw-latex:`\endlatexonly`
+.. image:: ../static/images/projects/qtcreator/run_win.png
 
 Linux
 ~~~~~
 
 Run the project and you will see the main window,
 
-|image9|
+.. image:: ../static/images/projects/qtcreator/run_linux.png
 
-.. raw:: latex
-
-   \latexonly
-
-:raw-latex:`\includegraphics[width=1\textwidth]{run_linux.png}`
-:raw-latex:`\endlatexonly`
-
-.. |image0| image:: ../static/images/projects/qtcreator/new_project.png
-.. |image1| image:: ../static/images/projects/qtcreator/new_project2.png
-.. |image2| image:: ../static/images/projects/qtcreator/new_project3.png
-.. |image3| image:: ../static/images/projects/qtcreator/new_project4.png
-.. |image4| image:: ../static/images/projects/qtcreator/new_project5.png
-.. |image5| image:: ../static/images/projects/qtcreator/new_project6.png
-.. |image6| image:: ../static/images/projects/qtcreator/new_project7.png
-.. |image7| image:: ../static/images/projects/qtcreator/release_run.png
-.. |image8| image:: ../static/images/projects/qtcreator/run_win.png
-.. |image9| image:: ../static/images/projects/qtcreator/run_linux.png

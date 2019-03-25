@@ -46,13 +46,6 @@ follows:
    :alt: imu analytics
 
 
-.. raw:: latex
-
-   \latexonly
-
-:raw-latex:`\includegraphics[width=1\textwidth]{imu_analytics.png}`
-:raw-latex:`\endlatexonly`
-
 In addition, the script specific options can be executed -h:
 
 .. code-block:: bash
