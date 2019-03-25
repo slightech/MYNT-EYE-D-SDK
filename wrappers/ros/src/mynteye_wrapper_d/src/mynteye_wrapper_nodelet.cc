@@ -18,6 +18,7 @@
 #include <image_transport/image_transport.h>
 #include <sensor_msgs/image_encodings.h>
 #include <sensor_msgs/Imu.h>
+#include <visualization_msgs/Marker.h>
 #include <tf/tf.h>
 #include <tf2_ros/static_transform_broadcaster.h>
 #include <mynteye_wrapper_d/GetParams.h>
@@ -90,6 +91,9 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   ros::Publisher pub_imu;
   ros::Publisher pub_temp;
   ros::Publisher pub_imu_processed;
+  ros::Publisher pub_mesh_;  // < The publisher for camera mesh.
+
+  visualization_msgs::Marker mesh_msg_;  // < Mesh message.
   ros::ServiceServer get_params_service_;
 
   sensor_msgs::CameraInfoPtr left_info_ptr;
@@ -289,6 +293,16 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       NODELET_INFO_STREAM(dashes);
     }
 
+    pub_mesh_ = nh.advertise<visualization_msgs::Marker>("camera_mesh", 0 );
+    // where to get the mesh from
+    std::string mesh_file;
+    if (nh_ns.getParamCached("mesh_file", mesh_file)) {
+      mesh_msg_.mesh_resource = "package://mynteye_wrapper_d/mesh/"+mesh_file;
+    } else {
+      NODELET_INFO_STREAM("no mesh found for visualisation, set ros param mesh_file, if desired");
+      mesh_msg_.mesh_resource = "";
+    }
+
     const std::string DEVICE_PARAMS_SERVICE = "get_params";
     get_params_service_ = nh_ns.advertiseService(
         DEVICE_PARAMS_SERVICE, &MYNTEYEWrapperNodelet::getParams, this);
@@ -346,6 +360,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     // loop
     ros::Rate loop_rate(framerate);
     while (nh_ns.ok()) {
+      publishMesh();
       detectSubscribers();
       loop_rate.sleep();
     }
@@ -934,6 +949,38 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       default:
         return {1280, 720, 979.8, 942.8, 682.3, 254.9 * 2, {0, 0, 0, 0, 0}};
     }
+  }
+
+  void publishMesh() {
+    mesh_msg_.header.frame_id = temp_frame_id;
+    mesh_msg_.header.stamp = ros::Time::now();
+    mesh_msg_.type = visualization_msgs::Marker::MESH_RESOURCE;
+    // fill orientation
+    mesh_msg_.pose.orientation.x = -1;
+    mesh_msg_.pose.orientation.y = 0;
+    mesh_msg_.pose.orientation.z = 0;
+    mesh_msg_.pose.orientation.w = 1;
+
+    // fill position
+    mesh_msg_.pose.position.x = 0;
+    mesh_msg_.pose.position.y = 0;
+    mesh_msg_.pose.position.z = 0;
+
+    // scale -- needed
+    mesh_msg_.scale.x = 0.003;
+    mesh_msg_.scale.y = 0.003;
+    mesh_msg_.scale.z = 0.003;
+
+    mesh_msg_.action = visualization_msgs::Marker::ADD;
+    mesh_msg_.color.a = 1.0;  // Don't forget to set the alpha!
+    mesh_msg_.color.r = 1.0;
+    mesh_msg_.color.g = 1.0;
+    mesh_msg_.color.b = 1.0;
+
+    // embedded material / colour
+    // mesh_msg_.mesh_use_embedded_materials = true;
+    if (!mesh_msg_.mesh_resource.empty())
+      pub_mesh_.publish(mesh_msg_);  // publish stamped mesh
   }
 
   bool getParams(
