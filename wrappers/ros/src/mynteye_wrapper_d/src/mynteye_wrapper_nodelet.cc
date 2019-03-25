@@ -494,11 +494,12 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     }
 
     // motion intrinsics
+    bool motion_ok;
     if (motion_intrinsics == nullptr) {
       motion_intrinsics = std::make_shared<MotionIntrinsics>();
     }
-    *motion_intrinsics = mynteye->GetMotionIntrinsics(&in_ok);
-    if (in_ok) {
+    *motion_intrinsics = mynteye->GetMotionIntrinsics(&motion_ok);
+    if (motion_ok) {
       motion_intrinsics_enabled = true;
     } else {
       motion_intrinsics_enabled = false;

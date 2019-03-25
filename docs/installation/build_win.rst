@@ -1,6 +1,3 @@
-.. role:: raw-latex(raw)
-   :format: latex
-..
 
 .. _build_win:
 

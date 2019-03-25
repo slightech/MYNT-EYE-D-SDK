@@ -1,7 +1,3 @@
-.. role:: raw-latex(raw)
-   :format: latex
-..
-
 .. _install_exe_win:
 
 Windows EXE Installation

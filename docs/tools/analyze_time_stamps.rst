@@ -58,13 +58,6 @@ follow:
    :alt: stamp analytics
 
 
-.. raw:: latex
-
-   \latexonly
-
-:raw-latex:`\includegraphics[width=1\textwidth]{stamp_analytics.png}`
-:raw-latex:`\endlatexonly`
-
 In addition, the script specific options can be executed -h to
 understand:
 

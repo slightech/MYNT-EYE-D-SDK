@@ -1,7 +1,3 @@
-.. role:: raw-latex(raw)
-   :format: latex
-..
-
 .. _vs2017:
 
 How to use SDK with Visual Studio 2017
@@ -23,51 +19,23 @@ Create Project
 
 Open Visual Studio 2017, then ``File > New > Project``,
 
-|image0|
-
-.. raw:: latex
-
-   \latexonly
-
-:raw-latex:`\includegraphics[width=1\textwidth]{1_new_pro.png}`
-:raw-latex:`\endlatexonly`
+.. image:: ../static/images/projects/vs2017/1_new_pro.png
 
 Select “Windows Console Application”, set the project’s name and
 location, click “OK”,
 
-|image1|
-
-.. raw:: latex
-
-   \latexonly
-
-:raw-latex:`\includegraphics[width=1\textwidth]{2_new_pro.png}`
-:raw-latex:`\endlatexonly`
+.. image:: ../static/images/projects/vs2017/2_new_pro.png
 
 Finally, you will see the new project like this,
 
-|image2|
-
-.. raw:: latex
-
-   \latexonly
-
-:raw-latex:`\includegraphics[width=1\textwidth]{3_new_pro.png}`
-:raw-latex:`\endlatexonly`
+.. image:: ../static/images/projects/vs2017/3_new_pro.png
 
 Config Properties
 -----------------
 
 Right click the project, and open its “Properties” window,
 
-|image3|
-
-.. raw:: latex
-
-   \latexonly
-
-:raw-latex:`\includegraphics[width=0.6\textwidth]{4_config.png}`
-:raw-latex:`\endlatexonly`
+.. image:: ../static/images/projects/vs2017/4_config.png
 
 Change “Configuration” to “All Configurations”, then add the following
 paths to “Additional Include Directories”,
@@ -77,14 +45,7 @@ paths to “Additional Include Directories”,
    $(MYNTEYED_SDK_ROOT)\include
    $(MYNTEYED_SDK_ROOT)\3rdparty\opencv\build\include
 
-|image4|
-
-.. raw:: latex
-
-   \latexonly
-
-:raw-latex:`\includegraphics[width=1\textwidth]{5_config_include.png}`
-:raw-latex:`\endlatexonly`
+.. image:: ../static/images/projects/vs2017/5_config_include.png
 
 Add the following definitions to “Preprocessor Definitions”,
 
@@ -93,14 +54,7 @@ Add the following definitions to “Preprocessor Definitions”,
    WITH_OPENCV
    WITH_OPENCV3
 
-|image5|
-
-.. raw:: latex
-
-   \latexonly
-
-:raw-latex:`\includegraphics[width=1\textwidth]{6_config_definition.png}`
-:raw-latex:`\endlatexonly`
+.. image:: ../static/images/projects/vs2017/6_config_definition.png
 
 Add the following paths to “Additional Library Directories”,
 
@@ -109,14 +63,7 @@ Add the following paths to “Additional Library Directories”,
    $(MYNTEYED_SDK_ROOT)\lib
    $(MYNTEYED_SDK_ROOT)\3rdparty\opencv\build\x64\vc15\lib
 
-|image6|
-
-.. raw:: latex
-
-   \latexonly
-
-:raw-latex:`\includegraphics[width=1\textwidth]{7_config_lib_dir.png}`
-:raw-latex:`\endlatexonly`
+.. image:: ../static/images/projects/vs2017/7_config_lib_dir.png
 
 Add the following libs to “Additional Dependencies”,
 
@@ -125,37 +72,13 @@ Add the following libs to “Additional Dependencies”,
    mynteye_depth.lib
    opencv_world343.lib
 
-|image7|
-
-.. raw:: latex
-
-   \latexonly
-
-:raw-latex:`\includegraphics[width=1\textwidth]{8_config_lib.png}`
-:raw-latex:`\endlatexonly`
+.. image:: ../static/images/projects/vs2017/8_config_lib.png
 
 Start using SDK
 ---------------
 
 Include the headers of SDK and start using its APIs,
 
-|image8|
-
-.. raw:: latex
-
-   \latexonly
-
-:raw-latex:`\includegraphics[width=1\textwidth]{9_run_x64.png}`
-:raw-latex:`\endlatexonly`
+.. image:: ../static/images/projects/vs2017/9_run_x64.png
 
 Select “Release x64” to run the project.
-
-.. |image0| image:: ../static/images/projects/vs2017/1_new_pro.png
-.. |image1| image:: ../static/images/projects/vs2017/2_new_pro.png
-.. |image2| image:: ../static/images/projects/vs2017/3_new_pro.png
-.. |image3| image:: ../static/images/projects/vs2017/4_config.png
-.. |image4| image:: ../static/images/projects/vs2017/5_config_include.png
-.. |image5| image:: ../static/images/projects/vs2017/6_config_definition.png
-.. |image6| image:: ../static/images/projects/vs2017/7_config_lib_dir.png
-.. |image7| image:: ../static/images/projects/vs2017/8_config_lib.png
-.. |image8| image:: ../static/images/projects/vs2017/9_run_x64.png

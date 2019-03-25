@@ -1,7 +1,3 @@
-.. role:: raw-latex(raw)
-   :format: latex
-..
-
 .. _cmake:
 
 How to use SDK with CMake

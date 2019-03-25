@@ -1,7 +1,3 @@
-.. role:: raw-latex(raw)
-   :format: latex
-..
-
 .. _product_surface:
 
 Product Surface
@@ -14,13 +10,6 @@ Shell(mm)     PCBA board(mm)
 ============= ==============
 
 .. image:: ../static/images/mynteye_surface.png
-
-.. raw:: latex
-
-   \latexonly
-
-:raw-latex:`\includegraphics[width=1\textwidth]{mynteye_surface.jpg}`
-:raw-latex:`\endlatexonly`
 
 A. Camera:please pay attention to protect the camera sensor lenses, to
 avoid imaging quality degradation.

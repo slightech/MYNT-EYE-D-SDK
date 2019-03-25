@@ -47,10 +47,3 @@ Use the tool according to diagram:
 .. figure:: ../static/images/update_camera_tool.png
    :alt: update tool
 
-
-.. raw:: latex
-
-   \latexonly
-
-:raw-latex:`\includegraphics[width=1\textwidth]{update_camera_tool.png}`
-:raw-latex:`\endlatexonly`
