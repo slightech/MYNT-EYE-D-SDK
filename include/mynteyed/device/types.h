@@ -31,9 +31,9 @@ MYNTEYE_BEGIN_NAMESPACE
  * Note: y: available, n: unavailable, -: depends on StreamMode
  */
 enum class DeviceMode : std::int32_t {
-  DEVICE_COLOR = 0,  // IMAGE_LEFT_COLOR y IMAGE_RIGHT_COLOR - IMAGE_DEPTH n
-  DEVICE_DEPTH = 1,  // IMAGE_LEFT_COLOR n IMAGE_RIGHT_COLOR n IMAGE_DEPTH y
-  DEVICE_ALL = 2,    // IMAGE_LEFT_COLOR y IMAGE_RIGHT_COLOR - IMAGE_DEPTH y
+  DEVICE_COLOR = 0,  /**< IMAGE_LEFT_COLOR y IMAGE_RIGHT_COLOR - IMAGE_DEPTH n */
+  DEVICE_DEPTH = 1,  /**< IMAGE_LEFT_COLOR n IMAGE_RIGHT_COLOR n IMAGE_DEPTH y */
+  DEVICE_ALL = 2,    /**< IMAGE_LEFT_COLOR y IMAGE_RIGHT_COLOR - IMAGE_DEPTH y */
 };
 
 /**
@@ -41,8 +41,8 @@ enum class DeviceMode : std::int32_t {
  * @brief List color modes.
  */
 enum class ColorMode : std::int32_t {
-  COLOR_RAW       = 0,  // color raw
-  COLOR_RECTIFIED = 1,  // color rectified
+  COLOR_RAW       = 0,  /**< color raw */
+  COLOR_RECTIFIED = 1,  /**< color rectified */
   COLOR_MODE_LAST
 };
 
@@ -51,9 +51,9 @@ enum class ColorMode : std::int32_t {
  * @brief List depth modes.
  */
 enum class DepthMode : std::int32_t {
-  DEPTH_RAW      = 0,  // ImageFormat::DEPTH_RAW
-  DEPTH_GRAY     = 1,  // ImageFormat::DEPTH_GRAY_24
-  DEPTH_COLORFUL = 2,  // ImageFormat::DEPTH_RGB
+  DEPTH_RAW      = 0,  /**< ImageFormat::DEPTH_RAW */
+  DEPTH_GRAY     = 1,  /**< ImageFormat::DEPTH_GRAY_24 */
+  DEPTH_COLORFUL = 2,  /**< ImageFormat::DEPTH_RGB */
   DEPTH_MODE_LAST
 };
 
@@ -62,10 +62,10 @@ enum class DepthMode : std::int32_t {
  * @brief List stream modes.
  */
 enum class StreamMode : std::int32_t {
-  STREAM_640x480  = 0,  // 480p, vga, left
-  STREAM_1280x480 = 1,  // 480p, vga, left+right
-  STREAM_1280x720 = 2,  // 720p, hd, left
-  STREAM_2560x720 = 3,  // 720p, hd, left+right
+  STREAM_640x480  = 0,  /**< 480p, vga, left */
+  STREAM_1280x480 = 1,  /**< 480p, vga, left+right */
+  STREAM_1280x720 = 2,  /**< 720p, hd, left */
+  STREAM_2560x720 = 3,  /**< 720p, hd, left+right */
   STREAM_MODE_LAST
 };
 
@@ -105,12 +105,12 @@ std::ostream& operator<<(std::ostream& os, const ImageType& code);
  * @brief List image formats.
  */
 enum class ImageFormat : std::int32_t {
-  IMAGE_BGR_24,   // 8UC3
-  IMAGE_RGB_24,   // 8UC3
-  IMAGE_GRAY_8,   // 8UC1
-  IMAGE_GRAY_16,  // 16UC1
-  IMAGE_GRAY_24,  // 8UC3
-  IMAGE_YUYV,     // 8UC2
+  IMAGE_BGR_24,   /**< 8UC3 */
+  IMAGE_RGB_24,   /**< 8UC3 */
+  IMAGE_GRAY_8,   /**< 8UC1 */
+  IMAGE_GRAY_16,  /**< 16UC1 */
+  IMAGE_GRAY_24,  /**< 8UC3 */
+  IMAGE_YUYV,     /**< 8UC2 */
   IMAGE_MJPG,
   // color
   COLOR_BGR   = IMAGE_BGR_24,  // > COLOR_RGB

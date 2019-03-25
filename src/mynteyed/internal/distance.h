@@ -2,6 +2,8 @@
 #define MYNTEYE_INTERNAL_DISTANCE_H_
 #pragma once
 
+#include <cstdint>
+#include <functional>
 #include <vector>
 #include <mutex>
 
