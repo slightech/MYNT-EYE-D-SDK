@@ -177,27 +177,27 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     bool state_awb = true;
     int ir_intensity = 0;
     bool ir_depth_only = true;
-    nh_ns.getParam("dev_index", dev_index);
-    nh_ns.getParam("framerate", framerate);
-    nh_ns.getParam("dev_mode", dev_mode);
-    nh_ns.getParam("color_mode", color_mode);
-    nh_ns.getParam("depth_mode", depth_mode);
-    nh_ns.getParam("stream_mode", stream_mode);
-    nh_ns.getParam("color_stream_format", color_stream_format);
-    nh_ns.getParam("depth_stream_format", depth_stream_format);
-    nh_ns.getParam("state_ae", state_ae);
-    nh_ns.getParam("state_awb", state_awb);
-    nh_ns.getParam("ir_intensity", ir_intensity);
-    nh_ns.getParam("ir_depth_only", ir_depth_only);
-    nh_ns.getParam("depth_type", depth_type);
-    nh_ns.getParam("imu_timestamp_align", imu_timestamp_align);
+    nh_ns.getParamCached("dev_index", dev_index);
+    nh_ns.getParamCached("framerate", framerate);
+    nh_ns.getParamCached("dev_mode", dev_mode);
+    nh_ns.getParamCached("color_mode", color_mode);
+    nh_ns.getParamCached("depth_mode", depth_mode);
+    nh_ns.getParamCached("stream_mode", stream_mode);
+    nh_ns.getParamCached("color_stream_format", color_stream_format);
+    nh_ns.getParamCached("depth_stream_format", depth_stream_format);
+    nh_ns.getParamCached("state_ae", state_ae);
+    nh_ns.getParamCached("state_awb", state_awb);
+    nh_ns.getParamCached("ir_intensity", ir_intensity);
+    nh_ns.getParamCached("ir_depth_only", ir_depth_only);
+    nh_ns.getParamCached("depth_type", depth_type);
+    nh_ns.getParamCached("imu_timestamp_align", imu_timestamp_align);
 
     points_frequency = DEFAULT_POINTS_FREQUENCE;
     points_factor = DEFAULT_POINTS_FACTOR;
     gravity = 9.8;
-    nh_ns.getParam("points_frequency", points_frequency);
-    nh_ns.getParam("points_factor", points_factor);
-    nh_ns.getParam("gravity", gravity);
+    nh_ns.getParamCached("points_frequency", points_frequency);
+    nh_ns.getParamCached("points_factor", points_factor);
+    nh_ns.getParamCached("gravity", gravity);
 
     base_frame_id = "mynteye_link";
     left_mono_frame_id = "mynteye_left_mono_frame";
@@ -209,16 +209,16 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     imu_frame_id = "mynteye_imu_frame";
     temp_frame_id = "mynteye_temp_frame";
     imu_frame_processed_id = "mynteye_imu_frame_processed";
-    nh_ns.getParam("base_frame_id", base_frame_id);
-    nh_ns.getParam("left_mono_frame", left_mono_frame_id);
-    nh_ns.getParam("left_color_frame", left_color_frame_id);
-    nh_ns.getParam("right_mono_frame", right_mono_frame_id);
-    nh_ns.getParam("right_color_frame", right_color_frame_id);
-    nh_ns.getParam("depth_frame", depth_frame_id);
-    nh_ns.getParam("points_frame", points_frame_id);
-    nh_ns.getParam("imu_frame", imu_frame_id);
-    nh_ns.getParam("temp_frame", temp_frame_id);
-    nh_ns.getParam("imu_frame_processed", imu_frame_processed_id);
+    nh_ns.getParamCached("base_frame_id", base_frame_id);
+    nh_ns.getParamCached("left_mono_frame", left_mono_frame_id);
+    nh_ns.getParamCached("left_color_frame", left_color_frame_id);
+    nh_ns.getParamCached("right_mono_frame", right_mono_frame_id);
+    nh_ns.getParamCached("right_color_frame", right_color_frame_id);
+    nh_ns.getParamCached("depth_frame", depth_frame_id);
+    nh_ns.getParamCached("points_frame", points_frame_id);
+    nh_ns.getParamCached("imu_frame", imu_frame_id);
+    nh_ns.getParamCached("temp_frame", temp_frame_id);
+    nh_ns.getParamCached("imu_frame_processed", imu_frame_processed_id);
     NODELET_INFO_STREAM("base_frame: " << base_frame_id);
     NODELET_INFO_STREAM("left_mono_frame: " << left_mono_frame_id);
     NODELET_INFO_STREAM("left_color_frame: " << left_color_frame_id);
@@ -239,15 +239,15 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     std::string imu_topic = "mynteye/imu";
     std::string temp_topic = "mynteye/temp";
     std::string imu_processed_topic = "mynteye/imu_processed";
-    nh_ns.getParam("left_mono_topic", left_mono_topic);
-    nh_ns.getParam("left_color_topic", left_color_topic);
-    nh_ns.getParam("right_mono_topic", right_mono_topic);
-    nh_ns.getParam("right_color_topic", right_color_topic);
-    nh_ns.getParam("depth_topic", depth_topic);
-    nh_ns.getParam("points_topic", points_topic);
-    nh_ns.getParam("imu_topic", imu_topic);
-    nh_ns.getParam("temp_topic", temp_topic);
-    nh_ns.getParam("imu_processed_topic", imu_processed_topic);
+    nh_ns.getParamCached("left_mono_topic", left_mono_topic);
+    nh_ns.getParamCached("left_color_topic", left_color_topic);
+    nh_ns.getParamCached("right_mono_topic", right_mono_topic);
+    nh_ns.getParamCached("right_color_topic", right_color_topic);
+    nh_ns.getParamCached("depth_topic", depth_topic);
+    nh_ns.getParamCached("points_topic", points_topic);
+    nh_ns.getParamCached("imu_topic", imu_topic);
+    nh_ns.getParamCached("temp_topic", temp_topic);
+    nh_ns.getParamCached("imu_processed_topic", imu_processed_topic);
 
     // MYNTEYE objects
     mynteye.reset(new Camera);
@@ -479,11 +479,12 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     }
 
     // motion intrinsics
+    bool motion_ok;
     if (motion_intrinsics == nullptr) {
       motion_intrinsics = std::make_shared<MotionIntrinsics>();
     }
-    *motion_intrinsics = mynteye->GetMotionIntrinsics(&in_ok);
-    if (in_ok) {
+    *motion_intrinsics = mynteye->GetMotionIntrinsics(&motion_ok);
+    if (motion_ok) {
       motion_intrinsics_enabled = true;
     } else {
       motion_intrinsics_enabled = false;
