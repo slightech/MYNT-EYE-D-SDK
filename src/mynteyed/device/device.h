@@ -118,6 +118,12 @@ class Device {
    * */
   bool GetGlobalGain(float &value);
 
+  /** Set serial number */
+  void SetSerialNumber(const std::string &sn);
+
+  /** Get serial number */
+  std::string GetSerialNumber() const;
+
  protected:
   /** Get stream index for open */
   void GetStreamIndex(const OpenParams& params,

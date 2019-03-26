@@ -235,6 +235,12 @@ class MYNTEYE_API CameraPrivate {
   /** Set distance data callback. */
   void SetDistanceCallback(distance_callback_t callback, bool async);
 
+  /** Set serial number */
+  void SetSerialNumber(const std::string &sn);
+
+  /** Get serial number */
+  std::string GetSerialNumber() const;
+
  protected:
   std::shared_ptr<Channels> channels() const {
     return channels_;

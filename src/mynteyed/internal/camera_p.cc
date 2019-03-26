@@ -119,7 +119,8 @@ std::shared_ptr<device::Descriptors> CameraPrivate::GetDescriptors() const {
 }
 
 std::string CameraPrivate::GetDescriptor(const Descriptor &desc) const {
-  if (!descriptors_) {
+  if (!descriptors_ &&
+      desc != Descriptor::SERIAL_NUMBER) {
     LOGE("%s %d:: Device information not found", __FILE__, __LINE__);
     return "";
   }
@@ -127,6 +128,8 @@ std::string CameraPrivate::GetDescriptor(const Descriptor &desc) const {
     case Descriptor::DEVICE_NAME:
       return descriptors_->name;
     case Descriptor::SERIAL_NUMBER:
+      if (!descriptors_)
+        return GetSerialNumber();
       return descriptors_->serial_number;
     case Descriptor::FIRMWARE_VERSION:
       return descriptors_->firmware_version.to_string();
@@ -590,4 +593,12 @@ void CameraPrivate::SetDistanceCallback(distance_callback_t callback, bool async
   } else {
     distance_->SetDistanceCallback(callback);
   }
+}
+
+void CameraPrivate::SetSerialNumber(const std::string &sn) {
+  device_->SetSerialNumber(sn);
+}
+
+std::string CameraPrivate::GetSerialNumber() const {
+  return device_->GetSerialNumber();
 }
