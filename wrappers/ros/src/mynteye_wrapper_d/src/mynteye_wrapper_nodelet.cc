@@ -488,9 +488,10 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       left_info_ptr = createCameraInfo(in.left);
       right_info_ptr = createCameraInfo(in.right);
     } else {
-      NODELET_WARN_STREAM("Camera info is null");
-      left_info_ptr = nullptr;
-      right_info_ptr = nullptr;
+      NODELET_WARN_STREAM("Camera info is null, use default parameters.");
+      auto&& in = getDefaultCameraIntrinsics(params.stream_mode);
+      left_info_ptr = createCameraInfo(in);
+      right_info_ptr = createCameraInfo(in);
     }
 
     // motion intrinsics
