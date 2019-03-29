@@ -21,6 +21,12 @@ MYNTEYE_BEGIN_NAMESPACE
 
 namespace util {
 
+inline
+CameraIntrinsics get_camera_intrinsics(const Camera &camera) {
+  auto stream_mode = camera.GetOpenParams().stream_mode;
+  return camera.GetStreamIntrinsics(stream_mode).left;
+}
+
 pcl::PointCloud<pcl::PointXYZRGBA>::Ptr get_point_cloud(
     Camera *camera, float cam_factor) {
   static auto cam_in = get_camera_intrinsics(*camera);
@@ -62,30 +68,6 @@ pcl::PointCloud<pcl::PointXYZRGBA>::Ptr get_point_cloud(
     }
   }
   return cloud;
-}
-
-CameraIntrinsics get_camera_intrinsics(const Camera &camera) {
-  auto stream_mode = camera.GetOpenParams().stream_mode;
-  bool ok;
-  auto stream_intrinsics = camera.GetStreamIntrinsics(stream_mode, &ok);
-  return ok ? stream_intrinsics.left
-            : get_default_camera_intrinsics(stream_mode);
-}
-
-CameraIntrinsics get_default_camera_intrinsics(const StreamMode& mode) {
-  // {w, h, fx, fy, cx, cy, coeffs[5]{k1,k2,p1,p2,k3}}
-  switch (mode) {
-    case StreamMode::STREAM_640x480:
-      return {640, 480, 979.8, 942.8, 682.3 / 2, 254.9, {0, 0, 0, 0, 0}};
-    case StreamMode::STREAM_1280x480:
-      return {640, 480, 979.8, 942.8, 682.3, 254.9, {0, 0, 0, 0, 0}};
-    case StreamMode::STREAM_1280x720:
-      return {1280, 720, 979.8, 942.8, 682.3, 254.9 * 2, {0, 0, 0, 0, 0}};
-    case StreamMode::STREAM_2560x720:
-      return {1280, 720, 979.8, 942.8, 682.3 * 2, 254.9 * 2, {0, 0, 0, 0, 0}};
-    default:
-      return {1280, 720, 979.8, 942.8, 682.3, 254.9 * 2, {0, 0, 0, 0, 0}};
-  }
 }
 
 // PCViewer

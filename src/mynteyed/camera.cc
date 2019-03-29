@@ -74,7 +74,24 @@ std::string Camera::GetDescriptor(const Descriptor &desc) const {
 
 StreamIntrinsics Camera::GetStreamIntrinsics(
     const StreamMode& stream_mode, bool* ok) const {
-  return p_->GetStreamIntrinsics(stream_mode, ok);
+  auto in = p_->GetStreamIntrinsics(stream_mode, ok);
+  if (*ok) return in;
+  // if false, return default intrinsics
+  // {w, h, fx, fy, cx, cy, coeffs[5]{k1,k2,p1,p2,k3}}
+  CameraIntrinsics cam_in;
+  switch (stream_mode) {
+    case StreamMode::STREAM_640x480:
+      cam_in = {640, 480, 979.8, 942.8, 682.3 / 2, 254.9, {0, 0, 0, 0, 0}};
+    case StreamMode::STREAM_1280x480:
+      cam_in = {640, 480, 979.8, 942.8, 682.3, 254.9, {0, 0, 0, 0, 0}};
+    case StreamMode::STREAM_1280x720:
+      cam_in = {1280, 720, 979.8, 942.8, 682.3, 254.9 * 2, {0, 0, 0, 0, 0}};
+    case StreamMode::STREAM_2560x720:
+      cam_in = {1280, 720, 979.8, 942.8, 682.3 * 2, 254.9 * 2, {0, 0, 0, 0, 0}};
+    default:
+      cam_in = {1280, 720, 979.8, 942.8, 682.3, 254.9 * 2, {0, 0, 0, 0, 0}};
+  }
+  return {cam_in, cam_in};
 }
 
 StreamExtrinsics Camera::GetStreamExtrinsics(

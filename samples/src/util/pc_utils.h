@@ -35,9 +35,6 @@ pcl::PointCloud<pcl::PointXYZRGBA>::Ptr get_point_cloud(
     const cv::Mat &rgb, const cv::Mat& depth,
     const CameraIntrinsics& cam_in, float cam_factor);
 
-CameraIntrinsics get_camera_intrinsics(const Camera &camera);
-CameraIntrinsics get_default_camera_intrinsics(const StreamMode& mode);
-
 class PCViewer {
  public:
   using point_t = pcl::PointXYZRGBA;

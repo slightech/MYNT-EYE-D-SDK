@@ -33,8 +33,6 @@
 
 MYNTEYE_USE_NAMESPACE
 
-CameraIntrinsics get_default_camera_intrinsics(const StreamMode& mode);
-
 int main(int argc, char const* argv[]) {
   // About warning in vtkOutputWindow with prebuilt version PCL on Windows.
   // Please see: Ugrade vtk api to 8.1 for 1.9,
@@ -73,13 +71,10 @@ int main(int argc, char const* argv[]) {
 
   cv::namedWindow("color");
 
-  bool ok;
-  auto stream_intrinsics = cam.GetStreamIntrinsics(stream_mode, &ok);
-  CameraIntrinsics in = ok ? stream_intrinsics.left
-      : get_default_camera_intrinsics(stream_mode);
+  auto stream_intrinsics = cam.GetStreamIntrinsics(stream_mode);
 
   CVPainter painter;
-  PCViewer viewer(in, CAMERA_FACTOR);
+  PCViewer viewer(stream_intrinsics.left, CAMERA_FACTOR);
   util::Counter counter;
   cv::Mat color;
   cv::Mat depth;
@@ -120,20 +115,4 @@ int main(int argc, char const* argv[]) {
   cam.Close();
   cv::destroyAllWindows();
   return 0;
-}
-
-CameraIntrinsics get_default_camera_intrinsics(const StreamMode& mode) {
-  // {w, h, fx, fy, cx, cy, coeffs[5]{k1,k2,p1,p2,k3}}
-  switch (mode) {
-    case StreamMode::STREAM_640x480:
-      return {640, 480, 979.8, 942.8, 682.3 / 2, 254.9, {0, 0, 0, 0, 0}};
-    case StreamMode::STREAM_1280x480:
-      return {640, 480, 979.8, 942.8, 682.3, 254.9, {0, 0, 0, 0, 0}};
-    case StreamMode::STREAM_1280x720:
-      return {1280, 720, 979.8, 942.8, 682.3, 254.9 * 2, {0, 0, 0, 0, 0}};
-    case StreamMode::STREAM_2560x720:
-      return {1280, 720, 979.8, 942.8, 682.3 * 2, 254.9 * 2, {0, 0, 0, 0, 0}};
-    default:
-      return {1280, 720, 979.8, 942.8, 682.3, 254.9 * 2, {0, 0, 0, 0, 0}};
-  }
 }
