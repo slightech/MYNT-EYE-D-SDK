@@ -190,4 +190,12 @@ if(PCL_FOUND)
     SRCS src/points/view_points.cc
     LINK_LIBS ${PCL_LIBRARIES}
   )
+
+  make_executable(get_points2
+    SRCS
+      src/points/get_points2.cc
+      src/util/pc_utils.cc
+    LINK_LIBS mynteye_depth ${OpenCV_LIBS} ${PCL_LIBRARIES}
+    DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
+  )
 endif()
