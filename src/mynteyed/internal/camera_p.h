@@ -65,6 +65,9 @@ class MYNTEYE_API CameraPrivate {
   /** Check camera is opened, otherwise error */
   void CheckOpened() const;
 
+  /** Get open params */
+  OpenParams GetOpenParams() const;
+
   /** Get all device descriptors */
   std::shared_ptr<device::Descriptors> GetDescriptors() const;
   /** Get one device descriptor */

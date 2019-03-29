@@ -114,6 +114,10 @@ void CameraPrivate::CheckOpened() const {
   device_->CheckOpened();
 }
 
+OpenParams CameraPrivate::GetOpenParams() const {
+  return device_->GetOpenParams();
+}
+
 std::shared_ptr<device::Descriptors> CameraPrivate::GetDescriptors() const {
   return descriptors_;
 }

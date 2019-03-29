@@ -60,6 +60,10 @@ bool Camera::IsOpened() const {
   return p_->IsOpened();
 }
 
+OpenParams Camera::GetOpenParams() const {
+  return p_->GetOpenParams();
+}
+
 std::shared_ptr<device::Descriptors> Camera::GetDescriptors() const {
   return p_->GetDescriptors();
 }
