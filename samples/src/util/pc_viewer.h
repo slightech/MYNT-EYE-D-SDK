@@ -51,6 +51,8 @@ class PCViewer {
 
   void Run();
 
+  void KeyboardCallback(const pcl::visualization::KeyboardEvent& event);
+
   std::shared_ptr<pcl::visualization::PCLVisualizer> viewer_;
 
   MYNTEYE_NAMESPACE::CameraIntrinsics cam_in_;
@@ -65,6 +67,8 @@ class PCViewer {
 
   cv::Mat rgb_;
   cv::Mat depth_;
+
+  pointcloud_t::ConstPtr cloud_;
 };
 
 #endif  // MYNTEYE_SAMPLES_PC_VIEWER_H_ NOLINT
