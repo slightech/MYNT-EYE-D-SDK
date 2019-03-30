@@ -9,8 +9,8 @@ Set the resolution of image
 Using the ``params.stream_mode`` parameter, you can set the resolution
 of the image.
 
-   Attention: Now image resolution supports 4 types: 640X480，1280x720
-   for single camera. 1280x480， 2560x720 for left and right camera.
+   Attention: Now image resolution supports 4 types: 640X480,1280x720
+   for single camera. 1280x480, 2560x720 for left and right camera.
 
 Reference code snippet:
 
@@ -140,15 +140,15 @@ Reference code snippet:
 Adjust colour depth value
 -------------------------
 
-Using the ``params.colour_depth_value`` parameter, The value is 1000 by
+Using the ``params.colour_depth_value`` parameter, The value is 5000 by
 default.
 
 Reference code snippet:
 
 .. code-block:: c++
 
-   // Colour depth image, default 1000. [0, 16384]
-   // params.colour_depth_value = 1000;
+   // Colour depth image, default 5000. [0, 16384]
+   // params.colour_depth_value = 5000;
 
 Reference running results on Linux:
 
