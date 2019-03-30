@@ -13,7 +13,7 @@ Update Camera Firmware
 Get Firmware
 ------------
 
-Latest firmware: SICI-B12-B0135P-016-005-ISO_Plugout2M(Interleave).bin
+Latest firmware: MYNTEYE_D_016_006.bin
 `Google
 Drive <https://drive.google.com/open?id=1gAbTf6W10a8iwT7L9TceMVgxQCWKnEsx>`__,
 `Baidu Pan <https://pan.baidu.com/s/1sZKxugg5P8Dk5QgneA9ttw>`__
