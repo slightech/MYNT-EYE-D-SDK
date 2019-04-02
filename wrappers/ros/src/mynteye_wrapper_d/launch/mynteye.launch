@@ -126,7 +126,7 @@
   <node pkg="tf" type="static_transform_publisher" name="b2imu_processed_broadcaster"
       args="0 0 0 $(arg pi/2) 0 $(arg pi) $(arg base_frame) $(arg imu_frame_processed) 50" />
   
-  <arg name="mesh_file" default="S1030-0315.obj" />
+  <arg name="mesh_file" default="D-0315.obj" />
 
   <node name="mynteye_wrapper_d_node" pkg="mynteye_wrapper_d" type="mynteye_wrapper_d_node" output="screen">
 

@@ -14,8 +14,10 @@
 #include "util/pc_viewer.h"
 
 // #include <pcl/common/common_headers.h>
+#include <pcl/io/ply_io.h>
 
 #include <cmath>
+#include <string>
 
 std::shared_ptr<pcl::visualization::PCLVisualizer> CustomColorVis(
     PCViewer::pointcloud_t::ConstPtr cloud, int xw, int yw) {
@@ -72,10 +74,16 @@ bool PCViewer::UpdateDirectly(const cv::Mat &rgb, const cv::Mat& depth) {
 void PCViewer::Update(pointcloud_t::ConstPtr cloud) {
   if (viewer_ == nullptr) {
     viewer_ = CustomColorVis(cloud, cam_in_.width, cam_in_.height);
+    viewer_->registerKeyboardCallback(
+      boost::bind(&PCViewer::KeyboardCallback, this, _1));
+    std::cout << std::endl
+        << "Press 'Space' on Viewer to save *.ply, 'J' to capture screenshot"
+        << std::endl;
   }
   pcl::visualization::PointCloudColorHandlerRGBField<point_t>color(cloud);
   viewer_->updatePointCloud<point_t>(cloud, color, "points");
   viewer_->spinOnce();
+  cloud_ = cloud;
 }
 
 bool PCViewer::WasVisual() const {
@@ -154,6 +162,23 @@ void PCViewer::Run() {
     {
       std::lock_guard<std::mutex> _(mutex_);
       generating_ = false;
+    }
+  }
+}
+
+void PCViewer::KeyboardCallback(
+    const pcl::visualization::KeyboardEvent& event) {
+  if (event.getKeySym() == "space" && event.keyDown()) {
+    static int count = 1;
+    std::stringstream ss;
+    ss << "pointcloud-" << (count++) << ".ply";
+    std::string filename = ss.str();
+    int ret = 0;
+    if (cloud_ && (ret = pcl::io::savePLYFileBinary(filename, *cloud_)) == 0) {
+      std::cout << "PLY file (" << filename << ") successfully saved."
+          << std::endl;
+    } else {
+      std::cout << "PLY file save failed: " << ret << std::endl;
     }
   }
 }

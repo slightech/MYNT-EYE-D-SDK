@@ -485,13 +485,11 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     auto&& in = mynteye->GetStreamIntrinsics(params.stream_mode, &in_ok);
     if (in_ok) {
       NODELET_INFO_STREAM("Camera info is created");
-      left_info_ptr = createCameraInfo(in.left);
-      right_info_ptr = createCameraInfo(in.right);
     } else {
-      NODELET_WARN_STREAM("Camera info is null");
-      left_info_ptr = nullptr;
-      right_info_ptr = nullptr;
+      NODELET_WARN_STREAM("Camera info is null, use default parameters.");
     }
+    left_info_ptr = createCameraInfo(in.left);
+    right_info_ptr = createCameraInfo(in.right);
 
     // motion intrinsics
     bool motion_ok;
@@ -508,8 +506,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     }
 
     // pointcloud generator
-    pointcloud_generator.reset(new PointCloudGenerator(
-        in_ok ? in.left : getDefaultCameraIntrinsics(params.stream_mode),
+    pointcloud_generator.reset(new PointCloudGenerator(in.left,
         [this](sensor_msgs::PointCloud2 msg) {
           msg.header.frame_id = points_frame_id;
           pub_points.publish(msg);
@@ -934,22 +931,6 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
           + motion_intrinsics->gyro.z[0];
     }
     return res;
-  }
-
-  CameraIntrinsics getDefaultCameraIntrinsics(const StreamMode& mode) {
-    // {w, h, fx, fy, cx, cy, coeffs[5]{k1,k2,p1,p2,k3}}
-    switch (mode) {
-      case StreamMode::STREAM_640x480:
-        return {640, 480, 979.8, 942.8, 682.3 / 2, 254.9, {0, 0, 0, 0, 0}};
-      case StreamMode::STREAM_1280x480:
-        return {640, 480, 979.8, 942.8, 682.3, 254.9, {0, 0, 0, 0, 0}};
-      case StreamMode::STREAM_1280x720:
-        return {1280, 720, 979.8, 942.8, 682.3, 254.9 * 2, {0, 0, 0, 0, 0}};
-      case StreamMode::STREAM_2560x720:
-        return {1280, 720, 979.8, 942.8, 682.3 * 2, 254.9 * 2, {0, 0, 0, 0, 0}};
-      default:
-        return {1280, 720, 979.8, 942.8, 682.3, 254.9 * 2, {0, 0, 0, 0, 0}};
-    }
   }
 
   void publishMesh() {

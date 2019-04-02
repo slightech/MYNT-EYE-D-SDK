@@ -1151,3 +1151,27 @@ bool Device::GetGlobalGain(float &value) {
     return false;
   }
 }
+
+void Device::SetSerialNumber(const std::string &sn) {
+  unsigned char serial_n[48];
+
+  for (int i = 0; i <= 23; i++) {
+    serial_n[i * 2] = static_cast<unsigned char>(sn[i]);
+    serial_n[i * 2 + 1] = 0x00;
+  }
+  EtronDI_SetSerialNumber(etron_di_, &dev_sel_info_, serial_n, 48);
+}
+
+std::string Device::GetSerialNumber() const {
+  unsigned char serial_n[512];
+  int len;
+  EtronDI_GetSerialNumber(etron_di_, (PDEVSELINFO)&dev_sel_info_, serial_n, 512, &len);
+
+  char tmp[25];
+  for (int i = 0; i < len / 2; i++) {
+    tmp[i] = serial_n[i * 2];
+  }
+  tmp[24] = '\0';
+  std::string s = tmp;
+  return s;
+}

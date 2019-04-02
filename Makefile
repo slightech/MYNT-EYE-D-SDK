@@ -120,7 +120,6 @@ ros: install
 ifeq ($(HOST_OS),Linux)
 	@$(call echo,Make $@)
 	@cd ./wrappers/ros && catkin_make
-	@cd ./wrappers/beta_ros && catkin_make
 endif
 
 cleanros:
@@ -130,11 +129,6 @@ cleanros:
 	@$(call rm,./wrappers/ros/install/)
 	@$(call rm,./wrappers/ros/.catkin_workspace)
 	@$(call rm,./wrappers/ros/src/CMakeLists.txt)
-	@$(call rm,./wrappers/beta_ros/build/)
-	@$(call rm,./wrappers/beta_ros/devel/)
-	@$(call rm,./wrappers/beta_ros/install/)
-	@$(call rm,./wrappers/beta_ros/.catkin_workspace)
-	@$(call rm,./wrappers/beta_ros/src/CMakeLists.txt)
 
 .PHONY: ros cleanros
 

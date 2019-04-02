@@ -56,7 +56,7 @@ LIST(APPEND CMAKE_MODULE_PATH ${PRO_DIR}/cmake)
 
 LIST(APPEND CMAKE_PREFIX_PATH ${PRO_DIR}/_install/lib/cmake)
 find_package(mynteyed REQUIRED)
-message(STATUS "Found mynteye: ${mynteye_VERSION}")
+message(STATUS "Found mynteye: ${mynteyed_VERSION}")
 if(NOT mynteyed_WITH_OPENCV)
   message(FATAL_ERROR "Please install OpenCV, then rebuild mynteye with it."
       " Because these samples use OpenCV to show images.")
@@ -167,10 +167,12 @@ make_executable(get_ultrasonic
   DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
 )
 
-find_package(PCL QUIET)
+find_package(PCL)
 if(PCL_FOUND)
-  list(REMOVE_ITEM PCL_LIBRARIES "vtkproj4")
+  #list(REMOVE_ITEM PCL_LIBRARIES "vtkproj4")
 
+  message(STATUS "PCL_INCLUDE_DIRS: ${PCL_INCLUDE_DIRS}")
+  message(STATUS "PCL_LIBRARIES: ${PCL_LIBRARIES}")
   include_directories(${PCL_INCLUDE_DIRS})
 
   make_executable(get_points
@@ -183,5 +185,17 @@ if(PCL_FOUND)
     LINK_LIBS mynteye_depth ${OpenCV_LIBS} ${PCL_LIBRARIES}
     DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
   )
-endif()
 
+  make_executable(view_points
+    SRCS src/points/view_points.cc
+    LINK_LIBS ${PCL_LIBRARIES}
+  )
+
+  make_executable(get_points2
+    SRCS
+      src/points/get_points2.cc
+      src/util/pc_utils.cc
+    LINK_LIBS mynteye_depth ${OpenCV_LIBS} ${PCL_LIBRARIES}
+    DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
+  )
+endif()

@@ -65,6 +65,9 @@ class MYNTEYE_API CameraPrivate {
   /** Check camera is opened, otherwise error */
   void CheckOpened() const;
 
+  /** Get open params */
+  OpenParams GetOpenParams() const;
+
   /** Get all device descriptors */
   std::shared_ptr<device::Descriptors> GetDescriptors() const;
   /** Get one device descriptor */
@@ -234,6 +237,12 @@ class MYNTEYE_API CameraPrivate {
 
   /** Set distance data callback. */
   void SetDistanceCallback(distance_callback_t callback, bool async);
+
+  /** Set serial number */
+  void SetSerialNumber(const std::string &sn);
+
+  /** Get serial number */
+  std::string GetSerialNumber() const;
 
  protected:
   std::shared_ptr<Channels> channels() const {
