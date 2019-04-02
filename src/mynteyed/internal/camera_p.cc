@@ -418,8 +418,6 @@ void CameraPrivate::ReadDeviceFlash() {
   if (imu_params.ok) {
     SetMotionIntrinsics({imu_params.in_accel, imu_params.in_gyro});
     SetMotionExtrinsics(imu_params.ex_left_to_imu);
-    // std::cout << GetMotionIntrinsics() << std::endl;
-    // std::cout << GetMotionExtrinsics() << std::endl;
   } else {
     LOGE("%s %d:: Motion intrinsics & extrinsics not exist",
         __FILE__, __LINE__);

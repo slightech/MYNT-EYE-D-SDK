@@ -6,7 +6,7 @@ ROS Installation
 1 Install With OpenCV ROS
 -------------------------
 
-If you won’t use ROS(The Robot Operating System), you can skip this
+If you won't use ROS(The Robot Operating System), you can skip this
 part.
 
 1.1 Install ROS Kinetic
