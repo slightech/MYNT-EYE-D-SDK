@@ -32,7 +32,7 @@
   <!-- Device index -->
   <arg name="dev_index" default="0" />
   <!-- Framerate -->
-  <arg name="framerate" default="30" />
+  <arg name="framerate" default="20" />
 
   <!--
   Device mode
@@ -46,7 +46,7 @@
   <arg name="color_mode" default="$(arg color_rectified)" />
   <!-- Note: must set DEPTH_RAW to get raw depth values for points -->
   <arg name="depth_mode" default="$(arg depth_raw)" />
-  <arg name="stream_mode" default="$(arg stream_2560x720)" />
+  <arg name="stream_mode" default="$(arg stream_1280x480)" />
   <arg name="color_stream_format" default="$(arg stream_yuyv)" />
   <arg name="depth_stream_format" default="$(arg stream_yuyv)" />
   <arg name="depth_type" default="$(arg type_mono16)" />
@@ -125,8 +125,6 @@
       args="0 0 0 $(arg pi/2) 0 $(arg pi) $(arg base_frame) $(arg temp_frame) 50" />
   <node pkg="tf" type="static_transform_publisher" name="b2imu_processed_broadcaster"
       args="0 0 0 $(arg pi/2) 0 $(arg pi) $(arg base_frame) $(arg imu_frame_processed) 50" />
-  
-  <arg name="mesh_file" default="S1030-0315.obj" />
 
   <node name="mynteye_wrapper_d_node" pkg="mynteye_wrapper_d" type="mynteye_wrapper_d_node" output="screen">
 
@@ -175,8 +173,6 @@
     <param name="imu_topic"         value="$(arg imu_topic)" />
     <param name="temp_topic"        value="$(arg temp_topic)" />
     <param name="imu_processed_topic"         value="$(arg imu_processed_topic)" />
-
-    <param name="mesh_file" value="$(arg mesh_file)" />
   </node>
 
   <!-- disable compressed depth plugin for image topics -->

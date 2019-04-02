@@ -173,8 +173,6 @@
     <param name="imu_topic"         value="$(arg imu_topic)" />
     <param name="temp_topic"        value="$(arg temp_topic)" />
     <param name="imu_processed_topic"         value="$(arg imu_processed_topic)" />
-
-    <rosparam file="$(find mynteye_wrapper_d)/config/slam/vins_fusion.yaml" command="load" />
   </node>
 
   <!-- disable compressed depth plugin for image topics -->
