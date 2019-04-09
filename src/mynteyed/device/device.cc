@@ -11,11 +11,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#include "mynteyed/device/device.h"
 #include <cstring>
 #include <fstream>
 #include <string>
 
+#include "mynteyed/device/device.h"
 #include "mynteyed/util/log.h"
 
 MYNTEYE_USE_NAMESPACE
@@ -86,6 +86,18 @@ int get_sensor_type(const SensorType &type) {
   }
 }
 
+void COVER_LOG(bool cover = true) {
+  FILE *file;
+  if (cover) {
+    file = freopen("/dev/null", "w", stderr);
+    file = freopen("/dev/null", "w", stdout);
+  } else {
+    file = freopen("/dev/tty", "w", stderr);
+    file = freopen("/dev/tty", "w", stdout);
+  }
+  UNUSED(file);
+}
+
 }  // namespace
 
 Device::Device()
@@ -103,9 +115,15 @@ Device::~Device() {
 }
 
 void Device::Init() {
+  COVER_LOG();
   int ret = EtronDI_Init(&etron_di_, false);
-  DBG_LOGI("MYNTEYE Init: %d", ret);
-  UNUSED(ret);
+  COVER_LOG(false);
+  if (ETronDI_OK == ret) {
+    LOGI("MYNTEYE Initialization successful");
+  } else {
+    LOGI("MYNTEYE Initialization failed");
+    return;
+  }
 
   stream_color_info_ptr_ =
       (PETRONDI_STREAM_INFO)malloc(sizeof(ETRONDI_STREAM_INFO)*64);
@@ -427,7 +445,9 @@ bool Device::Open(const OpenParams& params) {
     open_params_ = params;
     if (depth_device_opened_) {
       // depth device must be opened.
+      COVER_LOG();
       SyncCameraCalibrations();
+      COVER_LOG(false);
     }
     return true;
   } else {
