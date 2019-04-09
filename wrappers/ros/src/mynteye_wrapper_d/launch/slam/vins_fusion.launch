@@ -32,7 +32,7 @@
   <!-- Device index -->
   <arg name="dev_index" default="0" />
   <!-- Framerate -->
-  <arg name="framerate" default="20" />
+  <arg name="framerate" default="30" />
 
   <!--
   Device mode
