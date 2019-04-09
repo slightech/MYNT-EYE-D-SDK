@@ -540,14 +540,14 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     auto timestamp = data.img_info
           ? hardTimeToSoftTime(data.img_info->timestamp)
           : ros::Time().now();
-    auto&& mat = data.img->To(ImageFormat::COLOR_RGB)->ToMat();
+    auto&& mat = data.img->To(ImageFormat::COLOR_BGR)->ToMat();
 
     if (color_sub) {
       std_msgs::Header header;
       header.stamp = timestamp;
       header.frame_id = color_frame_id;
 
-      auto&& msg = cv_bridge::CvImage(header, enc::RGB8, mat).toImageMsg();
+      auto&& msg = cv_bridge::CvImage(header, enc::BGR8, mat).toImageMsg();
       if (info) info->header.stamp = msg->header.stamp;
       pub_color.publish(msg, info);
     }
