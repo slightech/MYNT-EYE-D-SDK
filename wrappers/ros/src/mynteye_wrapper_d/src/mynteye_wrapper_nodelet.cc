@@ -567,8 +567,8 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     if (is_left && sub_result.points) {
       pthread_mutex_lock(&mutex_color);
       points_color = mat;
-      pthread_mutex_unlock(&mutex_color);
       publishPoints(timestamp);
+      pthread_mutex_unlock(&mutex_color);
     }
   }
 
@@ -611,9 +611,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     if (points_color.empty() || points_depth.empty()) {
       return;
     }
-    pthread_mutex_lock(&mutex_color);
     pointcloud_generator->Push(points_color, points_depth, stamp);
-    pthread_mutex_unlock(&mutex_color);
     points_color.release();
     points_depth.release();
   }
