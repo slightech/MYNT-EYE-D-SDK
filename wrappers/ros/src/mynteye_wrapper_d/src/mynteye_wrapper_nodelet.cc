@@ -81,6 +81,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   ros::NodeHandle nh_ns;
 
   pthread_mutex_t mutex_sub_result;
+  pthread_mutex_t mutex_color;
 
   image_transport::Publisher pub_left_mono;
   image_transport::CameraPublisher pub_left_color;
@@ -153,6 +154,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
   MYNTEYEWrapperNodelet() {
     pthread_mutex_init(&mutex_sub_result, nullptr);
+    pthread_mutex_init(&mutex_color, nullptr);
   }
 
   ~MYNTEYEWrapperNodelet() {
@@ -563,7 +565,9 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     }
 
     if (is_left && sub_result.points) {
+      pthread_mutex_lock(&mutex_color);
       points_color = mat;
+      pthread_mutex_unlock(&mutex_color);
       publishPoints(timestamp);
     }
   }
