@@ -105,7 +105,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
   std::int32_t points_frequency;
   double points_factor;
-  int gravity;
+  double gravity;
 
   std::string base_frame_id;
   std::string left_mono_frame_id;
