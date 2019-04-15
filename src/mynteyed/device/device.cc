@@ -117,15 +117,8 @@ Device::~Device() {
 }
 
 void Device::Init() {
-  // COVER_LOG();
   int ret = EtronDI_Init(&etron_di_, false);
-  // COVER_LOG(false);
-  if (ETronDI_OK == ret) {
-    LOGI("MYNTEYE Initialization successful");
-  } else {
-    LOGI("MYNTEYE Initialization failed");
-    return;
-  }
+  LOGI("MYNTEYE Initialization %d", ret);
 
   stream_color_info_ptr_ =
       (PETRONDI_STREAM_INFO)malloc(sizeof(ETRONDI_STREAM_INFO)*64);
@@ -447,9 +440,7 @@ bool Device::Open(const OpenParams& params) {
     open_params_ = params;
     if (depth_device_opened_) {
       // depth device must be opened.
-      // COVER_LOG();
       SyncCameraCalibrations();
-      // COVER_LOG(false);
     }
     return true;
   } else {
