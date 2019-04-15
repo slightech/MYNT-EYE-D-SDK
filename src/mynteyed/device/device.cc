@@ -86,6 +86,7 @@ int get_sensor_type(const SensorType &type) {
   }
 }
 
+/*
 void COVER_LOG(bool cover = true) {
   FILE *file;
   if (cover) {
@@ -97,6 +98,7 @@ void COVER_LOG(bool cover = true) {
   }
   UNUSED(file);
 }
+*/
 
 }  // namespace
 
@@ -115,9 +117,9 @@ Device::~Device() {
 }
 
 void Device::Init() {
-  COVER_LOG();
+  // COVER_LOG();
   int ret = EtronDI_Init(&etron_di_, false);
-  COVER_LOG(false);
+  // COVER_LOG(false);
   if (ETronDI_OK == ret) {
     LOGI("MYNTEYE Initialization successful");
   } else {
@@ -445,9 +447,9 @@ bool Device::Open(const OpenParams& params) {
     open_params_ = params;
     if (depth_device_opened_) {
       // depth device must be opened.
-      COVER_LOG();
+      // COVER_LOG();
       SyncCameraCalibrations();
-      COVER_LOG(false);
+      // COVER_LOG(false);
     }
     return true;
   } else {
