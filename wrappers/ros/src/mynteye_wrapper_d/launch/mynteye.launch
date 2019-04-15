@@ -99,32 +99,6 @@
   <arg name="temp_topic"    default="$(arg mynteye)/temp/data_raw" />
   <!-- imu topic processed -->
   <arg name="imu_processed_topic"     default="$(arg mynteye)/imu/data_raw_processed" />
-
-  <arg name="pi"   value="3.1415926535897932" />
-  <arg name="pi/2" value="1.5707963267948966" />
-  <arg name="optical_rotate" value="0 0 0 -$(arg pi/2) 0 -$(arg pi/2)" />
-
-  <node pkg="tf" type="static_transform_publisher" name="b2l_m_broadcaster"
-      args="$(arg optical_rotate) $(arg base_frame) $(arg left_mono_frame) 100" />
-  <node pkg="tf" type="static_transform_publisher" name="b2l_c_broadcaster"
-      args="$(arg optical_rotate) $(arg base_frame) $(arg left_color_frame) 100" />
-
-  <node pkg="tf" type="static_transform_publisher" name="b2r_m_broadcaster"
-      args="$(arg optical_rotate) $(arg base_frame) $(arg right_mono_frame) 100" />
-  <node pkg="tf" type="static_transform_publisher" name="b2r_c_broadcaster"
-      args="$(arg optical_rotate) $(arg base_frame) $(arg right_color_frame) 100" />
-
-  <node pkg="tf" type="static_transform_publisher" name="b2d_broadcaster"
-      args="$(arg optical_rotate) $(arg base_frame) $(arg depth_frame) 100" />
-  <node pkg="tf" type="static_transform_publisher" name="b2p_broadcaster"
-      args="$(arg optical_rotate) $(arg base_frame) $(arg points_frame) 100" />
-
-  <node pkg="tf" type="static_transform_publisher" name="b2imu_broadcaster"
-      args="0 0 0 $(arg pi/2) 0 $(arg pi) $(arg base_frame) $(arg imu_frame) 50" />
-  <node pkg="tf" type="static_transform_publisher" name="b2temp_broadcaster"
-      args="0 0 0 $(arg pi/2) 0 $(arg pi) $(arg base_frame) $(arg temp_frame) 50" />
-  <node pkg="tf" type="static_transform_publisher" name="b2imu_processed_broadcaster"
-      args="0 0 0 $(arg pi/2) 0 $(arg pi) $(arg base_frame) $(arg imu_frame_processed) 50" />
   
   <arg name="mesh_file" default="D-0315.obj" />
 
