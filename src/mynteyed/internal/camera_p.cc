@@ -199,7 +199,7 @@ StreamExtrinsics CameraPrivate::GetStreamExtrinsics(
     const StreamMode& stream_mode, bool* ok) {
   StreamExtrinsics ex;
   auto calib = GetCameraCalibration(stream_mode);
-  if (calib == nullptr) {
+  if (calib == nullptr || calib->InImgWidth == 0) {
     *ok = false;
     return std::move(ex);
   }
