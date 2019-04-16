@@ -96,7 +96,13 @@ StreamIntrinsics Camera::GetStreamIntrinsics(
 
 StreamExtrinsics Camera::GetStreamExtrinsics(
     const StreamMode& stream_mode, bool* ok) const {
-  return p_->GetStreamExtrinsics(stream_mode, ok);
+  auto ex = p_->GetStreamExtrinsics(stream_mode, ok);
+  if (*ok) return ex;
+
+  return {{0.99978113174438477, 0.00282573699951172, 0.02072787284851074,
+    -0.00284624099731445, 0.99999547004699707, 0.00096035003662109,
+    -0.02072513103485107, -0.00101912021636963, 0.99978458881378174},
+    {-120.21408843994140625, 0.00000000000000000, 0.00000000000000000}};
 }
 
 bool Camera::WriteCameraCalibrationBinFile(const std::string& filename) {
