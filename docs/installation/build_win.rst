@@ -14,7 +14,9 @@ using prebuilt DLL, please see :ref:`install_exe_win` .
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Download Visual Studio 2017 from https://visualstudio.microsoft.com/ and
-install
+install, select "Desktop development with C++" .
+
+.. image:: ../static/images/vs_install.png
 
 .. tip::
 
@@ -31,7 +33,7 @@ Download CMake from https://cmake.org/ and install
 1) Download MSYS2 from http://mirrors.ustc.edu.cn/msys2/distrib/x86_64/
    and install
 
-2) Add bin path to System PATH environment variable list
+2) Add bin path to System PATH environment variable list (`Add to the PATH on Windows 10 <https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/>`__)
 
 .. code-block:: none
 
@@ -74,7 +76,7 @@ Finally, the CMD (Command Prompt) can run the following command:
 2.1.2 Set up environment variable
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Start up a command window as admin and enter following command to add ``OPENCV_DIR`` environment variable:
+1. Start up a command window as admin and enter following command to add ``OPENCV_DIR`` environment variable:
 
 *Change the “D:\OpenCV” to your opencv unpack path*
 
@@ -83,7 +85,15 @@ Start up a command window as admin and enter following command to add ``OPENCV_D
    setx -m OPENCV_DIR D:\OpenCV\Build\x64\vc14\lib     (suggested for Visual Studio 2015 - 64 bit Windows)
    setx -m OPENCV_DIR D:\OpenCV\Build\x64\vc15\lib     (suggested for Visual Studio 2017 - 64 bit Windows)
 
-Add OpenCV bin path to System PATH environment variable list
+Or referring to `Add to the PATH on Windows 10 <https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/>`__
+to add ``OPENCV_DIR`` environment variable manually.
+
+.. code-block:: bat
+
+   D:\OpenCV\Build\x64\vc14\lib     (suggested for Visual Studio 2015 - 64 bit Windows)
+   D:\OpenCV\Build\x64\vc15\lib     (suggested for Visual Studio 2017 - 64 bit Windows)
+
+2. Add OpenCV bin path to System PATH environment variable list
 
 .. code-block:: bat
 
@@ -111,8 +121,7 @@ https://github.com/PointCloudLibrary/pcl/releases
 3. Build SDK
 ------------
 
-Open “x64 Native Tools Command Prompt for VS 2017”(适用于 VS 2017 的 x64
-本机工具命令提示) command shell
+Open “x64 Native Tools Command Prompt for VS 2017”(suggested for Visual Studio 2017 - 64 bit Windows) command shell
 
 .. code-block:: bat
 

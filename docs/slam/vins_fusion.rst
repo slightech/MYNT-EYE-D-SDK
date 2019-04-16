@@ -19,6 +19,21 @@ Preparation
 `ROS Installation <http://wiki.ros.org/ROS/Installation>`_
 2. Install `Ceres Installation <http://ceres-solver.org/installation.html>`_
 
+Install Ceres
+---------------
+
+.. code-block:: bash
+
+    cd ~
+    git clone https://ceres-solver.googlesource.com/ceres-solver
+    sudo apt-get -y install cmake libgoogle-glog-dev libatlas-base-dev libeigen3-dev libsuitesparse-dev
+    sudo add-apt-repository ppa:bzindovic/suitesparse-bugfix-1319687
+    sudo apt-get update && sudo apt-get install libsuitesparse-dev
+    mkdir ceres-bin
+    cd ceres-bin
+    cmake ../ceres-solver
+    make -j3
+    sudo make install
 
 Build VINS-Fusion
 -------------------
@@ -43,7 +58,7 @@ Run MYNTEYE VINS-Fusion
 
 .. code-block:: bash
 
-  cd (local path of MYNT-EYE-D-SDK)
+  cd MYNT-EYE-D-SDK (local path of MYNT-EYE-D-SDK)
   source ./wrappers/ros/devel/setup.bash
   roslaunch mynteye_wrapper_d vins_fusion.launch
 

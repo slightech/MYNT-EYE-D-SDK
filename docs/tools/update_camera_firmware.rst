@@ -1,11 +1,7 @@
-.. role:: raw-latex(raw)
-   :format: latex
-..
-
 .. _update_camera_firmware:
 
-Update Camera Firmware
-======================
+Update Main Processing Chip
+=============================
 
 .. note::
  This tool does not support beta device upgrade.
@@ -36,7 +32,7 @@ Update Firmware
 
  2, Select data type(256KB).
 
- 3, Select camera firmware.
+ 3, Select firmware.
 
  4, Select ``Keep tables`` (in order to keep calibration parameters).
 

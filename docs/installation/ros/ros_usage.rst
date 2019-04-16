@@ -1,7 +1,3 @@
-.. role:: raw-latex(raw)
-   :format: latex
-..
-
 .. _ros_usage:
 
 ROS Usage
@@ -61,6 +57,10 @@ The ROS file is structured like follows:
         ├─launch/
         │  ├─display.launch
         │  └─mynteye.launch
+        │  └─slam
+        │     ├─orb_slam2.launch
+        │     └─vins_fusion.launch
+        │     └─vins_mono.launch
         ├─msg/
         ├─rviz/
         ├─src/
@@ -79,4 +79,35 @@ In ``mynteye.launch`` ,you can configure ``topics`` and ``frame_ids``
 
 .. code-block:: c++
 
-   <arg name="gravity" default="9.8" />
+  <!-- Camera Params -->
+
+  <!-- Device index -->
+  <arg name="dev_index" default="0" />
+  <!-- Framerate -->
+  <arg name="framerate" default="30" />
+
+  <!--
+  Device mode
+    device_color: left_color ✓ right_color ? depth x
+    device_depth: left_color x right_color x depth ✓
+    device_all:   left_color ✓ right_color ? depth ✓
+  Note: ✓: available, x: unavailable, ?: depends on #stream_mode
+  -->
+  <arg name="dev_mode" default="$(arg device_all)" />
+
+  <arg name="color_mode" default="$(arg color_raw)" />
+  <!-- Note: must set DEPTH_RAW to get raw depth values for points -->
+  <arg name="depth_mode" default="$(arg depth_raw)" />
+  <arg name="stream_mode" default="$(arg stream_2560x720)" />
+
+  <!-- Auto-exposure -->
+  <arg name="state_ae" default="true" />
+  <!-- Auto-white balance -->
+  <arg name="state_awb" default="true" />
+  <!-- IR intensity -->
+  <arg name="ir_intensity" default="4" />
+  <!-- IR Depth Only -->
+  <arg name="ir_depth_only" default="false" />
+
+  <!-- Setup your local gravity here -->
+  <arg name="gravity" default="9.8" />

@@ -5,6 +5,8 @@ Get point image
 
 Point images belongs to upper layer of synthetic data.You can get it
 through ``GetStreamData()``.It should be check not empty before use.
+Otherwise, when running pionts,you can use "space" to save ``.ply`` files.
+Then sample ``view_points`` can be used to view ``.ply`` files.
 
 Sample code snippet:
 

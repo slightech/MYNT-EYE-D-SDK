@@ -1,7 +1,7 @@
 .. _update_hid_firmware:
 
-Update HID Firmware
-===================
+Update Coprocessing chip
+=========================
 
 Get Firmware
 ------------
