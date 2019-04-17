@@ -559,7 +559,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       header.frame_id = mono_frame_id;
 
       cv::Mat dst;
-      cv::cvtColor(mat, dst, CV_RGB2GRAY);
+      cv::cvtColor(mat, dst, CV_BGR2GRAY);
       auto&& msg = cv_bridge::CvImage(header, enc::MONO8, dst).toImageMsg();
       pub_mono.publish(msg);
     }
@@ -597,11 +597,11 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     } else if (params.depth_mode == DepthMode::DEPTH_GRAY) {
       auto&& mat = data.img->To(ImageFormat::DEPTH_GRAY_24)->ToMat();
       pub_depth.publish(
-          cv_bridge::CvImage(header, enc::RGB8, mat).toImageMsg(), info);
+          cv_bridge::CvImage(header, enc::BGR8, mat).toImageMsg(), info);
     } else if (params.depth_mode == DepthMode::DEPTH_COLORFUL) {
-      auto&& mat = data.img->To(ImageFormat::DEPTH_RGB)->ToMat();
+      auto&& mat = data.img->To(ImageFormat::DEPTH_BGR)->ToMat();
       pub_depth.publish(
-          cv_bridge::CvImage(header, enc::RGB8, mat).toImageMsg(), info);
+          cv_bridge::CvImage(header, enc::BGR8, mat).toImageMsg(), info);
     } else {
       NODELET_ERROR_STREAM("Depth mode unsupported");
     }
