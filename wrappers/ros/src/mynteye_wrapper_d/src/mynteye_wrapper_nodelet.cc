@@ -19,7 +19,7 @@
 #include <sensor_msgs/image_encodings.h>
 #include <sensor_msgs/Imu.h>
 #include <visualization_msgs/Marker.h>
-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <tf/tf.h>
 #include <tf2_ros/static_transform_broadcaster.h>
 #include <mynteye_wrapper_d/GetParams.h>
 
@@ -93,8 +93,6 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   ros::Publisher pub_imu_processed;
   ros::Publisher pub_mesh_;  // < The publisher for camera mesh.
 
-  tf2_ros::StaticTransformBroadcaster tf_broadcaster;
-
   visualization_msgs::Marker mesh_msg_;  // < Mesh message.
   ros::ServiceServer get_params_service_;
 
@@ -130,11 +128,6 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
   std::shared_ptr<MotionIntrinsics> motion_intrinsics;
   bool motion_intrinsics_enabled;
-
-  std::shared_ptr<MotionExtrinsics> motion_extrinsics;
-  bool motion_extrinsics_enabled;
-
-  std::shared_ptr<StreamExtrinsics> stream_extrinsics;
 
   std::shared_ptr<ImuData> imu_accel;
   std::shared_ptr<ImuData> imu_gyro;
@@ -220,7 +213,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     imu_frame_id = "mynteye_imu_frame";
     temp_frame_id = "mynteye_temp_frame";
     imu_frame_processed_id = "mynteye_imu_frame_processed";
-    nh_ns.getParamCached("base_frame", base_frame_id);
+    nh_ns.getParamCached("base_frame_id", base_frame_id);
     nh_ns.getParamCached("left_mono_frame", left_mono_frame_id);
     nh_ns.getParamCached("left_color_frame", left_color_frame_id);
     nh_ns.getParamCached("right_mono_frame", right_mono_frame_id);
@@ -368,7 +361,6 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     ros::Rate loop_rate(framerate);
     while (nh_ns.ok()) {
       publishMesh();
-      publishTF();
       detectSubscribers();
       loop_rate.sleep();
     }
@@ -507,15 +499,6 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     left_info_ptr = createCameraInfo(in.left);
     right_info_ptr = createCameraInfo(in.right);
 
-    // camera extrinsics
-    auto&& cam_ex = mynteye->GetStreamExtrinsics(params.stream_mode, &in_ok);
-    if (in_ok) {
-      stream_extrinsics = std::make_shared<StreamExtrinsics>(cam_ex);
-    } else {
-      stream_extrinsics = nullptr;
-      NODELET_WARN_STREAM("This device not supported to get camera extrinsics.");
-    }
-
     // motion intrinsics
     bool motion_ok;
     if (motion_intrinsics == nullptr) {
@@ -528,19 +511,6 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       motion_intrinsics_enabled = false;
       std::cout << "This device not supported to get motion intrinsics."
           << std::endl;
-    }
-
-    // motion extrinsics
-    if (motion_extrinsics == nullptr) {
-      motion_extrinsics = std::make_shared<MotionExtrinsics>();
-    }
-    *motion_extrinsics = mynteye->GetMotionExtrinsics(&motion_ok);
-    if (motion_ok) {
-      motion_extrinsics_enabled = true;
-    } else {
-      motion_extrinsics_enabled = false;
-      std::cout << "This device not supported to get motion extrinsics."
-                << std::endl;
     }
 
     // pointcloud generator
@@ -978,7 +948,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     mesh_msg_.header.stamp = ros::Time::now();
     mesh_msg_.type = visualization_msgs::Marker::MESH_RESOURCE;
     // fill orientation
-    mesh_msg_.pose.orientation.x = 0;
+    mesh_msg_.pose.orientation.x = -1;
     mesh_msg_.pose.orientation.y = 0;
     mesh_msg_.pose.orientation.z = 0;
     mesh_msg_.pose.orientation.w = 1;
@@ -989,9 +959,9 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     mesh_msg_.pose.position.z = 0;
 
     // scale -- needed
-    mesh_msg_.scale.x = 0.001;
-    mesh_msg_.scale.y = 0.001;
-    mesh_msg_.scale.z = 0.001;
+    mesh_msg_.scale.x = 0.003;
+    mesh_msg_.scale.y = 0.003;
+    mesh_msg_.scale.z = 0.003;
 
     mesh_msg_.action = visualization_msgs::Marker::ADD;
     mesh_msg_.color.a = 1.0;  // Don't forget to set the alpha!
@@ -1206,76 +1176,6 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       break;
     }
     return true;
-  }
-
-  void publishTF() {
-    geometry_msgs::TransformStamped transform_stamped;
-    std::vector<geometry_msgs::TransformStamped> transforms;
-
-    tf2::Quaternion q_body_temp;
-    q_body_temp.setEuler(M_PI_2, 0, M_PI_2);
-    tf2::Transform T_body_temp(q_body_temp);
-
-    tf2::convert(tf2::Stamped<tf2::Transform>(T_body_temp, ros::Time::now(), base_frame_id), transform_stamped);
-    transform_stamped.child_frame_id = temp_frame_id;
-    transforms.push_back(transform_stamped);
-
-    if (stream_extrinsics != nullptr) {
-      // left to right, T^right_left
-      auto& cam_ex = *stream_extrinsics;
-      tf2::Transform T_right_left(tf2::Matrix3x3(cam_ex.rotation[0][0], cam_ex.rotation[0][1], cam_ex.rotation[0][2],
-                                                 cam_ex.rotation[1][0], cam_ex.rotation[1][1], cam_ex.rotation[1][2],
-                                                 cam_ex.rotation[2][0], cam_ex.rotation[2][1], cam_ex.rotation[2][2]),
-                                  tf2::Vector3(cam_ex.translation[0], cam_ex.translation[1], cam_ex.translation[2]) / 1000);
-
-      tf2::Quaternion q_left_right = T_right_left.getRotation().inverse();
-      tf2::Quaternion q_left_opticenter;
-      q_left_opticenter.setRotation(q_left_right.getAxis(), q_left_right.getAngle());
-
-      tf2::Transform T_left_opticenter;
-      T_left_opticenter.setRotation(q_left_opticenter);
-      T_left_opticenter.setOrigin(T_right_left.inverse().getOrigin() / 2);
-
-      tf2::Quaternion q_body_opticenter;
-      q_body_opticenter.setEuler(M_PI_2, 0, -M_PI_2);
-      tf2::Transform T_body_opticenter(q_body_opticenter);
-
-      tf2::Transform T_body_left = T_body_opticenter * T_left_opticenter.inverse();
-
-      tf2::convert(tf2::Stamped<tf2::Transform>(T_body_left, ros::Time::now(), base_frame_id), transform_stamped);
-      transform_stamped.child_frame_id = left_mono_frame_id;
-      transforms.push_back(transform_stamped);
-      transform_stamped.child_frame_id = left_color_frame_id;
-      transforms.push_back(transform_stamped);
-      transform_stamped.child_frame_id = depth_frame_id;
-      transforms.push_back(transform_stamped);
-      transform_stamped.child_frame_id = points_frame_id;
-      transforms.push_back(transform_stamped);
-
-      tf2::convert(tf2::Stamped<tf2::Transform>(T_body_left * T_right_left.inverse(), ros::Time::now(), base_frame_id), transform_stamped);
-      transform_stamped.child_frame_id = right_mono_frame_id;
-      transforms.push_back(transform_stamped);
-      transform_stamped.child_frame_id = right_color_frame_id;
-      transforms.push_back(transform_stamped);
-
-      if (motion_extrinsics_enabled) {
-        // left to imu, T^imu_left
-        auto& imu_ex = *motion_extrinsics;
-        tf2::Transform T_imu_left(tf2::Matrix3x3(imu_ex.rotation[0][0], imu_ex.rotation[0][1], imu_ex.rotation[0][2],
-                                                 imu_ex.rotation[1][0], imu_ex.rotation[1][1], imu_ex.rotation[1][2],
-                                                 imu_ex.rotation[2][0], imu_ex.rotation[2][1], imu_ex.rotation[2][2]),
-                                  tf2::Vector3(imu_ex.translation[0], imu_ex.translation[1], imu_ex.translation[2]) / 1000);
-
-        tf2::convert(tf2::Stamped<tf2::Transform>(T_body_left * T_imu_left.inverse(), ros::Time::now(), base_frame_id), transform_stamped);
-        transform_stamped.child_frame_id = imu_frame_id;
-        transforms.push_back(transform_stamped);
-        transform_stamped.child_frame_id = imu_frame_processed_id;
-        transforms.push_back(transform_stamped);
-      }
-    }
-
-
-    tf_broadcaster.sendTransform(transforms);
   }
 };
 

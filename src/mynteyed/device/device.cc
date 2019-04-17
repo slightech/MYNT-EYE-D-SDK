@@ -86,20 +86,6 @@ int get_sensor_type(const SensorType &type) {
   }
 }
 
-/*
-void COVER_LOG(bool cover = true) {
-  FILE *file;
-  if (cover) {
-    file = freopen("/dev/null", "w", stderr);
-    file = freopen("/dev/null", "w", stdout);
-  } else {
-    file = freopen("/dev/tty", "w", stderr);
-    file = freopen("/dev/tty", "w", stdout);
-  }
-  UNUSED(file);
-}
-*/
-
 }  // namespace
 
 Device::Device()
@@ -118,7 +104,7 @@ Device::~Device() {
 
 void Device::Init() {
   int ret = EtronDI_Init(&etron_di_, false);
-  LOGI("MYNTEYE Initialization %d", ret);
+  UNUSED(ret);
 
   stream_color_info_ptr_ =
       (PETRONDI_STREAM_INFO)malloc(sizeof(ETRONDI_STREAM_INFO)*64);
