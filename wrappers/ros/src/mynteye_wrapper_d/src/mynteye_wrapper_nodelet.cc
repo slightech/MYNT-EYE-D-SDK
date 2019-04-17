@@ -80,6 +80,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   ros::NodeHandle nh;
   ros::NodeHandle nh_ns;
 
+  pthread_mutex_t mutex_sub_result;
   pthread_mutex_t mutex_color;
 
   image_transport::Publisher pub_left_mono;
@@ -136,22 +137,23 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   cv::Mat points_depth;
 
   typedef struct SubResult {
-    bool left_mono = false;
-    bool left_color = false;
-    bool right_mono = false;
-    bool right_color = false;
-    bool depth = false;
-    bool points = false;
-    bool imu = false;
-    bool temp = false;
-    bool imu_processed = false;
-    bool left = false;
-    bool right = false;
+    bool left_mono;
+    bool left_color;
+    bool right_mono;
+    bool right_color;
+    bool depth;
+    bool points;
+    bool imu;
+    bool temp;
+    bool imu_processed;
+    bool left;
+    bool right;
   } sub_result_t;
 
   sub_result_t sub_result;
 
   MYNTEYEWrapperNodelet() {
+    pthread_mutex_init(&mutex_sub_result, nullptr);
     pthread_mutex_init(&mutex_color, nullptr);
   }
 
@@ -380,6 +382,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     bool left_sub = left_mono_sub || left_color_sub;
     bool right_sub = right_mono_sub || right_color_sub;
 
+    pthread_mutex_lock(&mutex_sub_result);
     if (left_sub != sub_result.left ||
         right_sub != sub_result.right ||
         depth_sub != sub_result.depth ||
@@ -391,11 +394,6 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       } else {
         mynteye->DisableImageInfo();
       }
-
-      sub_result.left = left_sub;
-      sub_result.right = right_sub;
-      sub_result.depth = depth_sub;
-      sub_result.points = points_sub;
     }
     if (imu_sub != sub_result.imu ||
         imu_processed_sub != sub_result.imu_processed ||
@@ -407,22 +405,14 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       } else {
         mynteye->DisableMotionDatas();
       }
-
-      sub_result.imu = imu_sub;
-      sub_result.imu_processed = imu_processed_sub;
-      sub_result.temp = temp_sub;
     }
 
-    if (left_mono_sub != sub_result.left_mono ||
-        right_mono_sub != sub_result.right_mono ||
-        left_color_sub != sub_result.left_color ||
-        right_color_sub != sub_result.right_color) {
-
-      sub_result.left_mono = left_mono_sub;
-      sub_result.right_mono = right_mono_sub;
-      sub_result.left_color = left_color_sub;
-      sub_result.right_color = right_color_sub;
-    }
+    sub_result = {
+      left_mono_sub, left_color_sub, right_mono_sub, right_color_sub,
+      depth_sub, points_sub, imu_sub, temp_sub,
+      imu_processed_sub, left_sub, right_sub,
+    };
+    pthread_mutex_unlock(&mutex_sub_result);
   }
 
   void openDevice() {
@@ -436,6 +426,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     };
     for (auto&& type : types) {
       mynteye->SetStreamCallback(type, [this](const StreamData& data) {
+        pthread_mutex_lock(&mutex_sub_result);
         switch (data.img->type()) {
           case ImageType::IMAGE_LEFT_COLOR: {
             if (sub_result.left || sub_result.points) {
@@ -455,11 +446,13 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
             }
           } break;
         }
+        pthread_mutex_unlock(&mutex_sub_result);
       });
     }
 
     // Set motion data callback
     mynteye->SetMotionCallback([this](const MotionData& data) {
+      pthread_mutex_lock(&mutex_sub_result);
       if (data.imu && (sub_result.imu ||
                        sub_result.imu_processed ||
                        sub_result.temp)) {
@@ -479,6 +472,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
           }
         }
       }
+      pthread_mutex_unlock(&mutex_sub_result);
     });
 
     mynteye->Open(params);
