@@ -3,6 +3,21 @@
 Change log
 ============
 
+2019-04-17 v1.7.5
+-------------------
+
+1. Remove beta_ros wrapper
+
+2. Publish default camera info for beta device
+
+3. Add view point cloud ply file sample
+
+4. Add slam launch to ros wrapper
+
+5. Fix color anomaly issue for ros display
+
+6. Fix point cloud jitter issue for ros display
+
 
 2019-03-25 v1.7.4
 -----------------

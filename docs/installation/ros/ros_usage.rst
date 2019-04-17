@@ -74,7 +74,8 @@ The ROS file is structured like follows:
         └─package.xml
 
 In ``mynteye.launch`` ,you can configure ``topics`` and ``frame_ids``
-,decide which data to enable, and set the control options. Please set
+,decide which data to enable, and set the control options.Please refer
+ to :ref:`support_resolutions` to set frame rate and resolution. Please set
 ``gravity`` to the local gravity acceleration.
 
 .. code-block:: c++
