@@ -27,7 +27,7 @@ Install MYNT-EYE-VINS-Sample
 
   mkdir -p ~/catkin_ws/src
   cd ~/catkin_ws/src
-  git clone -b mynteye https://github.com/slightech/MYNT-EYE-VINS-Sample.git
+  git clone https://github.com/slightech/MYNT-EYE-VINS-Sample.git
   cd ..
   catkin_make
   source devel/setup.bash
