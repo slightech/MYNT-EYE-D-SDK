@@ -11,6 +11,20 @@ If you wanna run ORB_SLAM2 with MYNT EYE camera, please follow the steps:
 2. Follow the normal procedure to install ORB_SLAM2.
 3. Run examples by MYNT® EYE.
 
+Prerequisites
+------------------
+
+.. code-block:: bash
+
+    sudo apt-get -y install libglew-dev cmake
+    cd ~
+    git clone https://github.com/stevenlovegrove/Pangolin.git
+    cd Pangolin
+    mkdir build
+    cd build
+    cmake ..
+    cmake --build .
+    sudo make install
 
 Building the nodes for stereo (ROS)
 --------------------------------------------
@@ -25,6 +39,8 @@ Building the nodes for stereo (ROS)
 
 .. code-block:: bash
 
+  chmod +x build.sh
+  ./build.sh
   chmod +x build_ros.sh
   ./build_ros.sh
 
