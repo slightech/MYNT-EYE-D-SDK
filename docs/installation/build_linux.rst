@@ -54,9 +54,19 @@ Alternatively, refer to the command below:
 1.2 Install PCL for Point Cloud sample (Optional)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    To build and install PCL, please refer to `PCL Installation <http://www.pointclouds.org/documentation/tutorials/compiling_pcl_posix.php>`__
+
 .. code-block:: bash
 
-   sudo apt-get install libpcl-dev libproj-dev libopenni2-dev libopenni-dev
+  git clone https://github.com/PointCloudLibrary/pcl.git
+  cd pcl
+  git checkout pcl-1.7.2
+  mkdir build && cd build
+
+  cmake -DCMAKE_BUILD_TYPE=Release ..
+
+  make -j2
+  sudo make -j2 install
 
 1.3 Link libGL.so for TX1/TX2 compile bug (Optional)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
