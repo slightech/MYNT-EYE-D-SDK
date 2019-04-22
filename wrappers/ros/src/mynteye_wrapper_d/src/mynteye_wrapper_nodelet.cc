@@ -427,52 +427,63 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     for (auto&& type : types) {
       mynteye->SetStreamCallback(type, [this](const StreamData& data) {
         pthread_mutex_lock(&mutex_sub_result);
+        bool sub_result_left = sub_result.left;
+        bool sub_result_points = sub_result.points;
+        bool sub_result_left_color = sub_result.left_color;
+        bool sub_result_left_mono = sub_result.left_mono;
+        bool sub_result_right = sub_result.right;
+        bool sub_result_right_color = sub_result.right_color;
+        bool sub_result_right_mono = sub_result.right_mono;
+        bool sub_result_right_depth = sub_result.depth;
+        pthread_mutex_unlock(&mutex_sub_result);
         switch (data.img->type()) {
           case ImageType::IMAGE_LEFT_COLOR: {
-            if (sub_result.left || sub_result.points) {
-              publishLeft(data, sub_result.left_color,
-                  sub_result.left_mono);
+            if (sub_result_left || sub_result_points) {
+              publishLeft(data, sub_result_left_color,
+                  sub_result_left_mono);
             }
           } break;
           case ImageType::IMAGE_RIGHT_COLOR: {
-            if (sub_result.right) {
-              publishRight(data, sub_result.right_color,
-                  sub_result.right_mono);
+            if (sub_result_right) {
+              publishRight(data, sub_result_right_color,
+                  sub_result_right_mono);
             }
           } break;
           case ImageType::IMAGE_DEPTH: {
-            if (sub_result.depth || sub_result.points) {
+            if (sub_result_right_depth || sub_result_points) {
               publishDepth(data);
             }
           } break;
         }
-        pthread_mutex_unlock(&mutex_sub_result);
       });
     }
 
     // Set motion data callback
     mynteye->SetMotionCallback([this](const MotionData& data) {
       pthread_mutex_lock(&mutex_sub_result);
-      if (data.imu && (sub_result.imu ||
-                       sub_result.imu_processed ||
-                       sub_result.temp)) {
+      bool sub_result_imu = sub_result.imu;
+      bool sub_result_imu_processed = sub_result.imu_processed;
+      bool sub_result_temp = sub_result.temp;
+      pthread_mutex_unlock(&mutex_sub_result);
+      if (data.imu && (sub_result_imu ||
+                       sub_result_imu_processed ||
+                       sub_result_temp)) {
         if (data.imu->flag == MYNTEYE_IMU_ACCEL) {
           imu_accel = data.imu;
           if (imu_timestamp_align) {
-            publishAlignImu(sub_result.imu, sub_result.imu_processed, sub_result.temp);
+            publishAlignImu(sub_result_imu, sub_result_imu_processed, sub_result_temp);
           } else {
-            publishImu(sub_result.imu, sub_result.imu_processed, sub_result.temp);
+            publishImu(sub_result_imu, sub_result_imu_processed, sub_result_temp);
           }
         } else if (data.imu->flag == MYNTEYE_IMU_GYRO) {
           imu_gyro = data.imu;
           if (imu_timestamp_align) {
-            publishAlignImu(sub_result.imu, sub_result.imu_processed, sub_result.temp);
+            publishAlignImu(sub_result_imu, sub_result_imu_processed, sub_result_temp);
           } else {
-            publishImu(sub_result.imu, sub_result.imu_processed, sub_result.temp);
+            publishImu(sub_result_imu, sub_result_imu_processed, sub_result_temp);
           }
         }
       }
-      pthread_mutex_unlock(&mutex_sub_result);
     });
 
     mynteye->Open(params);
