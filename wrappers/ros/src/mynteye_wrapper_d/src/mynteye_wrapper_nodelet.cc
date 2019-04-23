@@ -574,8 +574,10 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       auto&& msg = cv_bridge::CvImage(header, enc::MONO8, dst).toImageMsg();
       pub_mono.publish(msg);
     }
-
-    if (is_left && sub_result.points) {
+    pthread_mutex_lock(&mutex_sub_result);
+    bool sub_result_points = sub_result.points;
+    pthread_mutex_unlock(&mutex_sub_result);
+    if (is_left && sub_result_points) {
       pthread_mutex_lock(&mutex_color);
       points_color = mat;
       publishPoints(timestamp);
@@ -601,7 +603,10 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
         pub_depth.publish(
             cv_bridge::CvImage(header, enc::TYPE_16UC1, mat).toImageMsg(), info);
       }
-      if (sub_result.points) {
+      pthread_mutex_lock(&mutex_sub_result);
+      bool sub_result_points = sub_result.points;
+      pthread_mutex_unlock(&mutex_sub_result);
+      if (sub_result_points) {
         points_depth = mat;
         publishPoints(header.stamp);
       }
