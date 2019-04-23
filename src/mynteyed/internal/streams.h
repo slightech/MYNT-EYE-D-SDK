@@ -102,6 +102,8 @@ class Streams {
 
   void OnImageInfoCallback(const ImgInfoPacket& packet);
 
+  bool IsIRDepthOnly();
+
  private:
   void NotifyStreamData(const ImageType &type, const StreamData &data);
 

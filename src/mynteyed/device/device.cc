@@ -282,6 +282,7 @@ void Device::SetInfraredDepthOnly(const OpenParams& params) {
     return;
   }
 
+  /*
   int error_n = 0;
   if (params.dev_mode != DeviceMode::DEVICE_ALL) {
     error_n = 1;
@@ -307,6 +308,7 @@ void Device::SetInfraredDepthOnly(const OpenParams& params) {
 
     return;
   }
+  */
 
   if (depth_data_type_ == 1 ||
       depth_data_type_ == 2 ||
@@ -319,7 +321,7 @@ void Device::SetInfraredDepthOnly(const OpenParams& params) {
   }
   ir_depth_only_enabled_ = true;
   EtronDI_EnableInterleave(etron_di_, &dev_sel_info_, true);
-  framerate_ *= 2;
+  // framerate_ *= 2;
 }
 
 void Device::SetInfraredIntensity(const std::uint16_t &value) {
@@ -1173,4 +1175,8 @@ std::string Device::GetSerialNumber() const {
   tmp[24] = '\0';
   std::string s = tmp;
   return s;
+}
+
+bool Device::IsIRDepthOnly() {
+  return ir_depth_only_enabled_;
 }

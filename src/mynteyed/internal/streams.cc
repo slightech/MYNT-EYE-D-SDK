@@ -226,6 +226,7 @@ void Streams::StartStreamCapturing() {
         "\nOr cancel EnableStreamData(ImageType::IMAGE_RIGHT_COLOR)");
   }
 
+  match_->SetIRDepthStatus(IsIRDepthOnly());
   is_stream_capturing_ = true;
   stream_capture_thread_ = std::thread([this]() {
     // Rate rate(device_->GetOpenParams().framerate);
@@ -426,4 +427,8 @@ void Streams::NotifyStreamData(const ImageType &type,
   if (match_) {
     match_->OnStreamDataCallback(type, data);
   }
+}
+
+bool Streams::IsIRDepthOnly() {
+  return device_->IsIRDepthOnly();
 }
