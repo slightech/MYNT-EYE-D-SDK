@@ -607,8 +607,10 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       bool sub_result_points = sub_result.points;
       pthread_mutex_unlock(&mutex_sub_result);
       if (sub_result_points) {
+        pthread_mutex_lock(&mutex_color);
         points_depth = mat;
         publishPoints(header.stamp);
+        pthread_mutex_unlock(&mutex_color);
       }
     } else if (params.depth_mode == DepthMode::DEPTH_GRAY) {
       auto&& mat = data.img->To(ImageFormat::DEPTH_GRAY_24)->ToMat();
