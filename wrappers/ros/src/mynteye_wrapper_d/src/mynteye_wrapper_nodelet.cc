@@ -580,7 +580,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     if (is_left && sub_result_points) {
       pthread_mutex_lock(&mutex_color);
       points_color = mat;
-      // publishPoints(timestamp);
+      publishPoints(timestamp);
       pthread_mutex_unlock(&mutex_color);
     }
   }
@@ -609,7 +609,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       if (sub_result_points) {
         pthread_mutex_lock(&mutex_color);
         points_depth = mat;
-        publishPoints(header.stamp);
+        // publishPoints(header.stamp);
         pthread_mutex_unlock(&mutex_color);
       }
     } else if (params.depth_mode == DepthMode::DEPTH_GRAY) {
