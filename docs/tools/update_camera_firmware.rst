@@ -6,8 +6,8 @@ Update Main Processing Chip
 .. note::
  This tool does not support beta device upgrade.
 
-Get Firmware
-------------
+Get Main Chip Firmware
+-----------------------
 
 Latest firmware: MYNTEYE_D_016_006.bin
 `Google
@@ -32,7 +32,7 @@ Update Firmware
 
  2, Select data type(256KB).
 
- 3, Select firmware.
+ 3, Select chip firmware.
 
  4, Select ``Keep tables`` (in order to keep calibration parameters).
 

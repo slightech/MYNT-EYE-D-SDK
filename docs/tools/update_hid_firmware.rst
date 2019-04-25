@@ -1,10 +1,10 @@
 .. _update_hid_firmware:
 
-Update Coprocessing chip
+Update Auxiliary Chip
 =========================
 
-Get Firmware
-------------
+Get Auxiliary Chip Firmware
+----------------------------
 
 Latest firmware: mynteye-d-hid-firmware-1.2.bin `Google
 Drive <https://drive.google.com/open?id=1gAbTf6W10a8iwT7L9TceMVgxQCWKnEsx>`__,
