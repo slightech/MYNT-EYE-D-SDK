@@ -282,33 +282,31 @@ void Device::SetInfraredDepthOnly(const OpenParams& params) {
     return;
   }
 
-  /*
   int error_n = 0;
   if (params.dev_mode != DeviceMode::DEVICE_ALL) {
     error_n = 1;
     EtronDI_EnableInterleave(etron_di_, &dev_sel_info_, false);
-  } else if (params.framerate < 15 || params.framerate > 30) {
+  } else if (params.framerate < 30 || params.framerate > 60) {
     error_n = 2;
     EtronDI_EnableInterleave(etron_di_, &dev_sel_info_, false);
   } else if (params.stream_mode == StreamMode::STREAM_2560x720 &&
-      params.framerate > 15) {
+      params.framerate > 30) {
     error_n = 3;
     EtronDI_EnableInterleave(etron_di_, &dev_sel_info_, false);
   }
 
   if (error_n > 0) {
     throw_error("\n\nNote: IR Depth Only mode support frame"
-        " rate only be between 15fps and 30fps.\n"
+        " rate only be between 30fps and 60fps.\n"
         "    When dev_mode != DeviceMode::DEVICE_ALL,"
         " IR Depth Only mode not be supported.\n"
         "    When stream_mode == StreamMode::STREAM_2560x720,"
-        " frame rate only be 15fps in this mode.\n"
-        "    When frame rate less than 15fps or greater than 30fps,"
+        " frame rate only be 30fps in this mode.\n"
+        "    When frame rate less than 30fps or greater than 60fps,"
         " IR Depth Only mode will be not available.\n");
 
     return;
   }
-  */
 
   if (depth_data_type_ == 1 ||
       depth_data_type_ == 2 ||
