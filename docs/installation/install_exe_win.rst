@@ -78,8 +78,3 @@ p.s. The example result of “generate.bat”,
 
   Right click sample and select ``Set as StartUp Project``，then launch with Release x64 mode.
 
-Start using MYNT® EYE Depth SDK with Visual Studio 2017
--------------------------------------------------------
-
-Goto the ``<SDK_ROOT_DIR>\projects\vs2017``, see the
-“README.md”.
