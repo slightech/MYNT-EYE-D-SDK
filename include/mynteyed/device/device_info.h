@@ -60,6 +60,11 @@ struct MYNTEYE_API DeviceInfo {
    * The firmware version.
    */
   std::string fw_version;
+
+  /**
+   * The serial number.
+   */
+  std::string sn;
 };
 
 MYNTEYE_API

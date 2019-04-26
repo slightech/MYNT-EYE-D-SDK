@@ -27,7 +27,8 @@ std::ostream& operator<<(std::ostream& os, const DeviceInfo& info) {
     << ", pid: 0x" << std::hex << info.pid
     << ", vid: 0x" << std::hex << info.vid
     << ", chip_id: 0x" << std::hex << info.chip_id
-    << ", fw_version: " << info.fw_version;
+    << ", fw_version: " << info.fw_version
+    << ", serial_number: " << info.sn;
   os.copyfmt(fmt);  // restore format
   return os;
 }
