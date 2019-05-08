@@ -18,6 +18,12 @@ void Match::OnStreamDataCallback(const ImageType &type, const img_data_t &data) 
 }
 
 Match::img_datas_t Match::GetStreamDatas(const ImageType& type) {
+  if (is_ir_depth_only_) {
+    auto datas = stream_datas_[type];
+    stream_datas_[type].clear();
+    return datas;
+  }
+
   if (order_ == Order::NONE)
     InitOrder(type);
 
@@ -94,6 +100,11 @@ void Match::InitOrder(const ImageType& type) {
       return;
   }
 }
+
+void Match::SetIRDepthStatus(const bool &enable) {
+  is_ir_depth_only_ = enable;
+}
+
 
 
 

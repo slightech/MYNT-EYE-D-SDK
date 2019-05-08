@@ -124,6 +124,8 @@ class Device {
   /** Get serial number */
   std::string GetSerialNumber() const;
 
+  bool IsIRDepthOnly();
+
  protected:
   /** Get stream index for open */
   void GetStreamIndex(const OpenParams& params,

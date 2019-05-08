@@ -60,7 +60,13 @@ if(NOT mynteyed_WITH_OPENCV)
       " Because these samples use OpenCV to show images.")
 endif()
 
-include(${SDK_DIR}/cmake/DetectOpenCV.cmake)
+find_package(OpenCV REQUIRED)
+if(OpenCV_FOUND)
+  message(STATUS "OpenCV is found.")
+  set(WITH_OPENCV TRUE)
+  add_definitions(-DWITH_OPENCV)
+  message(STATUS "Defined WITH_OPENCV.")
+endif()
 
 # targets
 

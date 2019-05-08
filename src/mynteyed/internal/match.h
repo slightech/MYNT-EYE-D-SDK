@@ -30,6 +30,8 @@ class Match {
 
   img_datas_t GetStreamDatas(const ImageType& type);
 
+  void SetIRDepthStatus(const bool &enable);
+
  protected:
   void OnUpdateMatchedDatas(const ImageType& type, const StreamData& data);
   img_datas_t MatchStreamDatas(const ImageType& type);
@@ -43,6 +45,8 @@ class Match {
   std::uint16_t base_frame_id_ = 0;
 
   Order order_;
+
+  bool is_ir_depth_only_;
 };
 
 MYNTEYE_END_NAMESPACE
