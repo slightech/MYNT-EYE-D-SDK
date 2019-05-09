@@ -1167,10 +1167,10 @@ std::string Device::GetSerialNumber() const {
   EtronDI_GetSerialNumber(etron_di_, (PDEVSELINFO)&dev_sel_info_, serial_n, 512, &len);
 
   char tmp[25];
+  memset(tmp, '\0', sizeof(tmp));
   for (int i = 0; i < len / 2; i++) {
     tmp[i] = serial_n[i * 2];
   }
-  tmp[24] = '\0';
   std::string s = tmp;
   return s;
 }
