@@ -20,6 +20,8 @@
 
 MYNTEYE_USE_NAMESPACE
 
+static const int MAX_STREAM_COUNT = 64;
+
 namespace {
 
 void get_stream_size(const StreamMode& stream_mode, int* width, int* height) {
@@ -89,7 +91,7 @@ int get_sensor_type(const SensorType &type) {
 }  // namespace
 
 Device::Device()
-  : etron_di_(nullptr), dev_sel_info_({-1}),
+  : handle_(nullptr), dev_sel_info_({-1}),
     camera_calibrations_({nullptr, nullptr}) {
   DBG_LOGD(__func__);
   Init();
@@ -103,7 +105,7 @@ Device::~Device() {
 }
 
 void Device::Init() {
-  int ret = EtronDI_Init(&etron_di_, false);
+  int ret = EtronDI_Init(&handle_, false);
   UNUSED(ret);
 
   stream_color_info_ptr_ =
@@ -136,13 +138,13 @@ void Device::GetDeviceInfos(std::vector<DeviceInfo>* dev_infos) {
   int count = 0;
   while (true) {
     if (num > 0 && num < 3) {
-      EtronDI_Release(&etron_di_);
-      EtronDI_Init(&etron_di_, false);
+      EtronDI_Release(&handle_);
+      EtronDI_Init(&handle_, false);
       LOGI("\n");
     } else if (num >= 3) {
       break;
     }
-    count = EtronDI_GetDeviceNumber(etron_di_);
+    count = EtronDI_GetDeviceNumber(handle_);
     if (count <= 0) {
       num++;
     } else {
@@ -158,12 +160,12 @@ void Device::GetDeviceInfos(std::vector<DeviceInfo>* dev_infos) {
   for (int i = 0; i < count; i++) {
     dev_sel_info.index = i;
 
-    EtronDI_GetDeviceInfo(etron_di_, &dev_sel_info, p_dev_info+i);
+    EtronDI_GetDeviceInfo(handle_, &dev_sel_info, p_dev_info+i);
 
     char sz_buf[256];
     int actual_length = 0;
     if (ETronDI_OK == EtronDI_GetFwVersion(
-        etron_di_, &dev_sel_info, sz_buf, 256, &actual_length)) {
+        handle_, &dev_sel_info, sz_buf, 256, &actual_length)) {
       DeviceInfo info;
       info.index = i;
       info.name = p_dev_info[i].strDevName;
@@ -198,7 +200,7 @@ void Device::GetStreamInfos(const std::int32_t& dev_index,
   memset(stream_depth_info_ptr_, 0, sizeof(ETRONDI_STREAM_INFO)*64);
 
   DEVSELINFO dev_sel_info{dev_index};
-  EtronDI_GetDeviceResolutionList(etron_di_, &dev_sel_info, 64,
+  EtronDI_GetDeviceResolutionList(handle_, &dev_sel_info, 64,
       stream_color_info_ptr_, 64, stream_depth_info_ptr_);
 
   PETRONDI_STREAM_INFO stream_temp_info_ptr = stream_color_info_ptr_;
@@ -244,9 +246,9 @@ bool Device::SetAutoExposureEnabled(bool enabled) {
 
   bool ok;
   if (enabled) {
-    ok = ETronDI_OK == EtronDI_EnableAE(etron_di_, &dev_sel_info_);
+    ok = ETronDI_OK == EtronDI_EnableAE(handle_, &dev_sel_info_);
   } else {
-    ok = ETronDI_OK == EtronDI_DisableAE(etron_di_, &dev_sel_info_);
+    ok = ETronDI_OK == EtronDI_DisableAE(handle_, &dev_sel_info_);
   }
   if (ok) {
     LOGI("-- Auto-exposure state: %s", enabled ? "enabled" : "disabled");
@@ -264,9 +266,9 @@ bool Device::SetAutoWhiteBalanceEnabled(bool enabled) {
 
   bool ok;
   if (enabled) {
-    ok = ETronDI_OK == EtronDI_EnableAWB(etron_di_, &dev_sel_info_);
+    ok = ETronDI_OK == EtronDI_EnableAWB(handle_, &dev_sel_info_);
   } else {
-    ok = ETronDI_OK == EtronDI_DisableAWB(etron_di_, &dev_sel_info_);
+    ok = ETronDI_OK == EtronDI_DisableAWB(handle_, &dev_sel_info_);
   }
   if (ok) {
     LOGI("-- Auto-white balance state: %s", enabled ? "enabled" : "disabled");
@@ -278,21 +280,21 @@ bool Device::SetAutoWhiteBalanceEnabled(bool enabled) {
 
 void Device::SetInfraredDepthOnly(const OpenParams& params) {
   if (!params.ir_depth_only) {
-    EtronDI_EnableInterleave(etron_di_, &dev_sel_info_, false);
+    EtronDI_EnableInterleave(handle_, &dev_sel_info_, false);
     return;
   }
 
   int error_n = 0;
   if (params.dev_mode != DeviceMode::DEVICE_ALL) {
     error_n = 1;
-    EtronDI_EnableInterleave(etron_di_, &dev_sel_info_, false);
+    EtronDI_EnableInterleave(handle_, &dev_sel_info_, false);
   } else if (params.framerate < 30 || params.framerate > 60) {
     error_n = 2;
-    EtronDI_EnableInterleave(etron_di_, &dev_sel_info_, false);
+    EtronDI_EnableInterleave(handle_, &dev_sel_info_, false);
   } else if (params.stream_mode == StreamMode::STREAM_2560x720 &&
       params.framerate > 30) {
     error_n = 3;
-    EtronDI_EnableInterleave(etron_di_, &dev_sel_info_, false);
+    EtronDI_EnableInterleave(handle_, &dev_sel_info_, false);
   }
 
   if (error_n > 0) {
@@ -318,7 +320,7 @@ void Device::SetInfraredDepthOnly(const OpenParams& params) {
     depth_ir_depth_only_enabled_ = false;
   }
   ir_depth_only_enabled_ = true;
-  EtronDI_EnableInterleave(etron_di_, &dev_sel_info_, true);
+  EtronDI_EnableInterleave(handle_, &dev_sel_info_, true);
   // framerate_ *= 2;
 }
 
@@ -329,15 +331,17 @@ void Device::SetInfraredIntensity(const std::uint16_t &value) {
   }
 
   if (value != 0) {
-    EtronDI_SetIRMode(etron_di_, &dev_sel_info_, 0x03);
-    EtronDI_SetCurrentIRValue(etron_di_, &dev_sel_info_, value);
+    EtronDI_SetIRMode(handle_, &dev_sel_info_, 0x03);
+    EtronDI_SetCurrentIRValue(handle_, &dev_sel_info_, value);
   } else {
-    EtronDI_SetCurrentIRValue(etron_di_, &dev_sel_info_, value);
-    EtronDI_SetIRMode(etron_di_, &dev_sel_info_, 0x00);
+    EtronDI_SetCurrentIRValue(handle_, &dev_sel_info_, value);
+    EtronDI_SetIRMode(handle_, &dev_sel_info_, 0x00);
   }
 }
 
 bool Device::Open(const OpenParams& params) {
+  open_params_ = params;
+
   if (params.stream_mode == StreamMode::STREAM_2560x720 &&
       params.framerate > 30) {
     LOGW("The framerate is too large, please use a smaller value (<=30).");
@@ -398,7 +402,7 @@ bool Device::Open(const OpenParams& params) {
 
   LOGI("-- Framerate: %d", framerate_);
 
-  EtronDI_SetDepthDataType(etron_di_, &dev_sel_info_, depth_data_type_);
+  EtronDI_SetDepthDataType(handle_, &dev_sel_info_, depth_data_type_);
   DBG_LOGI("SetDepthDataType: %d", depth_data_type_);
 
   LOGI("-- Color Stream: %dx%d %s",
@@ -423,7 +427,6 @@ bool Device::Open(const OpenParams& params) {
 
   if (ETronDI_OK == ret) {
     OnInitColorPalette(params.colour_depth_value);
-    open_params_ = params;
     if (depth_device_opened_) {
       // depth device must be opened.
       SyncCameraCalibrations();
@@ -514,7 +517,7 @@ bool Device::SetCameraCalibrationBinFile(const std::string& filename) {
 
   int nActualLength = 0;
 
-  bool ok = (ETronDI_OK == EtronDI_SetLogData(etron_di_, &dev_sel_info_,
+  bool ok = (ETronDI_OK == EtronDI_SetLogData(handle_, &dev_sel_info_,
       (unsigned char*)buffer, length, &nActualLength, 0));
   if (!ok) printf("error when setLogData\n");
   delete[] buffer;
@@ -525,11 +528,11 @@ bool Device::SetCameraCalibrationBinFile(const std::string& filename) {
 
 void Device::Close() {
   if (dev_sel_info_.index != -1) {
-    EtronDI_CloseDevice(etron_di_, &dev_sel_info_);
+    EtronDI_CloseDevice(handle_, &dev_sel_info_);
     dev_sel_info_.index = -1;
   }
   ReleaseBuf();
-  EtronDI_Release(&etron_di_);
+  EtronDI_Release(&handle_);
 }
 
 void Device::GetStreamIndex(const OpenParams& params,
@@ -566,7 +569,7 @@ void Device::GetStreamIndex(const std::int32_t& dev_index,
   memset(stream_depth_info_ptr_, 0, sizeof(ETRONDI_STREAM_INFO)*64);
 
   DEVSELINFO dev_sel_info{dev_index};
-  EtronDI_GetDeviceResolutionList(etron_di_, &dev_sel_info, 64,
+  EtronDI_GetDeviceResolutionList(handle_, &dev_sel_info, 64,
       stream_color_info_ptr_, 64, stream_depth_info_ptr_);
 
   PETRONDI_STREAM_INFO stream_temp_info_ptr = stream_color_info_ptr_;
@@ -615,10 +618,10 @@ bool Device::GetSensorRegister(int id, std::uint16_t address,
     std::uint16_t* value, int flag) {
   if (!ExpectOpened(__func__)) return false;
 #ifdef MYNTEYE_OS_WIN
-  return ETronDI_OK == EtronDI_GetSensorRegister(etron_di_, &dev_sel_info_, id,
+  return ETronDI_OK == EtronDI_GetSensorRegister(handle_, &dev_sel_info_, id,
       address, value, flag, 2);
 #else
-  return ETronDI_OK == EtronDI_GetSensorRegister(etron_di_, &dev_sel_info_, id,
+  return ETronDI_OK == EtronDI_GetSensorRegister(handle_, &dev_sel_info_, id,
       address, value, flag, SENSOR_BOTH);
 #endif
 }
@@ -626,14 +629,14 @@ bool Device::GetSensorRegister(int id, std::uint16_t address,
 bool Device::GetHWRegister(std::uint16_t address, std::uint16_t* value,
     int flag) {
   if (!ExpectOpened(__func__)) return false;
-  return ETronDI_OK == EtronDI_GetHWRegister(etron_di_, &dev_sel_info_,
+  return ETronDI_OK == EtronDI_GetHWRegister(handle_, &dev_sel_info_,
       address, value, flag);
 }
 
 bool Device::GetFWRegister(std::uint16_t address, std::uint16_t* value,
     int flag) {
   if (!ExpectOpened(__func__)) return false;
-  return ETronDI_OK == EtronDI_GetFWRegister(etron_di_, &dev_sel_info_, address,
+  return ETronDI_OK == EtronDI_GetFWRegister(handle_, &dev_sel_info_, address,
       value, flag);
 }
 
@@ -641,10 +644,10 @@ bool Device::SetSensorRegister(int id, std::uint16_t address,
     std::uint16_t value, int flag) {
   if (!ExpectOpened(__func__)) return false;
 #ifdef MYNTEYE_OS_WIN
-  return ETronDI_OK == EtronDI_SetSensorRegister(etron_di_, &dev_sel_info_, id,
+  return ETronDI_OK == EtronDI_SetSensorRegister(handle_, &dev_sel_info_, id,
       address, value, flag, 2);
 #else
-  return ETronDI_OK == EtronDI_SetSensorRegister(etron_di_, &dev_sel_info_, id,
+  return ETronDI_OK == EtronDI_SetSensorRegister(handle_, &dev_sel_info_, id,
       address, value, flag, SENSOR_BOTH);
 #endif
 }
@@ -652,14 +655,14 @@ bool Device::SetSensorRegister(int id, std::uint16_t address,
 bool Device::SetHWRegister(std::uint16_t address, std::uint16_t value,
     int flag) {
   if (!ExpectOpened(__func__)) return false;
-  return ETronDI_OK == EtronDI_SetHWRegister(etron_di_, &dev_sel_info_, address,
+  return ETronDI_OK == EtronDI_SetHWRegister(handle_, &dev_sel_info_, address,
       value, flag);
 }
 
 bool Device::SetFWRegister(std::uint16_t address, std::uint16_t value,
     int flag) {
   if (!ExpectOpened(__func__)) return false;
-  return ETronDI_OK == EtronDI_SetFWRegister(etron_di_, &dev_sel_info_, address,
+  return ETronDI_OK == EtronDI_SetFWRegister(handle_, &dev_sel_info_, address,
       value, flag);
 }
 
@@ -675,7 +678,7 @@ bool Device::GetCameraCalibrationFile(int index, const std::string& filename) {
   eSPCtrl_RectLogData eSPRectLogData;
   // EtronDI_GetRectifyLogData in puma
   // EtronDI_GetRectifyMatLogData
-  nRet = EtronDI_GetRectifyMatLogData(etron_di_,
+  nRet = EtronDI_GetRectifyMatLogData(handle_,
     &dev_sel_info_, &eSPRectLogData, index);
   // printf("nRet = %d", nRet);
   if (nRet != ETronDI_OK) {
@@ -793,7 +796,7 @@ void Device::SyncCameraCalibrations() {
   camera_calibrations_.clear();
   for (int index = 0; index < 2; index++) {
     eSPCtrl_RectLogData eSPRectLogData;
-    int ret = EtronDI_GetRectifyMatLogData(etron_di_, &dev_sel_info_,
+    int ret = EtronDI_GetRectifyMatLogData(handle_, &dev_sel_info_,
         &eSPRectLogData, index);
     if (ret != ETronDI_OK) {
       return;
@@ -1063,14 +1066,14 @@ bool Device::SetSensorType(const SensorType &type) {
 
 #ifdef MYNTEYE_OS_WIN
   if (EtronDI_SetSensorTypeName(
-      etron_di_, (SENSOR_TYPE_NAME)sensor_type) == ETronDI_OK) {
+      handle_, (SENSOR_TYPE_NAME)sensor_type) == ETronDI_OK) {
     return true;
   } else {
     return false;
   }
 #else
   if (EtronDI_SetSensorTypeName(
-      etron_di_, &dev_sel_info_,
+      handle_, &dev_sel_info_,
       (SENSOR_TYPE_NAME)sensor_type) == ETronDI_OK) {
     return true;
   } else {
@@ -1089,7 +1092,7 @@ bool Device::SetExposureTime(const float &value) {
 
   int sensor_mode = get_sensor_mode(SensorMode::ALL);
   if (EtronDI_SetExposureTime(
-        etron_di_, &dev_sel_info_,
+        handle_, &dev_sel_info_,
         sensor_mode, value) == ETronDI_OK) {
     return true;
   } else {
@@ -1107,7 +1110,7 @@ bool Device::GetExposureTime(float &value) {
 
   int sensor_mode = get_sensor_mode(SensorMode::ALL);
   if (EtronDI_GetExposureTime(
-        etron_di_, &dev_sel_info_,
+        handle_, &dev_sel_info_,
         sensor_mode, &value) == ETronDI_OK) {
     return true;
   } else {
@@ -1125,7 +1128,7 @@ bool Device::SetGlobalGain(const float &value) {
 
   int sensor_mode = get_sensor_mode(SensorMode::ALL);
   if (EtronDI_SetGlobalGain(
-        etron_di_, &dev_sel_info_,
+        handle_, &dev_sel_info_,
         sensor_mode, value) == ETronDI_OK) {
     return true;
   } else {
@@ -1143,7 +1146,7 @@ bool Device::GetGlobalGain(float &value) {
 
   int sensor_mode = get_sensor_mode(SensorMode::ALL);
   if (EtronDI_GetGlobalGain(
-        etron_di_, &dev_sel_info_,
+        handle_, &dev_sel_info_,
         sensor_mode, &value) == ETronDI_OK) {
     return true;
   } else {
@@ -1158,13 +1161,13 @@ void Device::SetSerialNumber(const std::string &sn) {
     serial_n[i * 2] = static_cast<unsigned char>(sn[i]);
     serial_n[i * 2 + 1] = 0x00;
   }
-  EtronDI_SetSerialNumber(etron_di_, &dev_sel_info_, serial_n, 48);
+  EtronDI_SetSerialNumber(handle_, &dev_sel_info_, serial_n, 48);
 }
 
 std::string Device::GetSerialNumber() const {
   unsigned char serial_n[512];
   int len;
-  EtronDI_GetSerialNumber(etron_di_, (PDEVSELINFO)&dev_sel_info_, serial_n, 512, &len);
+  EtronDI_GetSerialNumber(handle_, (PDEVSELINFO)&dev_sel_info_, serial_n, 512, &len);
 
   char tmp[25];
   for (int i = 0; i < len / 2; i++) {
@@ -1177,4 +1180,38 @@ std::string Device::GetSerialNumber() const {
 
 bool Device::IsIRDepthOnly() {
   return ir_depth_only_enabled_;
+}
+
+void Device::ReleaseDevice() {
+  EtronDI_CloseDevice(handle_, &dev_sel_info_);
+  EtronDI_Release(&handle_);
+}
+
+bool Device::Restart() {
+  ReleaseDevice();
+  EtronDI_Init(&handle_, false);
+  if (!handle_) { return false; }
+
+  UpdateStreamInfos();
+  EtronDI_SetDepthDataType(handle_, &dev_sel_info_, depth_data_type_);
+
+  int ret = OpenDevice(open_params_.dev_mode);
+  if (ret != ETronDI_OK) {
+    std::cout << "Reopen device failed." << std::endl;
+    return false;
+  }
+
+  return true;
+}
+
+bool Device::UpdateStreamInfos() {
+  memset(stream_color_info_ptr_, 0, sizeof(ETRONDI_STREAM_INFO) * MAX_STREAM_COUNT);
+  memset(stream_depth_info_ptr_, 0, sizeof(ETRONDI_STREAM_INFO) * MAX_STREAM_COUNT);
+
+  DEVSELINFO dev_sel_info{stream_info_dev_index_};
+  int ret = EtronDI_GetDeviceResolutionList(handle_, &dev_sel_info, MAX_STREAM_COUNT,
+      stream_color_info_ptr_, MAX_STREAM_COUNT, stream_depth_info_ptr_);
+  if (ret != ETronDI_OK) { return false; }
+
+  return true;
 }

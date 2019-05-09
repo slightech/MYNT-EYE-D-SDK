@@ -33,7 +33,7 @@ void Device::OnInit() {
   dtc_ = DEPTH_IMG_NON_TRANSFER;
 }
 
-// int ret = EtronDI_Get2Image(etron_di_, &dev_sel_info_,
+// int ret = EtronDI_Get2Image(handle_, &dev_sel_info_,
 //     (BYTE*)color_img_buf_, (BYTE*)depth_img_buf_,
 //     &color_image_size_, &depth_image_size_,
 //     &color_serial_number_, &depth_serial_number_, depth_data_type_);
@@ -53,7 +53,7 @@ Image::pointer Device::GetImageColor() {
     color_image_buf_->ResetBuffer();
   }
 
-  int ret = EtronDI_GetColorImage(etron_di_, &dev_sel_info_,
+  int ret = EtronDI_GetColorImage(handle_, &dev_sel_info_,
       color_image_buf_->data(), &color_image_size_, &color_serial_number_, 0);
 
   if (ETronDI_OK != ret) {
@@ -117,7 +117,7 @@ Image::pointer Device::GetImageDepth() {
     }
   }
 
-  int ret = EtronDI_GetDepthImage(etron_di_, &dev_sel_info_,
+  int ret = EtronDI_GetDepthImage(handle_, &dev_sel_info_,
       depth_raw ? depth_image_buf_->data() : depth_buf_,
       &depth_image_size_, &depth_serial_number_, depth_data_type_);
 
@@ -185,7 +185,7 @@ int Device::OpenDevice(const DeviceMode& dev_mode) {
       color_device_opened_ = true;
       depth_device_opened_ = false;
 
-      return EtronDI_OpenDevice2(etron_di_, &dev_sel_info_,
+      return EtronDI_OpenDevice2(handle_, &dev_sel_info_,
           stream_color_info_ptr_[color_res_index_].nWidth,
           stream_color_info_ptr_[color_res_index_].nHeight,
           stream_color_info_ptr_[color_res_index_].bFormatMJPG,
@@ -195,7 +195,7 @@ int Device::OpenDevice(const DeviceMode& dev_mode) {
       color_device_opened_ = false;
       depth_device_opened_ = true;
 
-      return EtronDI_OpenDevice2(etron_di_, &dev_sel_info_,
+      return EtronDI_OpenDevice2(handle_, &dev_sel_info_,
           0, 0, false, stream_depth_info_ptr_[depth_res_index_].nWidth,
           stream_depth_info_ptr_[depth_res_index_].nHeight,
           DEPTH_IMG_NON_TRANSFER, false, NULL, &framerate_);
@@ -204,7 +204,7 @@ int Device::OpenDevice(const DeviceMode& dev_mode) {
       color_device_opened_ = true;
       depth_device_opened_ = true;
 
-      return EtronDI_OpenDevice2(etron_di_, &dev_sel_info_,
+      return EtronDI_OpenDevice2(handle_, &dev_sel_info_,
           stream_color_info_ptr_[color_res_index_].nWidth,
           stream_color_info_ptr_[color_res_index_].nHeight,
           stream_color_info_ptr_[color_res_index_].bFormatMJPG,

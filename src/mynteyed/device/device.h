@@ -58,6 +58,9 @@ class Device {
       std::vector<StreamInfo>* color_infos,
       std::vector<StreamInfo>* depth_infos);
 
+  /** Update all stream infos */
+  bool UpdateStreamInfos();
+
   /** Set auto-exposure enabled or not */
   bool SetAutoExposureEnabled(bool enabled);
   /** Set auto-white-balance enabled or not */
@@ -126,6 +129,8 @@ class Device {
 
   bool IsIRDepthOnly();
 
+  bool Restart();
+
  protected:
   /** Get stream index for open */
   void GetStreamIndex(const OpenParams& params,
@@ -167,6 +172,8 @@ class Device {
 
   void ReleaseBuf();
 
+  void ReleaseDevice();
+
   bool IsUSB2();
 
   void OnInitColorPalette(const float &z14_Far);
@@ -182,7 +189,7 @@ class Device {
 
   int OpenDevice(const DeviceMode& dev_mode);  // cross
 
-  void* etron_di_;
+  void* handle_;
 
   DEVSELINFO dev_sel_info_;
   int depth_data_type_;

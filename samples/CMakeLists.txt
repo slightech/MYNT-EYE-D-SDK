@@ -167,6 +167,15 @@ make_executable(get_ultrasonic
   DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
 )
 
+make_executable(auto_restart
+  SRCS
+    src/auto_restart.cc
+    src/util/cam_utils.cc
+    src/util/cv_painter.cc
+  LINK_LIBS mynteye_depth ${OpenCV_LIBS}
+  DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
+)
+
 find_package(PCL)
 if(PCL_FOUND)
   #list(REMOVE_ITEM PCL_LIBRARIES "vtkproj4")

@@ -160,7 +160,18 @@ Streams::img_datas_t Streams::GetStreamDatas(const ImageType& type) {
     return {};
   }
 
-  return match_->GetStreamDatas(type);
+  static int count = 0;
+  auto datas = match_->GetStreamDatas(type);
+  if (datas.empty()) {
+    if (++count > 100) {
+      device_->Restart();
+      count = 0;
+    }
+  } else {
+    count = 0;
+  }
+  // return match_->GetStreamDatas(type);
+  return datas;
 }
 
 void Streams::SetStreamCallback(const ImageType& type,
