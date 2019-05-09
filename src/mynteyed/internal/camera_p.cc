@@ -33,6 +33,8 @@
 #define LOCATION_ASYNC_MAX_SIZE 800  // 400hz, 2s
 #define DISTANCE_ASYNC_MAX_SIZE 800  // 400hz, 2s
 
+static const int MAX_RELINK_TIMES = 5;
+
 MYNTEYE_USE_NAMESPACE
 
 CameraPrivate::CameraPrivate() : device_(std::make_shared<Device>()) {
@@ -46,6 +48,9 @@ void CameraPrivate::Init() {
   location_ = std::make_shared<Location>();
   distance_ = std::make_shared<Distance>();
   streams_ = std::make_shared<Streams>(device_);
+
+  relink_times_ = 0;
+  get_failure_times_ = 0;
 
   if (channels_->IsAvaliable()) {
     ReadDeviceFlash();
@@ -306,12 +311,42 @@ bool CameraPrivate::HasStreamDataEnabled() const {
   return streams_->HasStreamDataEnabled();
 }
 
+/*
 StreamData CameraPrivate::GetStreamData(const ImageType& type) {
-  return streams_->GetStreamData(type);
+  auto data = streams_->GetStreamData(type);
+  if (!data.img) {
+    if (get_failure_times_++ > 100) {
+      Relink();
+      get_failure_times_ = 0;
+    }
+  } else {
+    relink_times_ = 0;
+    get_failure_times_ = 0;
+  }
+  // return streams_->GetStreamData(type);
+  return data;
+}
+*/
+
+StreamData CameraPrivate::GetStreamData(const ImageType& type) {
+  auto&& datas = GetStreamDatas(type);
+  if (datas.empty()) return {};
+  return std::move(datas.back());
 }
 
 std::vector<StreamData> CameraPrivate::GetStreamDatas(const ImageType& type) {
-  return streams_->GetStreamDatas(type);
+  auto datas = streams_->GetStreamDatas(type);
+  if (datas.empty()) {
+    if (get_failure_times_++ > 200) {
+      Relink();
+      get_failure_times_ = 0;
+    }
+  } else {
+    relink_times_ = 0;
+    get_failure_times_ = 0;
+  }
+  return datas;
+  // return streams_->GetStreamDatas(type);
 }
 
 bool CameraPrivate::IsExSensorDatasSupported() const {
@@ -603,4 +638,16 @@ void CameraPrivate::SetSerialNumber(const std::string &sn) {
 
 std::string CameraPrivate::GetSerialNumber() const {
   return device_->GetSerialNumber();
+}
+
+void CameraPrivate::Relink() {
+  if (relink_times_++ > MAX_RELINK_TIMES)
+    throw_error("The camera device is disconnected.");
+
+  StopDataTracking();
+  channels_->CloseHid();
+  if (channels_->OpenHid()) {
+    NotifyDataTrackStateChanged();
+  }
+  device_->Restart();
 }

@@ -180,6 +180,8 @@ Image::pointer Device::GetImageDepth() {
 }
 
 int Device::OpenDevice(const DeviceMode& dev_mode) {
+  int frame_rate = framerate_;
+
   switch (dev_mode) {
     case DeviceMode::DEVICE_COLOR:
       color_device_opened_ = true;
@@ -189,7 +191,7 @@ int Device::OpenDevice(const DeviceMode& dev_mode) {
           stream_color_info_ptr_[color_res_index_].nWidth,
           stream_color_info_ptr_[color_res_index_].nHeight,
           stream_color_info_ptr_[color_res_index_].bFormatMJPG,
-          0, 0, dtc_, false, NULL, &framerate_);
+          0, 0, dtc_, false, NULL, &frame_rate);
       break;
     case DeviceMode::DEVICE_DEPTH:
       color_device_opened_ = false;
@@ -198,7 +200,7 @@ int Device::OpenDevice(const DeviceMode& dev_mode) {
       return EtronDI_OpenDevice2(handle_, &dev_sel_info_,
           0, 0, false, stream_depth_info_ptr_[depth_res_index_].nWidth,
           stream_depth_info_ptr_[depth_res_index_].nHeight,
-          DEPTH_IMG_NON_TRANSFER, false, NULL, &framerate_);
+          DEPTH_IMG_NON_TRANSFER, false, NULL, &frame_rate);
       break;
     case DeviceMode::DEVICE_ALL:
       color_device_opened_ = true;
@@ -210,7 +212,7 @@ int Device::OpenDevice(const DeviceMode& dev_mode) {
           stream_color_info_ptr_[color_res_index_].bFormatMJPG,
           stream_depth_info_ptr_[depth_res_index_].nWidth,
           stream_depth_info_ptr_[depth_res_index_].nHeight,
-          DEPTH_IMG_NON_TRANSFER, false, NULL, &framerate_);
+          DEPTH_IMG_NON_TRANSFER, false, NULL, &frame_rate);
       break;
     default:
       throw_error("ERROR:: DeviceMode is unknown.");

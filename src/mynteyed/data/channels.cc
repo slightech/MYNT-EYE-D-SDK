@@ -133,8 +133,7 @@ bool Channels::StartHidTracking() {
   is_hid_tracking_ = true;
   hid_track_thread_ = std::thread([this]() {
     while (is_hid_tracking_) {
-      if (!DoHidTrack())
-        is_hid_tracking_ = false;
+      DoHidTrack();
     }
   });
 
@@ -315,7 +314,7 @@ bool Channels::DoHidDataExtract(imu_packets_t &imu, img_packets_t &img,
 
   int size = hid_->receive(0, data, PACKET_SIZE * 2, 220);
   if (size < 0) {
-    LOGE("%s, %d:: Error Reading, device went offline !", __FILE__, __LINE__);
+    // LOGE("%s, %d:: Error Reading, device went offline !", __FILE__, __LINE__);
     return false;
   }
 

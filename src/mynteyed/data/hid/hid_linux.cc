@@ -107,7 +107,7 @@ int hid_device::open(int max, int usage_page, int usage) {
   usb_find_busses();
   usb_find_devices();
 
-  int count = 0;
+  int count = -1;
   for (usb_bus_t *bus = usb_get_busses(); bus; bus = bus->next) {
     for (usb_device_t *dev = bus->devices; dev; dev = dev->next) {
       if (VID > 0 && dev->descriptor.idVendor != VID) {
@@ -233,6 +233,9 @@ void hid_device::free_all_hid(void) {
 }
 
 void hid_device::hid_close(hid_t *hid) {
+  if (hid->usb == nullptr)
+    return;
+
   hid_t *p;
   int others = 0;
 

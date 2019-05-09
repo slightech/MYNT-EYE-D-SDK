@@ -110,14 +110,15 @@ class MYNTEYE_API Channels {
 
   bool HidFirmwareUpdate(const char *filepath);
 
+  bool OpenHid();
+  void CloseHid();
+
  protected:
   void Detect();
   bool Open();
   void Close();
 
   void DetectHid();
-  bool OpenHid();
-  void CloseHid();
 
  private:
   bool DoHidTrack();

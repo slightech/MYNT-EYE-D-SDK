@@ -249,6 +249,8 @@ class MYNTEYE_API CameraPrivate {
     return channels_;
   }
 
+  void Relink();
+
  private:
   void Init();
 
@@ -276,6 +278,9 @@ class MYNTEYE_API CameraPrivate {
   std::shared_ptr<device::Descriptors> descriptors_;
   std::shared_ptr<MotionIntrinsics> motion_intrinsics_;
   std::shared_ptr<MotionExtrinsics> motion_extrinsics_;
+
+  int relink_times_;
+  int get_failure_times_;
 };
 
 MYNTEYE_END_NAMESPACE
