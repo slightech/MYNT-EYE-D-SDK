@@ -114,17 +114,7 @@ RESTART:
               CVPainter::BOTTOM_RIGHT);
           cv::imshow("left color", left);
           count = 0;
-        } else {
-          if (++count > 100) {
-            std::cout << "image is null..................." << std::endl;
-            // std::cout << ".................................." << std::endl;
-            count = 0;
-            // goto RESTART;
-            // break;
-          }
         }
-      } else {
-        std::cout << "Please enable ........................." << std::endl;
       }
 
       if (is_depth_ok) {
