@@ -143,12 +143,6 @@ void Streams::EnableStreamDatas(std::size_t max_size) {
   }
 }
 
-Streams::img_data_t Streams::GetStreamData(const ImageType& type) {
-  auto&& datas = GetStreamDatas(type);
-  if (datas.empty()) return {};
-  return std::move(datas.back());
-}
-
 Streams::img_datas_t Streams::GetStreamDatas(const ImageType& type) {
   device_->CheckOpened(__func__);
 
@@ -160,20 +154,7 @@ Streams::img_datas_t Streams::GetStreamDatas(const ImageType& type) {
     return {};
   }
 
-  // static int count = 0;
-  auto datas = match_->GetStreamDatas(type);
-  /*
-  if (datas.empty()) {
-    if (++count > 100) {
-      device_->Restart();
-      count = 0;
-    }
-  } else {
-    count = 0;
-  }
-  */
-  // return match_->GetStreamDatas(type);
-  return datas;
+  return match_->GetStreamDatas(type);
 }
 
 void Streams::SetStreamCallback(const ImageType& type,

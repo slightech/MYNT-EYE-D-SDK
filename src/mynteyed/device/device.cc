@@ -119,6 +119,7 @@ void Device::Init() {
 
   color_device_opened_ = false;
   depth_device_opened_ = false;
+  is_device_opened_ = false;
 
   ir_depth_only_enabled_ = false;
   color_ir_depth_only_enabled_ = false;
@@ -251,6 +252,7 @@ bool Device::SetAutoExposureEnabled(bool enabled) {
     ok = ETronDI_OK == EtronDI_DisableAE(handle_, &dev_sel_info_);
   }
   if (ok) {
+    params_member_[ControlParams::AUTO_EXPOSURE].enabled = enabled;
     LOGI("-- Auto-exposure state: %s", enabled ? "enabled" : "disabled");
   } else {
     LOGW("-- %s auto-exposure failed", enabled ? "Enable" : "Disable");
@@ -271,6 +273,7 @@ bool Device::SetAutoWhiteBalanceEnabled(bool enabled) {
     ok = ETronDI_OK == EtronDI_DisableAWB(handle_, &dev_sel_info_);
   }
   if (ok) {
+    params_member_[ControlParams::AUTO_WHITE_BALANCE].enabled = enabled;
     LOGI("-- Auto-white balance state: %s", enabled ? "enabled" : "disabled");
   } else {
     LOGW("-- %s auto-white balance failed", enabled ? "Enable" : "Disable");
@@ -321,6 +324,7 @@ void Device::SetInfraredDepthOnly(const OpenParams& params) {
   }
   ir_depth_only_enabled_ = true;
   EtronDI_EnableInterleave(handle_, &dev_sel_info_, true);
+  params_member_[ControlParams::IR_DEPTH_ONLY].enabled = ir_depth_only_enabled_;
   // framerate_ *= 2;
 }
 
@@ -337,6 +341,7 @@ void Device::SetInfraredIntensity(const std::uint16_t &value) {
     EtronDI_SetCurrentIRValue(handle_, &dev_sel_info_, value);
     EtronDI_SetIRMode(handle_, &dev_sel_info_, 0x00);
   }
+  params_member_[ControlParams::IR_INTENSITY].value = value;
 }
 
 bool Device::Open(const OpenParams& params) {
@@ -389,10 +394,10 @@ bool Device::Open(const OpenParams& params) {
 #endif
   depth_mode_ = params.depth_mode;
 
-  if (params.dev_index != stream_info_dev_index_) {
-    std::vector<StreamInfo> color_infos;
-    std::vector<StreamInfo> depth_infos;
-    GetStreamInfos(params.dev_index, &color_infos, &depth_infos);
+  stream_info_dev_index_ = params.dev_index;
+  if (UpdateStreamInfos()) {
+    LOGE("%s, %d:: Get Stream information failed.", __FILE__, __LINE__);
+    return false;
   }
 
   GetStreamIndex(params, &color_res_index_, &depth_res_index_);
@@ -431,15 +436,17 @@ bool Device::Open(const OpenParams& params) {
       // depth device must be opened.
       SyncCameraCalibrations();
     }
+    is_device_opened_ = true;
     return true;
   } else {
+    is_device_opened_ = false;
     dev_sel_info_.index = -1;  // reset flag
     return false;
   }
 }
 
 bool Device::IsOpened() const {
-  return dev_sel_info_.index != -1;
+  return is_device_opened_;
 }
 
 void Device::CheckOpened(const std::string& event) const {
@@ -529,6 +536,7 @@ bool Device::SetCameraCalibrationBinFile(const std::string& filename) {
 void Device::Close() {
   if (dev_sel_info_.index != -1) {
     EtronDI_CloseDevice(handle_, &dev_sel_info_);
+    is_device_opened_ = false;
     dev_sel_info_.index = -1;
   }
   ReleaseBuf();
@@ -565,12 +573,12 @@ void Device::GetStreamIndex(const std::int32_t& dev_index,
   int width = 0, height = 0;
   get_stream_size(stream_mode, &width, &height);
 
-  memset(stream_color_info_ptr_, 0, sizeof(ETRONDI_STREAM_INFO)*64);
-  memset(stream_depth_info_ptr_, 0, sizeof(ETRONDI_STREAM_INFO)*64);
+  memset(stream_color_info_ptr_, 0, sizeof(ETRONDI_STREAM_INFO) * MAX_STREAM_COUNT);
+  memset(stream_depth_info_ptr_, 0, sizeof(ETRONDI_STREAM_INFO) * MAX_STREAM_COUNT);
 
   DEVSELINFO dev_sel_info{dev_index};
-  EtronDI_GetDeviceResolutionList(handle_, &dev_sel_info, 64,
-      stream_color_info_ptr_, 64, stream_depth_info_ptr_);
+  EtronDI_GetDeviceResolutionList(handle_, &dev_sel_info, MAX_STREAM_COUNT,
+      stream_color_info_ptr_, MAX_STREAM_COUNT, stream_depth_info_ptr_);
 
   PETRONDI_STREAM_INFO stream_temp_info_ptr = stream_color_info_ptr_;
   int i = 0;
@@ -655,6 +663,10 @@ bool Device::SetSensorRegister(int id, std::uint16_t address,
 bool Device::SetHWRegister(std::uint16_t address, std::uint16_t value,
     int flag) {
   if (!ExpectOpened(__func__)) return false;
+
+  params_member_[ControlParams::HW_REGISTER].address = address;
+  params_member_[ControlParams::HW_REGISTER].value = value;
+  params_member_[ControlParams::HW_REGISTER].flag = flag;
   return ETronDI_OK == EtronDI_SetHWRegister(handle_, &dev_sel_info_, address,
       value, flag);
 }
@@ -662,6 +674,10 @@ bool Device::SetHWRegister(std::uint16_t address, std::uint16_t value,
 bool Device::SetFWRegister(std::uint16_t address, std::uint16_t value,
     int flag) {
   if (!ExpectOpened(__func__)) return false;
+
+  params_member_[ControlParams::FW_REGISTER].address = address;
+  params_member_[ControlParams::FW_REGISTER].value = value;
+  params_member_[ControlParams::FW_REGISTER].flag = flag;
   return ETronDI_OK == EtronDI_SetFWRegister(handle_, &dev_sel_info_, address,
       value, flag);
 }
@@ -895,6 +911,7 @@ void Device::CompatibleUSB2(const OpenParams& params) {
       depth_res_index_ =
           GetStreamIndex(stream_depth_info_ptr_, 640, 720, false);
       framerate_ = 5;
+      open_params_.framerate = 5;
     } else if (params.stream_mode == StreamMode::STREAM_1280x480) {
       // color 1280x480 yuyv, depth 320x480 yuyv, 8 bits only 15 fail
       goto usb2_error;
@@ -906,6 +923,7 @@ void Device::CompatibleUSB2(const OpenParams& params) {
       depth_res_index_ =
           GetStreamIndex(stream_depth_info_ptr_, 320, 480, false);
       framerate_ = 15;
+      open_params_.framerate = 15;
     } else {
       goto usb2_error;
     }
@@ -919,24 +937,29 @@ void Device::CompatibleUSB2(const OpenParams& params) {
       color_res_index_ =
           GetStreamIndex(stream_color_info_ptr_, 2560, 720, false);
       framerate_ = 5;
+      open_params_.framerate = 5;
     } else if (params.stream_mode == StreamMode::STREAM_1280x720) {
       // color 1280x720 yuyv, only 10 ok
 
       color_res_index_ =
           GetStreamIndex(stream_color_info_ptr_, 1280, 720, false);
       framerate_ = 10;
+      open_params_.framerate = 10;
     } else if (params.stream_mode == StreamMode::STREAM_1280x480) {
       // color 1280x480 yuyv, only 15 ok
 
       color_res_index_ =
           GetStreamIndex(stream_color_info_ptr_, 1280, 480, false);
       framerate_ = 15;
+      open_params_.framerate = 15;
+    } else if (params.stream_mode == StreamMode::STREAM_1280x480) {
     } else if (params.stream_mode == StreamMode::STREAM_640x480) {
       // color 640x480 yuyv, only 15 ok
 
       color_res_index_ =
           GetStreamIndex(stream_color_info_ptr_, 640, 480, false);
       framerate_ = 15;
+      open_params_.framerate = 15;
     } else {
       goto usb2_error;
     }
@@ -952,12 +975,21 @@ void Device::CompatibleUSB2(const OpenParams& params) {
       depth_res_index_ =
           GetStreamIndex(stream_depth_info_ptr_, 640, 720, false);
       framerate_ = 5;
+      open_params_.framerate = 5;
     } else if (params.stream_mode == StreamMode::STREAM_1280x480 ||
                params.stream_mode == StreamMode::STREAM_640x480) {
       // depth 320x480 yuyv, 8 bits only 15 ok
       depth_res_index_ =
           GetStreamIndex(stream_depth_info_ptr_, 320, 480, false);
       framerate_ = 15;
+      open_params_.framerate = 15;
+    } else if (params.stream_mode == StreamMode::STREAM_1280x480 ||
+      params.stream_mode == StreamMode::STREAM_640x480) {
+      // depth 320x480 yuyv, 8 bits only 15 ok
+      depth_res_index_ =
+        GetStreamIndex(stream_depth_info_ptr_, 320, 480, false);
+      framerate_ = 15;
+      open_params_.framerate = 15;
     } else {
       goto usb2_error;
     }
@@ -1003,14 +1035,17 @@ void Device::CompatibleMJPG(const OpenParams& params) {
       if (params.stream_mode == StreamMode::STREAM_2560x720) {
         // color 2560x720 mjpg only 5
         framerate_ = 5;
+        open_params_.framerate = 5;
         break;
       } else if (params.stream_mode == StreamMode::STREAM_1280x480) {
         // color 1280x480 mjpg only 15
         framerate_ = 15;
+        open_params_.framerate = 15;
         break;
       } else if (params.stream_mode == StreamMode::STREAM_1280x720) {
         // color 1280x720 mjpg only 5
         framerate_ = 5;
+        open_params_.framerate = 5;
         break;
       }
       break;
@@ -1094,6 +1129,7 @@ bool Device::SetExposureTime(const float &value) {
   if (EtronDI_SetExposureTime(
         handle_, &dev_sel_info_,
         sensor_mode, value) == ETronDI_OK) {
+    params_member_[ControlParams::EXPOSURE_TIME].fvalue = value;
     return true;
   } else {
     return false;
@@ -1130,6 +1166,7 @@ bool Device::SetGlobalGain(const float &value) {
   if (EtronDI_SetGlobalGain(
         handle_, &dev_sel_info_,
         sensor_mode, value) == ETronDI_OK) {
+    params_member_[ControlParams::GLOBAL_GAIN].fvalue = value;
     return true;
   } else {
     return false;
@@ -1192,12 +1229,15 @@ bool Device::Restart() {
   EtronDI_Init(&handle_, false);
   if (!handle_) { return false; }
 
+  SetAutoExposureEnabled(open_params_.state_ae);
+  SetAutoWhiteBalanceEnabled(open_params_.state_awb);
+
   UpdateStreamInfos();
   EtronDI_SetDepthDataType(handle_, &dev_sel_info_, depth_data_type_);
 
   int ret = OpenDevice(open_params_.dev_mode);
   if (ret != ETronDI_OK) {
-    std::cout << "Reopen device failed." << std::endl;
+    LOGE("%s, %d:: Reopen device failed.", __FILE__, __LINE__);
     return false;
   }
 

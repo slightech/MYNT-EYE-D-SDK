@@ -45,6 +45,14 @@ MYNTEYE_BEGIN_NAMESPACE
 
 class Device {
  public:
+  typedef struct SetParams {
+    bool enabled;
+    std::uint16_t address;
+    std::uint16_t value;
+    float fvalue;
+    int flag;
+  } set_params_t;
+
   using image_size_t = unsigned long int;  // NOLINT
 
   Device();
@@ -249,6 +257,9 @@ class Device {
   bool ir_depth_only_enabled_;
   bool color_ir_depth_only_enabled_;
   bool depth_ir_depth_only_enabled_;
+
+  std::map<ControlParams, set_params_t> params_member_;
+  bool is_device_opened_;
 };
 
 MYNTEYE_END_NAMESPACE

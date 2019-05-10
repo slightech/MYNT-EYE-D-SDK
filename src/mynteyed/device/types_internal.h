@@ -82,6 +82,17 @@ struct CameraCalibration {
   };
 };
 
+enum class ControlParams : std::int32_t {
+  AUTO_EXPOSURE = 0,
+  AUTO_WHITE_BALANCE,
+  IR_DEPTH_ONLY,
+  IR_INTENSITY,
+  GLOBAL_GAIN,
+  EXPOSURE_TIME,
+  HW_REGISTER,
+  FW_REGISTER,
+};
+
 MYNTEYE_END_NAMESPACE
 
 #endif  // MYNTEYE_DEVICE_TYPES_INTERNAL_H_

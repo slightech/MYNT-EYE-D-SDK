@@ -34,6 +34,7 @@
 #define DISTANCE_ASYNC_MAX_SIZE 800  // 400hz, 2s
 
 static const int MAX_RELINK_TIMES = 5;
+static const int MAX_GET_FAILURE_TIMES = 200;
 
 MYNTEYE_USE_NAMESPACE
 
@@ -311,23 +312,6 @@ bool CameraPrivate::HasStreamDataEnabled() const {
   return streams_->HasStreamDataEnabled();
 }
 
-/*
-StreamData CameraPrivate::GetStreamData(const ImageType& type) {
-  auto data = streams_->GetStreamData(type);
-  if (!data.img) {
-    if (get_failure_times_++ > 100) {
-      Relink();
-      get_failure_times_ = 0;
-    }
-  } else {
-    relink_times_ = 0;
-    get_failure_times_ = 0;
-  }
-  // return streams_->GetStreamData(type);
-  return data;
-}
-*/
-
 StreamData CameraPrivate::GetStreamData(const ImageType& type) {
   auto&& datas = GetStreamDatas(type);
   if (datas.empty()) return {};
@@ -337,7 +321,7 @@ StreamData CameraPrivate::GetStreamData(const ImageType& type) {
 std::vector<StreamData> CameraPrivate::GetStreamDatas(const ImageType& type) {
   auto datas = streams_->GetStreamDatas(type);
   if (datas.empty()) {
-    if (get_failure_times_++ > 200) {
+    if (get_failure_times_++ > MAX_GET_FAILURE_TIMES) {
       Relink();
       get_failure_times_ = 0;
     }
