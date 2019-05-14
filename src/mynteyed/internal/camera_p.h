@@ -244,6 +244,8 @@ class MYNTEYE_API CameraPrivate {
   /** Get serial number */
   std::string GetSerialNumber() const;
 
+  void WaitForStream();
+
  protected:
   std::shared_ptr<Channels> channels() const {
     return channels_;
@@ -281,6 +283,9 @@ class MYNTEYE_API CameraPrivate {
 
   int relink_times_;
   int get_failure_times_;
+
+  std::condition_variable cs_;
+  std::mutex mtx_;
 };
 
 MYNTEYE_END_NAMESPACE

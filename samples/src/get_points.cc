@@ -79,6 +79,7 @@ int main(int argc, char const* argv[]) {
   cv::Mat color;
   cv::Mat depth;
   for (;;) {
+    cam.WaitForStream();
     counter.Update();
 
     auto image_color = cam.GetStreamData(ImageType::IMAGE_LEFT_COLOR);

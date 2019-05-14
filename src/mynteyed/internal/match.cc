@@ -5,6 +5,10 @@ MYNTEYE_USE_NAMESPACE
 
 Match::Match() :
   order_(Order::NONE) {
+
+    key_streams_ = {ImageType::IMAGE_LEFT_COLOR,
+                   // ImageType::IMAGE_RIGHT_COLOR,
+                   ImageType::IMAGE_DEPTH};
 }
 
 Match::~Match() {
@@ -15,9 +19,11 @@ void Match::OnStreamDataCallback(const ImageType &type, const img_data_t &data) 
   if (stream_datas_[type].size() > 10)
     stream_datas_[type].clear();
   stream_datas_[type].push_back(data);
+  cs_.notify_one();
 }
 
 Match::img_datas_t Match::GetStreamDatas(const ImageType& type) {
+  std::lock_guard<std::recursive_mutex> _(match_mutex_);
   if (is_ir_depth_only_) {
     auto datas = stream_datas_[type];
     stream_datas_[type].clear();
@@ -27,7 +33,6 @@ Match::img_datas_t Match::GetStreamDatas(const ImageType& type) {
   if (order_ == Order::NONE)
     InitOrder(type);
 
-  std::lock_guard<std::recursive_mutex> _(match_mutex_);
   if (!stream_datas_[type].empty()) {
     auto datas = stream_datas_[type];
     switch (order_) {
@@ -103,6 +108,31 @@ void Match::InitOrder(const ImageType& type) {
 
 void Match::SetIRDepthStatus(const bool &enable) {
   is_ir_depth_only_ = enable;
+}
+
+bool Match::HasStreamDatas(const ImageType &type) {
+  std::lock_guard<std::recursive_mutex> _(match_mutex_);
+  return stream_datas_.find(type) != stream_datas_.end() &&
+    !stream_datas_[type].empty();
+}
+
+bool Match::WaitForStreamData() {
+  std::unique_lock<std::recursive_mutex> _(match_mutex_);
+  auto ready = std::bind(&Match::IsStreamDatasReady, this);
+  bool ok = cs_.wait_for(_, std::chrono::seconds(1), ready);
+  if (!ok) {
+    return false;
+  }
+  return true;
+}
+
+bool Match::IsStreamDatasReady() {
+  for (auto &type : key_streams_) {
+    if (!HasStreamDatas(type))
+      return false;
+  }
+
+  return true;
 }
 
 

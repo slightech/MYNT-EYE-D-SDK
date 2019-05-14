@@ -291,3 +291,7 @@ bool Camera::IsDistanceDatasEnabled() const {
 std::vector<DistanceData> Camera::GetDistanceDatas() {
   return std::move(p_->GetDistanceDatas());
 }
+
+void Camera::WaitForStream() {
+  return p_->WaitForStream();
+}

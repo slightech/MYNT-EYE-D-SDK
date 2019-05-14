@@ -229,6 +229,7 @@ int main(int argc, char const* argv[]) {
   CVPainter painter;
   util::Counter counter;
   for (;;) {
+    cam.WaitForStream();
     counter.Update();
 
     auto image_color = cam.GetStreamData(ImageType::IMAGE_LEFT_COLOR);

@@ -257,6 +257,8 @@ class MYNTEYE_API Camera {
   /** Set distance data callback. */
   void SetDistanceCallback(distance_callback_t callback, bool async = true);
 
+  void WaitForStream();
+
  private:
   std::unique_ptr<CameraPrivate> p_;
 };

@@ -33,8 +33,7 @@
 #define LOCATION_ASYNC_MAX_SIZE 800  // 400hz, 2s
 #define DISTANCE_ASYNC_MAX_SIZE 800  // 400hz, 2s
 
-static const int MAX_RELINK_TIMES = 5;
-static const int MAX_GET_FAILURE_TIMES = 200;
+static const int MAX_RELINK_TIMES = 3;
 
 MYNTEYE_USE_NAMESPACE
 
@@ -313,24 +312,11 @@ bool CameraPrivate::HasStreamDataEnabled() const {
 }
 
 StreamData CameraPrivate::GetStreamData(const ImageType& type) {
-  auto&& datas = GetStreamDatas(type);
-  if (datas.empty()) return {};
-  return std::move(datas.back());
+  return streams_->GetStreamData(type);
 }
 
 std::vector<StreamData> CameraPrivate::GetStreamDatas(const ImageType& type) {
-  auto datas = streams_->GetStreamDatas(type);
-  if (datas.empty()) {
-    if (get_failure_times_++ > MAX_GET_FAILURE_TIMES) {
-      Relink();
-      get_failure_times_ = 0;
-    }
-  } else {
-    relink_times_ = 0;
-    get_failure_times_ = 0;
-  }
-  return datas;
-  // return streams_->GetStreamDatas(type);
+  return streams_->GetStreamDatas(type);
 }
 
 bool CameraPrivate::IsExSensorDatasSupported() const {
@@ -459,6 +445,11 @@ void CameraPrivate::SetMotionExtrinsics(const MotionExtrinsics &ex) {
 }
 
 bool CameraPrivate::StartDataTracking() {
+  if (!channels_->IsHidAvaliable()) {
+    // Not tracking if hid is unavaliable
+    return false;
+  }
+
   if (!IsOpened()) {
     // ensure start after opened
     return false;
@@ -468,10 +459,6 @@ bool CameraPrivate::StartDataTracking() {
       !location_->IsLocationDatasEnabled() &&
       !distance_->IsDistanceDatasEnabled()) {
     // Not tracking if data & info both disabled
-    return false;
-  }
-  if (!channels_->IsHidAvaliable()) {
-    // Not tracking if hid is unavaliable
     return false;
   }
 
@@ -626,12 +613,20 @@ std::string CameraPrivate::GetSerialNumber() const {
 
 void CameraPrivate::Relink() {
   if (relink_times_++ > MAX_RELINK_TIMES)
-    throw_error("The camera device is disconnected.");
+    throw_error("\n\nThe camera device is disconnected.\n");
 
-  StopDataTracking();
-  channels_->CloseHid();
-  if (channels_->OpenHid()) {
-    NotifyDataTrackStateChanged();
+  if (channels_->IsHidAvaliable()) {
+    StopDataTracking();
+    channels_->CloseHid();
+    if (channels_->OpenHid()) {
+      NotifyDataTrackStateChanged();
+    }
   }
   device_->Restart();
+}
+
+void CameraPrivate::WaitForStream() {
+  if (!streams_->WaitForStreamData()) {
+    Relink();
+  }
 }

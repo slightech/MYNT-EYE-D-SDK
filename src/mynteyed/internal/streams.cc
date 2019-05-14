@@ -143,6 +143,12 @@ void Streams::EnableStreamDatas(std::size_t max_size) {
   }
 }
 
+Streams::img_data_t Streams::GetStreamData(const ImageType& type) {
+  auto &&datas = GetStreamDatas(type);
+  if (datas.empty()) return {};
+  return std::move(datas.back());
+}
+
 Streams::img_datas_t Streams::GetStreamDatas(const ImageType& type) {
   device_->CheckOpened(__func__);
 
@@ -425,4 +431,8 @@ void Streams::NotifyStreamData(const ImageType &type,
 
 bool Streams::IsIRDepthOnly() {
   return device_->IsIRDepthOnly();
+}
+
+bool Streams::WaitForStreamData() {
+  return match_->WaitForStreamData();
 }

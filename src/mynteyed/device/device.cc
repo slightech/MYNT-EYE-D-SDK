@@ -109,9 +109,9 @@ void Device::Init() {
   UNUSED(ret);
 
   stream_color_info_ptr_ =
-      (PETRONDI_STREAM_INFO)malloc(sizeof(ETRONDI_STREAM_INFO)*64);
+      (PETRONDI_STREAM_INFO)malloc(sizeof(ETRONDI_STREAM_INFO) * MAX_STREAM_COUNT);
   stream_depth_info_ptr_ =
-      (PETRONDI_STREAM_INFO)malloc(sizeof(ETRONDI_STREAM_INFO)*64);
+      (PETRONDI_STREAM_INFO)malloc(sizeof(ETRONDI_STREAM_INFO) * MAX_STREAM_COUNT);
   // default image type
   depth_data_type_ = 2;
   // default frame rate
@@ -156,7 +156,7 @@ void Device::GetDeviceInfos(std::vector<DeviceInfo>* dev_infos) {
 
   DEVSELINFO dev_sel_info;
   DEVINFORMATION* p_dev_info =
-      (DEVINFORMATION*)malloc(sizeof(DEVINFORMATION)*count);  // NOLINT
+      (DEVINFORMATION*)malloc(sizeof(DEVINFORMATION) * count);  // NOLINT
 
   for (int i = 0; i < count; i++) {
     dev_sel_info.index = i;
@@ -197,16 +197,16 @@ void Device::GetStreamInfos(const std::int32_t& dev_index,
   }
   depth_infos->clear();
 
-  memset(stream_color_info_ptr_, 0, sizeof(ETRONDI_STREAM_INFO)*64);
-  memset(stream_depth_info_ptr_, 0, sizeof(ETRONDI_STREAM_INFO)*64);
+  memset(stream_color_info_ptr_, 0, sizeof(ETRONDI_STREAM_INFO) * MAX_STREAM_COUNT);
+  memset(stream_depth_info_ptr_, 0, sizeof(ETRONDI_STREAM_INFO) * MAX_STREAM_COUNT);
 
   DEVSELINFO dev_sel_info{dev_index};
-  EtronDI_GetDeviceResolutionList(handle_, &dev_sel_info, 64,
-      stream_color_info_ptr_, 64, stream_depth_info_ptr_);
+  EtronDI_GetDeviceResolutionList(handle_, &dev_sel_info, MAX_STREAM_COUNT,
+      stream_color_info_ptr_, MAX_STREAM_COUNT, stream_depth_info_ptr_);
 
   PETRONDI_STREAM_INFO stream_temp_info_ptr = stream_color_info_ptr_;
   int i = 0;
-  while (i < 64) {
+  while (i < MAX_STREAM_COUNT) {
     if (stream_temp_info_ptr->nWidth > 0) {
       StreamInfo info;
       info.index = i;
@@ -222,7 +222,7 @@ void Device::GetStreamInfos(const std::int32_t& dev_index,
 
   stream_temp_info_ptr = stream_depth_info_ptr_;
   i = 0;
-  while (i < 64) {
+  while (i < MAX_STREAM_COUNT) {
     if (stream_temp_info_ptr->nWidth > 0) {
       StreamInfo info;
       info.index = i;
@@ -235,13 +235,11 @@ void Device::GetStreamInfos(const std::int32_t& dev_index,
     stream_temp_info_ptr++;
     i++;
   }
-
-  stream_info_dev_index_ = dev_index;
 }
 
 bool Device::SetAutoExposureEnabled(bool enabled) {
-  if (!IsOpened()) {
-    LOGE("\nERROR:: Device is not opened.\n");
+  if (!IsInitDevice()) {
+    LOGE("%s, %d:: Device is not initial.", __FILE__, __LINE__);
     return false;
   }
 
@@ -261,8 +259,8 @@ bool Device::SetAutoExposureEnabled(bool enabled) {
 }
 
 bool Device::SetAutoWhiteBalanceEnabled(bool enabled) {
-  if (!IsOpened()) {
-    LOGE("\nERROR:: Device is not opened.\n");
+  if (!IsInitDevice()) {
+    LOGE("%s, %d:: Device is not initial.", __FILE__, __LINE__);
     return false;
   }
 
@@ -329,8 +327,8 @@ void Device::SetInfraredDepthOnly(const OpenParams& params) {
 }
 
 void Device::SetInfraredIntensity(const std::uint16_t &value) {
-  if (!IsOpened()) {
-    LOGE("\nERROR:: Device is not opened.\n");
+  if (!IsInitDevice()) {
+    LOGE("%s, %d:: Device is not initial.", __FILE__, __LINE__);
     return;
   }
 
@@ -346,6 +344,7 @@ void Device::SetInfraredIntensity(const std::uint16_t &value) {
 
 bool Device::Open(const OpenParams& params) {
   open_params_ = params;
+  stream_info_dev_index_ = params.dev_index;
 
   if (params.stream_mode == StreamMode::STREAM_2560x720 &&
       params.framerate > 30) {
@@ -395,7 +394,7 @@ bool Device::Open(const OpenParams& params) {
   depth_mode_ = params.depth_mode;
 
   stream_info_dev_index_ = params.dev_index;
-  if (UpdateStreamInfos()) {
+  if (!UpdateStreamInfos()) {
     LOGE("%s, %d:: Get Stream information failed.", __FILE__, __LINE__);
     return false;
   }
@@ -431,12 +430,12 @@ bool Device::Open(const OpenParams& params) {
   int ret = OpenDevice(params.dev_mode);
 
   if (ETronDI_OK == ret) {
+    is_device_opened_ = true;
     OnInitColorPalette(params.colour_depth_value);
     if (depth_device_opened_) {
       // depth device must be opened.
       SyncCameraCalibrations();
     }
-    is_device_opened_ = true;
     return true;
   } else {
     is_device_opened_ = false;
@@ -1240,6 +1239,7 @@ bool Device::Restart() {
     LOGE("%s, %d:: Reopen device failed.", __FILE__, __LINE__);
     return false;
   }
+  ResumeParams();
 
   return true;
 }
@@ -1248,10 +1248,56 @@ bool Device::UpdateStreamInfos() {
   memset(stream_color_info_ptr_, 0, sizeof(ETRONDI_STREAM_INFO) * MAX_STREAM_COUNT);
   memset(stream_depth_info_ptr_, 0, sizeof(ETRONDI_STREAM_INFO) * MAX_STREAM_COUNT);
 
-  DEVSELINFO dev_sel_info{stream_info_dev_index_};
+  DEVSELINFO dev_sel_info{open_params_.dev_index};
   int ret = EtronDI_GetDeviceResolutionList(handle_, &dev_sel_info, MAX_STREAM_COUNT,
       stream_color_info_ptr_, MAX_STREAM_COUNT, stream_depth_info_ptr_);
   if (ret != ETronDI_OK) { return false; }
 
   return true;
+}
+
+void Device::ResumeParams() {
+  auto &&it = params_member_.find(ControlParams::AUTO_EXPOSURE);
+  if (it != params_member_.end()) {
+    SetAutoExposureEnabled(it->second.enabled);
+  }
+
+  it = params_member_.find(ControlParams::AUTO_WHITE_BALANCE);
+  if (it != params_member_.end()) {
+    SetAutoWhiteBalanceEnabled(it->second.enabled);
+  }
+
+  it = params_member_.find(ControlParams::IR_DEPTH_ONLY);
+  if (it != params_member_.end()) {
+    SetInfraredDepthOnly(open_params_);
+  }
+
+  it = params_member_.find(ControlParams::IR_INTENSITY);
+  if (it != params_member_.end()) {
+    SetInfraredIntensity(it->second.value);
+  }
+
+  it = params_member_.find(ControlParams::GLOBAL_GAIN);
+  if (it != params_member_.end()) {
+    SetGlobalGain(it->second.fvalue);
+  }
+
+  it = params_member_.find(ControlParams::EXPOSURE_TIME);
+  if (it != params_member_.end()) {
+    SetExposureTime(it->second.fvalue);
+  }
+
+  it = params_member_.find(ControlParams::HW_REGISTER);
+  if (it != params_member_.end()) {
+    SetHWRegister(it->second.address, it->second.value, it->second.flag);
+  }
+
+  it = params_member_.find(ControlParams::FW_REGISTER);
+  if (it != params_member_.end()) {
+    SetFWRegister(it->second.address, it->second.value, it->second.flag);
+  }
+}
+
+bool Device::IsInitDevice() {
+  return handle_ && dev_sel_info_.index != -1;
 }

@@ -92,6 +92,7 @@ class Streams {
     return stream_datas_max_size_ > 1;
   }
 
+  img_data_t GetStreamData(const ImageType& type);
   img_datas_t GetStreamDatas(const ImageType& type);
 
   void SetStreamCallback(const ImageType& type, img_data_callback_t callback);
@@ -102,6 +103,8 @@ class Streams {
   void OnImageInfoCallback(const ImgInfoPacket& packet);
 
   bool IsIRDepthOnly();
+
+  bool WaitForStreamData();
 
  private:
   void NotifyStreamData(const ImageType &type, const StreamData &data);

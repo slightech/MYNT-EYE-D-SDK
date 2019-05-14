@@ -296,6 +296,7 @@ int main(int argc, char const* argv[]) {
 
   CVPainter painter;
   for (;;) {
+    cam.WaitForStream();
     counter.Update();
 
     if (is_left_ok) {

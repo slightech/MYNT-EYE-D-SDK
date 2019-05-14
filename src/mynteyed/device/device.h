@@ -174,6 +174,10 @@ class Device {
   void CompatibleUSB2(const OpenParams& params);
   void CompatibleMJPG(const OpenParams& params);
 
+  void ResumeParams();
+
+  bool IsInitDevice();
+
  private:
   void Init();
   void OnInit();  // cross

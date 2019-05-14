@@ -5,6 +5,8 @@
 #include <vector>
 #include <map>
 #include <mutex>
+#include <condition_variable>
+#include <atomic>
 
 #include "mynteyed/data/types_internal.h"
 #include "mynteyed/types.h"
@@ -32,6 +34,12 @@ class Match {
 
   void SetIRDepthStatus(const bool &enable);
 
+  bool WaitForStreamData();
+
+  bool HasStreamDatas(const ImageType &type);
+
+  bool IsStreamDatasReady();
+
  protected:
   void OnUpdateMatchedDatas(const ImageType& type, const StreamData& data);
   img_datas_t MatchStreamDatas(const ImageType& type);
@@ -46,7 +54,11 @@ class Match {
 
   Order order_;
 
-  bool is_ir_depth_only_;
+  bool is_ir_depth_only_ = false;
+
+  std::condition_variable_any cs_;
+
+  std::vector<ImageType> key_streams_;
 };
 
 MYNTEYE_END_NAMESPACE
