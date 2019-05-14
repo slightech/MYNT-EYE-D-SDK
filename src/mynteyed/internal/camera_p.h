@@ -22,6 +22,7 @@
 #include <map>
 #include <memory>
 #include <vector>
+#include <thread>
 
 #include "mynteyed/data/types_internal.h"
 #include "mynteyed/device/types_internal.h"
@@ -251,6 +252,7 @@ class MYNTEYE_API CameraPrivate {
     return channels_;
   }
 
+  void WatchDog();
   void Relink();
 
  private:
@@ -282,10 +284,8 @@ class MYNTEYE_API CameraPrivate {
   std::shared_ptr<MotionExtrinsics> motion_extrinsics_;
 
   int relink_times_;
-  int get_failure_times_;
 
-  std::condition_variable cs_;
-  std::mutex mtx_;
+  std::thread watch_thread_;
 };
 
 MYNTEYE_END_NAMESPACE

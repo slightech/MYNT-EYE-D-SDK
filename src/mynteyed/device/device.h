@@ -53,6 +53,11 @@ class Device {
     int flag;
   } set_params_t;
 
+  typedef enum DataType : std::uint32_t {
+    COLOR_DEVICE = 0,
+    DEPTH_DEVICE,
+  } data_type_t;
+
   using image_size_t = unsigned long int;  // NOLINT
 
   Device();
@@ -138,6 +143,8 @@ class Device {
   bool IsIRDepthOnly();
 
   bool Restart();
+
+  bool UpdateDeviceStatus();
 
  protected:
   /** Get stream index for open */
@@ -264,6 +271,9 @@ class Device {
 
   std::map<ControlParams, set_params_t> params_member_;
   bool is_device_opened_;
+
+  std::map<data_type_t, int> device_status_;
+  bool is_disconnect_;
 };
 
 MYNTEYE_END_NAMESPACE

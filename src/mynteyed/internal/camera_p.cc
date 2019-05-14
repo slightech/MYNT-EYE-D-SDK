@@ -26,6 +26,7 @@
 #include "mynteyed/internal/distance.h"
 #include "mynteyed/internal/streams.h"
 #include "mynteyed/util/log.h"
+#include "mynteyed/util/rate.h"
 
 #define IMG_INFO_ASYNC_MAX_SIZE 120  // 60fps, 2s
 #define STREAM_ASYNC_MAX_SIZE 1  // latest
@@ -50,7 +51,6 @@ void CameraPrivate::Init() {
   streams_ = std::make_shared<Streams>(device_);
 
   relink_times_ = 0;
-  get_failure_times_ = 0;
 
   if (channels_->IsAvaliable()) {
     ReadDeviceFlash();
@@ -61,6 +61,10 @@ CameraPrivate::~CameraPrivate() {
   DBG_LOGD(__func__);
   Close();
   device_ = nullptr;
+
+  if (watch_thread_.joinable()) {
+    watch_thread_.join();
+  }
 }
 
 void CameraPrivate::GetDeviceInfos(std::vector<DeviceInfo>* dev_infos) const {
@@ -105,6 +109,7 @@ ErrorCode CameraPrivate::Open(const OpenParams& params) {
         break;
     }
     streams_->OnCameraOpen();
+    WatchDog();
     return ErrorCode::SUCCESS;
   } else {
     return ErrorCode::ERROR_CAMERA_OPEN_FAILED;
@@ -626,7 +631,17 @@ void CameraPrivate::Relink() {
 }
 
 void CameraPrivate::WaitForStream() {
-  if (!streams_->WaitForStreamData()) {
-    Relink();
-  }
+  streams_->WaitForStreamData();
+}
+
+void CameraPrivate::WatchDog() {
+  watch_thread_ = std::thread([this](){
+    Rate rate(100);
+    while (true) {
+     if (device_->UpdateDeviceStatus())
+       Relink();
+
+     rate.Sleep();
+    }
+  });
 }

@@ -125,6 +125,9 @@ void Device::Init() {
   color_ir_depth_only_enabled_ = false;
   depth_ir_depth_only_enabled_ = false;
 
+  device_status_ = {{COLOR_DEVICE, 0}, {DEPTH_DEVICE, 0}};
+  is_disconnect_ = false;
+
   OnInit();
 }
 
@@ -1300,4 +1303,8 @@ void Device::ResumeParams() {
 
 bool Device::IsInitDevice() {
   return handle_ && dev_sel_info_.index != -1;
+}
+
+bool Device::UpdateDeviceStatus() {
+  return is_disconnect_;
 }

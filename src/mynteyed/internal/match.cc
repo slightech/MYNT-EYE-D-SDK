@@ -6,9 +6,9 @@ MYNTEYE_USE_NAMESPACE
 Match::Match() :
   order_(Order::NONE) {
 
-    key_streams_ = {ImageType::IMAGE_LEFT_COLOR,
-                   // ImageType::IMAGE_RIGHT_COLOR,
-                   ImageType::IMAGE_DEPTH};
+  key_streams_ = {ImageType::IMAGE_LEFT_COLOR,
+                  // ImageType::IMAGE_RIGHT_COLOR,
+                  ImageType::IMAGE_DEPTH};
 }
 
 Match::~Match() {

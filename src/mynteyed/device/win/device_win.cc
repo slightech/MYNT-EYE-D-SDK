@@ -495,6 +495,8 @@ Image::pointer Device::GetImageColor() {
     // unsigned int color_img_height = (unsigned int)(
     //     stream_color_info_ptr_[color_res_index_].nHeight);
 
+    device_status_[COLOR_DEVICE] = 0;
+    is_disconnect_ = false;
     if (color_image_buf_->format() == ImageFormat::COLOR_MJPG) {  // mjpg
       // return clone as it will be changed in imgcallback
       return color_image_buf_->Clone();
@@ -512,6 +514,10 @@ Image::pointer Device::GetImageColor() {
     }
   }
 
+  if (device_status_[COLOR_DEVICE]++ > MAX_FAILED_COUNT) {
+    is_disconnect_ = true;
+    device_status_[COLOR_DEVICE] = 0;
+  }
   return nullptr;
 }
 
@@ -522,6 +528,9 @@ Image::pointer Device::GetImageDepth() {
   is_depth_ok_ = false;
 
   if (depth_image_buf_) {
+    device_status_[DEPTH_DEVICE] = 0;
+    is_disconnect_ = false;
+
     // DEPTH_14BITS for ETronDI_DEPTH_DATA_14_BITS
     unsigned int depth_img_width  = (unsigned int)(
         stream_depth_info_ptr_[depth_res_index_].nWidth);
@@ -556,6 +565,10 @@ Image::pointer Device::GetImageDepth() {
     }
   }
 
+  if (device_status_[DEPTH_DEVICE]++ > MAX_FAILED_COUNT) {
+    is_disconnect_ = true;
+    device_status_[DEPTH_DEVICE] = 0;
+  }
   return nullptr;
 }
 
