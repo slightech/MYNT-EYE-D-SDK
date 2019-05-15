@@ -256,7 +256,6 @@ bool Device::SetAutoExposureEnabled(bool enabled) {
     ok = ETronDI_OK == EtronDI_DisableAE(handle_, &dev_sel_info_);
   }
   if (ok) {
-    params_member_[ControlParams::AUTO_EXPOSURE].enabled = enabled;
     LOGI("-- Auto-exposure state: %s", enabled ? "enabled" : "disabled");
   } else {
     LOGW("-- %s auto-exposure failed", enabled ? "Enable" : "Disable");
@@ -277,7 +276,6 @@ bool Device::SetAutoWhiteBalanceEnabled(bool enabled) {
     ok = ETronDI_OK == EtronDI_DisableAWB(handle_, &dev_sel_info_);
   }
   if (ok) {
-    params_member_[ControlParams::AUTO_WHITE_BALANCE].enabled = enabled;
     LOGI("-- Auto-white balance state: %s", enabled ? "enabled" : "disabled");
   } else {
     LOGW("-- %s auto-white balance failed", enabled ? "Enable" : "Disable");
@@ -1224,32 +1222,6 @@ bool Device::IsIRDepthOnly() {
   return ir_depth_only_enabled_;
 }
 
-void Device::ReleaseDevice() {
-  EtronDI_CloseDevice(handle_, &dev_sel_info_);
-  EtronDI_Release(&handle_);
-}
-
-bool Device::Restart() {
-  ReleaseDevice();
-  EtronDI_Init(&handle_, false);
-  if (!handle_) { return false; }
-
-  SetAutoExposureEnabled(open_params_.state_ae);
-  SetAutoWhiteBalanceEnabled(open_params_.state_awb);
-
-  UpdateStreamInfos();
-  EtronDI_SetDepthDataType(handle_, &dev_sel_info_, depth_data_type_);
-
-  int ret = OpenDevice(open_params_.dev_mode);
-  if (ret != ETronDI_OK) {
-    LOGE("%s, %d:: Reopen device failed.", __FILE__, __LINE__);
-    return false;
-  }
-  ResumeParams();
-
-  return true;
-}
-
 bool Device::UpdateStreamInfos() {
   memset(stream_color_info_ptr_, 0, sizeof(ETRONDI_STREAM_INFO) * MAX_STREAM_COUNT);
   memset(stream_depth_info_ptr_, 0, sizeof(ETRONDI_STREAM_INFO) * MAX_STREAM_COUNT);
@@ -1262,17 +1234,7 @@ bool Device::UpdateStreamInfos() {
 }
 
 void Device::ResumeParams() {
-  auto &&it = params_member_.find(ControlParams::AUTO_EXPOSURE);
-  if (it != params_member_.end()) {
-    SetAutoExposureEnabled(it->second.enabled);
-  }
-
-  it = params_member_.find(ControlParams::AUTO_WHITE_BALANCE);
-  if (it != params_member_.end()) {
-    SetAutoWhiteBalanceEnabled(it->second.enabled);
-  }
-
-  it = params_member_.find(ControlParams::IR_DEPTH_ONLY);
+  auto &&it = params_member_.find(ControlParams::IR_DEPTH_ONLY);
   if (it != params_member_.end()) {
     SetInfraredDepthOnly(open_params_);
   }

@@ -620,14 +620,16 @@ void CameraPrivate::Relink() {
   if (relink_times_++ > MAX_RELINK_TIMES)
     throw_error("\n\nThe camera device is disconnected.\n");
 
-  if (channels_->IsHidAvaliable()) {
+  if (channels_->IsHidTracking())
+  {
     StopDataTracking();
     channels_->CloseHid();
     if (channels_->OpenHid()) {
       NotifyDataTrackStateChanged();
     }
   }
-  device_->Restart();
+  if (device_->Restart())
+    relink_times_ = 0;
 }
 
 void CameraPrivate::WaitForStream() {
@@ -638,9 +640,9 @@ void CameraPrivate::WatchDog() {
   watch_thread_ = std::thread([this](){
     Rate rate(100);
     while (true) {
-     if (!device_->UpdateDeviceStatus())
+     if (!device_->UpdateDeviceStatus()) {
        Relink();
-
+     }
      rate.Sleep();
     }
   });

@@ -637,4 +637,27 @@ void Device::OnInitColorPalette(const float &z14_Far) {
   // ToDo
 }
 
+bool Device::Restart() {
+  std::lock_guard<std::mutex> _(mtx_);
+  EtronDI_CloseDevice(handle_, &dev_sel_info_);
+  // EtronDI_Release(&handle_);
+  EtronDI_Init(&handle_, false);
+  if (!handle_) { return false; }
+
+  // SetAutoExposureEnabled(open_params_.state_ae);
+  // SetAutoWhiteBalanceEnabled(open_params_.state_awb);
+
+  UpdateStreamInfos();
+  EtronDI_SetDepthDataType(handle_, &dev_sel_info_, depth_data_type_);
+
+  int ret = OpenDevice(open_params_.dev_mode);
+  if (ret != ETronDI_OK) {
+    LOGE("%s, %d:: Reopen device failed.", __FILE__, __LINE__);
+    return false;
+  }
+  ResumeParams();
+
+  return true;
+}
+
 #endif

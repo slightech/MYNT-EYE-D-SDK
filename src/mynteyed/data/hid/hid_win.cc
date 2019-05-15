@@ -24,7 +24,7 @@ void print_error() {
   DWORD error_no = GetLastError();
   FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM,
       nullptr, error_no, 0, buf, sizeof(buf), nullptr);
-  LOGI("error_no %ld: %s\n", error_no, buf);
+  // LOGI("error_no %ld: %s\n", error_no, buf);
 }
 
 }  // namespace
