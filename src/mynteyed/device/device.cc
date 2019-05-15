@@ -1255,9 +1255,8 @@ bool Device::UpdateStreamInfos() {
   memset(stream_depth_info_ptr_, 0, sizeof(ETRONDI_STREAM_INFO) * MAX_STREAM_COUNT);
 
   DEVSELINFO dev_sel_info{open_params_.dev_index};
-  int ret = EtronDI_GetDeviceResolutionList(handle_, &dev_sel_info, MAX_STREAM_COUNT,
+  EtronDI_GetDeviceResolutionList(handle_, &dev_sel_info, MAX_STREAM_COUNT,
       stream_color_info_ptr_, MAX_STREAM_COUNT, stream_depth_info_ptr_);
-  if (ret != ETronDI_OK) { return false; }
 
   return true;
 }
