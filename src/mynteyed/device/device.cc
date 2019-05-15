@@ -21,6 +21,7 @@
 MYNTEYE_USE_NAMESPACE
 
 static const int MAX_STREAM_COUNT = 64;
+static const int MAX_CHECK_TIMES = 100;
 
 namespace {
 
@@ -125,7 +126,9 @@ void Device::Init() {
   color_ir_depth_only_enabled_ = false;
   depth_ir_depth_only_enabled_ = false;
 
-  device_status_ = {{COLOR_DEVICE, 0}, {DEPTH_DEVICE, 0}};
+  device_status_ = {{COLOR_DEVICE, false}, {DEPTH_DEVICE, false}};
+  is_actual_ = {{COLOR_DEVICE, false}, {DEPTH_DEVICE, false}};
+  check_times_ = MAX_CHECK_TIMES;
   is_disconnect_ = false;
 
   OnInit();
@@ -1306,5 +1309,21 @@ bool Device::IsInitDevice() {
 }
 
 bool Device::UpdateDeviceStatus() {
-  return is_disconnect_;
+  if ((!device_status_[COLOR_DEVICE] && is_actual_[COLOR_DEVICE]) ||
+        (!device_status_[DEPTH_DEVICE] && is_actual_[DEPTH_DEVICE])) {
+
+    if (check_times_ > 0) {
+      --check_times_;
+      return true;
+    } else {
+      check_times_ = MAX_CHECK_TIMES;
+      return false;
+    }
+  }
+
+  device_status_[COLOR_DEVICE] = false;
+  device_status_[DEPTH_DEVICE] = false;
+  check_times_ = MAX_CHECK_TIMES;
+
+  return true;
 }

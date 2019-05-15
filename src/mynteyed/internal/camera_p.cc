@@ -638,7 +638,7 @@ void CameraPrivate::WatchDog() {
   watch_thread_ = std::thread([this](){
     Rate rate(100);
     while (true) {
-     if (device_->UpdateDeviceStatus())
+     if (!device_->UpdateDeviceStatus())
        Relink();
 
      rate.Sleep();

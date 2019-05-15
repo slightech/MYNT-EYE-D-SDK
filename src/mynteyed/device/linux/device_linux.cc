@@ -59,15 +59,11 @@ Image::pointer Device::GetImageColor() {
       color_image_buf_->data(), &color_image_size_, &color_serial_number_, 0);
 
   if (ETronDI_OK != ret) {
-    if (device_status_[COLOR_DEVICE]++ > MAX_FAILED_COUNT) {
-      is_disconnect_ = true;
-      device_status_[COLOR_DEVICE] = 0;
-    }
     DBG_LOGI("GetImageColor: %d", ret);
     return nullptr;
   }
-  device_status_[COLOR_DEVICE] = 0;
-  is_disconnect_ = false;
+  device_status_[COLOR_DEVICE] = true;
+  is_actual_[COLOR_DEVICE] = true;
 
   if (ir_depth_only_enabled_) {
     if (color_ir_depth_only_enabled_ &&
@@ -130,15 +126,11 @@ Image::pointer Device::GetImageDepth() {
       &depth_image_size_, &depth_serial_number_, depth_data_type_);
 
   if (ETronDI_OK != ret) {
-    if (device_status_[DEPTH_DEVICE]++ > MAX_FAILED_COUNT) {
-      is_disconnect_ = true;
-      device_status_[DEPTH_DEVICE] = 0;
-    }
     DBG_LOGI("GetImageDepth: %d", ret);
     return nullptr;
   }
-  device_status_[DEPTH_DEVICE] = 0;
-  is_disconnect_ = false;
+  device_status_[DEPTH_DEVICE] = true;
+  is_actual_[DEPTH_DEVICE] = true;
 
   if (ir_depth_only_enabled_) {
     if (depth_ir_depth_only_enabled_ &&

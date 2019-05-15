@@ -272,7 +272,9 @@ class Device {
   std::map<ControlParams, set_params_t> params_member_;
   bool is_device_opened_;
 
-  std::map<data_type_t, int> device_status_;
+  std::map<data_type_t, bool> device_status_;
+  std::map<data_type_t, bool> is_actual_;
+  int check_times_;
   bool is_disconnect_;
 };
 
