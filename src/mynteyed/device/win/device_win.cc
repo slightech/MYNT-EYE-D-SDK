@@ -593,7 +593,7 @@ int Device::OpenDevice(const DeviceMode& dev_mode) {
       color_device_opened_ = true;
       depth_device_opened_ = false;
 
-      return EtronDI_OpenDeviceEx(etron_di_, &dev_sel_info_,
+      return EtronDI_OpenDeviceEx(handle_, &dev_sel_info_,
         color_res_index_, toRgb,
         -1, depthStreamSwitch,
         Device::ImgCallback, this, &framerate_, ctrlMode);
@@ -601,7 +601,7 @@ int Device::OpenDevice(const DeviceMode& dev_mode) {
       color_device_opened_ = false;
       depth_device_opened_ = true;
 
-      return EtronDI_OpenDeviceEx(etron_di_, &dev_sel_info_,
+      return EtronDI_OpenDeviceEx(handle_, &dev_sel_info_,
         -1, toRgb,
         depth_res_index_, depthStreamSwitch,
         Device::ImgCallback, this, &framerate_, ctrlMode);
@@ -610,7 +610,7 @@ int Device::OpenDevice(const DeviceMode& dev_mode) {
       color_device_opened_ = true;
       depth_device_opened_ = true;
 
-      return EtronDI_OpenDeviceEx(etron_di_, &dev_sel_info_,
+      return EtronDI_OpenDeviceEx(handle_, &dev_sel_info_,
         color_res_index_, toRgb,
         depth_res_index_, depthStreamSwitch,
         Device::ImgCallback, this, &framerate_, ctrlMode);
