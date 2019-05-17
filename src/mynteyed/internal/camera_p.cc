@@ -109,7 +109,9 @@ ErrorCode CameraPrivate::Open(const OpenParams& params) {
         break;
     }
     streams_->OnCameraOpen();
+#ifdef MYNTEYE_OS_LINUX
     WatchDog();
+#endif
     return ErrorCode::SUCCESS;
   } else {
     return ErrorCode::ERROR_CAMERA_OPEN_FAILED;
@@ -633,7 +635,14 @@ void CameraPrivate::Relink() {
 }
 
 void CameraPrivate::WaitForStream() {
+#ifdef MYNTEYE_OS_WIN
+  if (!streams_->WaitForStreamData()) {
+    Relink();
+  }
+#endif
+#ifdef MYNTEYE_OS_LINUX
   streams_->WaitForStreamData();
+#endif
 }
 
 void CameraPrivate::WatchDog() {
