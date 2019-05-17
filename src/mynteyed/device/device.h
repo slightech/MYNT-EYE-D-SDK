@@ -274,8 +274,6 @@ class Device {
   std::map<data_type_t, bool> is_actual_;
   int check_times_;
   bool is_disconnect_;
-
-  std::mutex mtx_;
 };
 
 MYNTEYE_END_NAMESPACE
