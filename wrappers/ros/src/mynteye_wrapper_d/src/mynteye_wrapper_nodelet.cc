@@ -79,6 +79,9 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
  public:
   ros::NodeHandle nh;
   ros::NodeHandle nh_ns;
+  int skip_tag;
+  int skip_tmp_left_tag;
+  int skip_tmp_right_tag;
 
   pthread_mutex_t mutex_sub_result;
   pthread_mutex_t mutex_color;
@@ -153,6 +156,9 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   sub_result_t sub_result;
 
   MYNTEYEWrapperNodelet() {
+    skip_tag = -1;
+    skip_tmp_left_tag = 0;
+    skip_tmp_right_tag = 0;
     pthread_mutex_init(&mutex_sub_result, nullptr);
     pthread_mutex_init(&mutex_color, nullptr);
   }
@@ -173,6 +179,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     // Launch params
     int dev_index = 0;
     int framerate = 10;
+    int ros_output_framerate = -1;
     int dev_mode = 2;
     int color_mode = 0;
     int depth_mode = 0;
@@ -185,6 +192,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     bool ir_depth_only = true;
     nh_ns.getParamCached("dev_index", dev_index);
     nh_ns.getParamCached("framerate", framerate);
+    nh_ns.getParamCached("ros_output_framerate", ros_output_framerate);
     nh_ns.getParamCached("dev_mode", dev_mode);
     nh_ns.getParamCached("color_mode", color_mode);
     nh_ns.getParamCached("depth_mode", depth_mode);
@@ -201,6 +209,9 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     points_frequency = DEFAULT_POINTS_FREQUENCE;
     points_factor = DEFAULT_POINTS_FACTOR;
     gravity = 9.8;
+    if (ros_output_framerate > 0 && ros_output_framerate < 7) {
+      skip_tag = ros_output_framerate;
+    }
     nh_ns.getParamCached("points_frequency", points_frequency);
     nh_ns.getParamCached("points_factor", points_factor);
     nh_ns.getParamCached("gravity", gravity);
@@ -533,12 +544,28 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   }
 
   void publishLeft(const StreamData& data, bool color_sub, bool mono_sub) {
+    if (skip_tag > 0) {
+      if (skip_tmp_left_tag == 0) {
+        skip_tmp_left_tag = skip_tag;
+      } else {
+        skip_tmp_left_tag--;
+        return;
+      }
+    }
     publishColor(data, left_info_ptr,
         pub_left_color, color_sub, left_color_frame_id,
         pub_left_mono, mono_sub, left_mono_frame_id, true);
   }
 
   void publishRight(const StreamData& data, bool color_sub, bool mono_sub) {
+    if (skip_tag > 0) {
+      if (skip_tmp_right_tag == 0) {
+        skip_tmp_right_tag = skip_tag;
+      } else {
+        skip_tmp_right_tag--;
+        return;
+      }
+    }
     publishColor(data, right_info_ptr,
         pub_right_color, color_sub, right_color_frame_id,
         pub_right_mono, mono_sub, right_mono_frame_id, false);

@@ -43,7 +43,7 @@
   -->
   <arg name="dev_mode" default="$(arg device_all)" />
 
-  <arg name="color_mode" default="$(arg color_rectified)" />
+  <arg name="color_mode" default="$(arg color_raw)" />
   <!-- Note: must set DEPTH_RAW to get raw depth values for points -->
   <arg name="depth_mode" default="$(arg depth_raw)" />
   <arg name="stream_mode" default="$(arg stream_1280x480)" />
