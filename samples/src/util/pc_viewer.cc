@@ -13,11 +13,20 @@
 // limitations under the License.
 #include "util/pc_viewer.h"
 
+#ifdef WITH_OPENCV2
+#include <opencv2/highgui/highgui.hpp>
+#else
+#include <opencv2/imgcodecs/imgcodecs.hpp>
+#endif
+
 // #include <pcl/common/common_headers.h>
 #include <pcl/io/ply_io.h>
 
 #include <cmath>
 #include <string>
+
+#include "mynteyed/util/files.h"
+#include "mynteyed/util/times.h"
 
 std::shared_ptr<pcl::visualization::PCLVisualizer> CustomColorVis(
     PCViewer::pointcloud_t::ConstPtr cloud, int xw, int yw) {
@@ -77,8 +86,7 @@ void PCViewer::Update(pointcloud_t::ConstPtr cloud) {
     viewer_->registerKeyboardCallback(
       boost::bind(&PCViewer::KeyboardCallback, this, _1));
     std::cout << std::endl
-        << "Press 'Space' on Viewer to save *.ply, 'J' to capture screenshot"
-        << std::endl;
+        << "Press 'Space' on Viewer to save *.ply, *.png" << std::endl;
   }
   pcl::visualization::PointCloudColorHandlerRGBField<point_t>color(cloud);
   viewer_->updatePointCloud<point_t>(cloud, color, "points");
@@ -168,17 +176,44 @@ void PCViewer::Run() {
 
 void PCViewer::KeyboardCallback(
     const pcl::visualization::KeyboardEvent& event) {
+  MYNTEYE_USE_NAMESPACE
   if (event.getKeySym() == "space" && event.keyDown()) {
-    static int count = 1;
-    std::stringstream ss;
-    ss << "pointcloud-" << (count++) << ".ply";
-    std::string filename = ss.str();
-    int ret = 0;
-    if (cloud_ && (ret = pcl::io::savePLYFileBinary(filename, *cloud_)) == 0) {
-      std::cout << "PLY file (" << filename << ") successfully saved."
-          << std::endl;
-    } else {
-      std::cout << "PLY file save failed: " << ret << std::endl;
+    if (save_dir_.empty()) {
+      auto dir = times::to_local_string(times::now(), "%Y%m%d%H%M%S", 0);
+      if (files::mkdir(dir)) {
+        save_dir_ = dir + MYNTEYE_OS_SEP;
+      } else {
+        std::cout << "Create directory failed: " << save_dir_ << std::endl;
+      }
     }
+    static int count = 1;
+    {
+      std::stringstream ss;
+      ss << save_dir_ << "pointcloud-" << count << ".ply";
+      std::string filename = ss.str();
+      int ret = 0;
+      if (cloud_ && (ret = pcl::io::savePLYFileBinary(filename, *cloud_))
+          == 0) {
+        std::cout << filename  << " saved" << std::endl;
+      } else {
+        std::cout << filename << " save failed: " << ret << std::endl;
+      }
+    }
+    {
+      std::stringstream ss;
+      ss << save_dir_ << "image-" << count << ".png";
+      std::string filename = ss.str();
+      cv::imwrite(filename, rgb_);
+        std::cout << filename  << " saved" << std::endl;
+    }
+    {
+      std::stringstream ss;
+      ss << save_dir_ << "depth-" << count << ".png";
+      std::string filename = ss.str();
+      cv::imwrite(filename, depth_);
+        std::cout << filename  << " saved" << std::endl;
+    }
+    ++count;
   }
 }
+

@@ -18,6 +18,7 @@
 #include <condition_variable>
 #include <memory>
 #include <mutex>
+#include <string>
 #include <thread>
 
 #include <opencv2/core/core.hpp>
@@ -69,6 +70,8 @@ class PCViewer {
   cv::Mat depth_;
 
   pointcloud_t::ConstPtr cloud_;
+
+  std::string save_dir_;
 };
 
 #endif  // MYNTEYE_SAMPLES_PC_VIEWER_H_ NOLINT

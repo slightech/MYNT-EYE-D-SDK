@@ -93,6 +93,8 @@ int main(int argc, char const* argv[]) {
 
     if (color.empty() || depth.empty()) { continue; }
 
+    viewer.Update(color, depth);
+
     painter.DrawSize(color, CVPainter::TOP_LEFT);
     painter.DrawStreamData(color, image_color, CVPainter::TOP_RIGHT);
     painter.DrawInformation(color, util::to_string(counter.fps()),
@@ -100,7 +102,6 @@ int main(int argc, char const* argv[]) {
 
     cv::imshow("color", color);
 
-    viewer.Update(color, depth);
     color.release();
     depth.release();
 
