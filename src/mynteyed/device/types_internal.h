@@ -83,7 +83,9 @@ struct CameraCalibration {
 };
 
 enum class ControlParams : std::int32_t {
-  IR_DEPTH_ONLY = 0,
+  AUTO_EXPOSURE = 0,
+  AUTO_WHITE_BALANCE,
+  IR_DEPTH_ONLY,
   IR_INTENSITY,
   GLOBAL_GAIN,
   EXPOSURE_TIME,
