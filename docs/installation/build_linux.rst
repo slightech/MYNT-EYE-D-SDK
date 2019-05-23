@@ -25,8 +25,12 @@ skip this part.*
 1.1.1.2 Install OpenCV by Compile
 '''''''''''''''''''''''''''''''''
 
-   To build and install Opencv, please refer to
-   `Installation in Linux <https://docs.opencv.org/master/d7/d9f/tutorial_linux_install.html>`_
+  To build and install Opencv, please refer to `Installation in Linux <https://docs.opencv.org/master/d7/d9f/tutorial_linux_install.html>`_
+
+.. tip::
+
+  If you need to install ros, you can skip this step and use opencv in ros. 
+
 
 Alternatively, refer to the command below:
 
@@ -55,6 +59,10 @@ Alternatively, refer to the command below:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     To build and install PCL, please refer to `PCL Installation <http://www.pointclouds.org/documentation/tutorials/compiling_pcl_posix.php>`__
+
+.. tip::
+  
+  If you need to install ros, you can skip this step and use pcl in ros. 
 
 .. code-block:: bash
 
