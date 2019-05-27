@@ -1,3 +1,5 @@
+#include <functional>
+
 #include "mynteyed/internal/match.h"
 #include "mynteyed/util/log.h"
 
