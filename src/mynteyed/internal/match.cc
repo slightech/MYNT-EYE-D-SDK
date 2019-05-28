@@ -137,8 +137,7 @@ void Match::InitStreamKey(const bool &enable) {
   if (enable) {
     key_streams_ = {ImageType::IMAGE_DEPTH};
   } else {
-    key_streams_ = {ImageType::IMAGE_LEFT_COLOR,
-                    ImageType::IMAGE_RIGHT_COLOR};
+    key_streams_ = {ImageType::IMAGE_LEFT_COLOR};
   }
 }
 
