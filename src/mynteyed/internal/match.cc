@@ -40,21 +40,24 @@ Match::img_datas_t Match::GetStreamDatas(const ImageType& type) {
     switch (order_) {
       case Order::LEFT_IMAGE:
         if (type == ImageType::IMAGE_LEFT_COLOR) {
-          base_frame_id_ = datas.back().img->frame_id();
+          // base_frame_id_ = datas.back().img->frame_id();
+          base_frame_id_.push_back(datas.back().img->frame_id());
           stream_datas_[type].clear();
           return datas;
         }
         return MatchStreamDatas(type);
       case Order::RIGHT_IMAGE:
         if (type == ImageType::IMAGE_RIGHT_COLOR) {
-          base_frame_id_ = stream_datas_[type].back().img->frame_id();
+          // base_frame_id_ = stream_datas_[type].back().img->frame_id();
+          base_frame_id_.push_back(datas.back().img->frame_id());
           stream_datas_[type].clear();
           return datas;
         }
         return MatchStreamDatas(type);
       case Order::DEPTH_IMAGE:
         if (type == ImageType::IMAGE_DEPTH) {
-          base_frame_id_ = stream_datas_[type].back().img->frame_id();
+          // base_frame_id_ = stream_datas_[type].back().img->frame_id();
+          base_frame_id_.push_back(datas.back().img->frame_id());
           stream_datas_[type].clear();
           return datas;
         }
@@ -74,17 +77,29 @@ Match::img_datas_t Match::MatchStreamDatas(const ImageType& type) {
   std::vector<StreamData> result;
 
   auto&& datas = stream_datas_[type];
-  if (base_frame_id_ == datas.back().img->frame_id()) {
+  if (base_frame_id_.back() == datas.back().img->frame_id()) {
     result = {datas.begin(), datas.end()};
     datas.clear();
+    base_frame_id_.clear();
     return result;
   } else {
     for (auto it = datas.begin(); it != datas.end();) {
+      for (auto id = base_frame_id_.begin(); id != base_frame_id_.end();) {
+        if (*id == (*it).img->frame_id()) {
+          result = {datas.begin(), ++it};
+          datas.erase(datas.begin(), it);
+          base_frame_id_.erase(base_frame_id_.begin(), id);
+          return result;
+        }
+        ++id;
+      }
+      /*
       if (base_frame_id_ == (*it).img->frame_id()) {
         result = {datas.begin(), ++it};
         datas.erase(datas.begin(), it);
         return result;
       }
+      */
       ++it;
     }
   }
