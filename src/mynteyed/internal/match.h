@@ -40,6 +40,8 @@ class Match {
 
   bool IsStreamDatasReady();
 
+  void InitStreamKey(const bool &enable);
+
  protected:
   void OnUpdateMatchedDatas(const ImageType& type, const StreamData& data);
   img_datas_t MatchStreamDatas(const ImageType& type);

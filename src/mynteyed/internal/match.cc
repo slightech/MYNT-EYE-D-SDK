@@ -7,10 +7,6 @@ MYNTEYE_USE_NAMESPACE
 
 Match::Match() :
   order_(Order::NONE) {
-
-  key_streams_ = {ImageType::IMAGE_LEFT_COLOR,
-                  // ImageType::IMAGE_RIGHT_COLOR,
-                  ImageType::IMAGE_DEPTH};
 }
 
 Match::~Match() {
@@ -135,6 +131,15 @@ bool Match::IsStreamDatasReady() {
   }
 
   return true;
+}
+
+void Match::InitStreamKey(const bool &enable) {
+  if (enable) {
+    key_streams_ = {ImageType::IMAGE_DEPTH};
+  } else {
+    key_streams_ = {ImageType::IMAGE_LEFT_COLOR,
+                    ImageType::IMAGE_RIGHT_COLOR};
+  }
 }
 
 

@@ -1300,3 +1300,7 @@ bool Device::UpdateDeviceStatus() {
 
   return true;
 }
+
+bool Device::DepthDeviceOpened() {
+  return depth_device_opened_;
+}

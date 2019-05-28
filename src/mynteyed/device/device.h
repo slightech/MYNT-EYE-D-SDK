@@ -146,6 +146,8 @@ class Device {
 
   bool UpdateDeviceStatus();
 
+  bool DepthDeviceOpened();
+
  protected:
   /** Get stream index for open */
   void GetStreamIndex(const OpenParams& params,
