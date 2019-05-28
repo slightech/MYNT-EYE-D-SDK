@@ -52,8 +52,7 @@ class Match {
 
   std::recursive_mutex match_mutex_;
 
-  // std::uint16_t base_frame_id_ = 0;
-  std::vector<std::uint16_t> base_frame_id_;
+  std::uint16_t base_frame_id_ = 0;
 
   Order order_;
 
