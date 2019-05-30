@@ -373,8 +373,20 @@ bool SpatialFilter::ProcessFrame(
     UpdateConfig(in->get_image_profile());
     if (out == in) {
       process_frame(in->data());
+    } else {
+      if (in->get_image_profile() == out->get_image_profile()) {
+        auto tmp = in->Clone();
+        process_frame(tmp->data());
+        uint8_t *out_ptr = out->data();
+        uint8_t *in_ptr = tmp->data();
+        for (size_t i = 0; i < tmp->valid_size(); i++) {
+          *out_ptr++ = *in_ptr++;
+        }
+      } else {
+        out = in;
+        return false;
+      }
     }
-    // todo
     return true;
   } else {
     out = in;

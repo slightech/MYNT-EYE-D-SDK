@@ -235,28 +235,30 @@ int main(int argc, char const* argv[]) {
     cam.WaitForStream();
     counter.Update();
 
-    auto image_color = cam.GetStreamData(ImageType::IMAGE_LEFT_COLOR);
-    if (image_color.img) {
-      cv::Mat color = image_color.img->To(ImageFormat::COLOR_BGR)->ToMat();
-      painter.DrawSize(color, CVPainter::TOP_LEFT);
-      painter.DrawStreamData(color, image_color, CVPainter::TOP_RIGHT);
-      painter.DrawInformation(color, util::to_string(counter.fps()),
-          CVPainter::BOTTOM_RIGHT);
-
-      cv::setMouseCallback("color", OnDepthMouseCallback, &depth_region);
-      depth_region.DrawRect(color);
-      cv::imshow("color", color);
-    }
-
     auto image_depth = cam.GetStreamData(ImageType::IMAGE_DEPTH);
     if (image_depth.img) {
-      spat_filter.ProcessFrame(image_depth.img, image_depth.img);
       cv::Mat depth = image_depth.img->To(ImageFormat::DEPTH_RAW)->ToMat();
 
       cv::setMouseCallback("depth", OnDepthMouseCallback, &depth_region);
       // Note: DrawRect will change some depth values to show the rect.
       depth_region.DrawRect(depth);
-      cv::imshow("depth", depth);
+      cv::Mat res_org;
+      cv::normalize(depth, res_org, 0, 255, cv::NORM_MINMAX, CV_8UC1);
+#ifdef WITH_OPENCV3
+      // ColormapTypes
+      //   http://docs.opencv.org/master/d3/d50/group__imgproc__colormap.html#ga9a805d8262bcbe273f16be9ea2055a65
+      cv::applyColorMap(res_org, res_org, cv::COLORMAP_JET);
+#endif
+      cv::imshow("depth_before_filter", res_org);
+      spat_filter.ProcessFrame(image_depth.img, image_depth.img);
+      cv::Mat res;
+      cv::normalize(depth, res, 0, 255, cv::NORM_MINMAX, CV_8UC1);
+#ifdef WITH_OPENCV3
+      // ColormapTypes
+      //   http://docs.opencv.org/master/d3/d50/group__imgproc__colormap.html#ga9a805d8262bcbe273f16be9ea2055a65
+      cv::applyColorMap(res, res, cv::COLORMAP_JET);
+#endif
+      cv::imshow("depth_after_filter", res);
 
       depth_region.ShowElems<ushort>(depth, [](const ushort& elem) {
         return std::to_string(elem);
