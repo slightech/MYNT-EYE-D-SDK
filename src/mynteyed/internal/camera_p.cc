@@ -49,6 +49,7 @@ void CameraPrivate::Init() {
   location_ = std::make_shared<Location>();
   distance_ = std::make_shared<Distance>();
   streams_ = std::make_shared<Streams>(device_);
+  m_filter_manager = std::make_shared<FilterSpigot>();
 
   relink_times_ = 0;
 

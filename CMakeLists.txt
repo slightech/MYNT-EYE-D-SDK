@@ -143,6 +143,9 @@ set(MYNTEYE_DEPTH_SRCS
   src/mynteyed/internal/motions.cc
   src/mynteyed/internal/location.cc
   src/mynteyed/internal/distance.cc
+  src/mynteyed/filter/base_filter.cpp
+  src/mynteyed/filter/filter_spigot.cpp
+  src/mynteyed/filter/spatial_filter.cpp
 )
 if(OS_WIN)
   list(APPEND MYNTEYE_DEPTH_SRCS

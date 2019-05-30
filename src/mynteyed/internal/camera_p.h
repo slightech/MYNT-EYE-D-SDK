@@ -28,6 +28,7 @@
 #include "mynteyed/device/types_internal.h"
 #include "mynteyed/internal/async_callback.h"
 #include "mynteyed/types.h"
+#include "mynteyed/filter/filter_spigot.h"
 
 MYNTEYE_BEGIN_NAMESPACE
 
@@ -37,6 +38,7 @@ class Motions;
 class Location;
 class Distance;
 class Streams;
+class FilterSpigot;
 
 class MYNTEYE_API CameraPrivate {
  public:
@@ -286,6 +288,7 @@ class MYNTEYE_API CameraPrivate {
   int relink_times_;
 
   std::thread watch_thread_;
+  std::shared_ptr<FilterSpigot> m_filter_manager;
 };
 
 MYNTEYE_END_NAMESPACE

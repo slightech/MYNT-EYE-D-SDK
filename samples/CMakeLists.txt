@@ -112,6 +112,15 @@ make_executable(get_depth
   DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
 )
 
+make_executable(get_depth_with_filter
+  SRCS
+    src/get_depth_with_filter.cc
+    src/util/cam_utils.cc
+    src/util/cv_painter.cc
+  LINK_LIBS mynteye_depth ${OpenCV_LIBS}
+  DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
+)
+
 make_executable(get_imu
   SRCS
     src/get_imu.cc

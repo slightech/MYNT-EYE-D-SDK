@@ -29,6 +29,21 @@
 #include "mynteyed/stubs/global.h"
 
 MYNTEYE_BEGIN_NAMESPACE
+struct ImageProfile {
+  size_t width;
+  size_t height;
+  size_t bpp;
+  ImageFormat format;
+  bool operator==(const ImageProfile& other) const {
+    if (width == other.width &&
+        height == other.height &&
+        bpp == other.bpp &&
+        format == other.format) {
+      return true;
+    }
+    return false;
+  }
+};
 
 class MYNTEYE_API Image {
  public:
@@ -107,6 +122,31 @@ class MYNTEYE_API Image {
   void set_valid_size(std::size_t valid_size);
 
   virtual pointer To(const ImageFormat& format) = 0;
+
+  ImageProfile get_image_profile() {
+    struct ImageProfile res = {static_cast<unsigned int>(width_),
+        static_cast<unsigned int>(height_), 0, format_};
+    switch (format_) {
+      case ImageFormat::IMAGE_GRAY_24:
+      case ImageFormat::IMAGE_BGR_24:
+      case ImageFormat::IMAGE_RGB_24:
+        res.bpp = 3;
+      break;
+      case ImageFormat::IMAGE_GRAY_16:  /**< 16UC1 */
+      case ImageFormat::IMAGE_YUYV:     /**< 8UC2 */
+        res.bpp = 2;
+      break;
+      // color
+      case ImageFormat::IMAGE_GRAY_8:   /**< 8UC1 */
+        res.bpp = 1;
+      break;
+      default:
+        std::cout << "invalid profile format "<< std::endl;
+        return res;
+      break;
+    }
+    return res;
+  }
 
 #ifdef WITH_OPENCV
   cv::Mat ToMat();
