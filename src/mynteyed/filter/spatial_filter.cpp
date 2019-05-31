@@ -409,5 +409,7 @@ void SpatialFilter::UpdateConfig(
   _current_frm_size_pixels = _width * _height;
   _tmp_frame.clear();
   _tmp_frame.resize(_current_frm_size_pixels*_bpp);
+
+  last_frame_profile = in;
 }
 

@@ -146,6 +146,7 @@ set(MYNTEYE_DEPTH_SRCS
   src/mynteyed/filter/base_filter.cpp
   src/mynteyed/filter/filter_spigot.cpp
   src/mynteyed/filter/spatial_filter.cpp
+  src/mynteyed/filter/temporal_filter.cpp
 )
 if(OS_WIN)
   list(APPEND MYNTEYE_DEPTH_SRCS

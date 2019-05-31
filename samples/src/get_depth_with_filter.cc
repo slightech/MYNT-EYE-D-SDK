@@ -20,6 +20,7 @@
 #include "mynteyed/camera.h"
 #include "mynteyed/utils.h"
 #include "mynteyed/filter/spatial_filter.h"
+#include "mynteyed/filter/temporal_filter.h"
 
 #include "util/cam_utils.h"
 #include "util/counter.h"
@@ -74,6 +75,7 @@ int main(int argc, char const* argv[]) {
   util::print_stream_infos(cam, dev_info.index);
 
   SpatialFilter spat_filter;
+  TemporalFilter temp_filter;
 
   cout << "Open device: " << dev_info.index << ", "
       << dev_info.name << endl << endl;
@@ -140,6 +142,7 @@ int main(int argc, char const* argv[]) {
 #endif
       cv::imshow("depth_before_filter", res_org);
       spat_filter.ProcessFrame(image_depth.img, image_depth.img);
+      temp_filter.ProcessFrame(image_depth.img, image_depth.img);
       cv::Mat res;
       cv::normalize(depth, res, 0, 255, cv::NORM_MINMAX, CV_8UC1);
 #ifdef WITH_OPENCV3
