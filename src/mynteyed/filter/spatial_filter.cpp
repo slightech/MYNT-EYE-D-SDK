@@ -95,7 +95,26 @@ bool SpatialFilter::LoadConfig(void* data) {
   _spatial_delta_param = *delta_default_val_ptr;
   _spatial_iterations = *filter_iter_def_ptr;
   _holes_filling_mode = *holes_fill_def_ptr;
-  return false;
+  _spatial_edge_threshold = float(_spatial_delta_param);  // NOLINT
+  switch (_holes_filling_mode) {
+  case sp_hf_disabled:
+    _holes_filling_radius = 0;      // disabled
+    break;
+  case sp_hf_unlimited_radius:
+      // Unrealistic smearing; not particulary useful
+    _holes_filling_radius = 0xff;
+    break;
+  case sp_hf_2_pixel_radius:
+  case sp_hf_4_pixel_radius:
+  case sp_hf_8_pixel_radius:
+  case sp_hf_16_pixel_radius:
+      // 2's exponential radius
+    _holes_filling_radius = 0x1 << _holes_filling_mode;
+    break;
+  default:
+    break;
+  }
+  return true;
 }
 
 void SpatialFilter::process_frame(void* source) {

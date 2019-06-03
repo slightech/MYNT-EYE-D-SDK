@@ -152,7 +152,13 @@ void TemporalFilter::recalc_persistence_map() {
 }
 
 bool TemporalFilter::LoadConfig(void* data) {
-  return false;
+  uint8_t* persistence_control_p = reinterpret_cast<uint8_t*>(data);
+  float* alpha_p = reinterpret_cast<float*>(persistence_control_p + 1);
+  uint16_t* delta_p = reinterpret_cast<uint16_t*>(persistence_control_p + 5);
+  on_set_persistence_control(*persistence_control_p);
+  on_set_delta(*delta_p);
+  on_set_alpha(*alpha_p);
+  return true;
 }
 
 bool TemporalFilter::ProcessFrame(
