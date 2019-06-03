@@ -56,7 +56,7 @@ int main(int argc, char const* argv[]) {
   auto temp_sptr = std::make_shared<TemporalFilter>();
   std::vector<std::shared_ptr<BaseFilter>> vec;
   vec.push_back(spat_sptr);
-  vec.push_back(spat_sptr);
+  vec.push_back(temp_sptr);
 
   Rate rate(params.framerate);
   util::PCViewer viewer(1280, 720);
