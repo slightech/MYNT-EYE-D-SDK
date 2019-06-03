@@ -37,7 +37,6 @@ const size_t PRESISTENCY_LUT_SIZE = 256;
 class TemporalFilter : public BaseFilter{
  public:
   TemporalFilter();
-  bool process_frame(void* source);
   bool LoadConfig(void* data) override;
   bool ProcessFrame(
       std::shared_ptr<Image> out,
@@ -101,6 +100,7 @@ class TemporalFilter : public BaseFilter{
   void recalc_persistence_map();
 
  private:
+  bool process_frame(void* source);
   void UpdateConfig(const ImageProfile &in);
   uint8_t _persistence_param;
 

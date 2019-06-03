@@ -23,7 +23,6 @@ MYNTEYE_BEGIN_NAMESPACE
 class SpatialFilter : public BaseFilter {
  public:
   SpatialFilter();
-  void process_frame(void* source);
   bool LoadConfig(void* data) override;
   bool ProcessFrame(
       std::shared_ptr<Image> out,
@@ -240,6 +239,7 @@ class SpatialFilter : public BaseFilter {
   }
 
  private:
+  void process_frame(void* source);
   void UpdateConfig(const ImageProfile &in);
 
   float                   _spatial_alpha_param;
