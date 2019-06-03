@@ -623,14 +623,16 @@ void CameraPrivate::Relink() {
   if (relink_times_++ > MAX_RELINK_TIMES)
     throw_error("\n\nThe camera device is disconnected.\n");
 
-  if (channels_->IsHidTracking())
-  {
+  if (channels_->IsAvaliable()) {
     StopDataTracking();
     channels_->CloseHid();
     if (channels_->OpenHid()) {
       NotifyDataTrackStateChanged();
+    } else {
+      return;
     }
   }
+
   if (device_->Restart())
     relink_times_ = 0;
 }

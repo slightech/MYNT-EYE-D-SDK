@@ -1,3 +1,5 @@
+#include <functional>
+
 #include "mynteyed/internal/match.h"
 #include "mynteyed/util/log.h"
 
@@ -5,10 +7,6 @@ MYNTEYE_USE_NAMESPACE
 
 Match::Match() :
   order_(Order::NONE) {
-
-  key_streams_ = {ImageType::IMAGE_LEFT_COLOR,
-                  // ImageType::IMAGE_RIGHT_COLOR,
-                  ImageType::IMAGE_DEPTH};
 }
 
 Match::~Match() {
@@ -45,14 +43,14 @@ Match::img_datas_t Match::GetStreamDatas(const ImageType& type) {
         return MatchStreamDatas(type);
       case Order::RIGHT_IMAGE:
         if (type == ImageType::IMAGE_RIGHT_COLOR) {
-          base_frame_id_ = stream_datas_[type].back().img->frame_id();
+          base_frame_id_ = datas.back().img->frame_id();
           stream_datas_[type].clear();
           return datas;
         }
         return MatchStreamDatas(type);
       case Order::DEPTH_IMAGE:
         if (type == ImageType::IMAGE_DEPTH) {
-          base_frame_id_ = stream_datas_[type].back().img->frame_id();
+          base_frame_id_ = datas.back().img->frame_id();
           stream_datas_[type].clear();
           return datas;
         }
@@ -133,6 +131,14 @@ bool Match::IsStreamDatasReady() {
   }
 
   return true;
+}
+
+void Match::InitStreamKey(const bool &enable) {
+  if (enable) {
+    key_streams_ = {ImageType::IMAGE_DEPTH};
+  } else {
+    key_streams_ = {ImageType::IMAGE_LEFT_COLOR};
+  }
 }
 
 

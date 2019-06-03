@@ -170,6 +170,7 @@ void Streams::SetStreamCallback(const ImageType& type,
 
 void Streams::OnCameraOpen() {
   is_right_color_supported_ = device_->IsRightColorSupported();
+  match_->InitStreamKey(device_->DepthDeviceOpened());
   StartStreamCapturing();
 }
 

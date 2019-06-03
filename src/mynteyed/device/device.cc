@@ -251,6 +251,7 @@ bool Device::SetAutoExposureEnabled(bool enabled) {
 
   bool ok;
   if (enabled) {
+    params_member_[ControlParams::AUTO_EXPOSURE].enabled = enabled;
     ok = ETronDI_OK == EtronDI_EnableAE(handle_, &dev_sel_info_);
   } else {
     ok = ETronDI_OK == EtronDI_DisableAE(handle_, &dev_sel_info_);
@@ -271,6 +272,7 @@ bool Device::SetAutoWhiteBalanceEnabled(bool enabled) {
 
   bool ok;
   if (enabled) {
+    params_member_[ControlParams::AUTO_WHITE_BALANCE].enabled = enabled;
     ok = ETronDI_OK == EtronDI_EnableAWB(handle_, &dev_sel_info_);
   } else {
     ok = ETronDI_OK == EtronDI_DisableAWB(handle_, &dev_sel_info_);
@@ -1234,7 +1236,17 @@ bool Device::UpdateStreamInfos() {
 }
 
 void Device::ResumeParams() {
-  auto &&it = params_member_.find(ControlParams::IR_DEPTH_ONLY);
+  auto &&it = params_member_.find(ControlParams::AUTO_EXPOSURE);
+  if (it != params_member_.end()) {
+    SetAutoExposureEnabled(it->second.enabled);
+  }
+
+  it = params_member_.find(ControlParams::AUTO_WHITE_BALANCE);
+  if (it != params_member_.end()) {
+    SetAutoWhiteBalanceEnabled(it->second.enabled);
+  }
+
+  it =  params_member_.find(ControlParams::IR_DEPTH_ONLY);
   if (it != params_member_.end()) {
     SetInfraredDepthOnly(open_params_);
   }
@@ -1287,4 +1299,8 @@ bool Device::UpdateDeviceStatus() {
   check_times_ = MAX_CHECK_TIMES;
 
   return true;
+}
+
+bool Device::DepthDeviceOpened() {
+  return depth_device_opened_;
 }

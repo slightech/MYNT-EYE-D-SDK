@@ -3,6 +3,14 @@
 Change log
 ============
 
+2019-05-29 v1.7.7
+-------------------------
+
+1. Add relink function.
+
+2. Add ros wrapper independent compilations.
+
+
 2019-04-26 v1.7.6
 --------------------------
 

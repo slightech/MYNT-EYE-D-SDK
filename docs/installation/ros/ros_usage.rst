@@ -96,9 +96,14 @@ In ``mynteye.launch`` ,you can configure ``topics`` and ``frame_ids``
   -->
   <arg name="dev_mode" default="$(arg device_all)" />
 
-  <arg name="color_mode" default="$(arg color_raw)" />
-  <!-- Note: must set DEPTH_RAW to get raw depth values for points -->
+  <!-- 
+  Set depth mode
+  Note: must set DEPTH_RAW to get raw depth values for points
+  -->
   <arg name="depth_mode" default="$(arg depth_raw)" />
+  <!--
+  Set resolution from stream_640x480,stream_1280x720,stream_1280x480,stream_2560x720
+  -->
   <arg name="stream_mode" default="$(arg stream_2560x720)" />
 
   <!-- Auto-exposure -->
