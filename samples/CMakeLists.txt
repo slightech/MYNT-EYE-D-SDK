@@ -216,4 +216,12 @@ if(PCL_FOUND)
     LINK_LIBS mynteye_depth ${OpenCV_LIBS} ${PCL_LIBRARIES}
     DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
   )
+
+  make_executable(get_points_with_filter
+    SRCS
+      src/points/get_points_with_filter.cc
+      src/util/pc_utils.cc
+    LINK_LIBS mynteye_depth ${OpenCV_LIBS} ${PCL_LIBRARIES}
+    DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
+  )
 endif()

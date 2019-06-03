@@ -26,11 +26,11 @@ MYNTEYE_BEGIN_NAMESPACE
 class BaseFilter : public std::enable_shared_from_this<BaseFilter> {
  protected:
   BaseFilter();
+
+ public:
   virtual bool ProcessFrame(
       std::shared_ptr<Image> out,
       const std::shared_ptr<Image> in) = 0; // NOLINT
-
- public:
   virtual bool LoadConfig(void* data);
   inline bool TurnOn() {
     return Enable(true);

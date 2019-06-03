@@ -14,6 +14,7 @@
 #include "util/pc_utils.h"
 
 #include <string>
+#include <vector>
 
 #include <pcl/io/ply_io.h>
 
@@ -25,6 +26,31 @@ inline
 CameraIntrinsics get_camera_intrinsics(const Camera &camera) {
   auto stream_mode = camera.GetOpenParams().stream_mode;
   return camera.GetStreamIntrinsics(stream_mode).left;
+}
+
+pcl::PointCloud<pcl::PointXYZRGBA>::Ptr get_point_cloud(
+    Camera *camera, float cam_factor,
+    std::vector<std::shared_ptr<BaseFilter>> filters) {
+  static auto cam_in = get_camera_intrinsics(*camera);
+
+  cv::Mat color;
+  auto image_color = camera->GetStreamData(ImageType::IMAGE_LEFT_COLOR);
+  if (image_color.img) {
+    color = image_color.img->To(ImageFormat::COLOR_BGR)->ToMat();
+  }
+
+  cv::Mat depth;
+  auto image_depth = camera->GetStreamData(ImageType::IMAGE_DEPTH);
+  if (image_depth.img) {
+    depth = image_depth.img->To(ImageFormat::DEPTH_RAW)->ToMat();
+  }
+
+  if (color.empty() || depth.empty()) { return nullptr; }
+  for (size_t i=0; i< filters.size(); i++) {
+    filters[i]->ProcessFrame(image_depth.img, image_depth.img);
+  }
+
+  return get_point_cloud(color, depth, cam_in, cam_factor);
 }
 
 pcl::PointCloud<pcl::PointXYZRGBA>::Ptr get_point_cloud(

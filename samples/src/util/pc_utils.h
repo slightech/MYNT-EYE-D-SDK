@@ -21,12 +21,17 @@
 #include <pcl/point_types.h>
 #include <pcl/visualization/pcl_visualizer.h>
 
+#include "mynteyed/filter/base_filter.h"
+
 #include "mynteyed/stubs/global.h"
 #include "mynteyed/camera.h"
 
 MYNTEYE_BEGIN_NAMESPACE
 
 namespace util {
+pcl::PointCloud<pcl::PointXYZRGBA>::Ptr get_point_cloud(
+    Camera *camera, float cam_factor,
+    std::vector<std::shared_ptr<BaseFilter>> filters);
 
 pcl::PointCloud<pcl::PointXYZRGBA>::Ptr get_point_cloud(
     Camera *camera, float cam_factor = 1000);
