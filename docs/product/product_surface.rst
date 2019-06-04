@@ -1,4 +1,4 @@
-.. _product_surface:
+.. _product_product_surface:
 
 Product Surface
 ===============

@@ -1,4 +1,4 @@
-.. _imu_coord:
+.. _product_imu_coord:
 
 IMU Coordinata System
 =====================

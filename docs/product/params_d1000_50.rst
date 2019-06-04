@@ -1,4 +1,4 @@
-.. _params_d1000_50:
+.. _product_params_d1000_50:
 
 D1000-50/Color specification
 =============================
