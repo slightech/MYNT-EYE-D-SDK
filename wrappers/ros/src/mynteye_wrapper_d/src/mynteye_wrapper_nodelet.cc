@@ -26,6 +26,7 @@
 #include <unistd.h>
 #include <vector>
 #include <string>
+#include <iomanip>
 
 #include <boost/make_shared.hpp>
 #include <boost/thread/thread.hpp>
@@ -905,17 +906,14 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   ros::Time hardTimeToSoftTime(std::uint64_t _hard_time) {
     static bool isInited = false;
     static uint64_t hard_time_begin(0);
-    static uint32_t soft_time_begin(0);
+    static double soft_time_begin(0);
     if (false == isInited) {
       soft_time_begin = ros::Time::now().toSec();
       hard_time_begin = _hard_time;
       isInited = true;
     }
-    std::uint64_t time_ns_detal = (_hard_time - hard_time_begin);
-    std::uint64_t time_ns_detal_s = time_ns_detal / 100000;
-    std::uint64_t time_ns_detal_ns = time_ns_detal % 100000;
-    return ros::Time(soft_time_begin + time_ns_detal_s,
-                     time_ns_detal_ns * 10000);
+    double time_ns_detal = static_cast<double>(_hard_time - hard_time_begin);
+    return ros::Time(soft_time_begin + time_ns_detal / 100000.00);
   }
 
   ImuData ProcImuAssembly(const ImuData& data) const {
