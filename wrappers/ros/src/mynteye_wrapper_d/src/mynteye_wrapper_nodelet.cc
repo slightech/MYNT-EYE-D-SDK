@@ -912,8 +912,14 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       hard_time_begin = _hard_time;
       isInited = true;
     }
-    double time_ns_detal = static_cast<double>(_hard_time - hard_time_begin);
-    return ros::Time(soft_time_begin + time_ns_detal / 100000.00);
+
+    std::uint64_t time_ns_detal = (_hard_time - hard_time_begin);
+    std::uint64_t time_ns_detal_s = time_ns_detal / 100000;
+    std::uint64_t time_ns_detal_ns = time_ns_detal % 100000;
+    double time_sec_double =
+      ros::Time(time_ns_detal_s, time_ns_detal_ns * 10000).toSec();
+
+    return ros::Time(soft_time_begin + time_sec_double);
   }
 
   ImuData ProcImuAssembly(const ImuData& data) const {
