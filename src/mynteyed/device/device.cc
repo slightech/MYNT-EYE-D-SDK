@@ -1123,6 +1123,10 @@ bool Device::SetSensorType(const SensorType &type) {
 }
 
 bool Device::SetExposureTime(const float &value) {
+  SetExposureTime(value, SensorMode::ALL);
+}
+
+bool Device::SetExposureTime(const float &value, const SensorMode &sensor) {
   if (!IsOpened()) {
     LOGE("\nERROR:: Device is not opened.\n");
     return false;
@@ -1130,7 +1134,7 @@ bool Device::SetExposureTime(const float &value) {
   if (!SetSensorType(SensorType::SENSOR_TYPE_AR0135))
     return false;
 
-  int sensor_mode = get_sensor_mode(SensorMode::ALL);
+  int sensor_mode = get_sensor_mode(sensor);
   if (EtronDI_SetExposureTime(
         handle_, &dev_sel_info_,
         sensor_mode, value) == ETronDI_OK) {

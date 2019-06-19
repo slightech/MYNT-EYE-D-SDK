@@ -217,6 +217,10 @@ void Camera::SetExposureTime(const float &value) {
   return p_->SetExposureTime(value);
 }
 
+void Camera::SetExposureTime(const float &value, const SensorMode &sensor) {
+  return p_->SetExposureTime(value, sensor);
+}
+
 void Camera::GetExposureTime(float &value) {
   return p_->GetExposureTime(value);
 }
