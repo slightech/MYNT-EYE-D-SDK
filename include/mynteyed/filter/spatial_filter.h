@@ -20,7 +20,7 @@
 
 MYNTEYE_BEGIN_NAMESPACE
 
-class SpatialFilter : public BaseFilter {
+class MYNTEYE_API SpatialFilter : public BaseFilter {
  public:
   SpatialFilter();
   bool LoadConfig(void* data) override;

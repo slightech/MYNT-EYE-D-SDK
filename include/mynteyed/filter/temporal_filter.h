@@ -34,7 +34,7 @@ MYNTEYE_BEGIN_NAMESPACE
 
 const size_t PRESISTENCY_LUT_SIZE = 256;
 
-class TemporalFilter : public BaseFilter{
+class MYNTEYE_API TemporalFilter : public BaseFilter{
  public:
   TemporalFilter();
   bool LoadConfig(void* data) override;
