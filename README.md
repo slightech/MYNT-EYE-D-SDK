@@ -1,6 +1,6 @@
 # MYNT® EYE D SDK
 
-[![](https://img.shields.io/badge/MYNT%20EYE%20D%20SDK-v1.7.7-brightgreen.svg?style=flat)](https://github.com/slightech/MYNT-EYE-D-SDK)
+[![](https://img.shields.io/badge/MYNT%20EYE%20D%20SDK-v1.7.8-brightgreen.svg?style=flat)](https://github.com/slightech/MYNT-EYE-D-SDK)
 
 MYNT® EYE D SDK is a library for MYNT® EYE Depth cameras.
 
