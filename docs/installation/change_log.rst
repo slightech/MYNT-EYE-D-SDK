@@ -3,6 +3,12 @@
 Change log
 ============
 
+2019-06-24 v1.7.8
+--------------------
+
+1. Add get_depth_with_filter and get_points_with_filter samples.
+
+
 2019-05-29 v1.7.7
 -------------------------
 
