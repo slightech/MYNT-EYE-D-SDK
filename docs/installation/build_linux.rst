@@ -44,7 +44,7 @@ Alternatively, refer to the command below:
 
    git clone https://github.com/opencv/opencv.git
    cd opencv/
-   git checkout tags/3.4.5
+   git checkout tags/3.4.3
 
    cd opencv/
    mkdir build
