@@ -3,6 +3,15 @@
 Change log
 ============
 
+2019-06-25 v1.7.8
+-------------------------
+
+1. Add spatial filter.
+
+2. Add temporal filter.
+
+3. Fix a windows complie error.
+
 2019-05-29 v1.7.7
 -------------------------
 
