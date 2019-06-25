@@ -1,6 +1,6 @@
 .. _sdkdemo:
 
-Get depth image
+Get Depth Image
 ===============
 
 Depth images belongs to the upper layer of synthetic data.

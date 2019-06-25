@@ -1,6 +1,6 @@
 .. _write_imu_params:
 
-Write IMU parameters
+Write IMU Parameters
 ====================
 
 SDK provides the tool ``imu_params_writer`` to write IMU parameters.

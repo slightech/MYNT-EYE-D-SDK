@@ -1,6 +1,6 @@
 .. _sdkdemo:
 
-Get IMU data
+Get IMU Data
 ============
 
 You need ``EnableMotionDatas()``\ to enable caching in order to get IMU

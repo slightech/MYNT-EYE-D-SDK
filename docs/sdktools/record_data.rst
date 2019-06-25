@@ -1,6 +1,6 @@
 .. _record_data:
 
-Record data sets
+Record Data Sets
 ================
 
 The SDK provides the tool record for recording data sets. Tool details

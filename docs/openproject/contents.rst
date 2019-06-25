@@ -1,9 +1,8 @@
-.. _openproject:
-
-SLAM
-====
+OPEN SOURCE SUPPORT
+======================
 
 .. toctree::
+   :maxdepth: 2
 
    vins
    orb_slam2

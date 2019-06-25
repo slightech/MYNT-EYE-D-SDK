@@ -1,6 +1,6 @@
 .. _product_product_surface:
 
-Product Surface
+Surface
 ===============
 
 ============= ==============

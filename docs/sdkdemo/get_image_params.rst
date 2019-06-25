@@ -1,6 +1,6 @@
 .. _sdkdemo:
 
-Get image calibration parameters
+Get Image Calibration Parameters
 ================================
 
 Use ``GetStreamIntrinsics()`` and ``GetStreamExtrinsics()`` to get image

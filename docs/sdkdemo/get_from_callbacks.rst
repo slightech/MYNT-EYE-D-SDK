@@ -1,6 +1,6 @@
 .. _sdkdemo:
 
-Get data from callbacks
+Get Data From Callbacks
 =======================
 
 API offers function ``SetStreamCallback()`` and ``SetMotionCallback()``

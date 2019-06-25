@@ -1,6 +1,6 @@
 .. _sdkdemo:
 
-Camera control parameters API
+Camera Control Parameters API
 =============================
 
 Open or close auto exposure

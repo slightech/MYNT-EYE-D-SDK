@@ -1,6 +1,6 @@
 .. _sdkdemo:
 
-Set open parameters
+Set Open Parameters
 ===================
 
 Set the resolution of image

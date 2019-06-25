@@ -1,6 +1,6 @@
 .. _save_all_infos:
 
-Save device infomation and parameters
+Save Device Infomation And Parameters
 =====================================
 
 The SDK provides a tool ``save_all_infos`` for save information and

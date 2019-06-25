@@ -4,7 +4,7 @@
 
 .. _analyze_time_stamps:
 
-Analyze time stamps
+Analyze Time Stamps
 ===================
 
 SDK provides a script for timestamp analysis stamp_analytics.py . Tool

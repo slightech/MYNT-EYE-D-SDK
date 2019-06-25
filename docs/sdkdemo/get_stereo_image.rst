@@ -1,6 +1,6 @@
 .. _sdkdemo:
 
-Get camera image
+Get Camera Image
 ================
 
 Using the ``DeviceMode::DEVICE_COLOR`` function of the API, you can get

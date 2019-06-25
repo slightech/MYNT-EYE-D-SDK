@@ -1,6 +1,6 @@
 .. _sdkdemo:
 
-Get point image
+Get Point Image
 ===============
 
 Point images belongs to upper layer of synthetic data.You can get it

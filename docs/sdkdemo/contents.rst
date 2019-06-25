@@ -1,4 +1,4 @@
-MYNT® EYE SDK SAMPLES
+SDK SAMPLES
 ======================
 
 .. toctree::

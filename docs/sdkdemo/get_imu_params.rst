@@ -1,6 +1,6 @@
 .. _sdkdemo:
 
-Get IMU calibration parameters
+Get IMU Calibration Parameters
 ==============================
 
 Use ``GetMotionIntrinsics()`` and ``GetMotionExtrinsics`` to get current

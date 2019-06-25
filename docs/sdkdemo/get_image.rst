@@ -1,6 +1,6 @@
 .. _sdkdemo:
 
-Get camera image(Compatible with USB2.0)
+Get Camera Image(Compatible With USB2.0)
 ===========================================
 
 Compatible with USB2.0 ,change to the resolution and frame rate for

@@ -1,4 +1,4 @@
-.. _LogContents:
+.. _sdk_change_log:
 
 Change log
 ============

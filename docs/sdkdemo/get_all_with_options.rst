@@ -1,6 +1,6 @@
 .. _sdkdemo:
 
-Get different types of image by options
+Get Different Types Of Image By Options
 =======================================
 
 ``get_all_with_options`` sample can add different options to control

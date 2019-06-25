@@ -1,4 +1,4 @@
-.. _SDKContents_support_platforms:
+.. _sdk_support_platforms:
 
 Supported Platforms
 ===================
