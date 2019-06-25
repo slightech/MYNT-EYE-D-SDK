@@ -96,6 +96,9 @@ In ``mynteye.launch`` ,you can configure ``topics`` and ``frame_ids``
   -->
   <arg name="dev_mode" default="$(arg device_all)" />
 
+  <!-- Set Color Mode form color_raw, color_rectified-->
+  <arg name="color_mode" default="$(arg color_raw)" />
+
   <!-- 
   Set depth mode
   Note: must set DEPTH_RAW to get raw depth values for points

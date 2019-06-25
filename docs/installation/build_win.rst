@@ -68,7 +68,7 @@ Finally, the CMD (Command Prompt) can run the following command:
 1) Go to OpenCV Sourceforge page
    http://sourceforge.net/projects/opencvlibrary/files/opencv-win/
 2) Choose a build you want to use and download it. For example
-   3.4.2/opencv-3.4.2-vc14_vc15.exe
+   3.4.3/opencv-3.4.3-vc14_vc15.exe
 3) Make sure you have admin rights. Unpack the self-extracting archive
 4) To finalize the installation, go to set the OpenCV environment
    variable and add it to the systems path
