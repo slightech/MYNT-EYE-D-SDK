@@ -23,7 +23,7 @@
 
 MYNTEYE_BEGIN_NAMESPACE
 
-class BaseFilter : public std::enable_shared_from_this<BaseFilter> {
+class MYNTEYE_API BaseFilter : public std::enable_shared_from_this<BaseFilter> {
  protected:
   BaseFilter();
 

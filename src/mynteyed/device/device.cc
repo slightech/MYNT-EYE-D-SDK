@@ -299,27 +299,26 @@ void Device::SetInfraredDepthOnly(const OpenParams& params) {
     error_n = 2;
     EtronDI_EnableInterleave(handle_, &dev_sel_info_, false);
   } else if (params.stream_mode == StreamMode::STREAM_2560x720 &&
-      params.framerate > 30) {
+      params.framerate != 30) {
     error_n = 3;
+    EtronDI_EnableInterleave(handle_, &dev_sel_info_, false);
+  } else if ((params.stream_mode == StreamMode::STREAM_1280x720 ||
+        params.stream_mode == StreamMode::STREAM_1280x480 ||
+        params.stream_mode == StreamMode::STREAM_640x480) &&
+      params.framerate != 60) {
+
+    error_n = 4;
     EtronDI_EnableInterleave(handle_, &dev_sel_info_, false);
   }
 
   if (error_n > 0) {
-    throw_error("\n\nNote: IR Depth Only mode support frame"
-        " rate only be between 30fps and 60fps.\n"
-        "    When dev_mode != DeviceMode::DEVICE_ALL,"
-        " IR Depth Only mode not be supported.\n"
-        "    When stream_mode == StreamMode::STREAM_2560x720,"
-        " frame rate only be 30fps in this mode.\n"
-        "    When frame rate less than 30fps or greater than 60fps,"
-        " IR Depth Only mode will be not available.\n");
+    throw_error("\n\nThis feature is only available for "
+        "[2560x720 30fps] and [1280x720, 1280x480, 640x480 60fps].\n");
 
     return;
   }
 
-  if (depth_data_type_ == 1 ||
-      depth_data_type_ == 2 ||
-      depth_data_type_ == 4) {
+  if (params.color_mode == ColorMode::COLOR_RECTIFIED) {
     color_ir_depth_only_enabled_ = false;
     depth_ir_depth_only_enabled_ = true;
   } else {

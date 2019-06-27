@@ -76,6 +76,14 @@ void matrix_3x3(const double (*src1)[3], const double (*src2)[3],
 
 namespace enc = sensor_msgs::image_encodings;
 
+enum class PublishType : int32_t {
+  LEFT,
+  RIGHT,
+  DEPTH,
+  POINT,
+  IMU,
+};
+
 class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
  public:
   ros::NodeHandle nh;
@@ -578,8 +586,14 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       const std::string color_frame_id,
       const image_transport::Publisher& pub_mono, bool mono_sub,
       const std::string mono_frame_id, bool is_left) {
+    PublishType type;
+    if (is_left)
+      type = PublishType::LEFT;
+    else
+      type = PublishType::RIGHT;
+
     auto timestamp = data.img_info
-          ? hardTimeToSoftTime(data.img_info->timestamp)
+          ? checkUpTimeStamp(data.img_info->timestamp, type)
           : ros::Time().now();
     auto&& mat = data.img->To(ImageFormat::COLOR_BGR)->ToMat();
 
@@ -616,7 +630,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   void publishDepth(const StreamData& data) {
     std_msgs::Header header;
     header.stamp = data.img_info
-        ? hardTimeToSoftTime(data.img_info->timestamp)
+        ? checkUpTimeStamp(data.img_info->timestamp, PublishType::DEPTH)
         : ros::Time().now();
     header.frame_id = depth_frame_id;
 
@@ -733,7 +747,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       return;
     }
 
-    ros::Time stamp = hardTimeToSoftTime(imu_accel->timestamp);
+    ros::Time stamp = checkUpTimeStamp(imu_accel->timestamp, PublishType::IMU);
 
     if (imu_sub) {
       auto msg = getImuMsgFromData(ros::Time::now(),
@@ -770,7 +784,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       return;
     }
 
-    ros::Time stamp = hardTimeToSoftTime(imu_accel->timestamp);
+    ros::Time stamp = checkUpTimeStamp(imu_accel->timestamp, PublishType::IMU);
 
     if (imu_sub) {
       auto msg = getImuMsgFromData(ros::Time::now(),
@@ -903,6 +917,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
     return camera_info_ptr;
   }
+
   ros::Time hardTimeToSoftTime(std::uint64_t _hard_time) {
     static bool isInited = false;
     static uint64_t hard_time_begin(0);
@@ -920,6 +935,29 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       ros::Time(time_ns_detal_s, time_ns_detal_ns * 10000).toSec();
 
     return ros::Time(soft_time_begin + time_sec_double);
+  }
+
+  inline bool is_overflow(
+      std::uint64_t now, std::uint64_t pre) {
+    static std::uint64_t unit = std::numeric_limits<std::uint32_t>::max();
+
+    return (now < pre) && ((pre - now) > (unit / 2));
+  }
+
+  ros::Time checkUpTimeStamp(std::uint64_t _hard_time, const PublishType &type) {
+    static std::map<PublishType, std::uint64_t> hard_time_now;
+    static std::map<PublishType, std::uint64_t> acc_count;
+    static std::uint64_t unit_hard_time =
+      std::numeric_limits<std::uint32_t>::max();
+
+    if (is_overflow(_hard_time, hard_time_now[type])) {
+      acc_count[type]++;
+    }
+
+    hard_time_now[type] = _hard_time;
+
+    return hardTimeToSoftTime(
+        acc_count[type] * unit_hard_time + _hard_time);
   }
 
   ImuData ProcImuAssembly(const ImuData& data) const {
