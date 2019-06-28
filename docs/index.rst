@@ -15,6 +15,7 @@ MYNT® EYE D SDK
    firmware/contents
    sdkdemo/contents
    sdktools/contents
+   tools/contents
    openproject/contents
    apidoc/contents
    support/contents
