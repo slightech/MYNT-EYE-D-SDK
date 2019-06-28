@@ -164,6 +164,8 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
   sub_result_t sub_result;
 
+  std::uint64_t unit_hard_time = 4294900000;
+
   MYNTEYEWrapperNodelet() {
     skip_tag = -1;
     skip_tmp_left_tag = 0;
@@ -939,16 +941,13 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
   inline bool is_overflow(
       std::uint64_t now, std::uint64_t pre) {
-    static std::uint64_t unit = std::numeric_limits<std::uint32_t>::max();
 
-    return (now < pre) && ((pre - now) > (unit / 2));
+    return (now < pre) && ((pre - now) > (unit_hard_time / 2));
   }
 
   ros::Time checkUpTimeStamp(std::uint64_t _hard_time, const PublishType &type) {
     static std::map<PublishType, std::uint64_t> hard_time_now;
     static std::map<PublishType, std::uint64_t> acc_count;
-    static std::uint64_t unit_hard_time =
-      std::numeric_limits<std::uint32_t>::max();
 
     if (is_overflow(_hard_time, hard_time_now[type])) {
       acc_count[type]++;
