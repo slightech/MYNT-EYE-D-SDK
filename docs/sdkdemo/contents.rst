@@ -15,3 +15,4 @@ SDK SAMPLES
    get_imu_params
    set_open_params
    camera_control_params
+   depth_filter

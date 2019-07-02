@@ -1,9 +1,9 @@
-.. _InstallContents:
+.. _install_exe_win:
 
 Windows EXE Installation
 ========================
 
-   Download here: mynteye-d-1.7.1-win-x64-opencv-3.4.3.exe `Google
+   Download here: mynteye-d-x.x.x-win-x64-opencv-3.4.3.exe `Google
    Drive <https://drive.google.com/open?id=1FQrRdpK51U43ihX5pVkMRUedtOOc0FNg>`__,
    `Baidu Pan <https://pan.baidu.com/s/1GeeZ-4-DVyZJ2wUh0aknjQ>`__
 
@@ -12,11 +12,16 @@ SDK root directory on your desktop.
 
 First, you should plug the MYNT® EYE camera in a USB 3.0 port.
 
-Second, goto the “\bin\samples`” directory and
+Second, goto the "\bin\samples" directory and
 click “get_image.exe” to run.
 
 Finally, you will see the window that display the realtime frame of the
 camera.
+
+.. note::
+
+  If you cannot run samples successfully, please check if the system variable PATH was successfully added ``<SDK_ROOT_DIR>\bin`` , ``<SDK_ROOT_DIR>\bin\3rdparty`` ,
+  ``<SDK_ROOT_DIR>\3rdparty\opencv\build\x64\vc15\bin`` , ``<SDK_ROOT_DIR>\3rdparty\libjpeg-turbo64\bin`` .
 
 Generate samples project of Visual Studio 2017
 ----------------------------------------------
@@ -77,4 +82,3 @@ p.s. The example result of “generate.bat”,
 .. tip::
 
   Right click sample and select ``Set as StartUp Project``，then launch with Release x64 mode.
-

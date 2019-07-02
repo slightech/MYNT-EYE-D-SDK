@@ -5,20 +5,45 @@ MYNT EYE D Manual Calibration Tool
 
 
 
-Introduction
+Get Calibration Tool
 --------
 
-This manual calibration tool can generate both calibration data and ZD table (disparity to distance). The calibrator equipment configuration mainly involves two items; the size of the chess board and the distance between camera module and chess board
+Latest tool:  D1000-eSPCalibrator1.3.10_Release for SICILI.zip `Google
+Drive <https://drive.google.com/open?id=13QsqgkzNfh4yKDisYgHXtshzFyqRzbDs>`__,
+`Baidu Pan <https://pan.baidu.com/s/11gbg_KkzaezNa52YfdMjJw>`__
 
-* The recommended distance between chess board and camera module is the working distance of the target application
 
-* The recommended size of the chess board is that the chess board shall cover the maximum portion(over 50%) of the preview image from both camera
+Prerequisites(Update config file)
+--------
 
+* You can find Depth 50°'s config file in ``D1000-50`` , Depth 120°'s config file in ``D1000-120`` 。
+* Config file in ``HD`` folder means using for 720p, ``VGA`` for 480p. You need calibrate both resolution for camera.
+* Copy and paste ``eDepthK.prj`` to ``D1000-eSPCalibrator1.3.10_Release for SICILI`` folder.
+* Open ``eDepthK.prj`` with txt and modify Col1/2/3/4 to chessboard width, Row1/2/3/4 to chessboard height, Size1/2/3/4 to chessboard square size in meters.
+* Chessboard width and height refer to the number of black and white intersections in the horizontal and vertical directions of the checkerboard.
+
+
+Example of 11x7 Intersection Chess Board
+-------
+
+.. image:: ../images/calibration005.png
+   :width: 80%
+
+
+Parameters of eSPCalibrator
+-------
+
+.. image:: ../images/calibration004.png
+   :width: 80%
+
+1.Open eDepthK.prj
+2.Note that 'Col1' 'Row1' 'Size1' must match your chess board
 
 
 Calibration Procedure 1 (Yoffset)
 --------
 
+* If you are calibrating VGA mode，please skip this procedure.
 * Calibration Process 1 need 1 picture.
 * The chess board must right in front of both camera and cover maximum portion(over 50%) of the preview image(try your best)
 * Press 'c' or 'C' to take the snapshot of the properly positioned chess board. If calibrator can not detect all the intersections on preview image, you will get “Not Found” result.
@@ -30,7 +55,7 @@ Operation guide
 2.Press 'c' or 'C' to take the snapshot (total one frame)
 
 .. image:: ../images/calibration001.png
-   :width: 60%
+   :width: 80%
 
 
 
@@ -52,35 +77,25 @@ Operation guide
 --------
 
 .. image:: ../images/calibration002.png
-   :width: 60%
+   :width: 80%
 
 Calibration Result
 -------
 
+* After caliobration, parameters will auto write into device.
+
 .. image:: ../images/calibration003.png
-   :width: 60%
+   :width: 80%
 
-Parameters of eSPCalibrator
--------
-
-.. image:: ../images/calibration004.png
-   :width: 60%
-
-1.Open eDepthK.prj
-2.Note that 'Col1' 'Row1' 'Size1' must match your chess board
-
-Example of 11x7 Intersection Chess Board
--------
-
-.. image:: ../images/calibration005.png
-   :width: 60%
-
+* After caliobration, you can get ``Reprojection error`` on command line, it is desirable to have a reprojection error of 0.2 or less.  If exceeds 0.5, it needs to be recalibrated.
 
 Log File
 -------
 
+* After caliobration, log file will save into ``Log_Folder`` .
+
 .. image:: ../images/calibration006.png
-   :width: 60%
+   :width: 80%
 
 Appendix
 -------
@@ -122,18 +137,6 @@ Cannot Preview Resolution                 1. FW issue, check page.14 2. eDepthK.
 Write ZD Table Fail                       1. FW issue, check page.14
 ========================================  ==================================================================
 
-FW version verification
--------
-
-The following FW version are verified. Any update/upgrade will not be guarantee!!
-
-1. EX8031-B01-B0135P-BL60U-011-EnDepthPostProcess(U3 HD,VGA)
-2. EX8036-B01-B0135P-BL60U-011-EnDepthPostProcess(U3 HD,VGA)
-3. EX8037-B01-A9714M-BL40U-005-EnDepthPostProcess(U2 HD,VGA)
-4. EX8038-B01-B0144M-BL60U-002(U3 HD)
-5. Vivian-B01-B0135P-BL60U-006(U3 color 1920x960, calibrationcolor 1440x720 depth 580x580)
-
-Yoffset not work, because its sensor swap
 
 
 
