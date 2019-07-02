@@ -123,6 +123,7 @@ only works on depth images. IR pattern will not show in color images.
   After turning this feature on, frame rate will be divided equally.For
   example,when set frame rate of image to 30 fps, the frame rate of color
   image is 15 fps. The frame rate of depth image is 15 fps too.
+  This feature will cause the left eye image and depth map to be out of sync.
 
 Reference code snippet:
 
