@@ -21,6 +21,9 @@ ROS Melodic (Ubuntu 18.04)
   sudo apt install ros-melodic-desktop-full
   sudo rosdep init
   rosdep update
+  echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
+  source ~/.bashrc
+
 
 ROS Kinetic (Ubuntu 16.04)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -57,10 +60,4 @@ ROS Kinetic (Ubuntu 16.04)
    source ./wrappers/ros/devel/setup.bash
    roslaunch mynteye_wrapper_d mynteye.launch
 
-**Subscribe:**
-
-.. code-block:: bash
-
-   source ./wrappers/ros/devel/setup.bash
-   rosrun mynteye_wrapper_d mynteye_listener_d
 

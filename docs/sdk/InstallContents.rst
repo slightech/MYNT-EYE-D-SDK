@@ -9,3 +9,5 @@ Installation and Use
    build_linux
    build_win
    install_exe_win
+   ros/ros_install
+   ros/ros_usage
