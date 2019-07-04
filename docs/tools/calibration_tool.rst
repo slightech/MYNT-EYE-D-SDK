@@ -87,7 +87,7 @@ Calibration Result
 .. image:: ../images/calibration003.png
    :width: 80%
 
-* After caliobration, you can get ``Reprojection error`` on command line, it is desirable to have a reprojection error of 0.2 or less.  If exceeds 0.5, it needs to be recalibrated.
+* After caliobration, you can get ``Reprojection error`` in log file ``StereoSetting.txt`` , it is desirable to have a reprojection error of 0.2 or less.  If exceeds 0.5, it needs to be recalibrated.
 
 Log File
 -------
