@@ -12,8 +12,8 @@ SDK root directory on your desktop.
 
 First, you should plug the MYNT® EYE camera in a USB 3.0 port.
 
-Second, goto the "\bin\samples" directory and
-click “get_image.exe” to run.
+Second, goto the ``\bin\samples`` directory and
+click ``get_image.exe`` to run.
 
 Finally, you will see the window that display the realtime frame of the
 camera.
@@ -26,11 +26,10 @@ camera.
 Generate samples project of Visual Studio 2017
 ----------------------------------------------
 
-First, you should install Visual Studio 2017
-https://visualstudio.microsoft.com/ and CMake https://cmake.org/.
+First, you should install `Visual Studio 2017 <https://visualstudio.microsoft.com/zh-hans/vs/older-downloads/>`__ and `CMake <https://cmake.org/>`__ .
 
-Second, goto the “\samples” directory and click
-“generate.bat” to run.
+Second, goto the ``\samples`` directory and click
+``generate.bat`` to run.
 
 Finally, you could click ``_build\mynteye_samples.sln`` to open the
 samples project.
@@ -81,4 +80,4 @@ p.s. The example result of “generate.bat”,
 
 .. tip::
 
-  Right click sample and select ``Set as StartUp Project``，then launch with Release x64 mode.
+  Right click sample and select ``Set as StartUp Project``，then launch with ``Release x64`` mode.

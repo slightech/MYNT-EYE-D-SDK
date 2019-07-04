@@ -1,7 +1,3 @@
-.. role:: raw-latex(raw)
-   :format: latex
-..
-
 .. _analyze_imu:
 
 Analyze IMU Data
@@ -9,6 +5,12 @@ Analyze IMU Data
 
 The SDK provides the script imu_analytics.py for IMU analysis. The tool
 details can be seen in tools/README.md .
+
+.. note::
+
+  You need to use ``record`` tool in ``tools`` or ``rosbag`` to record dataset first.
+  IMU analysis tool support python 2.7 .
+  Before run the script, you need to ``pip install -r requirements.txt`` .
 
 Reference to run commands on Linux:
 

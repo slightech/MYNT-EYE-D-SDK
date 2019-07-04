@@ -10,6 +10,12 @@ Analyze Time Stamps
 SDK provides a script for timestamp analysis stamp_analytics.py . Tool
 details are visible in tools/README.md .
 
+.. note::
+
+  You need to use ``record`` tool in ``tools`` or ``rosbag`` to record dataset first.
+  Timestamp analysis tool support python 2.7 .
+  Before run the script, you need to ``pip install -r requirements.txt`` .
+
 Reference run commands on Linux:
 
 .. code-block:: bash

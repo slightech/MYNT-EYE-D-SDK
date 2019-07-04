@@ -12,7 +12,7 @@ using prebuilt DLL, please see :ref:`install_exe_win` .
 1.1 Install Visual Studio
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Download Visual Studio 2017 from https://visualstudio.microsoft.com/ and
+Download Visual Studio 2017 from https://visualstudio.microsoft.com/zh-hans/vs/older-downloads/ and
 install, select "Desktop development with C++" .
 
 .. image:: ../static/images/vs_install.png
@@ -38,7 +38,7 @@ Download CMake from https://cmake.org/ and install
 
    C:\msys64\usr\bin
 
-3) Install make
+3) Install make , double click msys2.exe , input following command:
 
 .. code-block:: bat
 
@@ -107,7 +107,7 @@ to add ``OPENCV_DIR`` environment variable manually.
 
 2) Add bin path to System PATH environment variable list
 
-.. code-block:: none
+.. code-block:: bat
 
    C:\libjpeg-turbo64\bin
 
@@ -215,6 +215,19 @@ Open “x64 Native Tools Command Prompt for VS 2017”(suggested for Visual Stud
 .. code-block:: bat
 
    .\samples\_output\bin\get_all_with_options
+
+
+10) get_depth_with_filter display filtered depth image
+
+.. code-block:: bat
+
+  .\samples\_output\bin\get_depth_with_filter
+
+11) get_points_with_filter display filtered point cloud image
+
+.. code-block:: bat
+
+  .\samples\_output\bin\get_points_with_filter
 
 5. Clean
 --------

@@ -56,6 +56,11 @@ Alternatively, refer to the command below:
 
     To build and install PCL, please refer to `PCL Installation <http://www.pointclouds.org/documentation/tutorials/compiling_pcl_posix.php>`__
 
+.. tip::
+
+  If you need to install ros, you can skip this step and use pcl in ros.
+
+
 .. code-block:: bash
 
   git clone https://github.com/PointCloudLibrary/pcl.git
@@ -165,6 +170,18 @@ Alternatively, refer to the command below:
 .. code-block:: bash
 
    ./samples/_output/bin/get_all_with_options
+
+10) get_depth_with_filter display filtered depth image
+
+.. code-block:: bash
+
+  ./samples/_output/bin/get_depth_with_filter
+
+11) get_points_with_filter display filtered point cloud image
+
+.. code-block:: bash
+
+  ./samples/_output/bin/get_points_with_filter
 
 4 Install With OpenCV ROS
 -------------------------
