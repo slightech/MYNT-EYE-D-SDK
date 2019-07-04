@@ -181,7 +181,7 @@ void Streams::OnCameraClose() {
 void Streams::OnImageInfoCallback(const ImgInfoPacket& packet) {
   // drop first package of image information
   static int count = 0;
-  if (count < 1) {
+  if (count < 3) {
     count++;
     return;
   }
