@@ -179,6 +179,13 @@ void Streams::OnCameraClose() {
 }
 
 void Streams::OnImageInfoCallback(const ImgInfoPacket& packet) {
+  // drop first package of image information
+  static int count = 0;
+  if (count < 1) {
+    count++;
+    return;
+  }
+
   auto&& img_info = std::make_shared<ImgInfo>();
 
   img_info->frame_id = packet.frame_id;
