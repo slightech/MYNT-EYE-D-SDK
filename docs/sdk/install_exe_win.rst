@@ -22,6 +22,7 @@ camera.
 
   If you cannot run samples successfully, please check if the system variable PATH was successfully added ``<SDK_ROOT_DIR>\bin`` , ``<SDK_ROOT_DIR>\bin\3rdparty`` ,
   ``<SDK_ROOT_DIR>\3rdparty\opencv\build\x64\vc15\bin`` , ``<SDK_ROOT_DIR>\3rdparty\libjpeg-turbo64\bin`` .
+  The point cloud related sample requires PCL 1.9.0. Versions other than 1.9.0 can be run using the sample project.
 
 Generate samples project of Visual Studio 2017
 ----------------------------------------------
