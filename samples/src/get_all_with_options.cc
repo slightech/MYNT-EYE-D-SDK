@@ -88,7 +88,7 @@ int main(int argc, char const* argv[]) {
       .type("int").set_default(0)
       .metavar("VALUE").help("IR intensity, range [0,10], default %default");
   op_group.add_option("--ir-depth").dest("ir_depth_only")
-      .action("store_false").help("Enable ir-depth-only");
+      .action("store_true").help("Enable ir-depth-only");
   op_group.add_option("--cdv").dest("colour_depth_value")
       .type("float").set_default(1000)
       .metavar("VALUE").help("Colour depth value, "
@@ -221,6 +221,15 @@ int main(int argc, char const* argv[]) {
       if (!in_range("framerate", 0, 60, &val)) return 2;
     }
     params.framerate = val;
+    if (params.ir_depth_only) {
+      std::cout << std::endl;
+      std::cout << "Note:: ir_depth_only is only available for [2560x720 30fps] and [1280x720, 1280x480, 640x480 60fps]" << std::endl;
+      std::cout << std::endl;
+      if (params.stream_mode == StreamMode::STREAM_2560x720)
+        params.framerate = 30;
+      else
+        params.framerate = 60;
+    }
   }
   {
     int val;
