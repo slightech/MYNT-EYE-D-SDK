@@ -11,12 +11,14 @@ MYNT® EYE D SDK
    :maxdepth: 2
 
    product/contents
-   installation/contents
-   samples/contents
+   sdk/contents
+   firmware/contents
+   sdkdemo/contents
+   sdktools/contents
    tools/contents
-   projects/contents
-   slam/contents
-   api/contents
+   openproject/contents
+   apidoc/contents
+   support/contents
 
 ..
   Indices and tables

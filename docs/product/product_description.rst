@@ -1,4 +1,4 @@
-.. _product_description:
+.. _product_product_description:
 
 Product Description
 ===================

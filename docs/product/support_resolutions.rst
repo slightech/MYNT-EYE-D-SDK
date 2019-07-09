@@ -1,4 +1,4 @@
-.. _support_resolutions:
+.. _product_support_resolutions:
 
 Support Resolutions
 ===================
