@@ -7,13 +7,13 @@ Change log
 2019-07-09 v1.7.9
 -------------------------
 
-1. Fixed publish timestamp is inconsistent if no camera information
+1. Fixed publish timestamp is inconsistent if no camera information.
 
 2. Fixed timestamp errors caused by incorrect ROS timestamp data types.
 
 3. Fixed long running ROS timestamp problem.
 
-4. Fixed the feature of get_all_with_option ir_depth_only is invalid
+4. Fixed the feature of get_all_with_option ir_depth_only is invalid.
 
 
 2019-06-25 v1.7.8
