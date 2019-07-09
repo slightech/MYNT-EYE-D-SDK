@@ -11,7 +11,7 @@ Change log
 
 2. Fixed timestamp errors caused by incorrect ROS timestamp data types.
 
-3. Fixed long running ROS timestamp problem.
+3. Fixed long running ROS timestamp problem.(need update hid 1.3 firmware)
 
 4. Fixed the feature of get_all_with_option ir_depth_only is invalid.
 
