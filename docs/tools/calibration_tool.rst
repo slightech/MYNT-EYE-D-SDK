@@ -8,7 +8,7 @@ MYNT EYE D Manual Calibration Tool
 Get Calibration Tool
 --------
 
-Latest tool:  D1000-eSPCalibrator1.3.10_Release for SICILI.zip `Google
+Latest tool:  mynteye-d-calibrator_1.0.zip `Google
 Drive <https://drive.google.com/open?id=13QsqgkzNfh4yKDisYgHXtshzFyqRzbDs>`__,
 `Baidu Pan <https://pan.baidu.com/s/11gbg_KkzaezNa52YfdMjJw>`__
 
@@ -18,7 +18,7 @@ Prerequisites(Update config file)
 
 * You can find Depth 50°'s config file in ``D1000-50`` , Depth 120°'s config file in ``D1000-120`` 。
 * Config file in ``HD`` folder means using for 720p, ``VGA`` for 480p. You need calibrate both resolution for camera.
-* Copy and paste ``eDepthK.prj`` to ``D1000-eSPCalibrator1.3.10_Release for SICILI`` folder.
+* Copy and paste ``eDepthK.prj`` to ``mynteye-d-calibrator_1.0`` folder.
 * Open ``eDepthK.prj`` with txt and modify Col1/2/3/4 to chessboard width, Row1/2/3/4 to chessboard height, Size1/2/3/4 to chessboard square size in meters.
 * Chessboard width and height refer to the number of black and white intersections in the horizontal and vertical directions of the checkerboard.
 
@@ -51,7 +51,7 @@ Calibration Procedure 1 (Yoffset)
 Operation guide
 --------
 
-1.Double click eSPCalibrator.exe
+1.Double click mynteye-d-calibrator.exe
 2.Press 'c' or 'C' to take the snapshot (total one frame)
 
 .. image:: ../images/calibration001.png
@@ -82,7 +82,7 @@ Operation guide
 Calibration Result
 -------
 
-* After caliobration, parameters will auto write into device.
+* After calibration, parameters will auto write into device.
 
 .. image:: ../images/calibration003.png
    :width: 80%
