@@ -7,7 +7,7 @@ How To Use In `VINS-Mono <https://github.com/HKUST-Aerial-Robotics/VINS-Mono>`_
 If you wanna run VINS-Mono with MYNT EYE camera, please follow the steps:
 --------------------------------------------------------------------------
 
-1. Download `MYNT-EYE-D-SDK <https://github.com/slightech/MYNT-EYE-D-SDK.git>`__ and :ref:`ros_install` .
+1. Download `MYNT-EYE-D-SDK <https://github.com/slightech/MYNT-EYE-D-SDK.git>`__ and :ref:`install_ros` .
 2. Follow the normal procedure to install VINS-Mono.
 3. Run mynteye_wrapper_d and VINS-Mono.
 
@@ -51,7 +51,7 @@ Install docker
 
 .. tip::
 
-  add your account to docker group by ``sudo usermod -aG docker $YOUR_USER_NAME`` . Relaunch the terminal or 
+  add your account to docker group by ``sudo usermod -aG docker $YOUR_USER_NAME`` . Relaunch the terminal or
   logout and re-login if you get Permission denied error.
 
 
@@ -76,7 +76,7 @@ Run VINS-MONO
   source ./wrappers/ros/devel/setup.bash
   roslaunch mynteye_wrapper_d vins_mono.launch stream_mode:=0
 
- 
+
 2. Open another terminal to run vins-mono
 
 .. code-block:: bash

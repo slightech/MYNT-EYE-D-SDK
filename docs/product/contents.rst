@@ -4,8 +4,8 @@ PRODUCT
 .. toctree::
    :maxdepth: 2
 
-   product_description
+   product_desc
    product_surface
-   specification
+   product_spec
    support_resolutions
    imu_coord

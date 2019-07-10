@@ -1,4 +1,4 @@
-.. _slam_orb_slam2:
+.. _orb_slam2:
 
 How to Use In `ORB_SLAM2 <https://github.com/raulmur/ORB_SLAM2>`_
 ==================================================================
@@ -7,7 +7,7 @@ How to Use In `ORB_SLAM2 <https://github.com/raulmur/ORB_SLAM2>`_
 If you wanna run ORB_SLAM2 with MYNT EYE camera, please follow the steps:
 -------------------------------------------------------------------------
 
-1. Download `MYNT-EYE-D-SDK <https://github.com/slightech/MYNT-EYE-D-SDK.git>`_ and :ref:`ros_install`.
+1. Download `MYNT-EYE-D-SDK <https://github.com/slightech/MYNT-EYE-D-SDK.git>`_ and :ref:`install_ros`.
 2. Follow the normal procedure to install ORB_SLAM2.
 3. Run examples by MYNT® EYE.
 

@@ -7,7 +7,7 @@ How To Use In `VIORB <https://github.com/jingpang/LearnVIORB>`_
 If you wanna run VIORB with MYNT® EYE，please follow the steps:
 ---------------------------------------------------------------
 
-1. Download `MYNT-EYE-D-SDK <https://github.com/slightech/MYNT-EYE-D-SDK.git>`_ and :ref:`ros_install`.
+1. Download `MYNT-EYE-D-SDK <https://github.com/slightech/MYNT-EYE-D-SDK.git>`_ and :ref:`install_ros`.
 2. Follow the normal procedure to install VIORB.
 3. Update camera parameters to ``<VIO>/config/mynteye_d.yaml``.
 4. Run mynteye_wrapper_d and VIORB.

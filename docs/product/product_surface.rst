@@ -1,6 +1,6 @@
-.. _product_product_surface:
+.. _product_surface:
 
-Surface
+Product Surface
 ===============
 
 ============= ==============
@@ -9,7 +9,7 @@ Shell(mm)     PCBA board(mm)
 165x31.5x29.6 149x24
 ============= ==============
 
-.. image:: ../static/images/mynteye_surface.png
+.. image:: ../static/images/product/mynteye_surface.png
 
 A. Camera:please pay attention to protect the camera sensor lenses, to
 avoid imaging quality degradation.

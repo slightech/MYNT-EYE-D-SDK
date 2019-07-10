@@ -7,7 +7,7 @@ How To Use In `VINS-Fusion <https://github.com/HKUST-Aerial-Robotics/Vins-Fusion
 If you wanna run VINS-Fusion with MYNT EYE camera, please follow the steps:
 ----------------------------------------------------------------------------
 
-1. Download  `MYNT-EYE-D-SDK <https://github.com/slightech/MYNT-EYE-D-SDK.git>`_  and  :ref:`ros_install` .
+1. Download  `MYNT-EYE-D-SDK <https://github.com/slightech/MYNT-EYE-D-SDK.git>`_  and  :ref:`install_ros` .
 2. Follow the normal procedure to install VINS-Fusion .
 3. Run mynteye_wrapper_d and VINS-Fusion .
 
@@ -50,7 +50,7 @@ Install docker
 
 .. tip::
 
-  add your account to docker group by ``sudo usermod -aG docker $YOUR_USER_NAME`` . Relaunch the terminal or 
+  add your account to docker group by ``sudo usermod -aG docker $YOUR_USER_NAME`` . Relaunch the terminal or
   logout and re-login if you get Permission denied error.
 
 Install MYNT-EYE-VINS-FUSION-Samples

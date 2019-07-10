@@ -1,9 +1,7 @@
 .. _calibration_tool:
 
-MYNT EYE D Manual Calibration Tool
-==========
-
-
+Calibration Tool Manual
+=======================
 
 Get Calibration Tool
 --------
@@ -26,14 +24,14 @@ Prerequisites(Update config file)
 Example of 11x7 Intersection Chess Board
 -------
 
-.. image:: ../images/calibration005.png
+.. image:: ../static/images/tools/calibration005.png
    :width: 80%
 
 
 Parameters of eSPCalibrator
 -------
 
-.. image:: ../images/calibration004.png
+.. image:: ../static/images/tools/calibration004.png
    :width: 80%
 
 1.Open eDepthK.prj
@@ -54,7 +52,7 @@ Operation guide
 1.Double click mynteye-d-calibrator.exe
 2.Press 'c' or 'C' to take the snapshot (total one frame)
 
-.. image:: ../images/calibration001.png
+.. image:: ../static/images/tools/calibration001.png
    :width: 80%
 
 
@@ -66,7 +64,7 @@ Calibration Procedure 2 (Calibration)
 
 * The required angles will be the combination of rotation along X and
 Y axis. Each Rotation angle should be 10° to 30° and/or Y-axis
-around X- axis 
+around X- axis
 
 * The chess board must cover the maximum portion(over 50%)
 of the preview image from both camera(try your best)
@@ -76,7 +74,7 @@ of the preview image from both camera(try your best)
 Operation guide
 --------
 
-.. image:: ../images/calibration002.png
+.. image:: ../static/images/tools/calibration002.png
    :width: 80%
 
 Calibration Result
@@ -84,7 +82,7 @@ Calibration Result
 
 * After calibration, parameters will auto write into device.
 
-.. image:: ../images/calibration003.png
+.. image:: ../static/images/tools/calibration003.png
    :width: 80%
 
 * After caliobration, you can get ``Reprojection error`` in log file ``StereoSetting.txt`` , it is desirable to have a reprojection error of 0.2 or less.  If exceeds 0.5, it needs to be recalibrated.
@@ -94,7 +92,7 @@ Log File
 
 * After caliobration, log file will save into ``Log_Folder`` .
 
-.. image:: ../images/calibration006.png
+.. image:: ../static/images/tools/calibration006.png
    :width: 80%
 
 Appendix
@@ -108,7 +106,7 @@ Error Message                             Possible root cause
 ========================================  ==================================================================
 Yoffset Not support format.               1. FW issue, check page.14 2. eDepthK.prj setting error
 No Device                                 1. USB unstable
-Yoffset Cannot Preview Resolution         1. FW issue, check page.14 2. eDepthK.prj setting error                              
+Yoffset Cannot Preview Resolution         1. FW issue, check page.14 2. eDepthK.prj setting error
 ========================================  ==================================================================
 
 Error_Message : Calibration

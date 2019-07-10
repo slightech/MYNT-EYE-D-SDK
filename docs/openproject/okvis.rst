@@ -6,7 +6,7 @@ How To Use In `OKVIS <https://github.com/ethz-asl/okvis>`_
 If you wanna run OKVIS with MYNT EYE camera, please follow the steps:
 ----------------------------------------------------------------------
 
-1. Download `MYNT-EYE-D-SDK <https://github.com/slightech/MYNT-EYE-D-SDK.git>`_ and :ref:`ros_install`.
+1. Download `MYNT-EYE-D-SDK <https://github.com/slightech/MYNT-EYE-D-SDK.git>`_ and :ref:`install_ros`.
 2. Install dependencies and build MYNT-EYE-OKVIS-Sample follow the procedure of the original OKVIS.
 3. Update camera parameters to ``<OKVIS>/config/config_mynteye.yaml``.
 4. Run OKVIS using MYNT® EYE.

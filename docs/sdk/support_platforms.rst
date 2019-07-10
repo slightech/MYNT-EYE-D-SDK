@@ -22,6 +22,7 @@ These are the platforms that can be used:
     Only supports 64 bit systems.
 
 .. warning::
+
    Due to the requirement of hardware transmission rate, please
    use the USB 3 interface. In addition, virtual machines have USB
    driver compatibility problems, thus they are not recommended.
