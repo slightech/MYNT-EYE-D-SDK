@@ -176,9 +176,6 @@ class MYNTEYE_API Camera {
   /** Close the camera */
   void Close();
 
-  /** Update hid device firmware */
-  bool HidFirmwareUpdate(const char* filepath);
-
   /** Set exposure time [1ms - 655ms]
    * value -- exposure time value
    * */
@@ -258,6 +255,14 @@ class MYNTEYE_API Camera {
   void SetDistanceCallback(distance_callback_t callback, bool async = true);
 
   void WaitForStream();
+
+  /** Update auxiliary chip firmware. */
+  bool AuxiliaryChipFirmwareUpdate(const char* filepath);
+
+#ifdef MYNTEYE_DEPRECATED_COMPAT
+  /** @deprecated Replaced by OpenParams#device_mode */
+  bool HidFirmwareUpdate(const char* filepath);
+#endif
 
  private:
   std::unique_ptr<CameraPrivate> p_;

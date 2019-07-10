@@ -33,7 +33,7 @@ class DeviceWriter {
   /** Save all datas of this device */
   void SaveAllDatas(const std::string &dir);
 
-  bool HidFirmwareUpdate(const char *filepath);
+  bool AuxiliaryChipFirmwareUpdate(const char *filepath);
 
  private:
   device_desc_t LoadDescriptors(const std::string &filepath);

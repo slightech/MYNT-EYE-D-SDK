@@ -209,10 +209,6 @@ void Camera::Close() {
   p_->Close();
 }
 
-bool Camera::HidFirmwareUpdate(const char* filepath) {
-  return p_->HidFirmwareUpdate(filepath);
-}
-
 void Camera::SetExposureTime(const float &value) {
   return p_->SetExposureTime(value);
 }
@@ -295,3 +291,13 @@ std::vector<DistanceData> Camera::GetDistanceDatas() {
 void Camera::WaitForStream() {
   return p_->WaitForStream();
 }
+
+bool Camera::AuxiliaryChipFirmwareUpdate(const char* filepath) {
+  return p_->AuxiliaryChipFirmwareUpdate(filepath);
+}
+
+#ifdef MYNTEYE_DEPRECATED_COMPAT
+bool Camera::HidFirmwareUpdate(const char* filepath) {
+  return AuxiliaryChipFirmwareUpdate(filepath);
+}
+#endif

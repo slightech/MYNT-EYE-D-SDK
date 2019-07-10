@@ -172,8 +172,6 @@ class MYNTEYE_API CameraPrivate {
   bool GetCameraCalibrationFile(const StreamMode& stream_mode,
                                 const std::string& filename);
 
-  bool HidFirmwareUpdate(const char* filepath);
-
   /** Set exposure time
    * value -- exposure time value
    * */
@@ -248,6 +246,9 @@ class MYNTEYE_API CameraPrivate {
   std::string GetSerialNumber() const;
 
   void WaitForStream();
+
+  /** Update auxiliary chip firmware. */
+  bool AuxiliaryChipFirmwareUpdate(const char* filepath);
 
  protected:
   std::shared_ptr<Channels> channels() const {

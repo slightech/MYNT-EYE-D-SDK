@@ -514,10 +514,6 @@ void CameraPrivate::NotifyDataTrackStateChanged() {
   }
 }
 
-bool CameraPrivate::HidFirmwareUpdate(const char* filepath) {
-  return channels_->HidFirmwareUpdate(filepath);
-}
-
 void CameraPrivate::SetExposureTime(const float &value) {
   device_->SetExposureTime(value);
 }
@@ -646,6 +642,10 @@ void CameraPrivate::WaitForStream() {
 #ifdef MYNTEYE_OS_LINUX
   streams_->WaitForStreamData();
 #endif
+}
+
+bool CameraPrivate::AuxiliaryChipFirmwareUpdate(const char* filepath) {
+  return channels_->HidFirmwareUpdate(filepath);
 }
 
 void CameraPrivate::WatchDog() {
