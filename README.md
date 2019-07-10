@@ -22,13 +22,13 @@ API reference and the guide documentations.
 ### Quick Start Guide
 
 * en:
-  * [Linux Installation From Source](https://mynt-eye-d-sdk.rtfd.io/en/latest/installation/build_linux.html)
-  * [Windows Installation From Source](https://mynt-eye-d-sdk.rtfd.io/en/latest/installation/build_win.html)
-    * [Windows EXE Installation](https://mynt-eye-d-sdk.rtfd.io/en/latest/installation/install_exe_win.html)
+  * [Ubuntu Source Installation](https://mynt-eye-d-sdk.rtfd.io/en/latest/sdk/install_ubuntu_src.html)
+  * [Windows Source Installation](https://mynt-eye-d-sdk.rtfd.io/en/latest/sdk/install_win_src.html)
+    * [Windows EXE Installation](https://mynt-eye-d-sdk.rtfd.io/en/latest/sdk/install_win_exe.html)
 * zh-Hans:
-  * [Linux SDK 源码安装及使用](https://mynt-eye-d-sdk.rtfd.io/zh_CN/latest/installation/build_linux.html)
-  * [Windows SDK 源码安装及使用](https://mynt-eye-d-sdk.rtfd.io/zh_CN/latest/installation/build_win.html)
-    * [Windows 预编译 EXE 安装](https://mynt-eye-d-sdk.rtfd.io/zh_CN/latest/installation/install_exe_win.html)
+  * [Ubuntu 源码安装](https://mynt-eye-d-sdk.rtfd.io/zh_CN/latest/sdk/install_ubuntu_src.html)
+  * [Windows 源码安装](https://mynt-eye-d-sdk.rtfd.io/zh_CN/latest/sdk/install_win_src.html)
+    * [Windows EXE 安装](https://mynt-eye-d-sdk.rtfd.io/zh_CN/latest/sdk/install_win_exe.html)
 
 ## Mirrors
 
