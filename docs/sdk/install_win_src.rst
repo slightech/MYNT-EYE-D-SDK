@@ -234,5 +234,5 @@ Open “x64 Native Tools Command Prompt for VS 2017”(suggested for Visual Stud
 
 .. code-block:: bat
 
-   cd <sdk>  #local path of MYNT-EYE-D-SDK
+   cd <sdk>  # local path of SDK
    make cleanall

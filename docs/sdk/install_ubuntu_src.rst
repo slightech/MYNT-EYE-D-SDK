@@ -202,7 +202,7 @@ If you wanna package with specified OpenCV version:
 
 .. code-block:: bash
 
-   cd <sdk>
+   cd <sdk>  # local path of SDK
    make cleanall
    export OpenCV_DIR=<install prefix>
 
@@ -213,7 +213,7 @@ Packaging:
 
 .. code-block:: bash
 
-   cd <sdk>  #local path of MYNT-EYE-D-SDK
+   cd <sdk>  # local path of SDK
    make pkg
 
 6. Clean
@@ -221,6 +221,6 @@ Packaging:
 
 .. code-block:: bash
 
-   cd <sdk>   #local path of MYNT-EYE-D-SDK
+   cd <sdk>  # local path of SDK
    make cleanall
    make uninstall
