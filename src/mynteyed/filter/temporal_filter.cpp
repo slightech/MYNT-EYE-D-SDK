@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #include <mutex>
+#include <array>
 #include "mynteyed/filter/temporal_filter.h"
 
 MYNTEYE_USE_NAMESPACE
@@ -98,35 +99,35 @@ void TemporalFilter::recalc_persistence_map() {
       int sum = lastFrame + last_1 + last_2 + last_3 +
           last_4 + last_5 + last_6 + last_7;
       if (sum >= 8)  // valid in eight of the last eight frames
-        _persistence_map[i] = 1;
+        _persistence_map[i] = (uint8_t)1;
     } else if (_persistence_param == 2) {
       int sum = lastFrame + last_1 + last_2;
       if (sum >= 2)  // valid in two of the last three frames
-          _persistence_map[i] = 1;
+          _persistence_map[i] = (uint8_t)1;
     } else if (_persistence_param == 3) {
       int sum = lastFrame + last_1 + last_2 + last_3;
       if (sum >= 2)  // valid in two of the last four frames
-          _persistence_map[i] = 1;
+          _persistence_map[i] = (uint8_t)1;
     } else if (_persistence_param == 4) {
       int sum = lastFrame + last_1 + last_2 + last_3 +
           last_4 + last_5 + last_6 + last_7;
       if (sum >= 2)  // valid in two of the last eight frames
-          _persistence_map[i] = 1;
+          _persistence_map[i] = (uint8_t)1;
     } else if (_persistence_param == 5) {
       int sum = lastFrame + last_1;
       if (sum >= 1)  // valid in one of the last two frames
-          _persistence_map[i] = 1;
+          _persistence_map[i] = (uint8_t)1;
     } else if (_persistence_param == 6) {
       int sum = lastFrame + last_1 + last_2 + last_3 + last_4;
       if (sum >= 1)  // valid in one of the last five frames
-          _persistence_map[i] = 1;
+          _persistence_map[i] = (uint8_t)1;
     } else if (_persistence_param == 7) {
       int sum = lastFrame + last_1 + last_2 + last_3 +
           last_4 + last_5 + last_6 + last_7;
       if (sum >= 1)  // valid in one of the last eight frames
-          _persistence_map[i] = 1;
+          _persistence_map[i] = (uint8_t)1;
     } else if (_persistence_param == 8) {  //  <--- all 1's
-        _persistence_map[i] = 1;
+        _persistence_map[i] = (uint8_t)1;
     } else {  // all others, including 0, no persistance
     }
   }
@@ -144,7 +145,7 @@ void TemporalFilter::recalc_persistence_map() {
     for (i = 0; i < 256; i++) {
       unsigned char pos = (unsigned char)((i << (8 - phase)) | (i >> phase));
       if (_persistence_map[pos])
-          credible_threshold[i] |= mask;
+          credible_threshold[i] |= (uint8_t)mask;
     }
   }
   // Store results
