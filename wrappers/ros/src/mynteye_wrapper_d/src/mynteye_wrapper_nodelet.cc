@@ -608,7 +608,10 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       header.frame_id = color_frame_id;
 
       auto&& msg = cv_bridge::CvImage(header, enc::BGR8, mat).toImageMsg();
-      if (info) info->header.stamp = msg->header.stamp;
+      if (info) {
+        info->header.stamp = msg->header.stamp;
+        info->header.frame_id = color_frame_id;
+      }
       pub_color.publish(msg, info);
     }
     if (mono_sub) {
