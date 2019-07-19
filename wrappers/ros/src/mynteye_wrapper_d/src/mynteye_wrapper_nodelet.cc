@@ -103,6 +103,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
   sensor_msgs::CameraInfoPtr left_info_ptr;
   sensor_msgs::CameraInfoPtr right_info_ptr;
+  sensor_msgs::CameraInfoPtr depth_info_ptr;
 
   // Launch params
 
@@ -533,6 +534,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     }
     left_info_ptr = createCameraInfo(in.left);
     right_info_ptr = createCameraInfo(in.right);
+    depth_info_ptr = createCameraInfo(in.left);
 
     // motion intrinsics
     bool motion_ok;
@@ -608,7 +610,10 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       header.frame_id = color_frame_id;
 
       auto&& msg = cv_bridge::CvImage(header, enc::BGR8, mat).toImageMsg();
-      if (info) info->header.stamp = msg->header.stamp;
+      if (info) {
+        info->header.stamp = msg->header.stamp;
+        info->header.frame_id = color_frame_id;
+      }
       pub_color.publish(msg, info);
     }
     if (mono_sub) {
@@ -637,8 +642,9 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     header.stamp = timestamp;
     header.frame_id = depth_frame_id;
 
-    auto&& info = left_info_ptr;
+    auto&& info = depth_info_ptr;
     if (info) info->header.stamp = header.stamp;
+    if (info) info->header.frame_id = depth_frame_id;
     if (params.depth_mode == DepthMode::DEPTH_RAW) {
       auto&& mat = data.img->To(ImageFormat::DEPTH_RAW)->ToMat();
       if (depth_type == 0) {
