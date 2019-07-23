@@ -220,6 +220,8 @@ int EtronDI_GetImageInterrupt(void);
 int EtronDI_InitialHidGyro(void* pHandleEtronDI, PDEVSELINFO pDevSelInfo);
 int EtronDI_ReleaseHidGyro(void* pHandleEtronDI, PDEVSELINFO pDevSelInfo);
 int EtronDI_GetHidGyro(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, unsigned char *pBuffer, int length);
+int EtronDI_SetupHidGyro(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, unsigned char *pCmdBuf, int cmdlength);
+int EtronDI_GetInfoHidGyro(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, unsigned char *pCmdBuf, int cmdlength, unsigned char *pResponseBuf, int *resplength);
 // for Gyro -
 #endif
 
