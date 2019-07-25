@@ -109,6 +109,14 @@ class Device {
                                 const std::string& filename);
   /** Set camera calibration bin file. */
   bool SetCameraCalibrationBinFile(const std::string& filename);
+  /** Set camera calibration with struct. */
+  bool SetCameraCalibrationWithStruct(const eSPCtrl_RectLogData& filename);
+
+  /** Parse camera calibration with buffer２. */
+  eSPCtrl_RectLogData GetCameraCalibrationWithStruct(
+      unsigned char* buff, int nLen);
+  void GetCameraCalibrationWithStruct(char* DumpBuffer,
+    const eSPCtrl_RectLogData &data);  // NOLINT
 
   /** Close device */
   void Close();

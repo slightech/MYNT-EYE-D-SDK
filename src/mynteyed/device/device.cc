@@ -515,6 +515,497 @@ bool Device::GetCameraCalibrationFile(const StreamMode& stream_mode,
   }
 }
 
+#ifdef __i386
+#define MY_INT long
+#else
+#define MY_INT int
+#endif
+
+typedef struct
+{
+	char	SN[16];			//16
+	long	Version;		// 4
+	short	NumOfTable;		// 2
+	short	Reserve[13];	//26
+} TableHeader;
+
+#define TableHeaderSize  48  // bytes
+
+typedef struct
+{
+	short	DataOffset;			//2
+	short	ElementCount;		//2
+	char	DataSize;			//1; 2-bytes, 4-byte
+	char	TabID;				//1 
+	char    Attri; 				//1; T.B.D.
+	char	FractionalBit;		//1; 1:16.0; 2:S13.18; 3:S08.23; 4:S18.13; 5:S11.20
+	char	Reserve[8];			//8
+} TableInfo;
+
+#define TableInfoSize		16 //bytes
+
+#define TAB_ID_UNDEFINE 		0
+#define TAB_ID_InOutImgDim 		1
+#define TAB_ID_RectFlags 		2
+#define TAB_ID_RectScaleDim		3
+#define TAB_ID_CamMat1 			4
+#define TAB_ID_CamDist1 		5
+#define TAB_ID_CamMat2 			6
+#define TAB_ID_CamDist2 		7
+#define TAB_ID_RotaMat			8
+#define TAB_ID_TranMat			9
+#define TAB_ID_LRotaMat			10
+#define TAB_ID_RRotaMat			11
+#define TAB_ID_NewCamMat1		12
+#define TAB_ID_NewCamMat2		13
+#define TAB_ID_ReprojMat		14
+#define TAB_ID_ROI1				15
+#define TAB_ID_ROI2				16
+#define TAB_ID_ComROI			17
+#define TAB_ID_ScaleROI			18
+#define TAB_ID_RectCrop			19
+#define TAB_ID_RectScaleMN		20
+#define TAB_ID_RectScaleC		21
+#define TAB_ID_RectErrMeasure	22
+#define TAB_ID_LineBuffers		23
+#define	TAB_ID_EssentialMat		24
+#define	TAB_ID_FundamentalMat	25
+#define TAB_ID_ConfidenceVal	26
+#define TAB_ID_ConfidenceTH		27
+#define TAB_ID_ConfidenceLevel	28
+
+
+//#define Data_Type_Long			4
+//#define Data_Type_Short			2
+
+#define TAB_MAX_NUM 29
+
+// data definition
+//---------------------------------------------0--------------5-------------10-------------15-------------20-------------25
+static short TAB_ElementCount[TAB_MAX_NUM] 	= {0, 5, 3, 2, 9, 8, 9, 8, 9, 3, 9, 9,12,12,16, 4, 4, 4, 4, 6, 4, 2, 4, 1, 9, 9,16,16, 1};
+static char  TAB_DataSize[TAB_MAX_NUM]     	= {2, 2, 2, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 2, 2, 2, 2, 2, 2, 4, 4, 2, 4, 4, 4, 4, 2};
+//static char  TAB_FractionalBit[TAB_MAX_NUM]	= {0, 0, 0, 0,18,18,18,18,23,23,23,23,13,13,20, 0, 0, 0, 0, 0, 0,23,20, 0,23,23,12, 3, 0}; //bug on item#22
+static char  TAB_FractionalBit[TAB_MAX_NUM]	= {0, 0, 0, 0,18,18,18,18,23,23,23,23,13,13,18, 0, 0, 0, 0, 0, 0,23,23, 0,23,23,12, 3, 0};
+static char  TAB_Attri[TAB_MAX_NUM]		  	= {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+eSPCtrl_RectLogData Device::GetCameraCalibrationWithStruct(unsigned char* DumpBuffer, int nLen) {
+  std::cout << "file length: " << nLen << std::endl;
+  eSPCtrl_RectLogData data;
+  auto pData = &data;
+  double M1[9];
+  double D1[8];
+  double M2[9];
+  double D2[8];
+  double R[9];
+  double T[3];
+  double R1[9];
+  double R2[9];
+  double P1[12];
+  double P2[12];
+  double Q[16];
+  double E[9];
+  double F[9];
+
+  float mConfidenceValue[32];
+  float mConfidenceTH[32];
+  short mConfidenceLevel;
+
+  /*double InvR1[3][3];
+  double InvR2[3][3];*/
+
+  //bool EnableFixedROI;      //下一版更新
+
+  short  tempBufferShort[8];
+  MY_INT tempBufferLong[16];
+  //TCHAR strtest[256];
+
+  short idx = 0;
+
+  LOGI("GetRectifyLogFromCalibrationLog prepare to cpy data...");
+
+  //Table ID 0: Write Log Szie
+  memcpy(tempBufferShort,DumpBuffer,sizeof(short)*1);
+  int Log_Size  = (int)tempBufferShort[0];        // 2 bytes
+  DumpBuffer += 2;
+  idx++;
+
+  LOGI("GetRectifyLogFromCalibrationLog Table ID 0 Log_Size:%d", Log_Size);
+  auto thr = (TableHeader *)DumpBuffer;
+  std::cout << "thr->NumOfTable" << thr->NumOfTable << std::endl
+            << "thr->Reserve[]";
+            for (size_t i = 0; i < 13; i++) {
+              std::cout << thr->Reserve[i];
+            }
+            std::cout << std::endl
+            << "thr->SN";
+            for (size_t i = 0; i < 8; i++) {
+              std::cout << thr->SN[i];
+            }
+            std::cout << std::endl
+            << "thr->Version" << thr->Version << std::endl;
+  DumpBuffer += TableHeaderSize;
+
+  for (size_t i = 0; i < TAB_MAX_NUM; i++) {
+    auto kk = (TableInfo *)DumpBuffer;
+    std::cout <<"kk->Attri" <<  kk->Attri << std::endl
+              <<"kk->DataOffset" <<  kk->DataOffset << std::endl
+              <<"kk->DataSize" <<  kk->DataSize << std::endl
+              <<"kk->ElementCount" <<  kk->ElementCount << std::endl
+              <<"kk->FractionalBit" <<  kk->FractionalBit << std::endl
+              <<"kk->TabID" <<  kk->TabID << std::endl;
+
+    std::cout << "std::cout << kk->Reserve[]";
+    for (size_t i = 0; i < 8; i++) {
+      std::cout << kk->Reserve[i];
+    }
+    std::cout << std::endl;
+
+    DumpBuffer += TableInfoSize;
+  }
+
+  // DumpBuffer += (TableInfoSize * TAB_MAX_NUM);
+
+  //wsprintf(strtest,L" DumpBuffer = 0x%x   *DumpBuffer = %d\n",DumpBuffer,*DumpBuffer);
+  //OutputDebugString(strtest);
+
+  LOGI("GetRectifyLogFromCalibrationLog Table ID 0...");
+
+  //Table ID 1: Write "InOutDim" Entries
+  memcpy(tempBufferShort,DumpBuffer,sizeof(short)*TAB_ElementCount[idx]);
+  
+  int in_width   = (int)tempBufferShort[0];       // 2 bytes
+  int in_height  = (int)tempBufferShort[1];       // 2 bytes
+  int out_width  = (int)tempBufferShort[2];       // 2 bytes
+  int out_height = (int)tempBufferShort[3];       // 2 bytes
+  int color_type = (int)tempBufferShort[4];       // 2 bytes
+  std::cout << "idx" << idx << "in_width" << in_width
+            << "in_height" << in_height
+            << "out_width" << out_width
+            << "out_height" << out_height
+            << "color_type" << color_type
+            << std::endl;
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+  pData->InImgWidth   = (unsigned short)in_width;
+  pData->InImgHeight  = (unsigned short)in_height;
+  pData->OutImgWidth  = (unsigned short)out_width;
+  pData->OutImgHeight = (unsigned short)out_height;
+  //wsprintf(strtest,_T("  width = %d height = %d  width = %d height = %d\n"),in_width,in_height,out_width,  out_height);
+  //OutputDebugString(strtest);
+
+  LOGI("GetRectifyLogFromCalibrationLog Table ID 1...");
+
+  //Table ID 2: Write "RECT_Flags" Entries
+  memcpy(tempBufferShort,DumpBuffer,sizeof(short)*TAB_ElementCount[idx]);
+  bool EnableModule = (bool)tempBufferShort[0];   // 2 bytes
+  bool EnableScale  = (bool)tempBufferShort[1];   // 2 bytes
+  bool EnableCrop   = (bool)tempBufferShort[2];   // 2 bytes
+  std::cout << "EnableModule " << (EnableModule ? "yes " : "no ")
+            << "EnableScale " << (EnableScale ? "yes" : "no  ")
+            << "EnableCrop " << (EnableCrop ? "yes " : "no ")
+            << std::endl;
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  pData->RECT_ScaleEnable = (int)EnableScale;
+  pData->RECT_CropEnable = (int)EnableCrop;
+
+  LOGI("GetRectifyLogFromCalibrationLog Table ID 2...");
+
+  //Table ID 3: Write "RECT_ScaleDimension" Entries
+  memcpy(tempBufferShort,DumpBuffer,sizeof(short)*TAB_ElementCount[idx]);
+  int ScaleWidth  = (int)tempBufferShort[0];      // 2 bytes
+  int ScaleHeight = (int)tempBufferShort[1];      // 2 bytes
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  pData->RECT_ScaleWidth  = (unsigned short)ScaleWidth;
+  pData->RECT_ScaleHeight = (unsigned short)ScaleHeight;
+
+  LOGI("GetRectifyLogFromCalibrationLog Table ID 3...");
+
+  //Table ID 4: Write "CamMat1" Entries               // 4 bytes
+  memcpy(tempBufferLong,DumpBuffer,sizeof(MY_INT)*TAB_ElementCount[idx]);
+  for(int i=0;i<TAB_ElementCount[idx];i++)
+      M1[i] = ((double)(tempBufferLong[i]))/(1<<TAB_FractionalBit[idx]);
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  LOGI("GetRectifyLogFromCalibrationLog Table ID 4...");
+
+  //Table ID 5: Write "CamDist1" Entries              // 4 bytes
+  memcpy(tempBufferLong,DumpBuffer,sizeof(MY_INT)*TAB_ElementCount[idx]);
+  for(int i=0;i<TAB_ElementCount[idx];i++)
+      D1[i] = ((double)(tempBufferLong[i]))/(1<<TAB_FractionalBit[idx]);
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  LOGI("GetRectifyLogFromCalibrationLog Table ID 5...");
+
+  //Table ID 6: Write "CamMat2" Entries               // 4 bytes
+  memcpy(tempBufferLong,DumpBuffer,sizeof(MY_INT)*TAB_ElementCount[idx]);
+  for(int i=0;i<TAB_ElementCount[idx];i++)
+      M2[i] = ((double)(tempBufferLong[i]))/(1<<TAB_FractionalBit[idx]);
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  LOGI("GetRectifyLogFromCalibrationLog Table ID 6...");
+
+  //Table ID 7: Write "CamDist2" Entries              // 4 bytes
+  memcpy(tempBufferLong,DumpBuffer,sizeof(MY_INT)*TAB_ElementCount[idx]);
+  for(int i=0;i<TAB_ElementCount[idx];i++)
+      D2[i] = ((double)(tempBufferLong[i]))/(1<<TAB_FractionalBit[idx]);
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  LOGI("GetRectifyLogFromCalibrationLog Table ID 7...");
+
+  //Table ID 8: Write "RotaMat" Entries               // 4 bytes
+  memcpy(tempBufferLong,DumpBuffer,sizeof(MY_INT)*TAB_ElementCount[idx]);
+  for(int i=0;i<TAB_ElementCount[idx];i++)
+      R[i] = ((double)(tempBufferLong[i]))/(1<<TAB_FractionalBit[idx]);
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  LOGI("GetRectifyLogFromCalibrationLog Table ID 8...");
+
+  //Table ID 9: Write "TranMat" Entries               // 4 bytes
+  memcpy(tempBufferLong,DumpBuffer,sizeof(MY_INT)*TAB_ElementCount[idx]);
+  for(int i=0;i<TAB_ElementCount[idx];i++)
+      T[i] = ((double)(tempBufferLong[i]))/(1<<TAB_FractionalBit[idx]);
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  LOGI("GetRectifyLogFromCalibrationLog Table ID 9...");
+
+  //Table ID 10: Write "LRotaMat" Entries             // 4 bytes
+  memcpy(tempBufferLong,DumpBuffer,sizeof(MY_INT)*TAB_ElementCount[idx]);
+  for(int i=0;i<TAB_ElementCount[idx];i++)
+      R1[i] = ((double)(tempBufferLong[i]))/(1<<TAB_FractionalBit[idx]);
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  LOGI("GetRectifyLogFromCalibrationLog Table ID 10...");
+
+  //Table ID 11: Write "RRotaMat" Entries             // 4 bytes
+  memcpy(tempBufferLong,DumpBuffer,sizeof(MY_INT)*TAB_ElementCount[idx]);
+  for(int i=0;i<TAB_ElementCount[idx];i++)
+      R2[i] = ((double)(tempBufferLong[i]))/(1<<TAB_FractionalBit[idx]);
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  LOGI("GetRectifyLogFromCalibrationLog Table ID 11...");
+
+  //Table ID 12: Write "NewCamMat1" Entries           // 4 bytes
+  memcpy(tempBufferLong,DumpBuffer,sizeof(MY_INT)*TAB_ElementCount[idx]);
+  for(int i=0;i<TAB_ElementCount[idx];i++)
+      P1[i] = ((double)(tempBufferLong[i]))/(1<<TAB_FractionalBit[idx]);
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  LOGI("GetRectifyLogFromCalibrationLog Table ID 12...");
+
+  //Table ID 13: Write "NewCamMat2" Entries           // 4 bytes
+  memcpy(tempBufferLong,DumpBuffer,sizeof(MY_INT)*TAB_ElementCount[idx]);
+  for(int i=0;i<TAB_ElementCount[idx];i++)
+      P2[i] = ((double)(tempBufferLong[i]))/(1<<TAB_FractionalBit[idx]);
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  LOGI("GetRectifyLogFromCalibrationLog Table ID 13...");
+
+  //Table ID 14: Write "ReprojMat" Entries            // 4 bytes
+  memcpy(tempBufferLong,DumpBuffer,sizeof(MY_INT)*TAB_ElementCount[idx]);
+  for (int i=0; i < TAB_ElementCount[idx]; i++)
+      Q[i] = ((double)(tempBufferLong[i]))/(1<<TAB_FractionalBit[idx]);
+
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  for(int i=0; i<9 ;i++) {
+      pData->CamMat1[i] = M1[i];
+      pData->CamMat2[i] = M2[i];
+      pData->RotaMat[i] = R[i];
+      pData->LRotaMat[i] = R1[i];
+      pData->RRotaMat[i] = R2[i];
+  }
+
+  for(int i=0; i<8 ;i++){
+      pData->CamDist1[i] = D1[i];
+      pData->CamDist2[i] = D2[i];
+  }
+
+  for(int i=0; i<3 ;i++) {
+      pData->TranMat[i] = T[i];
+  }
+
+  for(int i=0; i<12 ;i++) {
+      pData->NewCamMat1[i] = P1[i];
+      pData->NewCamMat2[i] = P2[i];
+  }
+
+  LOGI("GetRectifyLogFromCalibrationLog Table ID 14...");
+
+  //Table ID 15: Write "ROI1" Entries
+  memcpy(tempBufferShort,DumpBuffer,sizeof(short)*TAB_ElementCount[idx]);
+  /*RoiL.x =      (int)tempBufferShort[0];        // 2 bytes
+  RoiL.y =        (int)tempBufferShort[1];        // 2 bytes
+  RoiL.width =    (int)tempBufferShort[2];        // 2 bytes
+  RoiL.height =   (int)tempBufferShort[3];        // 2 bytes*/
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  LOGI("GetRectifyLogFromCalibrationLog Table ID 15...");
+
+  //Table ID 16: Write "ROI2" Entries
+  memcpy(tempBufferShort,DumpBuffer,sizeof(short)*TAB_ElementCount[idx]);
+  /*RoiR.x =      (int)tempBufferShort[0];        // 2 bytes
+  RoiR.y =        (int)tempBufferShort[1];        // 2 bytes
+  RoiR.width =    (int)tempBufferShort[2];        // 2 bytes
+  RoiR.height =   (int)tempBufferShort[3];        // 2 bytes*/
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  LOGI("GetRectifyLogFromCalibrationLog Table ID 16...");
+
+  //Table ID 17: Write "ComROI" Entries
+  memcpy(tempBufferShort,DumpBuffer,sizeof(short)*TAB_ElementCount[idx]);
+  /*CommonROI.x =     (int)tempBufferShort[0];        // 2 bytes
+  CommonROI.y =       (int)tempBufferShort[1];        // 2 bytes
+  CommonROI.width =   (int)tempBufferShort[2];        // 2 bytes
+  CommonROI.height =  (int)tempBufferShort[3];        // 2 bytes*/
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  LOGI("GetRectifyLogFromCalibrationLog Table ID 17...");
+
+  //Table ID 18: Write "ScaleROI" Entries
+  memcpy(tempBufferShort,DumpBuffer,sizeof(short)*TAB_ElementCount[idx]);
+  /*SCommonROI.x =        (int)tempBufferShort[0];        // 2 bytes
+  SCommonROI.y =      (int)tempBufferShort[1];        // 2 bytes
+  SCommonROI.width =  (int)tempBufferShort[2];        // 2 bytes
+  SCommonROI.height = (int)tempBufferShort[3];        // 2 bytes*/
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  LOGI("GetRectifyLogFromCalibrationLog Table ID 18...");
+
+  //Table ID 19: Write "RECT_Crop" Entries
+  memcpy(tempBufferShort,DumpBuffer,sizeof(short)*TAB_ElementCount[idx]);
+  int mCrop_Row_BG   = (int)tempBufferShort[0];       // 2 bytes
+  int mCrop_Row_ED   = (int)tempBufferShort[1];       // 2 bytes
+  int mCrop_Col_BG_L = (int)tempBufferShort[2];       // 2 bytes
+  int mCrop_Col_ED_L = (int)tempBufferShort[3];       // 2 bytes
+  int mCrop_Col_BG_R = (int)tempBufferShort[4];       // 2 bytes
+  int mCrop_Col_ED_R = (int)tempBufferShort[5];       // 2 bytes
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  pData->RECT_Crop_Row_BG = (unsigned short)mCrop_Row_BG;
+  pData->RECT_Crop_Row_ED = (unsigned short)mCrop_Row_ED;
+  pData->RECT_Crop_Col_BG_L = (unsigned short)mCrop_Col_BG_L;
+  pData->RECT_Crop_Col_ED_L = (unsigned short)mCrop_Col_ED_L;
+
+  LOGI("GetRectifyLogFromCalibrationLog Table ID 19...");
+
+  //Table ID 20: Write "RECT_Scale_MN" Entries
+  memcpy(tempBufferShort,DumpBuffer,sizeof(short)*TAB_ElementCount[idx]);
+  int mScale_Col_M = (int)tempBufferShort[0];     // 2 bytes
+  int mScale_Col_N = (int)tempBufferShort[1];     // 2 bytes
+  int mScale_Row_M = (int)tempBufferShort[2];     // 2 bytes
+  int mScale_Row_N = (int)tempBufferShort[3];     // 2 bytes
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  pData->RECT_Scale_Col_M = (unsigned char)mScale_Col_M;
+  pData->RECT_Scale_Col_N = (unsigned char)mScale_Col_N;
+  pData->RECT_Scale_Row_M = (unsigned char)mScale_Row_M;
+  pData->RECT_Scale_Row_N = (unsigned char)mScale_Row_N;
+
+  LOGI("GetRectifyLogFromCalibrationLog Table ID 20...");
+
+  //Table ID 21: Write "RECT_Scale_C" Entries
+  memcpy(tempBufferLong,DumpBuffer,sizeof(MY_INT)*TAB_ElementCount[idx]);
+  double mScale_Col_C = ((double)(tempBufferLong[0]))/(1<<TAB_FractionalBit[idx]);
+  double mScale_Row_C = ((double)(tempBufferLong[1]))/(1<<TAB_FractionalBit[idx]);
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  LOGI("GetRectifyLogFromCalibrationLog Table ID 21...");
+
+  //Table ID 22: Write "RECT_ErrMeasure" Entries      4 bytes
+  memcpy(tempBufferLong,DumpBuffer,sizeof(MY_INT)*TAB_ElementCount[idx]);
+  double  avgReprojectError = ((double)(tempBufferLong[0]))/(1<<TAB_FractionalBit[idx]);
+  double  minYShiftError    = ((double)(tempBufferLong[1]))/(1<<TAB_FractionalBit[idx]);
+  double  maxYShiftError    = ((double)(tempBufferLong[2]))/(1<<TAB_FractionalBit[idx]);
+  double  avgYShiftError    = ((double)(tempBufferLong[3]))/(1<<TAB_FractionalBit[idx]);
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  pData->RECT_AvgErr = (float)avgReprojectError;
+
+  LOGI("GetRectifyLogFromCalibrationLog Table ID 22...");
+
+  //Table ID 23: Write "LineBufer" Entries
+  memcpy(tempBufferShort,DumpBuffer,sizeof(short)*TAB_ElementCount[idx]);
+  int lineBuffer = (int)tempBufferShort[0];       // 2 bytes
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  pData->nLineBuffers = (unsigned short)lineBuffer;
+
+  LOGI("GetRectifyLogFromCalibrationLog Table ID 23...");
+
+  //Table ID 24: Write "EssentialMat" Entries             // 4 bytes;
+  memcpy(tempBufferLong,DumpBuffer,sizeof(MY_INT)*TAB_ElementCount[idx]);
+  for(int i=0;i<TAB_ElementCount[idx];i++)
+      E[i] = ((double)(tempBufferLong[i]))/(1<<TAB_FractionalBit[idx]);
+
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  LOGI("GetRectifyLogFromCalibrationLog Table ID 24...");
+
+  //Table ID 25: Write "fundamentalMat" Entries           // 4 bytes;
+  memcpy(tempBufferLong,DumpBuffer,sizeof(MY_INT)*TAB_ElementCount[idx]);
+  for(int i=0;i<TAB_ElementCount[idx];i++)
+      F[i] = ((double)(tempBufferLong[i]))/(1<<TAB_FractionalBit[idx]);
+
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  LOGI("GetRectifyLogFromCalibrationLog Table ID 25...");
+
+  //Table ID 26: Write "ConfidenceVal" Entries            // 4 bytes;
+  memcpy(tempBufferLong,DumpBuffer,sizeof(MY_INT)*TAB_ElementCount[idx]);
+  for(int i=0;i<TAB_ElementCount[idx];i++)
+      mConfidenceValue[i] =  ((float)(tempBufferLong[i]))/(1<<TAB_FractionalBit[idx]);
+
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  LOGI("GetRectifyLogFromCalibrationLog Table ID 26...");
+
+  //Table ID 27: Write "ConfidenceTH" Entries
+  memcpy(tempBufferLong,DumpBuffer,sizeof(MY_INT)*TAB_ElementCount[idx]);
+  for(int i=0;i<TAB_ElementCount[idx];i++)
+      mConfidenceTH[i] = ((float)(tempBufferLong[i]))/(1<<TAB_FractionalBit[idx]);
+
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  LOGI("GetRectifyLogFromCalibrationLog Table ID 27...");
+
+  //Table ID 28: Write "ConfidenceLevel" Entries
+  memcpy(tempBufferShort,DumpBuffer,sizeof(short)*TAB_ElementCount[idx]);
+  mConfidenceLevel = (int)tempBufferShort[0];  // 2 bytes
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+
+  LOGI("GetRectifyLogFromCalibrationLog Table ID 28...");
+  LOGI("GetRectifyLogFromCalibrationLog cpy data ready...");
+  return data;
+}
+
 bool Device::SetCameraCalibrationBinFile(const std::string& filename) {
   std::ifstream t;
   int length;
@@ -527,6 +1018,8 @@ bool Device::SetCameraCalibrationBinFile(const std::string& filename) {
   t.close();
 
   int nActualLength = 0;
+  // GetCameraCalibrationWithStruct((unsigned char *)buffer, length);
+  // bool ok = true;
 
   bool ok = (ETronDI_OK == EtronDI_SetLogData(handle_, &dev_sel_info_,
       (unsigned char*)buffer, length, &nActualLength, 0));
@@ -535,6 +1028,371 @@ bool Device::SetCameraCalibrationBinFile(const std::string& filename) {
 
   SyncCameraCalibrations();
   return ok;
+}
+
+bool Device::SetCameraCalibrationWithStruct(
+    const eSPCtrl_RectLogData& data) {
+  std::ifstream t;
+  int length = 4096;
+  char* buffer = new char[length];
+  GetCameraCalibrationWithStruct(buffer, data);
+
+  int nActualLength = 0;
+
+  bool ok = (ETronDI_OK == EtronDI_SetLogData(handle_, &dev_sel_info_,
+      (unsigned char*)buffer, length, &nActualLength, 0));
+  if (!ok) printf("error when setLogData\n");
+  delete[] buffer;
+  std::cout << "success" << std::endl;
+  // SyncCameraCalibrations();
+  return ok;
+}
+
+void Device::GetCameraCalibrationWithStruct(char* DumpBuffer,
+    const eSPCtrl_RectLogData &data) {  // NOLINT
+  auto pData = &data;
+  double M1[9];
+  double D1[8];
+  double M2[9];
+  double D2[8];
+  double R[9];
+  double T[3];
+  double R1[9];
+  double R2[9];
+  double P1[12];
+  double P2[12];
+  double Q[16];
+  double E[9];
+  double F[9];
+
+  for(int i=0; i<9 ;i++) {
+    M1[i] =  pData->CamMat1[i];
+    M2[i] =  pData->CamMat2[i];
+    R[i] = pData->RotaMat[i];
+    R1[i] = pData->LRotaMat[i];
+    R2[i] = pData->RRotaMat[i];
+  }
+
+  for(int i=0; i<8 ;i++){
+    D1[i] = pData->CamDist1[i];
+    D2[i] = pData->CamDist2[i];
+  }
+
+  for(int i=0; i<3 ;i++) {
+    T[i] = pData->TranMat[i];
+  }
+
+  for(int i=0; i<12 ;i++) {
+    P1[i] = pData->NewCamMat1[i];
+    P2[i] = pData->NewCamMat2[i];
+  }
+
+  float mConfidenceValue[32];
+  float mConfidenceTH[32];
+  short mConfidenceLevel;
+
+  /*double InvR1[3][3];
+  double InvR2[3][3];*/
+
+  //bool EnableFixedROI;      //下一版更新
+
+  short  *tempBufferShort;
+  MY_INT *tempBufferLong;
+  //TCHAR strtest[256];
+
+  short idx = 0;
+
+  int Log_Size  = (int)tempBufferShort[0];        // 2 bytes
+  short *size_l = (short *)DumpBuffer;
+  *size_l = 1230;
+  DumpBuffer += 2;
+  idx++;
+
+  DumpBuffer += (TableHeaderSize + TableInfoSize * TAB_MAX_NUM);
+
+  // wsprintf(strtest,L" DumpBuffer = 0x%x   *DumpBuffer = %d\n",DumpBuffer,*DumpBuffer);
+  // OutputDebugString(strtest);
+
+  // LOGI("GetRectifyLogFromCalibrationLog Table ID 0...");
+
+  // Table ID 1: Write "InOutDim" Entries
+  // memcpy(tempBufferShort,DumpBuffer,sizeof(short)*TAB_ElementCount[idx]);
+  tempBufferShort = (short *)DumpBuffer;
+
+  tempBufferShort[0] = pData->InImgWidth;
+  tempBufferShort[1] = pData->InImgHeight;
+  tempBufferShort[2] = pData->OutImgWidth;
+  tempBufferShort[3] = pData->OutImgHeight;
+  tempBufferShort[4] = 3;
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  // LOGI("GetRectifyLogFromCalibrationLog Table ID 1...");
+
+  tempBufferShort = (short *)DumpBuffer;
+  tempBufferShort[0] = 1;
+  tempBufferShort[1] = pData->RECT_ScaleEnable;
+  tempBufferShort[2] = pData->RECT_CropEnable;
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  // LOGI("GetRectifyLogFromCalibrationLog Table ID 2...");
+
+  tempBufferShort = (short *)DumpBuffer;
+  tempBufferShort[0] = pData->RECT_ScaleWidth;
+  tempBufferShort[1] = pData->RECT_ScaleHeight;
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  // LOGI("GetRectifyLogFromCalibrationLog Table ID 3...");
+
+  tempBufferLong = (MY_INT *)DumpBuffer;
+  for(int i=0;i<TAB_ElementCount[idx];i++)
+    tempBufferLong[i] =M1[i] * (1<<TAB_FractionalBit[idx]);
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  // LOGI("GetRectifyLogFromCalibrationLog Table ID 4...");
+
+  tempBufferLong = (MY_INT *)DumpBuffer;
+  for (int i = 0; i < TAB_ElementCount[idx]; i++)
+      tempBufferLong[i] = D1[i] * (1<<TAB_FractionalBit[idx]);
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  // LOGI("GetRectifyLogFromCalibrationLog Table ID 5...");
+
+  tempBufferLong = (MY_INT *)DumpBuffer;
+  for(int i=0;i<TAB_ElementCount[idx];i++)
+      tempBufferLong[i] = M2[i] * (1<<TAB_FractionalBit[idx]);
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  // LOGI("GetRectifyLogFromCalibrationLog Table ID 6...");
+
+  tempBufferLong = (MY_INT *)DumpBuffer;
+  for(int i=0;i<TAB_ElementCount[idx];i++)
+      tempBufferLong[i] = D2[i] * (1<<TAB_FractionalBit[idx]);
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  // LOGI("GetRectifyLogFromCalibrationLog Table ID 7...");
+
+  tempBufferLong = (MY_INT *)DumpBuffer;
+  for(int i=0;i<TAB_ElementCount[idx];i++)
+      tempBufferLong[i] = R[i] * (1<<TAB_FractionalBit[idx]);
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  // LOGI("GetRectifyLogFromCalibrationLog Table ID 8...");
+
+  tempBufferLong = (MY_INT *)DumpBuffer;
+  for(int i=0;i<TAB_ElementCount[idx];i++)
+      tempBufferLong[i] = T[i] * (1<<TAB_FractionalBit[idx]);
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  // LOGI("GetRectifyLogFromCalibrationLog Table ID 9...");
+
+  tempBufferLong = (MY_INT *)DumpBuffer;
+  for(int i=0;i<TAB_ElementCount[idx];i++)
+      tempBufferLong[i] = R1[i] * (1<<TAB_FractionalBit[idx]);
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  // LOGI("GetRectifyLogFromCalibrationLog Table ID 10...");
+
+  tempBufferLong = (MY_INT *)DumpBuffer;
+  for(int i=0;i<TAB_ElementCount[idx];i++)
+      tempBufferLong[i] = R2[i] * (1<<TAB_FractionalBit[idx]);
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  // LOGI("GetRectifyLogFromCalibrationLog Table ID 11...");
+
+  tempBufferLong = (MY_INT *)DumpBuffer;
+  for(int i=0;i<TAB_ElementCount[idx];i++)
+      tempBufferLong[i] = P1[i] * (1<<TAB_FractionalBit[idx]);
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  // LOGI("GetRectifyLogFromCalibrationLog Table ID 12...");
+
+  tempBufferLong = (MY_INT *)DumpBuffer;
+  for(int i=0;i<TAB_ElementCount[idx];i++)
+      tempBufferLong[i] = P2[i] * (1<<TAB_FractionalBit[idx]);
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  // LOGI("GetRectifyLogFromCalibrationLog Table ID 13...");
+
+  tempBufferLong = (MY_INT *)DumpBuffer;
+  for (int i=0; i < TAB_ElementCount[idx]; i++)
+      tempBufferLong[i] = Q[i] * (1<<TAB_FractionalBit[idx]);
+
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  // LOGI("GetRectifyLogFromCalibrationLog Table ID 14...");
+
+  // tempBufferShort = (short *)DumpBuffer;
+  // /*RoiL.x =      (int)tempBufferShort[0];        // 2 bytes
+  // RoiL.y =        (int)tempBufferShort[1];        // 2 bytes
+  // RoiL.width =    (int)tempBufferShort[2];        // 2 bytes
+  // RoiL.height =   (int)tempBufferShort[3];        // 2 bytes*/
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  // //LOGI("GetRectifyLogFromCalibrationLog Table ID 15...");
+
+  // //Table ID 16: Write "ROI2" Entries
+  // memcpy(tempBufferShort,DumpBuffer,sizeof(short)*TAB_ElementCount[idx]);
+  // /*RoiR.x =      (int)tempBufferShort[0];        // 2 bytes
+  // RoiR.y =        (int)tempBufferShort[1];        // 2 bytes
+  // RoiR.width =    (int)tempBufferShort[2];        // 2 bytes
+  // RoiR.height =   (int)tempBufferShort[3];        // 2 bytes*/
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  // //LOGI("GetRectifyLogFromCalibrationLog Table ID 16...");
+
+  // //Table ID 17: Write "ComROI" Entries
+  // memcpy(tempBufferShort,DumpBuffer,sizeof(short)*TAB_ElementCount[idx]);
+  // /*CommonROI.x =     (int)tempBufferShort[0];        // 2 bytes
+  // CommonROI.y =       (int)tempBufferShort[1];        // 2 bytes
+  // CommonROI.width =   (int)tempBufferShort[2];        // 2 bytes
+  // CommonROI.height =  (int)tempBufferShort[3];        // 2 bytes*/
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  // //LOGI("GetRectifyLogFromCalibrationLog Table ID 17...");
+
+  // //Table ID 18: Write "ScaleROI" Entries
+  // memcpy(tempBufferShort,DumpBuffer,sizeof(short)*TAB_ElementCount[idx]);
+  // /*SCommonROI.x =        (int)tempBufferShort[0];        // 2 bytes
+  // SCommonROI.y =      (int)tempBufferShort[1];        // 2 bytes
+  // SCommonROI.width =  (int)tempBufferShort[2];        // 2 bytes
+  // SCommonROI.height = (int)tempBufferShort[3];        // 2 bytes*/
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  // //LOGI("GetRectifyLogFromCalibrationLog Table ID 18...");
+
+  // //Table ID 19: Write "RECT_Crop" Entries
+  tempBufferShort = (short *)DumpBuffer;
+  tempBufferShort[0] = pData->RECT_Crop_Row_BG;       // 2 bytes
+  tempBufferShort[1] = pData->RECT_Crop_Row_ED;       // 2 bytes
+  tempBufferShort[2] = pData->RECT_Crop_Col_BG_L;       // 2 bytes
+  tempBufferShort[3] = pData->RECT_Crop_Col_ED_L;       // 2 bytes
+  // int mCrop_Col_BG_R = (int)tempBufferShort[4];       // 2 bytes
+  // int mCrop_Col_ED_R = (int)tempBufferShort[5];       // 2 bytes
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  // pData->RECT_Crop_Row_BG = (unsigned short)mCrop_Row_BG;
+  // pData->RECT_Crop_Row_ED = (unsigned short)mCrop_Row_ED;
+  // pData->RECT_Crop_Col_BG_L = (unsigned short)mCrop_Col_BG_L;
+  // pData->RECT_Crop_Col_ED_L = (unsigned short)mCrop_Col_ED_L;
+
+  // //LOGI("GetRectifyLogFromCalibrationLog Table ID 19...");
+
+  // Table ID 20: Write "RECT_Scale_MN" Entries
+  tempBufferShort = (short *)DumpBuffer;
+  tempBufferShort[0] = pData->RECT_Scale_Col_M;     // 2 bytes
+  tempBufferShort[1] = pData->RECT_Scale_Col_N;     // 2 bytes
+  tempBufferShort[2] = pData->RECT_Scale_Row_M;     // 2 bytes
+  tempBufferShort[3] = pData->RECT_Scale_Row_N;     // 2 bytes
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  // pData->RECT_Scale_Col_M = (unsigned char)mScale_Col_M;
+  // pData->RECT_Scale_Col_N = (unsigned char)mScale_Col_N;
+  // pData->RECT_Scale_Row_M = (unsigned char)mScale_Row_M;
+  // pData->RECT_Scale_Row_N = (unsigned char)mScale_Row_N;
+
+  // LOGI("GetRectifyLogFromCalibrationLog Table ID 20...");
+
+  // Table ID 21: Write "RECT_Scale_C" Entries
+  // memcpy(tempBufferLong,DumpBuffer,sizeof(MY_INT)*TAB_ElementCount[idx]);
+  tempBufferLong = (MY_INT *)DumpBuffer;
+  // double mScale_Col_C = ((double)(tempBufferLong[0]))/(1<<TAB_FractionalBit[idx]);
+  // double mScale_Row_C = ((double)(tempBufferLong[1]))/(1<<TAB_FractionalBit[idx]);
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  // //LOGI("GetRectifyLogFromCalibrationLog Table ID 21...");
+
+  // //Table ID 22: Write "RECT_ErrMeasure" Entries      4 bytes
+  // memcpy(tempBufferLong,DumpBuffer,sizeof(MY_INT)*TAB_ElementCount[idx]);
+  tempBufferLong = (MY_INT *)DumpBuffer;
+  tempBufferLong[0]= pData->RECT_AvgErr * (1<<TAB_FractionalBit[idx]);
+  // double  minYShiftError    = ((double)(tempBufferLong[1]))/(1<<TAB_FractionalBit[idx]);
+  // double  maxYShiftError    = ((double)(tempBufferLong[2]))/(1<<TAB_FractionalBit[idx]);
+  // double  avgYShiftError    = ((double)(tempBufferLong[3]))/(1<<TAB_FractionalBit[idx]);
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  // pData->RECT_AvgErr = (float)avgReprojectError;
+
+  // LOGI("GetRectifyLogFromCalibrationLog Table ID 22...");
+
+  tempBufferShort = (short *)DumpBuffer;
+  tempBufferShort[0] = pData->nLineBuffers;       // 2 bytes
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  // pData->nLineBuffers = (unsigned short)lineBuffer;
+
+  // LOGI("GetRectifyLogFromCalibrationLog Table ID 23...");
+
+  // //Table ID 24: Write "EssentialMat" Entries             // 4 bytes;
+  // memcpy(tempBufferLong,DumpBuffer,sizeof(MY_INT)*TAB_ElementCount[idx]);
+  // for(int i=0;i<TAB_ElementCount[idx];i++)
+  //     E[i] = ((double)(tempBufferLong[i]))/(1<<TAB_FractionalBit[idx]);
+
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  // //LOGI("GetRectifyLogFromCalibrationLog Table ID 24...");
+
+  // //Table ID 25: Write "fundamentalMat" Entries           // 4 bytes;
+  // memcpy(tempBufferLong,DumpBuffer,sizeof(MY_INT)*TAB_ElementCount[idx]);
+  // for(int i=0;i<TAB_ElementCount[idx];i++)
+  //     F[i] = ((double)(tempBufferLong[i]))/(1<<TAB_FractionalBit[idx]);
+
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  // //LOGI("GetRectifyLogFromCalibrationLog Table ID 25...");
+  tempBufferLong = (MY_INT *)DumpBuffer;
+  // //Table ID 26: Write "ConfidenceVal" Entries            // 4 bytes;
+  // memcpy(tempBufferLong,DumpBuffer,sizeof(MY_INT)*TAB_ElementCount[idx]);
+  for(int i=0;i<TAB_ElementCount[idx];i++)
+      tempBufferLong[i] = mConfidenceValue[i] * (1<<TAB_FractionalBit[idx]);
+
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  // LOGI("GetRectifyLogFromCalibrationLog Table ID 26...");
+  tempBufferLong = (MY_INT *)DumpBuffer;
+  // //Table ID 27: Write "ConfidenceTH" Entries
+  // memcpy(tempBufferLong,DumpBuffer,sizeof(MY_INT)*TAB_ElementCount[idx]);
+  for(int i=0;i<TAB_ElementCount[idx];i++)
+      tempBufferLong[i] = mConfidenceTH[i] * (1<<TAB_FractionalBit[idx]);
+
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+  idx++;
+
+  // LOGI("GetRectifyLogFromCalibrationLog Table ID 27...");
+
+  // //Table ID 28: Write "ConfidenceLevel" Entries
+  // memcpy(tempBufferShort,DumpBuffer,sizeof(short)*TAB_ElementCount[idx]);
+  tempBufferShort = (short *)DumpBuffer;
+  tempBufferShort[0] = mConfidenceLevel;  // 2 bytes
+  DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);
+
+  // //LOGI("GetRectifyLogFromCalibrationLog Table ID 28...");
+  // //LOGI("GetRectifyLogFromCalibrationLog cpy data ready...");
 }
 
 void Device::Close() {
@@ -812,6 +1670,11 @@ bool Device::GetCameraCalibrationFile(int index, const std::string& filename) {
 }
 
 void Device::SyncCameraCalibrations() {
+  // if (SetCameraCalibrationBinFile(
+  //     "/home/tiny/develop/MYNT-EYE-D-SDK/00000001rectify_log_read0")) {
+  //   std::cout << "success" << std::endl;
+  // }
+
   if (!ExpectOpened(__func__)) return;
   camera_calibrations_.clear();
   for (int index = 0; index < 2; index++) {
@@ -821,6 +1684,7 @@ void Device::SyncCameraCalibrations() {
     if (ret != ETronDI_OK) {
       return;
     }
+    // SetCameraCalibrationWithStruct(eSPRectLogData);
     int i;
     auto camera_calib = std::make_shared<CameraCalibration>();
     camera_calib->InImgWidth = eSPRectLogData.InImgWidth;
