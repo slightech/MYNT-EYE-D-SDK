@@ -58,6 +58,8 @@ int get_mat_type(const ImageFormat& format) {
 
 // Global data caches
 DataCaches g_data_caches;
+DataCaches g_left_data_caches;
+DataCaches g_right_data_caches;
 DataCaches g_depth_data_caches;
 
 void init_cache_proper_sizes() {
@@ -75,6 +77,8 @@ void init_cache_proper_sizes() {
   }
 
   g_data_caches.SetProperSizes(sizes);
+  g_left_data_caches.SetProperSizes(sizes);
+  g_right_data_caches.SetProperSizes(sizes);
   g_depth_data_caches.SetProperSizes(sizes);
 }
 
@@ -82,6 +86,10 @@ DataCaches::data_ptr_t get_cache_fixed(const ImageType& type,
     const std::size_t& size) {
   if (type == ImageType::IMAGE_DEPTH) {
     return g_depth_data_caches.GetFixed(size);
+  } else if (type == ImageType::IMAGE_LEFT_COLOR) {
+    return g_left_data_caches.GetFixed(size);
+  } else if (type == ImageType::IMAGE_RIGHT_COLOR) {
+    return g_right_data_caches.GetFixed(size);
   } else {
     return g_data_caches.GetFixed(size);
   }
@@ -91,6 +99,10 @@ DataCaches::data_ptr_t get_cache_proper(const ImageType& type,
     const std::size_t& size) {
   if (type == ImageType::IMAGE_DEPTH) {
     return g_depth_data_caches.GetProper(size);
+  } else if (type == ImageType::IMAGE_LEFT_COLOR) {
+    return g_left_data_caches.GetProper(size);
+  } else if (type == ImageType::IMAGE_RIGHT_COLOR) {
+    return g_right_data_caches.GetProper(size);
   } else {
     return g_data_caches.GetProper(size);
   }
