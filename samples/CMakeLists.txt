@@ -155,6 +155,13 @@ make_executable(get_img_params
   DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
 )
 
+make_executable(set_img_params
+  SRCS
+    src/set_img_params.cc
+  LINK_LIBS mynteye_depth ${OpenCV_LIBS}
+  DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
+)
+
 make_executable(get_imu_params
   SRCS
     src/get_imu_params.cc

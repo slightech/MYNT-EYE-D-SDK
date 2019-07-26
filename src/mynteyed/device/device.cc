@@ -988,7 +988,7 @@ eSPCtrl_RectLogData Device::GetCameraCalibrationWithStruct(unsigned char* DumpBu
 
   //Table ID 27: Write "ConfidenceTH" Entries
   memcpy(tempBufferLong,DumpBuffer,sizeof(MY_INT)*TAB_ElementCount[idx]);
-  for(int i=0;i<TAB_ElementCount[idx];i++)
+  for (int i = 0; i < TAB_ElementCount[idx]; i++)
       mConfidenceTH[i] = ((float)(tempBufferLong[i]))/(1<<TAB_FractionalBit[idx]);
 
   DumpBuffer += (TAB_DataSize[idx]*TAB_ElementCount[idx]);

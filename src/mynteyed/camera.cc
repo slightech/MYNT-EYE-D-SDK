@@ -288,6 +288,11 @@ std::vector<DistanceData> Camera::GetDistanceDatas() {
   return std::move(p_->GetDistanceDatas());
 }
 
+std::shared_ptr<CameraCalibration> Camera::GetCameraCalibration(
+    const StreamMode& stream_mode) {
+  return p_->GetCameraCalibration(stream_mode);
+}
+
 void Camera::WaitForStream() {
   return p_->WaitForStream();
 }

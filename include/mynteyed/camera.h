@@ -93,6 +93,10 @@ class MYNTEYE_API Camera {
   /** Write camera calibration bin file */
   bool WriteCameraCalibration(const struct CameraCalibration &data);
 
+  /** Get camera calibration calib struct */
+  std::shared_ptr<CameraCalibration> GetCameraCalibration(
+    const StreamMode& stream_mode);
+
   /** Get the intrinsics of motion */
   MotionIntrinsics GetMotionIntrinsics() const {
     bool ok = true;
