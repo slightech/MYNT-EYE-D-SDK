@@ -1031,7 +1031,7 @@ bool Device::SetCameraCalibrationBinFile(const std::string& filename) {
 }
 
 bool Device::SetCameraCalibrationWithStruct(
-    const eSPCtrl_RectLogData& data) {
+    const struct CameraCalibration& data) {
   std::ifstream t;
   int length = 4096;
   char* buffer = new char[length];
@@ -1044,12 +1044,12 @@ bool Device::SetCameraCalibrationWithStruct(
   if (!ok) printf("error when setLogData\n");
   delete[] buffer;
   std::cout << "success" << std::endl;
-  // SyncCameraCalibrations();
+  SyncCameraCalibrations();
   return ok;
 }
 
 void Device::GetCameraCalibrationWithStruct(char* DumpBuffer,
-    const eSPCtrl_RectLogData &data) {  // NOLINT
+    const struct CameraCalibration& data) {  // NOLINT
   auto pData = &data;
   double M1[9];
   double D1[8];

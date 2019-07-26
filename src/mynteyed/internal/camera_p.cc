@@ -648,6 +648,11 @@ bool CameraPrivate::AuxiliaryChipFirmwareUpdate(const char* filepath) {
   return channels_->HidFirmwareUpdate(filepath);
 }
 
+bool CameraPrivate::WriteCameraCalibration(
+    const struct CameraCalibration &data) {
+  return device_->SetCameraCalibrationWithStruct(data);
+}
+
 void CameraPrivate::WatchDog() {
   watch_thread_ = std::thread([this](){
     Rate rate(100);

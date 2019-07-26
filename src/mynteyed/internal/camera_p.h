@@ -250,6 +250,8 @@ class MYNTEYE_API CameraPrivate {
   /** Update auxiliary chip firmware. */
   bool AuxiliaryChipFirmwareUpdate(const char* filepath);
 
+  bool WriteCameraCalibration(const struct CameraCalibration &data);
+
  protected:
   std::shared_ptr<Channels> channels() const {
     return channels_;

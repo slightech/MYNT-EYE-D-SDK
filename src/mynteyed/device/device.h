@@ -38,6 +38,7 @@
 #include "mynteyed/device/open_params.h"
 #include "mynteyed/device/stream_info.h"
 #include "mynteyed/device/types_internal.h"
+#include "mynteyed/device/types.h"
 
 #include "mynteyed/device/image.h"
 
@@ -110,13 +111,13 @@ class Device {
   /** Set camera calibration bin file. */
   bool SetCameraCalibrationBinFile(const std::string& filename);
   /** Set camera calibration with struct. */
-  bool SetCameraCalibrationWithStruct(const eSPCtrl_RectLogData& filename);
+  bool SetCameraCalibrationWithStruct(const struct CameraCalibration &data);
 
   /** Parse camera calibration with buffer２. */
   eSPCtrl_RectLogData GetCameraCalibrationWithStruct(
       unsigned char* buff, int nLen);
   void GetCameraCalibrationWithStruct(char* DumpBuffer,
-    const eSPCtrl_RectLogData &data);  // NOLINT
+    const struct CameraCalibration &data);  // NOLINT
 
   /** Close device */
   void Close();
