@@ -1043,7 +1043,7 @@ bool Device::SetCameraCalibrationWithStruct(
       (unsigned char*)buffer, length, &nActualLength, 0));
   if (!ok) printf("error when setLogData\n");
   delete[] buffer;
-  std::cout << "success" << std::endl;
+  if (ok) std::cout << "write calib info success!" << std::endl;
   SyncCameraCalibrations();
   return ok;
 }
