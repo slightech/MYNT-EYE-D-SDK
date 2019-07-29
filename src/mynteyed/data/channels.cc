@@ -315,6 +315,7 @@ bool Channels::DoHidDataExtract(imu_packets_t &imu, img_packets_t &img,
   int size = hid_->receive(0, data, PACKET_SIZE * 2, 220);
   if (size < 0) {
     // LOGE("%s, %d:: Error Reading, device went offline !", __FILE__, __LINE__);
+    LOGE("%s, %d:: Received data is failed. Please update auxiliary firmware.", __FILE__, __LINE__);
     return false;
   }
 
@@ -559,8 +560,7 @@ bool Channels::PullFileData(bool device_desc,
   while (buffer[0] != 0x0B) {
     hid_->receive(0, buffer, 64, 2000);
     if (++req_count > 5) {
-      LOGE("%s %d:: Error reading, device went offline.",
-          __FILE__, __LINE__);
+      LOGE("%s, %d:: Received data is failed. Please update auxiliary firmware.", __FILE__, __LINE__);
       return false;
     }
   }
@@ -869,6 +869,7 @@ bool Channels::PushFileData(
     if (++req_count > 5) {
       // LOGE("%s %d:: Error reading, device went offline.",
       //     __FILE__, __LINE__);
+      LOGE("%s, %d:: Received data is failed. Please update auxiliary firmware.", __FILE__, __LINE__);
       return false;
     }
   }
