@@ -90,6 +90,10 @@ class MYNTEYE_API Camera {
   /** Write camera calibration bin file */
   bool WriteCameraCalibrationBinFile(const std::string& filename);
 
+  /** Write camera calibration struct */
+  bool WriteCameraCalibration(
+      const struct CameraCalibration &data, const StreamMode& stream_mode);
+
   /** Write camera calibration bin file */
   bool WriteCameraCalibration(const struct CameraCalibration &data);
 

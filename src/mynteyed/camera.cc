@@ -301,8 +301,9 @@ bool Camera::AuxiliaryChipFirmwareUpdate(const char* filepath) {
   return p_->AuxiliaryChipFirmwareUpdate(filepath);
 }
 
-bool Camera::WriteCameraCalibration(const struct CameraCalibration &data) {
-  return p_->WriteCameraCalibration(data);
+bool Camera::WriteCameraCalibration(
+      const struct CameraCalibration &data, const StreamMode& stream_mode) {
+  return p_->WriteCameraCalibration(data, stream_mode);
 }
 
 #ifdef MYNTEYE_DEPRECATED_COMPAT

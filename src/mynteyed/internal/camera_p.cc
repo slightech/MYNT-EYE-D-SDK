@@ -649,8 +649,8 @@ bool CameraPrivate::AuxiliaryChipFirmwareUpdate(const char* filepath) {
 }
 
 bool CameraPrivate::WriteCameraCalibration(
-    const struct CameraCalibration &data) {
-  return device_->SetCameraCalibrationWithStruct(data);
+    const struct CameraCalibration &data, const StreamMode& stream_mode) {
+  return device_->SetCameraCalibrationWithStruct(data, stream_mode);
 }
 
 void CameraPrivate::WatchDog() {

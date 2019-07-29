@@ -1031,16 +1031,28 @@ bool Device::SetCameraCalibrationBinFile(const std::string& filename) {
 }
 
 bool Device::SetCameraCalibrationWithStruct(
-    const struct CameraCalibration& data) {
+    const struct CameraCalibration& data, const StreamMode& stream_mode) {
   std::ifstream t;
   int length = 4096;
   char* buffer = new char[length];
   GetCameraCalibrationWithStruct(buffer, data);
+  bool ok = false;
 
   int nActualLength = 0;
-
-  bool ok = (ETronDI_OK == EtronDI_SetLogData(handle_, &dev_sel_info_,
+  switch (stream_mode) {
+    case StreamMode::STREAM_640x480:
+    case StreamMode::STREAM_1280x480:
+    ok = (ETronDI_OK == EtronDI_SetLogData(handle_, &dev_sel_info_,
+      (unsigned char*)buffer, length, &nActualLength, 1));
+      break;
+    case StreamMode::STREAM_1280x720:
+    case StreamMode::STREAM_2560x720:
+    ok = (ETronDI_OK == EtronDI_SetLogData(handle_, &dev_sel_info_,
       (unsigned char*)buffer, length, &nActualLength, 0));
+      break;
+    default:
+      throw new std::runtime_error("StreamMode is unknown");
+  }
   if (!ok) printf("error when setLogData\n");
   delete[] buffer;
   if (ok) std::cout << "write calib info success!" << std::endl;

@@ -28,8 +28,9 @@ int main(int argc, char *argv[]) {
   std::cout << "Open device success" << std::endl << std::endl;
 
   // std::ofstream out("image_params.params");
-  auto data = cam.GetCameraCalibration(StreamMode::STREAM_1280x720);
-  bool in_ok = cam.WriteCameraCalibration(*data);
+  auto data = cam.GetCameraCalibration(StreamMode::STREAM_640x480);
+  data->CamMat1[0] = 521.56915283203125000;
+  bool in_ok = cam.WriteCameraCalibration(*data, StreamMode::STREAM_640x480);
   cam.Close();
   return 0;
 }

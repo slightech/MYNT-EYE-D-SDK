@@ -111,7 +111,8 @@ class Device {
   /** Set camera calibration bin file. */
   bool SetCameraCalibrationBinFile(const std::string& filename);
   /** Set camera calibration with struct. */
-  bool SetCameraCalibrationWithStruct(const struct CameraCalibration &data);
+  bool SetCameraCalibrationWithStruct(
+      const struct CameraCalibration &data, const StreamMode& stream_mode);
 
   /** Parse camera calibration with buffer２. */
   eSPCtrl_RectLogData GetCameraCalibrationWithStruct(
