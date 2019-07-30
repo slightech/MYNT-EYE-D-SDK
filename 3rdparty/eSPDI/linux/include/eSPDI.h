@@ -15,6 +15,7 @@
 
 #include "eSPDI_def.h"
 #include "eSPDI_version.h"
+#include <stdlib.h>
 int  EtronDI_Init(void **ppHandleEtronDI, bool bIsLogEnabled);
 int  EtronDI_FindDevice(void *pHandleEtronDI);
 void EtronDI_Release(void **ppHandleEtronDI);
@@ -25,6 +26,7 @@ int EtronDI_DoFusion(unsigned char **pDepthBufList, double *pDepthMerge, unsigne
 
 int  EtronDI_GetDeviceNumber(void *pHandleEtronDI);
 int  EtronDI_GetDeviceInfo(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo ,DEVINFORMATION* pdevinfo);
+int  EtronDI_GetDeviceInfoMBL_15cm(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo ,DEVINFORMATION* pdevinfo);
 int  EtronDI_SelectDevice(void *pHandleEtronDI, int dev_index);
 bool EtronDI_IsInterleaveDevice(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo);
 int EtronDI_EnableInterleave(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, bool enable);
@@ -36,6 +38,8 @@ int  EtronDI_GetFWRegister(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, unsign
 int  EtronDI_SetFWRegister(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, unsigned short address, unsigned short nValue,  int flag);
 int  EtronDI_GetHWRegister(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, unsigned short address, unsigned short *pValue, int flag);
 int  EtronDI_SetHWRegister(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, unsigned short address, unsigned short nValue,  int flag);
+int  EtronDI_GetHWRegisterMBL_15cm(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, unsigned short address, unsigned short *pValue, int flag);
+int  EtronDI_SetHWRegisterMBL_15cm(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, unsigned short address, unsigned short nValue,  int flag);
 // register APIs -
 
 // File ID +
@@ -65,10 +69,13 @@ int  EtronDI_WriteFlashData  (void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, FLA
 int  EtronDI_GetDeviceResolutionList(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, 
 									  int nMaxCount, ETRONDI_STREAM_INFO *pStreamInfo0, 
 									  int nMaxCount1, ETRONDI_STREAM_INFO *pStreamInfo1);
-									  
-int  EtronDI_OpenDevice(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, 
-						 int nWidth, int nHeight, bool bImageL, bool bDepth,
-						 void *phWndNotice=0, CONTROL_MODE cm=IMAGE_SN_NONSYNC);									  
+int  EtronDI_Setup_v4l2_requestbuffers(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, int cnt);
+int  EtronDI_OpenDevice(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo,
+                          int nEP0Width, int nEP0Height, bool bEP0MJPG,
+                          int nEP1Width, int nEP1Height,
+                          DEPTH_TRANSFER_CTRL dtc=DEPTH_IMG_NON_TRANSFER,
+                          bool bIsOutputRGB24=false, void *phWndNotice=0,
+                          int *pFPS=0, CONTROL_MODE cm=IMAGE_SN_NONSYNC);
                                      			
 int  EtronDI_OpenDevice2(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, 
 						  int nEP0Width, int nEP0Height, bool bEP0MJPG, 
@@ -197,17 +204,28 @@ int  EtronDI_EnableSensorIF(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, bool 
 
 #ifndef __WEYE__ 
 // for Gyro +
-int EtronDI_InitialUAC(void);
+#ifndef UAC_NOT_SUPPORTED
+int EtronDI_getUACNAME(char *input, char *output);
+int EtronDI_InitialUAC(char *deviceName);
+int EtronDI_WriteWaveHeader(int fd);
+int EtronDI_WriteWaveEnd(int fd, size_t length);
 int EtronDI_GetUACData(unsigned char *buffer, int length);
 int EtronDI_ReleaseUAC(void);
+#endif
 int EtronDI_InitialFlexibleGyro(void* pHandleEtronDI, PDEVSELINFO pDevSelInfo);
 int EtronDI_ReleaseFlexibleGyro(void* pHandleEtronDI, PDEVSELINFO pDevSelInfo);
 int EtronDI_GetFlexibleGyroData(void* pHandleEtronDI,PDEVSELINFO pDevSelInfo, int length, unsigned char* pGyroData);
 int EtronDI_GetFlexibleGyroLength(void* pHandleEtronDI, PDEVSELINFO pDevSelInfo, unsigned short* GyroLen);
 int EtronDI_GetImageInterrupt(void);
+int EtronDI_InitialHidGyro(void* pHandleEtronDI, PDEVSELINFO pDevSelInfo);
+int EtronDI_ReleaseHidGyro(void* pHandleEtronDI, PDEVSELINFO pDevSelInfo);
+int EtronDI_GetHidGyro(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, unsigned char *pBuffer, int length);
+int EtronDI_SetupHidGyro(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, unsigned char *pCmdBuf, int cmdlength);
+int EtronDI_GetInfoHidGyro(void *pHandleEtronDI, PDEVSELINFO pDevSelInfo, unsigned char *pCmdBuf, int cmdlength, unsigned char *pResponseBuf, int *resplength);
 // for Gyro -
 #endif
 
+#ifndef TINY_VERSION
 int EtronDI_GenerateLutFile(void* pHandleEtronDI, PDEVSELINFO pDevSelInfo, const char* filename);
 int EtronDI_SaveLutData(void* pHandleEtronDI, PDEVSELINFO pDevSelInfo, const char* filename);
 int EtronDI_GetLutData(void* pHandleEtronDI, PDEVSELINFO pDevSelInfo, BYTE* buffer, int nSize);
@@ -224,6 +242,14 @@ int EtronDI_DecryptString(const char* src, char* dst);
 int EtronDI_EncryptString(const char* src1, const char* src2, char* dst);
 int EtronDI_DecryptString(const char* src, char* dst1, char* dst2);
 #endif
+#endif
 int EtronDI_GetAutoExposureMode(void* pHandleEtronDI, PDEVSELINFO pDevSelInfo, unsigned short* mode);
 int EtronDI_SetAutoExposureMode(void* pHandleEtronDI, PDEVSELINFO pDevSelInfo, unsigned short mode);
+#ifndef OPENCV_NOT_SUPPORTED
+int EtronDI_RotateImg90(EtronDIImageType::Value imgType, int width, int height, unsigned char *src, unsigned char *dst, int len, bool clockwise);
+int EtronDI_RotateImg180(EtronDIImageType::Value imgType, int width, int height,unsigned char *src, unsigned char *dst, int len);
+int EtronDI_ResizeImgToHalf(EtronDIImageType::Value imgType, int width, int height, unsigned char *src, unsigned char *dst, int len);
+int EtronDI_ImgMirro(EtronDIImageType::Value imgType, int width, int height, unsigned char *src, unsigned char *dst);
+int EtronDI_RGB2BMP(char *filename, int width, int height, unsigned char *data);
+#endif
 #endif // LIB_ESPDI_H
