@@ -659,3 +659,7 @@ void CameraPrivate::WatchDog() {
     }
   });
 }
+
+std::uint16_t CameraPrivate::GetDepthDistance(const std::uint16_t &d) {
+  return Device::GetDepthDistance(d);
+}

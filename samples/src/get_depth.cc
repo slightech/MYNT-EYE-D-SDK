@@ -89,7 +89,9 @@ class DepthRegion {
         y = point_.y + j;
         if (y < 0 || y >= depth.rows) continue;
 
-        str = elem2string(depth.at<T>(y, x));
+        // str = elem2string(depth.at<T>(y, x));
+        auto elem = mynteyed::Camera::GetDepthDistance(depth.at<T>(y, x));
+        str = elem2string(elem);
 
         cv::Scalar color(0,0,0);
         if (i == 0 && j == 0) color = cv::Scalar(0,0,255);
