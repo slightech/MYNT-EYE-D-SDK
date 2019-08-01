@@ -1017,7 +1017,7 @@ bool Channels::HidFirmwareUpdate(const char *filepath) {
   } else {
     int ret = hid_->send(0, cmd, 64, 10);
     if (ret <= 0) {
-      LOGE("\n%s %d:: Update failed.\n", __FILE__, __LINE__);
+      LOGI("\nThis upgrade is not valid. Please re-upgrade.\n");
       return false;
     }
 
@@ -1029,7 +1029,7 @@ bool Channels::HidFirmwareUpdate(const char *filepath) {
       int ret = hid_->open(1, -1, -1);
       if (ret > 0) { break; }
       if (++req_count_ > 50) {
-        LOGE("\n%s %d:: Update failed.\n", __FILE__, __LINE__);
+        LOGI("\nThis upgrade is not valid. Please re-upgrade.\n");
         return false;
       }
     }
@@ -1037,13 +1037,13 @@ bool Channels::HidFirmwareUpdate(const char *filepath) {
       LOGI("\nUpdate will start......, "
         "please don't pull out device!\n");
     } else {
-      LOGE("\n%s %d:: Update failed.\n", __FILE__, __LINE__);
+      LOGI("\nThis upgrade is not valid. Please re-upgrade.\n");
       return false;
     }
   }
 
   if (hid_->send(0, cmd, 64, 10) <= 0) {
-    LOGE("\n%s %d:: Update failed. maybe device went offline\n", __FILE__, __LINE__);
+    LOGI("\nThis upgrade is not valid. Please re-upgrade.\n");
     return false;
   }
 
@@ -1051,32 +1051,32 @@ bool Channels::HidFirmwareUpdate(const char *filepath) {
   if (0x100 == hid_->get_version_number()) {
     cmd[0] = 0x00;
     if (hid_->send(0, cmd, 64, 20000) <= 0) {
-      LOGE("\n%s %d:: Update failed. Please try again.\n");
+      LOGI("\nThis upgrade is not valid. Please re-upgrade.\n");
       return false;
     }
     cmd[0] = 0xAB;
   } else {
     if (hid_->receive(0, cmd, 64, 20000) <= 0) {
-      LOGE("\n%s %d:: Update failed. maybe device went offline\n", __FILE__, __LINE__);
+      LOGI("\nThis upgrade is not valid. Please re-upgrade.\n");
       return false;
     }
   }
 #else
   if (hid_->receive(0, cmd, 64, 20000) <= 0) {
-    LOGE("\n%s %d:: Update failed. maybe device went offline\n", __FILE__, __LINE__);
+    LOGI("\nThis upgrade is not valid. Please re-upgrade.\n");
     return false;
   }
 #endif
 
   if (0xAB != cmd[0]) {
-    LOGE("\n%s %d:: Update failed.\n", __FILE__, __LINE__);
+    LOGI("\nThis upgrade is not valid. Please re-upgrade.\n");
     return false;
   }
 
   while (true) {
     int current_len = read(fd, static_cast<std::uint8_t *>(cmd + 3), 60);
     if (-1 == current_len) {
-      LOGE("\n%s %d:: Update failed.\n" __FILE__, __LINE__);
+      LOGI("\nThis upgrade is not valid. Please re-upgrade.\n");
       return false;
     }
 
@@ -1087,7 +1087,7 @@ bool Channels::HidFirmwareUpdate(const char *filepath) {
         static_cast<std::uint8_t *>(cmd + 3), current_len);
 
     if (hid_->send(0, cmd, 64, 100) <= 0) {
-      LOGE("%s %d:: Update failed............\n", __FILE__, __LINE__);
+      LOGI("\nThis upgrade is not valid. Please re-upgrade.\n");
       return false;
     }
 
@@ -1099,6 +1099,16 @@ bool Channels::HidFirmwareUpdate(const char *filepath) {
       hid_->send(0, cmd, 64, 100);
       break;
     }
+  }
+
+  CloseHid();
+  sleep(2);
+  OpenHid();
+  if (hid_->get_device_class() == 0xFF) {
+    LOGI("\nThis upgrade is not valid. Please re-upgrade.\n");
+    return false;
+  } else {
+    LOGI("\nUpdate success.\n");
   }
 
   LOGI("\nUpdate success.\n");
