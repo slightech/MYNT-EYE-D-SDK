@@ -292,12 +292,22 @@ std::vector<DistanceData> Camera::GetDistanceDatas() {
   return std::move(p_->GetDistanceDatas());
 }
 
+std::shared_ptr<CameraCalibration> Camera::GetCameraCalibration(
+    const StreamMode& stream_mode) {
+  return p_->GetCameraCalibration(stream_mode);
+}
+
 void Camera::WaitForStream() {
   return p_->WaitForStream();
 }
 
 bool Camera::AuxiliaryChipFirmwareUpdate(const char* filepath) {
   return p_->AuxiliaryChipFirmwareUpdate(filepath);
+}
+
+bool Camera::WriteCameraCalibration(
+      const struct CameraCalibration &data, const StreamMode& stream_mode) {
+  return p_->WriteCameraCalibration(data, stream_mode);
 }
 
 #ifdef MYNTEYE_DEPRECATED_COMPAT

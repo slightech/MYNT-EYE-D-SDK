@@ -253,6 +253,9 @@ class MYNTEYE_API CameraPrivate {
   /** Update auxiliary chip firmware. */
   bool AuxiliaryChipFirmwareUpdate(const char* filepath);
 
+  bool WriteCameraCalibration(
+      const struct CameraCalibration &data, const StreamMode& stream_mode);
+
   static std::uint16_t GetDepthDistance(const std::uint16_t &d);
 
  protected:

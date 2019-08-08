@@ -26,6 +26,7 @@
 #include "mynteyed/device/image.h"
 #include "mynteyed/device/open_params.h"
 #include "mynteyed/device/stream_info.h"
+#include "mynteyed/device/types.h"
 #include "mynteyed/types.h"
 
 MYNTEYE_BEGIN_NAMESPACE
@@ -88,6 +89,17 @@ class MYNTEYE_API Camera {
 
   /** Write camera calibration bin file */
   bool WriteCameraCalibrationBinFile(const std::string& filename);
+
+  /** Write camera calibration struct */
+  bool WriteCameraCalibration(
+      const struct CameraCalibration &data, const StreamMode& stream_mode);
+
+  /** Write camera calibration bin file */
+  bool WriteCameraCalibration(const struct CameraCalibration &data);
+
+  /** Get camera calibration calib struct */
+  std::shared_ptr<CameraCalibration> GetCameraCalibration(
+    const StreamMode& stream_mode);
 
   /** Get the intrinsics of motion */
   MotionIntrinsics GetMotionIntrinsics() const {
