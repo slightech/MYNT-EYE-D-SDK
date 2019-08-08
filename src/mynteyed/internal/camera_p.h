@@ -199,6 +199,9 @@ class MYNTEYE_API CameraPrivate {
   /** Auto-white-balance enabled or not */
   bool AutoWhiteBalanceControl(bool enable);
 
+  /** Get sensor temperature */
+  float GetSensorTemperature();
+
   /**↩
    * Enable location datas.
    *

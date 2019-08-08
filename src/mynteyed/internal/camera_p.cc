@@ -543,6 +543,10 @@ bool CameraPrivate::AutoWhiteBalanceControl(bool enable) {
   return device_->SetAutoWhiteBalanceEnabled(enable);
 }
 
+float CameraPrivate::GetSensorTemperature() {
+  return device_->GetSensorTemperature();
+}
+
 void CameraPrivate::EnableLocationDatas(std::size_t max_size) {
   if (!channels_->IsAvaliable()) {
     LOGW("Data channel is unavaliable, could not track location datas.");

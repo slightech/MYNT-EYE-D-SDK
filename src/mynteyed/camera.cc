@@ -238,6 +238,10 @@ bool Camera::AutoWhiteBalanceControl(bool enable) {
   return p_->AutoWhiteBalanceControl(enable);
 }
 
+float Camera::GetSensorTemperature() {
+  return p_->GetSensorTemperature();
+}
+
 #ifdef MYNTEYE_DEPRECATED_COMPAT
 void Camera::EnableStreamData(const ImageType& type) {
   LOGW("%s is deprecated, replaced by OpenParams#device_mode.", __func__);

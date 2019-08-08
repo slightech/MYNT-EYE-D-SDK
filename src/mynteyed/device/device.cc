@@ -1224,6 +1224,47 @@ std::string Device::GetSerialNumber() const {
   return s;
 }
 
+float Device::GetSensorTemperature() {
+  static bool inited = false;
+  static std::uint16_t tempsens_calib = 0;
+  if (!inited) {
+    if (SetSensorRegister(0x30, 0x30b4, (1 << 0) | (1 << 4),
+        FG_Address_2Byte | FG_Value_2Byte)) {
+      if (GetSensorRegister(0x30, 0x30c8, &tempsens_calib,
+          FG_Address_2Byte | FG_Value_2Byte)) {
+        tempsens_calib = ReverseBytes(tempsens_calib);
+      } else {
+        LOGW("SensorRegister: tempsens calib read failed");
+      }
+      inited = true;
+      return 0;  // temp is 0 first time, get it next time
+    } else {
+      LOGW("SensorRegister: tempsens power on failed");
+      return 0;
+    }
+  }
+  /*
+  std::uint16_t data = 0;
+  if (GetSensorRegister(0x30, 0x3000, &data,
+      FG_Address_2Byte | FG_Value_2Byte)) {
+    data = ReverseBytes(data);
+    std::cout << std::hex << "chip_version_reg: 0x" <<  data << std::endl;
+  }
+  */
+  std::uint16_t tempsens_data = 0;
+  if (GetSensorRegister(0x30, 0x30b2, &tempsens_data,
+      FG_Address_2Byte | FG_Value_2Byte)) {
+    tempsens_data = ReverseBytes(tempsens_data) & 0x7ff;  // [10:0]
+  } else {
+    return 0;
+  }
+  // std::cout << std::hex << "data: 0x" << tempsens_data
+  //     << ", calib: 0x" << tempsens_calib << std::endl;
+  // LOGI("GetSensorTemperature data: %d, calib: %d",
+  //     tempsens_data, tempsens_calib);
+  return 55 + 0.7 * (tempsens_data - tempsens_calib);
+}
+
 bool Device::IsIRDepthOnly() {
   return ir_depth_only_enabled_;
 }
@@ -1358,3 +1399,6 @@ std::uint16_t Device::GetDepthDistance(const std::uint16_t &d) {
   }
 }
 
+std::uint16_t Device::ReverseBytes(const std::uint16_t &value) {
+  return ((value >> 8) & 0xff) | ((value << 8) & 0xff00);
+}

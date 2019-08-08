@@ -203,6 +203,9 @@ class MYNTEYE_API Camera {
   /** Auto-white-balance enabled or not  default enabled*/
   bool AutoWhiteBalanceControl(bool enable);
 
+  /** Get sensor temperature */
+  float GetSensorTemperature();
+
 #ifdef MYNTEYE_DEPRECATED_COMPAT
   /** @deprecated Replaced by OpenParams#device_mode */
   void EnableStreamData(const ImageType& type);

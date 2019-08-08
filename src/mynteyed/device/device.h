@@ -140,6 +140,9 @@ class Device {
   /** Get serial number */
   std::string GetSerialNumber() const;
 
+  /** Get sensor temperature */
+  float GetSensorTemperature();
+
   bool IsIRDepthOnly();
 
   bool Restart();
@@ -151,6 +154,8 @@ class Device {
   // std::uint16_t GetDepthDistance(const std::uint16_t &d);
 
   static std::uint16_t GetDepthDistance(const std::uint16_t &d);
+
+  static std::uint16_t ReverseBytes(const std::uint16_t &value);
 
  protected:
   /** Get stream index for open */
