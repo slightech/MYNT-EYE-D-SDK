@@ -27,7 +27,10 @@
 #include "util/counter.h"
 #include "util/cv_painter.h"
 
+// Write temp to file if defined
 #define WRITE_TEMP_TO_FILE
+// Write temp to file per seconds, set undefined or 0 if write every time
+#define WRITE_TEMP_TO_FILE_PER_SECONDS    60
 
 #define FULL_PRECISION \
   std::fixed << std::setprecision(std::numeric_limits<double>::max_digits10)
@@ -48,7 +51,17 @@ class TempWriter {
   }
 
   void Write(float temp) {
-    auto &&time_elapsed = times::now() - time_beg_;
+    auto time_now = times::now();
+#ifdef WRITE_TEMP_TO_FILE_PER_SECONDS
+    if (WRITE_TEMP_TO_FILE_PER_SECONDS > 0 &&
+        times::count<times::seconds>(time_now - time_write_)
+          < WRITE_TEMP_TO_FILE_PER_SECONDS) {
+      return;
+    }
+    time_write_ = time_now;
+#endif
+
+    auto &&time_elapsed = time_now - time_beg_;
     ofstream_ << times::count<times::milliseconds>(time_elapsed) * 0.001f
         << ", " << temp << std::endl;
   }
@@ -64,6 +77,7 @@ class TempWriter {
   std::ofstream ofstream_;
 
   clock::time_point time_beg_;
+  clock::time_point time_write_;
 };
 
 MYNTEYE_END_NAMESPACE
