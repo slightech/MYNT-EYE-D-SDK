@@ -541,7 +541,7 @@ typedef struct
 	short	DataOffset;			//2
 	short	ElementCount;		//2
 	char	DataSize;			//1; 2-bytes, 4-byte
-	char	TabID;				//1 
+	char	TabID;				//1
 	char    Attri; 				//1; T.B.D.
 	char	FractionalBit;		//1; 1:16.0; 2:S13.18; 3:S08.23; 4:S18.13; 5:S11.20
 	char	Reserve[8];			//8
@@ -677,7 +677,7 @@ eSPCtrl_RectLogData Device::GetCameraCalibrationWithStruct(unsigned char* DumpBu
 
   //Table ID 1: Write "InOutDim" Entries
   memcpy(tempBufferShort,DumpBuffer,sizeof(short)*TAB_ElementCount[idx]);
-  
+
   int in_width   = (int)tempBufferShort[0];       // 2 bytes
   int in_height  = (int)tempBufferShort[1];       // 2 bytes
   int out_width  = (int)tempBufferShort[2];       // 2 bytes
@@ -2132,6 +2132,8 @@ float Device::GetSensorTemperature() {
       FG_Address_2Byte | FG_Value_2Byte)) {
     tempsens_data = ReverseBytes(tempsens_data) & 0x7ff;  // [10:0]
   } else {
+    LOGW("SensorRegister: tempsens data read failed");
+    inited = false;  // reinit if read temp failed
     return 0;
   }
   // std::cout << std::hex << "data: 0x" << tempsens_data
