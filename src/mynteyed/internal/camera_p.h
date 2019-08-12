@@ -250,8 +250,6 @@ class MYNTEYE_API CameraPrivate {
   /** Update auxiliary chip firmware. */
   bool AuxiliaryChipFirmwareUpdate(const char* filepath);
 
-  static std::uint16_t GetDepthDistance(const std::uint16_t &d);
-
   void ControlReconnectStatus(const bool &status);
 
  protected:

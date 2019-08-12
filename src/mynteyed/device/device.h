@@ -148,10 +148,6 @@ class Device {
 
   bool DepthDeviceOpened();
 
-  // std::uint16_t GetDepthDistance(const std::uint16_t &d);
-
-  static std::uint16_t GetDepthDistance(const std::uint16_t &d);
-
  protected:
   /** Get stream index for open */
   void GetStreamIndex(const OpenParams& params,
@@ -191,8 +187,6 @@ class Device {
 
   bool IsInitDevice();
 
-  bool GetZDTable();
-
  private:
   void Init();
   void OnInit();  // cross
@@ -217,7 +211,7 @@ class Device {
   void* handle_;
 
   DEVSELINFO dev_sel_info_;
-  static int depth_data_type_;
+  int depth_data_type_;
 
   PETRONDI_STREAM_INFO stream_color_info_ptr_;
   PETRONDI_STREAM_INFO stream_depth_info_ptr_;
@@ -282,8 +276,6 @@ class Device {
   std::map<data_type_t, bool> is_actual_;
   int check_times_;
   bool is_disconnect_;
-
-  static unsigned char g_zd_table_[ETronDI_ZD_TABLE_FILE_SIZE_11_BITS];
 };
 
 MYNTEYE_END_NAMESPACE
