@@ -266,6 +266,12 @@ class MYNTEYE_API Camera {
 
   static std::uint16_t GetDepthDistance(const std::uint16_t &d);
 
+  /**
+   * control status of reconnect
+   * default enabled
+   * */
+  void ControlReconnectStatus(const bool &status);
+
  private:
   std::unique_ptr<CameraPrivate> p_;
 };
