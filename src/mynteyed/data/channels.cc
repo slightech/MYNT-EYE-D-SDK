@@ -1025,6 +1025,7 @@ bool Channels::HidFirmwareUpdate(const char *filepath) {
     LOGI("\nPlease wait a moment, don't pull out device!\n");
 
     while (hid_->get_device_class() == -1) {
+      sleep(1);
       int ret = hid_->open(1, -1, -1);
       if (ret > 0) { break; }
       if (++req_count_ > 50) {
