@@ -1048,11 +1048,16 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     mesh_msg_.header.frame_id = temp_frame_id;
     mesh_msg_.header.stamp = ros::Time::now();
     mesh_msg_.type = visualization_msgs::Marker::MESH_RESOURCE;
+
+    geometry_msgs::Quaternion q;
+    double Pie = 3.1416;
+    q = tf::createQuaternionMsgFromRollPitchYaw(Pie/2, 0.0, Pie);
+
     // fill orientation
-    mesh_msg_.pose.orientation.x = -1;
-    mesh_msg_.pose.orientation.y = 0;
-    mesh_msg_.pose.orientation.z = 0;
-    mesh_msg_.pose.orientation.w = 1;
+    mesh_msg_.pose.orientation.x = q.x;
+    mesh_msg_.pose.orientation.y = q.y;
+    mesh_msg_.pose.orientation.z = q.z;
+    mesh_msg_.pose.orientation.w = q.w;
 
     // fill position
     mesh_msg_.pose.position.x = 0;
@@ -1065,7 +1070,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     mesh_msg_.scale.z = 0.003;
 
     mesh_msg_.action = visualization_msgs::Marker::ADD;
-    mesh_msg_.color.a = 1.0;  // Don't forget to set the alpha!
+    mesh_msg_.color.a = 0.5;  // Don't forget to set the alpha!
     mesh_msg_.color.r = 1.0;
     mesh_msg_.color.g = 1.0;
     mesh_msg_.color.b = 1.0;
