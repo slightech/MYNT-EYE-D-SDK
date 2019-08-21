@@ -301,3 +301,7 @@ bool Camera::HidFirmwareUpdate(const char* filepath) {
   return AuxiliaryChipFirmwareUpdate(filepath);
 }
 #endif
+
+void Camera::ControlReconnectStatus(const bool &status) {
+  p_->ControlReconnectStatus(status);
+}

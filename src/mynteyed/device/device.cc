@@ -1303,3 +1303,4 @@ bool Device::UpdateDeviceStatus() {
 bool Device::DepthDeviceOpened() {
   return depth_device_opened_;
 }
+

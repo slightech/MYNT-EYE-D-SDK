@@ -264,6 +264,12 @@ class MYNTEYE_API Camera {
   bool HidFirmwareUpdate(const char* filepath);
 #endif
 
+  /**
+   * control status of reconnect
+   * default enabled
+   * */
+  void ControlReconnectStatus(const bool &status);
+
  private:
   std::unique_ptr<CameraPrivate> p_;
 };

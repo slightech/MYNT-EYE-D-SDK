@@ -51,11 +51,13 @@ void CameraPrivate::Init() {
   streams_ = std::make_shared<Streams>(device_);
   m_filter_manager = std::make_shared<FilterSpigot>();
 
-  relink_times_ = 0;
+  reconnect_times_ = 0;
 
   if (channels_->IsAvaliable()) {
     ReadDeviceFlash();
   }
+
+  enable_reconnect_ = true;
 }
 
 CameraPrivate::~CameraPrivate() {
@@ -111,7 +113,10 @@ ErrorCode CameraPrivate::Open(const OpenParams& params) {
     }
     streams_->OnCameraOpen();
 #ifdef MYNTEYE_OS_LINUX
-    WatchDog();
+    // control whether reconnect
+    if (enable_reconnect_) {
+      WatchDog();
+    }
 #endif
     return ErrorCode::SUCCESS;
   } else {
@@ -615,8 +620,8 @@ std::string CameraPrivate::GetSerialNumber() const {
   return device_->GetSerialNumber();
 }
 
-void CameraPrivate::Relink() {
-  if (relink_times_++ > MAX_RELINK_TIMES)
+void CameraPrivate::Reconnect() {
+  if (reconnect_times_++ > MAX_RELINK_TIMES)
     throw_error("\n\nThe camera device is disconnected.\n");
 
   if (channels_->IsAvaliable()) {
@@ -630,13 +635,14 @@ void CameraPrivate::Relink() {
   }
 
   if (device_->Restart())
-    relink_times_ = 0;
+    reconnect_times_ = 0;
 }
 
 void CameraPrivate::WaitForStream() {
 #ifdef MYNTEYE_OS_WIN
-  if (!streams_->WaitForStreamData()) {
-    Relink();
+  if (!streams_->WaitForStreamData() && enable_reconnect_) {
+    // control whether connect
+    Reconnect();
   }
 #endif
 #ifdef MYNTEYE_OS_LINUX
@@ -653,9 +659,13 @@ void CameraPrivate::WatchDog() {
     Rate rate(100);
     while (true) {
      if (!device_->UpdateDeviceStatus()) {
-       Relink();
+       Reconnect();
      }
      rate.Sleep();
     }
   });
+}
+
+void CameraPrivate::ControlReconnectStatus(const bool &status) {
+  enable_reconnect_ = status;
 }

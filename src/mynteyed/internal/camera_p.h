@@ -250,13 +250,15 @@ class MYNTEYE_API CameraPrivate {
   /** Update auxiliary chip firmware. */
   bool AuxiliaryChipFirmwareUpdate(const char* filepath);
 
+  void ControlReconnectStatus(const bool &status);
+
  protected:
   std::shared_ptr<Channels> channels() const {
     return channels_;
   }
 
   void WatchDog();
-  void Relink();
+  void Reconnect();
 
  private:
   void Init();
@@ -286,10 +288,12 @@ class MYNTEYE_API CameraPrivate {
   std::shared_ptr<MotionIntrinsics> motion_intrinsics_;
   std::shared_ptr<MotionExtrinsics> motion_extrinsics_;
 
-  int relink_times_;
+  int reconnect_times_;
 
   std::thread watch_thread_;
   std::shared_ptr<FilterSpigot> m_filter_manager;
+
+  bool enable_reconnect_;
 };
 
 MYNTEYE_END_NAMESPACE
