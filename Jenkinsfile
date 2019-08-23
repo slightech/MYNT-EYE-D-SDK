@@ -85,8 +85,15 @@ pipeline {
     failure {
       echo 'This will run only if failed'
       mail to: 'mynteye-ci@slightech.com',
-      subject: "Failed Pipeline: ${currentBuild.fullDisplayName}",
-      body: "Something is wrong with ${env.BUILD_URL}"
+      subject: "${env.JOB_NAME} 编译失败 Failed Pipeline: ${currentBuild.fullDisplayName}",
+      body: """
+                详情：
+                FAILED       : Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'             
+                状态         ：${env.JOB_NAME} jenkins 运行失败 
+                URL          ：${env.BUILD_URL}
+                项目名称     ：${env.JOB_NAME} 
+                项目更新进度 ：${env.BUILD_NUMBER}
+            """
     }
     unstable {
       echo 'This will run only if the run was marked as unstable'
