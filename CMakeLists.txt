@@ -165,7 +165,7 @@ endif()
 if(OS_WIN)
   set(MYNTEYE_LINK_LIBS ${eSPDI_LIBS})
 else()
-  set(MYNTEYE_LINK_LIBS ${eSPDI_LIBS} "usb")
+  set(MYNTEYE_LINK_LIBS ${eSPDI_LIBS} "usb" -lpthread)
 endif()
 
 if(WITH_OPENCV)
