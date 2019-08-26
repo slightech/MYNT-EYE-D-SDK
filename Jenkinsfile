@@ -58,7 +58,7 @@ pipeline {
         echo 'make ros ..'
         sh '''
         . /opt/ros/kinetic/setup.sh
-        rosdep install --from-paths wrappers/ros/src --ignore-src --rosdistro kinetic -y 
+        rosdep install --allow-unauthenticated --from-paths wrappers/ros/src --ignore-src --rosdistro kinetic -y 
         make ros SUDO=
         '''
       }
