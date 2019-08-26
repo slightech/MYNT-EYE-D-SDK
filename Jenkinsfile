@@ -57,7 +57,7 @@ pipeline {
       steps {
         echo 'make ros ..'
         sh '''
-        . /opt/ros/melodic/setup.sh; cd ${env.WORKSPACE}; make ros SUDO=
+        . /opt/ros/kinetic/setup.sh; cd ${env.WORKSPACE}; make ros SUDO=
         '''
       }
     }
