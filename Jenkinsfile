@@ -9,7 +9,7 @@ pipeline {
       steps {
         echo "WORKSPACE: ${env.WORKSPACE}"
         echo 'apt-get ..'
-        sh 'apt-get update'
+        sh 'apt-get update &&  apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654 '
       }
     }
     stage('Init') {
@@ -57,7 +57,9 @@ pipeline {
       steps {
         echo 'make ros ..'
         sh '''
-        . /opt/ros/kinetic/setup.sh; cd ${env.WORKSPACE}; make ros SUDO=
+        . /opt/ros/kinetic/setup.sh
+        rosdep install --from-paths wrappers/ros/src --ignore-src --rosdistro kinetic -y
+        make ros SUDO=
         '''
       }
     }
