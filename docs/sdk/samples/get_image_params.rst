@@ -31,10 +31,10 @@ on Linux:
 .. note::
 
    In the parameters:
-   Intrinsics provide values for ``fx``,``fy``,``cx``,``cy``, then you can get intrinsic camera matrix (refer to
+   Intrinsics provide values for ``fx`` , ``fy`` , ``cx`` , ``cy`` , then you can get intrinsic camera matrix (refer to
    `sensor_msgs/CameraInfo.msg <http://docs.ros.org/melodic/api/sensor_msgs/html/msg/CameraInfo.html>`__ ),
-   distortion parameters``coeffs`` contains values for ``k1``,``k2``,``p1``,``p2``,``k3`` .
-   Extrinsics contains rotation matrix ``rotation``, Translation matrix``translation`` .
+   distortion parameters ``coeffs`` contains values for ``k1`` , ``k2`` , ``p1`` , ``p2`` , ``k3`` .
+   Extrinsics contains rotation matrix ``rotation`` , Translation matrix ``translation`` .
 
 
 Complete code examples, see

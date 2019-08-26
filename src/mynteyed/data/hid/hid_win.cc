@@ -48,7 +48,7 @@ int hid_device::get_device_class() {
     return -1;
 
   if (HidD_GetProductString(first_hid_->handle, desc, sizeof(desc))) {
-    if ('D' != desc[28]) { return 0xFF; }
+    if ('B' == desc[28]) { return 0xFF; }
   } else {
     return -1;
   }

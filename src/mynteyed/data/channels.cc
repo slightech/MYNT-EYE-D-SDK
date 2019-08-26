@@ -1025,6 +1025,9 @@ bool Channels::HidFirmwareUpdate(const char *filepath) {
     LOGI("\nPlease wait a moment, don't pull out device!\n");
 
     while (hid_->get_device_class() == -1) {
+#ifdef MYNTEYE_OS_LINUX
+      sleep(1);
+#endif
       int ret = hid_->open(1, -1, -1);
       if (ret > 0) { break; }
       if (++req_count_ > 50) {
@@ -1101,7 +1104,9 @@ bool Channels::HidFirmwareUpdate(const char *filepath) {
   }
 
   CloseHid();
+#ifdef MYNTEYE_OS_LINUX
   sleep(2);
+#endif
   OpenHid();
   if (hid_->get_device_class() == 0xFF) {
     LOGI("\nThis upgrade is not valid. Please re-upgrade.\n");
