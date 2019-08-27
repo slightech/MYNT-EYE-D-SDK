@@ -81,10 +81,11 @@ pipeline {
   post {
     always {
       echo 'This will always run'
-	  dingTalk accessToken: '7dca6ae9b1b159b8b4b375e858b71f2e6cec8f73fa20d07552d09791261b2344',
+	  /*dingTalk accessToken: '7dca6ae9b1b159b8b4b375e858b71f2e6cec8f73fa20d07552d09791261b2344',
                     imageUrl: 'http://icon-park.com/imagefiles/loading7_gray.gif',
                     message: '开始构建',
                     jenkinsUrl: "${JENKINS_URL}"
+					*/
 
     }
     success {
@@ -101,20 +102,6 @@ pipeline {
                     imageUrl: 'http://www.iconsdb.com/icons/preview/soylent-red/x-mark-3-xxl.png',
                     message: '构建失败',
                     jenkinsUrl: "${JENKINS_URL}"
-
-
-	 /*
-      mail to: 'mynteye-ci@slightech.com',
-      subject: "${env.JOB_NAME} 编译失败 Failed Pipeline: ${currentBuild.fullDisplayName}",
-      body: """
-                详情：
-                FAILED       : Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'             
-                状态         ：${env.JOB_NAME} jenkins 运行失败 
-                URL          ：${env.BUILD_URL}
-                项目名称     ：${env.JOB_NAME} 
-                项目更新进度 ：${env.BUILD_NUMBER}
-            """
-	*/
     }
     unstable {
       echo 'This will run only if the run was marked as unstable'
