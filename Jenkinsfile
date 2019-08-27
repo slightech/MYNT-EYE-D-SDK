@@ -81,11 +81,11 @@ pipeline {
   post {
     always {
       echo 'This will always run'
-	  /*dingTalk accessToken: '7dca6ae9b1b159b8b4b375e858b71f2e6cec8f73fa20d07552d09791261b2344',
+	  dingTalk accessToken: '7dca6ae9b1b159b8b4b375e858b71f2e6cec8f73fa20d07552d09791261b2344',
                     imageUrl: 'http://icon-park.com/imagefiles/loading7_gray.gif',
                     message: '开始构建',
                     jenkinsUrl: "${JENKINS_URL}"
-					*/
+					
 
     }
     success {
