@@ -81,12 +81,30 @@ pipeline {
   post {
     always {
       echo 'This will always run'
+	  dingTalk accessToken: 'https://oapi.dingtalk.com/robot/send?access_token=7dca6ae9b1b159b8b4b375e858b71f2e6cec8f73fa20d07552d09791261b2344',
+                    imageUrl: 'http://icon-park.com/imagefiles/loading7_gray.gif',
+                    message: '开始构建',
+                    jenkinsUrl: "${JENKINS_URL}"
+
     }
     success {
       echo 'This will run only if successful'
+	  
+            dingTalk accessToken: 'https://oapi.dingtalk.com/robot/send?access_token=7dca6ae9b1b159b8b4b375e858b71f2e6cec8f73fa20d07552d09791261b2344',
+                    imageUrl: 'http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/sign-check-icon.png',
+                    message: '构建成功',
+                    jenkinsUrl: "${JENKINS_URL}"
+
     }
     failure {
       echo 'This will run only if failed'
+	  dingTalk accessToken: 'https://oapi.dingtalk.com/robot/send?access_token=7dca6ae9b1b159b8b4b375e858b71f2e6cec8f73fa20d07552d09791261b2344',
+                    imageUrl: 'http://www.iconsdb.com/icons/preview/soylent-red/x-mark-3-xxl.png',
+                    message: '构建失败',
+                    jenkinsUrl: "${JENKINS_URL}"
+
+
+	 /*
       mail to: 'mynteye-ci@slightech.com',
       subject: "${env.JOB_NAME} 编译失败 Failed Pipeline: ${currentBuild.fullDisplayName}",
       body: """
@@ -97,6 +115,7 @@ pipeline {
                 项目名称     ：${env.JOB_NAME} 
                 项目更新进度 ：${env.BUILD_NUMBER}
             """
+	*/
     }
     unstable {
       echo 'This will run only if the run was marked as unstable'
