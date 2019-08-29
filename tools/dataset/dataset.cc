@@ -77,10 +77,13 @@ void Dataset::SaveStreamData(const ImageType &type,
       << data.img_info->exposure_time << std::endl;
     ++stream_count_[type];
   }
+
   if (data.img) {
+    static std::uint64_t count = 0;
+    ++count;
     std::stringstream ss;
     ss << writer->outdir << MYNTEYE_OS_SEP << std::dec
-       << std::setw(IMAGE_FILENAME_WIDTH) << std::setfill('0') << seq << ".png";
+       << std::setw(IMAGE_FILENAME_WIDTH) << std::setfill('0') << count << ".png";
     cv::imwrite(ss.str(), data.img->To(ImageFormat::COLOR_BGR)->ToMat());
   }
 }

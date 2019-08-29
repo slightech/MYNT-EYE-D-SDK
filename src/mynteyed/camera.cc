@@ -316,6 +316,6 @@ bool Camera::HidFirmwareUpdate(const char* filepath) {
 }
 #endif
 
-std::uint16_t Camera::GetDepthDistance(const std::uint16_t &d) {
-  return CameraPrivate::GetDepthDistance(d);
+void Camera::ControlReconnectStatus(const bool &status) {
+  p_->ControlReconnectStatus(status);
 }

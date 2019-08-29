@@ -13,7 +13,7 @@
 # limitations under the License.
 cmake_minimum_required(VERSION 3.0)
 
-project(mynteyed VERSION 1.7.9 LANGUAGES C CXX)
+project(mynteyed VERSION 1.8.0 LANGUAGES C CXX)
 
 include(cmake/Common.cmake)
 
@@ -165,7 +165,7 @@ endif()
 if(OS_WIN)
   set(MYNTEYE_LINK_LIBS ${eSPDI_LIBS})
 else()
-  set(MYNTEYE_LINK_LIBS ${eSPDI_LIBS} "usb")
+  set(MYNTEYE_LINK_LIBS ${eSPDI_LIBS} "usb" -lpthread)
 endif()
 
 if(WITH_OPENCV)

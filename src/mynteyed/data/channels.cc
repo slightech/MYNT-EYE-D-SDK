@@ -314,8 +314,7 @@ bool Channels::DoHidDataExtract(imu_packets_t &imu, img_packets_t &img,
 
   int size = hid_->receive(0, data, PACKET_SIZE * 2, 220);
   if (size < 0) {
-    // LOGE("%s, %d:: Error Reading, device went offline !", __FILE__, __LINE__);
-    LOGE("%s, %d:: Received data is failed. Please update auxiliary firmware.", __FILE__, __LINE__);
+    // LOGE("%s, %d:: Failed to retrieve data. device is disconnected.", __FILE__, __LINE__);
     return false;
   }
 
@@ -324,7 +323,7 @@ bool Channels::DoHidDataExtract(imu_packets_t &imu, img_packets_t &img,
 
     if (packet[PACKET_SIZE - 1] !=
         check_sum(&packet[3], packet[2])) {
-      LOGW("check droped.");
+      LOGW("%s, %d:: Data is invaild, discarded.");
       continue;
     }
 
@@ -560,7 +559,7 @@ bool Channels::PullFileData(bool device_desc,
   while (buffer[0] != 0x0B) {
     hid_->receive(0, buffer, 64, 2000);
     if (++req_count > 5) {
-      LOGE("%s, %d:: Received data is failed. Please update auxiliary firmware.", __FILE__, __LINE__);
+      LOGE("%s, %d:: Failed to retrieve data. Please update auxiliary firmware.", __FILE__, __LINE__);
       return false;
     }
   }
@@ -869,7 +868,7 @@ bool Channels::PushFileData(
     if (++req_count > 5) {
       // LOGE("%s %d:: Error reading, device went offline.",
       //     __FILE__, __LINE__);
-      LOGE("%s, %d:: Received data is failed. Please update auxiliary firmware.", __FILE__, __LINE__);
+      LOGE("%s, %d:: Failed to retrieve data. Please update auxiliary firmware.", __FILE__, __LINE__);
       return false;
     }
   }
@@ -1026,6 +1025,9 @@ bool Channels::HidFirmwareUpdate(const char *filepath) {
     LOGI("\nPlease wait a moment, don't pull out device!\n");
 
     while (hid_->get_device_class() == -1) {
+#ifdef MYNTEYE_OS_LINUX
+      sleep(1);
+#endif
       int ret = hid_->open(1, -1, -1);
       if (ret > 0) { break; }
       if (++req_count_ > 50) {
@@ -1102,7 +1104,9 @@ bool Channels::HidFirmwareUpdate(const char *filepath) {
   }
 
   CloseHid();
+#ifdef MYNTEYE_OS_LINUX
   sleep(2);
+#endif
   OpenHid();
   if (hid_->get_device_class() == 0xFF) {
     LOGI("\nThis upgrade is not valid. Please re-upgrade.\n");

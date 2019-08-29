@@ -91,8 +91,6 @@ int get_sensor_type(const SensorType &type) {
 
 }  // namespace
 
-int Device::depth_data_type_ = 2;
-unsigned char Device::g_zd_table_[ETronDI_ZD_TABLE_FILE_SIZE_11_BITS] = {0};
 Device::Device()
   : handle_(nullptr), dev_sel_info_({-1}),
     camera_calibrations_({nullptr, nullptr}) {
@@ -441,9 +439,6 @@ bool Device::Open(const OpenParams& params) {
     OnInitColorPalette(params.colour_depth_value);
     if (depth_device_opened_) {
       // depth device must be opened.
-      if (!GetZDTable()) {
-        LOGI("\nThe camera may not be calibrated. Please calibrate the camera.\n");
-      }
       SyncCameraCalibrations();
     }
     return true;
@@ -2226,55 +2221,6 @@ bool Device::UpdateDeviceStatus() {
 
 bool Device::DepthDeviceOpened() {
   return depth_device_opened_;
-}
-
-bool Device::GetZDTable() {
-  ZDTABLEINFO info;
-  int buffer_size = 0;
-
-  memset(g_zd_table_, 0, sizeof(g_zd_table_));
-  buffer_size = ETronDI_ZD_TABLE_FILE_SIZE_11_BITS;
-  info.nDataType = ETronDI_DEPTH_DATA_11_BITS;
-  info.nIndex = 0;
-
-  int actual_size = 0;
-
-  if (EtronDI_GetZDTable(handle_, &dev_sel_info_, g_zd_table_,
-        buffer_size, &actual_size, &info) != ETronDI_OK) {
-    return false;
-  }
-
-  return true;
-}
-
-std::uint16_t Device::GetDepthDistance(const std::uint16_t &d) {
-  const std::uint16_t zValueSize = (std::uint16_t)sizeof(std::uint16_t);
-
-  switch (depth_data_type_) {
-    case ETronDI_DEPTH_DATA_8_BITS:
-    case ETronDI_DEPTH_DATA_8_BITS_RAW:
-      {
-        std::uint16_t zdIndex = (d << 3) * zValueSize;
-        if (zdIndex > ETronDI_ZD_TABLE_FILE_SIZE_11_BITS - zValueSize)
-          zdIndex = ETronDI_ZD_TABLE_FILE_SIZE_11_BITS - zValueSize;
-
-        return (static_cast<std::uint16_t>(g_zd_table_[zdIndex]) << 8) + g_zd_table_[zdIndex + 1];
-      }
-    case ETronDI_DEPTH_DATA_11_BITS:
-    case ETronDI_DEPTH_DATA_11_BITS_RAW:
-      {
-        std::uint16_t zdIndex = d * zValueSize;
-        if (zdIndex > ETronDI_ZD_TABLE_FILE_SIZE_11_BITS - zValueSize)
-          zdIndex = ETronDI_ZD_TABLE_FILE_SIZE_11_BITS - zValueSize;
-
-        return (static_cast<std::uint16_t>(g_zd_table_[zdIndex]) << 8) + g_zd_table_[zdIndex + 1];
-      }
-    case ETronDI_DEPTH_DATA_14_BITS:
-    case ETronDI_DEPTH_DATA_14_BITS_RAW:
-      return d;
-    default:
-      return 0;
-  }
 }
 
 std::uint16_t Device::ReverseBytes(const std::uint16_t &value) {

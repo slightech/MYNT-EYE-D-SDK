@@ -9,7 +9,10 @@ pipeline {
       steps {
         echo "WORKSPACE: ${env.WORKSPACE}"
         echo 'apt-get ..'
-        sh 'apt-get update'
+        sh '''
+		apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+        apt-get update
+		'''
       }
     }
     stage('Init') {
@@ -78,22 +81,34 @@ pipeline {
   post {
     always {
       echo 'This will always run'
+	  dingTalk accessToken: '7dca6ae9b1b159b8b4b375e858b71f2e6cec8f73fa20d07552d09791261b2344',
+                    imageUrl: 'http://icon-park.com/imagefiles/loading7_gray.gif',
+                    message: '开始构建',
+                    jenkinsUrl: "${JENKINS_URL}"
+					
+
     }
     success {
       echo 'This will run only if successful'
+	  dingTalk accessToken: '7dca6ae9b1b159b8b4b375e858b71f2e6cec8f73fa20d07552d09791261b2344',
+                    imageUrl: 'http://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/sign-check-icon.png',
+                    message: '构建成功',
+                    jenkinsUrl: "${JENKINS_URL}"
+
     }
     failure {
       echo 'This will run only if failed'
-      mail to: 'mynteye-ci@slightech.com',
-      subject: "Failed Pipeline: ${currentBuild.fullDisplayName}",
-      body: "Something is wrong with ${env.BUILD_URL}"
+	  dingTalk accessToken: '7dca6ae9b1b159b8b4b375e858b71f2e6cec8f73fa20d07552d09791261b2344',
+                    imageUrl: 'http://www.iconsdb.com/icons/preview/soylent-red/x-mark-3-xxl.png',
+                    message: '构建失败',
+                    jenkinsUrl: "${JENKINS_URL}"
     }
     unstable {
       echo 'This will run only if the run was marked as unstable'
     }
     changed {
       echo 'This will run only if the state of the Pipeline has changed'
-      echo 'For example, if the Pipeline was previously failing but is now successful'
+      echo 'For example, if the Pipeline was previously failing but is now successf'
     }
   }
 }
