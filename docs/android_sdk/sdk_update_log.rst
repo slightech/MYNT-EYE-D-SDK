@@ -1,0 +1,64 @@
+Update Log
+=======================
+
+v1.3.1 - 2019-09-03
+----------------------
+
+- Support to get left and right original images
+- Simplify the sample example
+
+v1.3.0 - 2019-07-30
+----------------------
+
+- Supports d-1000 USB3.0
+- Remove mandatory Settings on Surface
+- Add FrameData transform distance interface
+- Fixed frequent popping authorization issues under USB2.0
+
+v1.2.6 - 2019-07-26
+----------------------
+
+- Add integration mode
+
+v1.2.5 - 2019-07-01
+----------------------
+
+- Save point cloud picture locally
+- View the point cloud file
+- Fix app recovery from background, camera does not display problems
+- add frame rate display switch interface
+
+v1.2.4 - 2019-05-27
+----------------------
+
+- Modify camera sample
+- Add deep data save read example
+- Fix crash caused by close camera
+- Fix crash caused by turning on the camera
+
+v1.2.3 - 2019-04-10
+----------------------
+
+- support enable and disable AE
+- support enable and disable AWB
+- support synchronous get depth images & color images
+- Add the ranging method for FramData 
+
+v1.2.2 - 2019-03-28
+----------------------
+
+- fix ANR problem of plug and unplug equipment
+- add a new interface for obtaining camera internal parameter acquisition 
+- SDK stability improvement
+
+v1.2.1 - 2019-02-26
+----------------------
+
+-  The D-1000 equipment supports IMU data callbacks
+
+v1.2.0 - 2019-02-26
+----------------------
+
+
+- Compatible with D-1200 devices
+- Image compatible with D-1000 device (IMU \| IR function temporarily unavailable)

@@ -17,6 +17,8 @@ MYNT® EYE D SDK
    openproject/contents
    apidoc/contents
    support/contents
+   android_sdk/contents
+   android_api/contents
 
 ..
   Indices and tables
