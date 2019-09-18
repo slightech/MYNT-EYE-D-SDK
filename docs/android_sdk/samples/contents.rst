@@ -1,4 +1,4 @@
-SDK samples
+SDK Samples
 ======================
 
 

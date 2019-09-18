@@ -1,7 +1,7 @@
-Get_Rectify_Log_Data
+Get rectify log data
 =============================================================================
 
-get internal reference 
+Get internal reference 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: kotlin

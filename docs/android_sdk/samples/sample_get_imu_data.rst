@@ -1,4 +1,4 @@
-Get_imu_data
+Get imu data
 ======================
 
 Set IMU data callback (camera with IMU model)

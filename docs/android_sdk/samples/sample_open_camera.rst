@@ -1,4 +1,4 @@
-Open_Camera
+Open camera
 ======================
 
 Set the Camera connection callback

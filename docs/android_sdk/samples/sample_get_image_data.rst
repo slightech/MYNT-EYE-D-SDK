@@ -1,4 +1,4 @@
-Get_image_data
+Get image data
 ======================
 
 Set image information callback

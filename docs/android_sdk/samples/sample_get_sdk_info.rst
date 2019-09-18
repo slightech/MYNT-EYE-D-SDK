@@ -1,4 +1,4 @@
-Get_SDK_info
+Get SDK info
 ======================
 
 SDK compile version
