@@ -305,3 +305,7 @@ bool Camera::HidFirmwareUpdate(const char* filepath) {
 void Camera::ControlReconnectStatus(const bool &status) {
   p_->ControlReconnectStatus(status);
 }
+
+bool Camera::IsDeviceConnected() {
+  return p_->IsDeviceConnected();
+}

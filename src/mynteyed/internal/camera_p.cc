@@ -113,10 +113,7 @@ ErrorCode CameraPrivate::Open(const OpenParams& params) {
     }
     streams_->OnCameraOpen();
 #ifdef MYNTEYE_OS_LINUX
-    // control whether reconnect
-    if (enable_reconnect_) {
-      WatchDog();
-    }
+    WatchDog();
 #endif
     return ErrorCode::SUCCESS;
   } else {
@@ -658,12 +655,19 @@ void CameraPrivate::WatchDog() {
   watch_thread_ = std::thread([this](){
     Rate rate(100);
     while (true) {
-     if (!device_->UpdateDeviceStatus()) {
-       Reconnect();
+      if (!device_->UpdateDeviceStatus()) {
+        // control whether reconnect
+        if (enable_reconnect_) {
+          Reconnect();
+        }
      }
      rate.Sleep();
     }
   });
+}
+
+bool CameraPrivate::IsDeviceConnected() {
+  return device_->IsDeviceConnected();
 }
 
 void CameraPrivate::ControlReconnectStatus(const bool &status) {

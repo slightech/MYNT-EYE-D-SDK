@@ -270,6 +270,11 @@ class MYNTEYE_API Camera {
    * */
   void ControlReconnectStatus(const bool &status);
 
+  /**
+   * Get device connected status
+   **/
+  bool IsDeviceConnected();
+
  private:
   std::unique_ptr<CameraPrivate> p_;
 };

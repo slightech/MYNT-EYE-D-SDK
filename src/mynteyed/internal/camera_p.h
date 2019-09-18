@@ -252,6 +252,8 @@ class MYNTEYE_API CameraPrivate {
 
   void ControlReconnectStatus(const bool &status);
 
+  bool IsDeviceConnected();
+
  protected:
   std::shared_ptr<Channels> channels() const {
     return channels_;

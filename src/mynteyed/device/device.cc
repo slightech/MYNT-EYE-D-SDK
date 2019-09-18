@@ -441,10 +441,12 @@ bool Device::Open(const OpenParams& params) {
       // depth device must be opened.
       SyncCameraCalibrations();
     }
+    is_device_connected_ = true;
     return true;
   } else {
     is_device_opened_ = false;
     dev_sel_info_.index = -1;  // reset flag
+    is_device_connected_ = false;
     return false;
   }
 }
@@ -1283,21 +1285,26 @@ bool Device::IsInitDevice() {
 bool Device::UpdateDeviceStatus() {
   if ((!device_status_[COLOR_DEVICE] && is_actual_[COLOR_DEVICE]) ||
         (!device_status_[DEPTH_DEVICE] && is_actual_[DEPTH_DEVICE])) {
-
     if (check_times_ > 0) {
       --check_times_;
       return true;
     } else {
       check_times_ = MAX_CHECK_TIMES;
-      return false;
+      is_device_connected_ = false;
+      return is_device_connected_;
     }
   }
 
   device_status_[COLOR_DEVICE] = false;
   device_status_[DEPTH_DEVICE] = false;
+
   check_times_ = MAX_CHECK_TIMES;
 
   return true;
+}
+
+bool Device::IsDeviceConnected() {
+  return is_device_connected_;
 }
 
 bool Device::DepthDeviceOpened() {

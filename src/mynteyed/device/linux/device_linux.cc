@@ -279,7 +279,7 @@ bool Device::Restart() {
     return false;
   }
   ResumeParams();
-
+  is_device_connected_ = true;
   return true;
 }
 

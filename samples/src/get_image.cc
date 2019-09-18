@@ -90,6 +90,7 @@ int main(int argc, char const* argv[]) {
   cam.EnableImageInfo(true);
 
   cam.Open(params);
+  // cam.ControlReconnectStatus(false);
 
   std::cout << std::endl;
   if (!cam.IsOpened()) {
@@ -109,6 +110,9 @@ int main(int argc, char const* argv[]) {
   CVPainter painter;
   util::Counter counter;
   for (;;) {
+    if (!cam.IsDeviceConnected()) {
+      std::cerr << "Error: The device is disconnected" << std::endl;
+    }
     cam.WaitForStream();
     counter.Update();
 

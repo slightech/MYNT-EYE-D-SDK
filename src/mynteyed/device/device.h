@@ -148,6 +148,7 @@ class Device {
 
   bool DepthDeviceOpened();
 
+  bool IsDeviceConnected();
  protected:
   /** Get stream index for open */
   void GetStreamIndex(const OpenParams& params,
@@ -271,6 +272,7 @@ class Device {
 
   std::map<ControlParams, set_params_t> params_member_;
   bool is_device_opened_;
+  bool is_device_connected_;
 
   std::map<data_type_t, bool> device_status_;
   std::map<data_type_t, bool> is_actual_;
