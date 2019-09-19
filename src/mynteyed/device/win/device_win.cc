@@ -486,7 +486,10 @@ void Device::ImgCallback(EtronDIImageType::Value imgType, int imgId,
 Image::pointer Device::GetImageColor() {
   // LOGI("Get image color");
   std::unique_lock<std::mutex> lock(color_mtx_);
-  color_condition_.wait(lock, [this] { return is_color_ok_; });
+  if (!color_condition_.wait_for(lock, std::chrono::seconds(1),
+      [this] { return is_color_ok_; })) {
+    return nullptr;
+  };
   is_color_ok_ = false;
 
   if (color_image_buf_) {
@@ -520,7 +523,10 @@ Image::pointer Device::GetImageColor() {
 Image::pointer Device::GetImageDepth() {
   // LOGI("Get image depth");
   std::unique_lock<std::mutex> lock(depth_mtx_);
-  depth_condition_.wait(lock, [this] { return is_depth_ok_; });
+  if (!depth_condition_.wait_for(lock, std::chrono::seconds(1),
+      [this] { return is_depth_ok_; })) {
+        return nullptr;
+  };
   is_depth_ok_ = false;
 
   if (depth_image_buf_) {
