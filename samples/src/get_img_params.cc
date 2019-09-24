@@ -58,6 +58,10 @@ int main(int argc, char *argv[]) {
     std::cout << "This device not supported to get hd image params." << std::endl;
   }
 
+  std::cout << "If you cant't have a clear understanding of the info,"
+               "you can read the ROS-doc (http://docs.ros.org/melodic/api/sensor_msgs/html/msg/CameraInfo.html)"  // NOLINT
+               " to learn more.";
+
   cam.Close();
   out.close();
   std::cout << std::endl;
