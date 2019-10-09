@@ -310,7 +310,6 @@ StreamRequest Camera::SelectStreamRequest(bool *ok) const {
   DeviceInfo dev_info;
   const Camera &cam = *this;
   StreamRequest params;
-  
 // select
   std::cout << std::endl;
   std::string dashes(80, '-');

@@ -25,12 +25,11 @@
 
 MYNTEYE_USE_NAMESPACE
 
-int main(int argc, char const *argv[])
-{
+int main(int argc, char const *argv[]) {
   API api;
   bool ok;
   auto &&request = api.SelectStreamRequest(&ok);
-  
+
   {
     // Framerate: 10(default), [0,60], [0,30](STREAM_2560x720)
     request.framerate = 30;
@@ -83,8 +82,7 @@ int main(int argc, char const *argv[])
         Stream::IMAGE_RIGHT_COLOR,
         Stream::IMAGE_DEPTH,
     };
-    for (auto &&type : types)
-    {
+    for (auto &&type : types) {
       // Set stream data callback
       api.SetStreamCallback(type, [&mutex](const StreamData &data) {
         std::lock_guard<std::mutex> _(mutex);
@@ -97,17 +95,14 @@ int main(int argc, char const *argv[])
     // Set motion data callback
     api.SetMotionCallback([&mutex](const MotionData &data) {
       std::lock_guard<std::mutex> _(mutex);
-      if (data.imu->flag == MYNTEYE_IMU_ACCEL)
-      {
+      if (data.imu->flag == MYNTEYE_IMU_ACCEL) {
         std::cout << "[accel] stamp: " << data.imu->timestamp
                   << ", x: " << data.imu->accel[0]
                   << ", y: " << data.imu->accel[1]
                   << ", z: " << data.imu->accel[2]
                   << ", temp: " << data.imu->temperature
                   << std::endl;
-      }
-      else if (data.imu->flag == MYNTEYE_IMU_GYRO)
-      {
+      } else if (data.imu->flag == MYNTEYE_IMU_GYRO) {
         std::cout << "[gyro] stamp: " << data.imu->timestamp
                   << ", x: " << data.imu->gyro[0]
                   << ", y: " << data.imu->gyro[1]
@@ -122,8 +117,7 @@ int main(int argc, char const *argv[])
   api.ConfigStreamRequest(request);
 
   std::cout << std::endl;
-  if (!api.IsOpened())
-  {
+  if (!api.IsOpened()) {
     std::cerr << "Error: Open camera failed" << std::endl;
     return 1;
   }
@@ -145,16 +139,13 @@ int main(int argc, char const *argv[])
 
   CVPainter painter;
   util::Counter counter;
-  for (;;)
-  {
+  for (;;) {
     api.WaitForStreams();
     counter.Update();
 
-    if (is_left_ok)
-    {
+    if (is_left_ok) {
       auto left_color = api.GetStreamData(Stream::IMAGE_LEFT_COLOR);
-      if (left_color.img)
-      {
+      if (left_color.img) {
         cv::Mat left = left_color.img->To(ImageFormat::COLOR_BGR)->ToMat();
         painter.DrawSize(left, CVPainter::TOP_LEFT);
         painter.DrawStreamData(left, left_color, CVPainter::TOP_RIGHT);
@@ -164,11 +155,9 @@ int main(int argc, char const *argv[])
       }
     }
 
-    if (is_right_ok)
-    {
+    if (is_right_ok) {
       auto right_color = api.GetStreamData(Stream::IMAGE_RIGHT_COLOR);
-      if (right_color.img)
-      {
+      if (right_color.img) {
         cv::Mat right = right_color.img->To(ImageFormat::COLOR_BGR)->ToMat();
         painter.DrawSize(right, CVPainter::TOP_LEFT);
         painter.DrawStreamData(right, right_color, CVPainter::TOP_RIGHT);
@@ -176,18 +165,13 @@ int main(int argc, char const *argv[])
       }
     }
 
-    if (is_depth_ok)
-    {
+    if (is_depth_ok) {
       auto image_depth = api.GetStreamData(Stream::IMAGE_DEPTH);
-      if (image_depth.img)
-      {
+      if (image_depth.img) {
         cv::Mat depth;
-        if (request.depth_mode == DepthMode::DEPTH_COLORFUL)
-        {
+        if (request.depth_mode == DepthMode::DEPTH_COLORFUL) {
           depth = image_depth.img->To(ImageFormat::DEPTH_BGR)->ToMat();
-        }
-        else
-        {
+        } else {
           depth = image_depth.img->ToMat();
         }
         painter.DrawSize(depth, CVPainter::TOP_LEFT);
@@ -197,8 +181,7 @@ int main(int argc, char const *argv[])
     }
 
     char key = static_cast<char>(cv::waitKey(1));
-    if (key == 27 || key == 'q' || key == 'Q')
-    { // ESC/Q
+    if (key == 27 || key == 'q' || key == 'Q') {  // ESC/Q
       break;
     }
   }

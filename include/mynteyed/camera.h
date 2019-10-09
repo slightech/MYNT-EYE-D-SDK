@@ -34,9 +34,8 @@ class CameraPrivate;
 using StreamRequest = OpenParams;
 using Stream = ImageType;
 
-class MYNTEYE_API Camera
-{
-public:
+class MYNTEYE_API Camera {
+ public:
   /*
   Camera
 */
@@ -226,7 +225,8 @@ public:
    *
    * Note: if max_size > 0, the distance datas will be cached until you call GetLocationDatas().
   */
-  void EnableLocationDatas(std::size_t max_size = std::numeric_limits<std::size_t>::max());
+  void EnableLocationDatas(std::size_t max_size =
+      std::numeric_limits<std::size_t>::max());
   /** Disable location datas. */
   void DisableLocationDatas();
   /** Whethor location datas enabled or not */
@@ -248,7 +248,8 @@ public:
    *
    * Note: if max_size > 0, the distance datas will be cached until you call GetDistanceDatas().
    */
-  void EnableDistanceDatas(std::size_t max_size = std::numeric_limits<std::size_t>::max());
+  void EnableDistanceDatas(std::size_t max_size =
+      std::numeric_limits<std::size_t>::max());
   /** Disable distance datas. */
   void DisableDistanceDatas();
   /** Whethor distance datas enabled or not */
@@ -285,7 +286,7 @@ public:
   /**
    * Get the device info.
    */
-  StreamRequest SelectStreamRequest(bool *ok) const;    
+  StreamRequest SelectStreamRequest(bool *ok) const;
 
   void ConfigStreamRequest(const StreamRequest &request) {
     Open(request);
@@ -301,7 +302,7 @@ public:
     WaitForStream();
   }
 
-private:
+ private:
   std::unique_ptr<CameraPrivate> p_;
 };
 
@@ -309,4 +310,4 @@ using API = Camera;
 
 MYNTEYE_END_NAMESPACE
 
-#endif // MYNTEYE_CAMERA_H_
+#endif  // MYNTEYE_CAMERA_H_
