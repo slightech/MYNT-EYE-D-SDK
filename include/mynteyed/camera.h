@@ -76,8 +76,7 @@ public:
   std::string GetDescriptor(const Descriptor &desc) const;
 
   /** Get the intrinsics of camera */
-  StreamIntrinsics GetStreamIntrinsics(const StreamMode &stream_mode) const
-  {
+  StreamIntrinsics GetStreamIntrinsics(const StreamMode &stream_mode) const {
     bool ok = true;
     return GetStreamIntrinsics(stream_mode, &ok);
   }
@@ -85,8 +84,7 @@ public:
   StreamIntrinsics GetStreamIntrinsics(const StreamMode &stream_mode,
                                        bool *ok) const;
   /** Get the extrinsics of camera */
-  StreamExtrinsics GetStreamExtrinsics(const StreamMode &stream_mode) const
-  {
+  StreamExtrinsics GetStreamExtrinsics(const StreamMode &stream_mode) const {
     bool ok = true;
     return GetStreamExtrinsics(stream_mode, &ok);
   }
@@ -98,16 +96,14 @@ public:
   bool WriteCameraCalibrationBinFile(const std::string &filename);
 
   /** Get the intrinsics of motion */
-  MotionIntrinsics GetMotionIntrinsics() const
-  {
+  MotionIntrinsics GetMotionIntrinsics() const {
     bool ok = true;
     return GetMotionIntrinsics(&ok);
   }
   /** Get the intrinsics of motion */
   MotionIntrinsics GetMotionIntrinsics(bool *ok) const;
   /** Get the extrinsics from left to motion */
-  MotionExtrinsics GetMotionExtrinsics() const
-  {
+  MotionExtrinsics GetMotionExtrinsics() const {
     bool ok = true;
     return GetMotionExtrinsics(&ok);
   }
@@ -284,20 +280,16 @@ public:
   API
 */
 
-
-
   /** The enable/disable switch callback. */
   // using stream_switch_callback_t = std::function<void(const Stream &stream)>;
   /**
    * Get the device info.
    */
-  StreamRequest SelectStreamRequest(bool *ok) const;
-    
+  StreamRequest SelectStreamRequest(bool *ok) const;    
 
   void ConfigStreamRequest(const StreamRequest &request) {
     Open(request);
   }
-
     /**
    * Supports the stream or not.
    */
