@@ -92,7 +92,7 @@ int main(int argc, char const* argv[]) {
           << std::flush;
     });
 
-    std::vector<ImageType> types{
+    std::vector<ImageType> types {
       ImageType::IMAGE_LEFT_COLOR,
       ImageType::IMAGE_RIGHT_COLOR,
       ImageType::IMAGE_DEPTH,

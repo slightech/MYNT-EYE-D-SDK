@@ -26,9 +26,9 @@
 MYNTEYE_USE_NAMESPACE
 
 int main(int argc, char const *argv[]) {
-  API api;
+  std::shared_ptr<API> api = API::Create();
   bool ok;
-  auto &&request = api.SelectStreamRequest(&ok);
+  auto &&request = api->SelectStreamRequest(&ok);
 
   {
     // Framerate: 10(default), [0,60], [0,30](STREAM_2560x720)
@@ -61,15 +61,15 @@ int main(int argc, char const *argv[]) {
   }
 
   // Enable image infos
-  api.EnableImageInfo(false);
+  api->EnableImageInfo(false);
   // Enable motion datas
-  api.EnableMotionDatas(0);
+  api->EnableMotionDatas(0);
 
   // Callbacks
   std::mutex mutex;
   {
     // Set image info callback
-    api.SetImgInfoCallback([&mutex](const std::shared_ptr<ImgInfo> &info) {
+    api->SetImgInfoCallback([&mutex](const std::shared_ptr<ImgInfo> &info) {
       std::lock_guard<std::mutex> _(mutex);
       std::cout << "  [img_info] fid: " << info->frame_id
                 << ", stamp: " << info->timestamp
@@ -77,14 +77,14 @@ int main(int argc, char const *argv[]) {
                 << std::flush;
     });
 
-    std::vector<Stream> types{
+    std::vector<Stream> types {
         Stream::IMAGE_LEFT_COLOR,
         Stream::IMAGE_RIGHT_COLOR,
         Stream::IMAGE_DEPTH,
     };
     for (auto &&type : types) {
       // Set stream data callback
-      api.SetStreamCallback(type, [&mutex](const StreamData &data) {
+      api->SetStreamCallback(type, [&mutex](const StreamData &data) {
         std::lock_guard<std::mutex> _(mutex);
         std::cout << "  [" << data.img->type() << "] fid: "
                   << data.img->frame_id() << std::endl
@@ -93,7 +93,7 @@ int main(int argc, char const *argv[]) {
     }
 
     // Set motion data callback
-    api.SetMotionCallback([&mutex](const MotionData &data) {
+    api->SetMotionCallback([&mutex](const MotionData &data) {
       std::lock_guard<std::mutex> _(mutex);
       if (data.imu->flag == MYNTEYE_IMU_ACCEL) {
         std::cout << "[accel] stamp: " << data.imu->timestamp
@@ -114,10 +114,10 @@ int main(int argc, char const *argv[]) {
     });
   }
 
-  api.ConfigStreamRequest(request);
+  api->ConfigStreamRequest(request);
 
   std::cout << std::endl;
-  if (!api.IsOpened()) {
+  if (!api->IsOpened()) {
     std::cerr << "Error: Open camera failed" << std::endl;
     return 1;
   }
@@ -126,9 +126,9 @@ int main(int argc, char const *argv[]) {
 
   std::cout << "Press ESC/Q on Windows to terminate" << std::endl;
 
-  bool is_left_ok = api.Supports(Stream::IMAGE_LEFT_COLOR);
-  bool is_right_ok = api.Supports(Stream::IMAGE_RIGHT_COLOR);
-  bool is_depth_ok = api.Supports(Stream::IMAGE_DEPTH);
+  bool is_left_ok = api->Supports(Stream::IMAGE_LEFT_COLOR);
+  bool is_right_ok = api->Supports(Stream::IMAGE_RIGHT_COLOR);
+  bool is_depth_ok = api->Supports(Stream::IMAGE_DEPTH);
 
   if (is_left_ok)
     cv::namedWindow("left color");
@@ -140,11 +140,11 @@ int main(int argc, char const *argv[]) {
   CVPainter painter;
   util::Counter counter;
   for (;;) {
-    api.WaitForStreams();
+    api->WaitForStreams();
     counter.Update();
 
     if (is_left_ok) {
-      auto left_color = api.GetStreamData(Stream::IMAGE_LEFT_COLOR);
+      auto left_color = api->GetStreamData(Stream::IMAGE_LEFT_COLOR);
       if (left_color.img) {
         cv::Mat left = left_color.img->To(ImageFormat::COLOR_BGR)->ToMat();
         painter.DrawSize(left, CVPainter::TOP_LEFT);
@@ -156,7 +156,7 @@ int main(int argc, char const *argv[]) {
     }
 
     if (is_right_ok) {
-      auto right_color = api.GetStreamData(Stream::IMAGE_RIGHT_COLOR);
+      auto right_color = api->GetStreamData(Stream::IMAGE_RIGHT_COLOR);
       if (right_color.img) {
         cv::Mat right = right_color.img->To(ImageFormat::COLOR_BGR)->ToMat();
         painter.DrawSize(right, CVPainter::TOP_LEFT);
@@ -166,7 +166,7 @@ int main(int argc, char const *argv[]) {
     }
 
     if (is_depth_ok) {
-      auto image_depth = api.GetStreamData(Stream::IMAGE_DEPTH);
+      auto image_depth = api->GetStreamData(Stream::IMAGE_DEPTH);
       if (image_depth.img) {
         cv::Mat depth;
         if (request.depth_mode == DepthMode::DEPTH_COLORFUL) {
@@ -186,7 +186,7 @@ int main(int argc, char const *argv[]) {
     }
   }
 
-  api.Close();
+  api->Close();
   cv::destroyAllWindows();
   return 0;
 }

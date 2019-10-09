@@ -280,7 +280,6 @@ class MYNTEYE_API Camera {
 /*
   API
 */
-
   /** The enable/disable switch callback. */
   // using stream_switch_callback_t = std::function<void(const Stream &stream)>;
   /**
@@ -300,6 +299,10 @@ class MYNTEYE_API Camera {
 
   void WaitForStreams() {
     WaitForStream();
+  }
+
+  static std::shared_ptr<Camera> Create() {
+    return std::make_shared<Camera>();
   }
 
  private:
