@@ -26,7 +26,7 @@
 MYNTEYE_USE_NAMESPACE
 
 int main(int argc, char const *argv[]) {
-  std::shared_ptr<API> api = API::Create();
+  auto api = API::Create();
   bool ok;
   auto &&request = api->SelectStreamRequest(&ok);
 
