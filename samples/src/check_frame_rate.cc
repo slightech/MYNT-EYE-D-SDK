@@ -29,7 +29,7 @@ template<typename info>
 class Record {
  public:
   explicit Record(const std::string &filename, bool log): log_to_console(log) {
-    file.open("./_output/"+filename);
+    file.open(filename);
     if (!file.is_open()) {
       std::cout << "file open failed:" << "./_output/"+filename << std::endl;
     }
@@ -81,6 +81,22 @@ class Record {
 };
 
 int main(int argc, char const* argv[]) {
+  std::string cmd = "mkdir ";
+  std::string path;
+  if (argc != 2) {
+      std::cout << "Run the program with record path param,"
+                << "eg: ./check_frame_rate ./_record"
+                << std::endl;
+      path = "./_record";
+  } else {
+      path = argv[1];
+  }
+  cmd = cmd + path;
+  int ok = system(cmd.c_str());
+  if (ok == -1) {
+    std::cout << "mkdir failed!" << std::endl;
+    return -1;
+  }
   Camera cam;
   DeviceInfo dev_info;
   if (!util::select(cam, &dev_info)) {
@@ -95,13 +111,8 @@ int main(int argc, char const* argv[]) {
   {
     // Framerate: 10(default usb3.0) 5(default usb2.0),
     // [0,60], [30](STREAM_2560x720)
-    if (argc != 2) {
-      std::cout << "Run the program with rate param,eg: ./check_frame_rate 30"
-                << std::endl;
-      params.framerate = 10;
-    } else {
-      params.framerate = *argv[1];
-    }
+
+    params.framerate = 10;
     std::cout << "Set rate to:" << params.framerate << std::endl;
     // Device mode, default DEVICE_ALL
     //   DEVICE_COLOR: IMAGE_LEFT_COLOR ✓ IMAGE_RIGHT_COLOR ? IMAGE_DEPTH x
@@ -171,9 +182,9 @@ int main(int argc, char const* argv[]) {
   bool is_depth_ok = cam.IsStreamDataEnabled(ImageType::IMAGE_DEPTH);
 
   // std::string left_re = "left_record.txt";
-  Record<ImgInfo> left_record("left_record.txt", true);
-  Record<ImgInfo> right_record("right_record.txt", false);
-  Record<ImgInfo> depth_record("depth_record.txt", false);
+  Record<ImgInfo> left_record(path+"/left_record.txt", true);
+  Record<ImgInfo> right_record(path+"/right_record.txt", false);
+  Record<ImgInfo> depth_record(path+"/depth_record.txt", false);
   if (is_left_ok) {
     cv::namedWindow("left color");
   }
