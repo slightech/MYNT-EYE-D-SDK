@@ -47,19 +47,26 @@ class Record {
       file << err_infos[i];
     }
     file.close();
+    // std::cout << "~Record()" << std::endl;
   }
   void record_fps(int fps) {
     file << "---------- fps:" << fps << " ----------" << std::endl;
      if (log_to_console)
         std::cout << "---------- fps:" << fps << " ----------" << std::endl;
   }
+  void push_back(std::string pre, info new_info) {
+    file << pre;
+    if (log_to_console)
+      std::cout << pre;
+    push_back(new_info);
+  }
   void push_back(info new_info) {
     if (record_nums) {
       if (last_info > new_info) {
         err_infos.push_back(new_info);
         if (log_to_console)
-          std::cout << "error--------------";
-        file << "error--------------";
+          std::cout << "error------------------";
+        file << "error------------------";
       }
     }
     file << new_info;
@@ -81,21 +88,15 @@ class Record {
 };
 
 int main(int argc, char const* argv[]) {
-  std::string cmd = "mkdir ";
-  std::string path;
+  std::string fn = "_";
   if (argc != 2) {
-      std::cout << "Run the program with record path param,"
-                << "eg: ./check_frame_rate ./_record"
+      std::cout << "Run the program with record filename param,"
+                << "eg: ./check_frame_rate 190830" << std::endl
+                << "use default name:out"
                 << std::endl;
-      path = "./_record";
+      fn = "out" + fn;
   } else {
-      path = argv[1];
-  }
-  cmd = cmd + path;
-  int ok = system(cmd.c_str());
-  if (ok == -1) {
-    std::cout << "mkdir failed!" << std::endl;
-    return -1;
+      fn = argv[1] + fn;
   }
   Camera cam;
   DeviceInfo dev_info;
@@ -182,9 +183,9 @@ int main(int argc, char const* argv[]) {
   bool is_depth_ok = cam.IsStreamDataEnabled(ImageType::IMAGE_DEPTH);
 
   // std::string left_re = "left_record.txt";
-  Record<ImgInfo> left_record(path+"/left_record.txt", true);
-  Record<ImgInfo> right_record(path+"/right_record.txt", false);
-  Record<ImgInfo> depth_record(path+"/depth_record.txt", false);
+  Record<ImgInfo> left_record(fn + "left_record.txt", true);
+  Record<ImgInfo> right_record(fn + "right_record.txt", false);
+  Record<ImgInfo> depth_record(fn + "depth_record.txt", false);
   if (is_left_ok) {
     cv::namedWindow("left color");
   }
@@ -258,7 +259,6 @@ int main(int argc, char const* argv[]) {
       break;
     }
   }
-
   cam.Close();
   cv::destroyAllWindows();
   return 0;
