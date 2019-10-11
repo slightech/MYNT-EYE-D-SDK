@@ -61,6 +61,20 @@ struct MYNTEYE_API ImgInfo {
     exposure_time = other.exposure_time;
     return *this;
   }
+  bool operator >(const ImgInfo &other) {
+    if (frame_id > other.frame_id || timestamp >  other.timestamp) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  friend std::ostream &operator <<(std::ostream &os,
+      const ImgInfo &m) {
+    os << "frame_id: " << m.frame_id
+       << "  timestamp:" << m.timestamp
+       << std::endl;
+    return os;
+  }
 };
 
 #define MYNTEYE_IMU_ACCEL 1

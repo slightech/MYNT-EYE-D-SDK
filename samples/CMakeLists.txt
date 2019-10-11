@@ -85,6 +85,15 @@ set(MYNTEYE_DLL_SEARCH_PATHS
   ${OpenCV_LIB_SEARCH_PATH}
 )
 
+make_executable(check_frame_rate
+  SRCS
+    src/check_frame_rate.cc
+    src/util/cam_utils.cc
+    src/util/cv_painter.cc
+  LINK_LIBS mynteye_depth ${OpenCV_LIBS}
+  DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
+)
+
 make_executable(get_image
   SRCS
     src/get_image.cc
