@@ -43,8 +43,8 @@ class Record {
     }
     file << std::endl << "record_nums:" << record_nums << std::endl;
     file << std::endl << "error_nums:" << errors() << std::endl;
-    for (int i = 0; i < errors(); i++) {
-      file << err_infos[i];
+    for (auto err : err_infos) {
+      file << err << std::endl;
     }
     file.close();
     // std::cout << "~Record()" << std::endl;
@@ -65,8 +65,11 @@ class Record {
       if (last_info > new_info) {
         err_infos.push_back(new_info);
         if (log_to_console)
-          std::cout << "error------------------";
-        file << "error------------------";
+          std::cout << "error------------";
+        file << "error";
+        for (int i = 0; i < 50; i++) {
+          file << "-";
+        }
       }
     }
     file << new_info;
@@ -98,6 +101,8 @@ int main(int argc, char const* argv[]) {
   } else {
       fn = argv[1] + fn;
   }
+  Record<std::uint32_t> imu_record(fn + "imu_record.txt", false);
+
   Camera cam;
   DeviceInfo dev_info;
   if (!util::select(cam, &dev_info)) {
@@ -165,7 +170,7 @@ int main(int argc, char const* argv[]) {
   cam.EnableImageInfo(true);
 
   // Enable motion datas
-  cam.EnableMotionDatas(0);
+  cam.EnableMotionDatas();
 
   cam.Open(params);
 
@@ -181,6 +186,11 @@ int main(int argc, char const* argv[]) {
   bool is_left_ok = cam.IsStreamDataEnabled(ImageType::IMAGE_LEFT_COLOR);
   bool is_right_ok = cam.IsStreamDataEnabled(ImageType::IMAGE_LEFT_COLOR);
   bool is_depth_ok = cam.IsStreamDataEnabled(ImageType::IMAGE_DEPTH);
+
+  if (!cam.IsMotionDatasSupported()) {
+    std::cerr << "Error: IMU is not supported on your device." << std::endl;
+    return -1;
+  }
 
   // std::string left_re = "left_record.txt";
   Record<ImgInfo> left_record(fn + "left_record.txt", true);
@@ -254,12 +264,46 @@ int main(int argc, char const* argv[]) {
       }
     }
 
+    auto motion_datas = cam.GetMotionDatas();
+    if (motion_datas.size() > 0) {
+      std::cout << "Imu count: " << motion_datas.size() << std::endl;
+      for (auto data : motion_datas) {
+        if (data.imu) {
+          if (data.imu->flag == MYNTEYE_IMU_ACCEL) {
+            imu_record.push_back("\n[accel] stamp: ", data.imu->timestamp);
+            counter.IncrAccelCount();
+            // std::cout << "[accel] stamp: " << data.imu->timestamp
+            //   << ", x: " << data.imu->accel[0]
+            //   << ", y: " << data.imu->accel[1]
+            //   << ", z: " << data.imu->accel[2]
+            //   << ", temp: " << data.imu->temperature
+            //   << std::endl;
+          } else if (data.imu->flag == MYNTEYE_IMU_GYRO) {
+            imu_record.push_back("\n[gyro] stamp: ", data.imu->timestamp);
+            counter.IncrGyroCount();
+            // std::cout << "[gyro ] stamp: " << data.imu->timestamp
+            //   << ", x: " << data.imu->gyro[0]
+            //   << ", y: " << data.imu->gyro[1]
+            //   << ", z: " << data.imu->gyro[2]
+            //   << ", temp: " << data.imu->temperature
+            //   << std::endl;
+          } else {
+            std::cerr << "Imu type is unknown" << std::endl;
+          }
+        } else {
+          std::cerr << "Motion data is empty" << std::endl;
+        }
+      }
+      std::cout << std::endl;
+    }
+
     char key = static_cast<char>(cv::waitKey(1));
     if (key == 27 || key == 'q' || key == 'Q') {  // ESC/Q
       break;
     }
   }
   cam.Close();
+  counter.PrintCountInfo();
   cv::destroyAllWindows();
   return 0;
 }
