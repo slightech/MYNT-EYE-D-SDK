@@ -1,6 +1,14 @@
 Update Log
 =======================
 
+v1.3.2 - 2019-10-11
+----------------------
+
+- Supports D-1000 (imu, usb 2.0/3.0)
+- Improve pointcloud register
+- Improve preview frame
+- Fix some issue
+
 v1.3.1 - 2019-09-03
 ----------------------
 
