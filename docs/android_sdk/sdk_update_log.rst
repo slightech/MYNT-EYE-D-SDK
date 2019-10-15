@@ -6,27 +6,10 @@ v1.3.2 - 2019-10-11
 
 - Supports D-1000 (imu, usb 2.0/3.0)
 - Improve pointcloud register
+- Support get right frame
+- add interface to get depth array converted from framedata
 - Improve preview frame
 - Fix some issue
-
-v1.3.1 - 2019-09-03
-----------------------
-
-- Support to get left and right original images
-- Simplify the sample example
-
-v1.3.0 - 2019-07-30
-----------------------
-
-- Supports d-1000 USB3.0
-- Remove mandatory Settings on Surface
-- Add FrameData transform distance interface
-- Fixed frequent popping authorization issues under USB2.0
-
-v1.2.6 - 2019-07-26
-----------------------
-
-- Add integration mode
 
 v1.2.5 - 2019-07-01
 ----------------------

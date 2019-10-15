@@ -57,5 +57,5 @@ After the connection is successful, the data is retrieved
            }
        }
        // To preview
-       mCamera?.start(MYNTCamera.Source.ALL)
+       mCamera?.start(MYNTCamera.Source.ALL, MYNTCamera.Frame.ALL)
    }
