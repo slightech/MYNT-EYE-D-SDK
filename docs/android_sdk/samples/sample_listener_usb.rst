@@ -8,7 +8,7 @@ Initialize USB Monitor
 
    mUSBMonitor = USBMonitor(mContext, object : USBMonitor.IUSBMonitorListener {
 
-       override fun didFoundCamera(camera: MYNTCamera) {
+       override fun didAttach(camera: MYNTCamera) {
            // Insert equipment
        }
 

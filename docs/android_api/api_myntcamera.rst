@@ -299,7 +299,7 @@ Enable or disable to display frame fps.
 
    public void setEnableFrameFPS(boolean enable, int camera_switch)
 
-Sava point cloud data.
+Sava point cloud data within the distance.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: java
@@ -307,4 +307,5 @@ Sava point cloud data.
    public void savePointCloud(final FrameData colorFrameData,
                               final FrameData depthFrameData,
                               final String filePath,
-                              Boolean hasColor)
+                              Boolean hasColor,
+                              int distance)
