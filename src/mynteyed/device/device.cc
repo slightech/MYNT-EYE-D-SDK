@@ -169,6 +169,12 @@ void Device::GetDeviceInfos(std::vector<DeviceInfo>* dev_infos) {
 
     EtronDI_GetDeviceInfo(handle_, &dev_sel_info, p_dev_info+i);
 
+    unsigned char sn_buf[256];
+    int sn_actual_length = 0;
+    if (!(ETronDI_OK == EtronDI_GetSerialNumber(handle_, &dev_sel_info, sn_buf, 256, &sn_actual_length))) {
+      LOGE("Failed to get device serial number.");
+    } 
+
     char sz_buf[256];
     int actual_length = 0;
     if (ETronDI_OK == EtronDI_GetFwVersion(
@@ -181,6 +187,7 @@ void Device::GetDeviceInfos(std::vector<DeviceInfo>* dev_infos) {
       info.vid = p_dev_info[i].wVID;
       info.chip_id = p_dev_info[i].nChipID;
       info.fw_version = sz_buf;
+      info.sn = reinterpret_cast<char*>(sn_buf);
       dev_infos->push_back(std::move(info));
     }
   }
