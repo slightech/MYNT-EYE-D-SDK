@@ -171,9 +171,15 @@ void Device::GetDeviceInfos(std::vector<DeviceInfo>* dev_infos) {
 
     unsigned char sn_buf[256];
     int sn_actual_length = 0;
-    if (!(ETronDI_OK == EtronDI_GetSerialNumber(handle_, &dev_sel_info, sn_buf, 256, &sn_actual_length))) {
+    std::string serial_num = "";
+    if (ETronDI_OK == EtronDI_GetSerialNumber(handle_, &dev_sel_info, sn_buf, 256, &sn_actual_length)) {
+      // For some reason, every other char has value 0x00. So, just use even-indexed chars
+      for (int i = 0; i < sn_actual_length; i += 2) {
+        serial_num += sn_buf[i];
+      }
+    } else {
       LOGE("Failed to get device serial number.");
-    } 
+    }
 
     char sz_buf[256];
     int actual_length = 0;
@@ -187,7 +193,7 @@ void Device::GetDeviceInfos(std::vector<DeviceInfo>* dev_infos) {
       info.vid = p_dev_info[i].wVID;
       info.chip_id = p_dev_info[i].nChipID;
       info.fw_version = sz_buf;
-      info.sn = reinterpret_cast<char*>(sn_buf);
+      info.sn = serial_num;
       dev_infos->push_back(std::move(info));
     }
   }
