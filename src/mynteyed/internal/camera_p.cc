@@ -498,6 +498,7 @@ bool CameraPrivate::StartDataTracking() {
   if (channels_->IsHidTracking()) return true;
 
   // Start hid tracking will callback imu data & image info
+  std::cout << "FW:" << descriptors_->firmware_version.to_string() <<std::endl;
   return channels_->StartHidTracking(descriptors_.get());
 }
 

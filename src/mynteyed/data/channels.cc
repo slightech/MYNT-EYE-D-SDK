@@ -129,11 +129,12 @@ bool Channels::StartHidTracking(device_desc_t *desc) {
     LOGI("INFO:: hid device was tracking already.");
     return true;
   }
-
   is_hid_tracking_ = true;
-  hid_track_thread_ = std::thread([&desc, this]() {
+  hid_track_thread_ = std::thread([desc, this]() {
     while (is_hid_tracking_) {
-      DoHidTrack(desc);
+      if (desc != nullptr) {
+        DoHidTrack(desc);
+      }
     }
   });
 
@@ -358,13 +359,12 @@ bool Channels::DoHidDataExtract(device_desc_t *desc, imu_packets_t &imu, img_pac
           std::ostream_iterator<int>(std::cout << std::hex, " "));
       std::cout << std::endl;
 #endif
-
       std::uint8_t header = *(packet + offset);
       std::uint8_t length = *(packet + offset + 1) + 2;
       static float temperature = 0.f;
       if (header == ACCEL || header == GYRO || header == ACCEL_AND_GYRO) {
         ImuDataPacket imu_data;
-        if (desc != nullptr && (Version(1,4) < (desc->firmware_version))) {
+        if (desc != nullptr && (Version(1, 4) < desc->firmware_version)) {
           imu_data = ImuDataPacket(true, packet + offset);
           imu_data.temperature = temperature;
         } else {

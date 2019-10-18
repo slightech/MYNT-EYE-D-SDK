@@ -66,7 +66,7 @@ class MYNTEYE_API Channels {
     DISTANCE,
     LOCATION,
     TEMPERATURE,
-    ACCEL_AND_GYRO = 10
+    ACCEL_AND_GYRO = 9
   } data_id_t;
 
   using device_desc_t = device::Descriptors;

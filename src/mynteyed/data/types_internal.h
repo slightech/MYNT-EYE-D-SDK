@@ -62,7 +62,7 @@ struct ImuDataPacket {
 
   ImuDataPacket() = default;
   explicit ImuDataPacket(bool is_v2, std::uint8_t *data) {
-    if(is_v2)
+    if (is_v2)
       from_data_v2(data);
     else
       from_data_v1(data);
@@ -70,7 +70,7 @@ struct ImuDataPacket {
 
   void from_data_v1(std::uint8_t *data) {
     std::uint16_t temp;
-    std::uint16_t accel_or_gyro[3];
+    std::int16_t accel_or_gyro[3];
     flag = *data + 1;
     timestamp =
         *(data + 2) | *(data + 3) << 8 | *(data + 4) << 16 | *(data + 5) << 24;
