@@ -14,6 +14,13 @@ Data type
      * */
     public int flag;
 
+TimeStamp
+~~~~~~~~~~
+
+.. code:: java
+
+    public int frameId;
+
 Image width
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -27,6 +34,26 @@ Image height
 .. code:: java
 
     public int height;
+
+Color frame type（Left / Left && Right）
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: java
+
+    public ColorFrame colorMode;
+
+Frame format
+~~~~~~~~~~~~~~~~~~~~
+
+.. code:: java
+    
+    /**
+     * MYNTCamera.FRAME_FORMAT_YUYV
+     * MYNTCamera.FRAME_FORMAT_MJPEG
+     * MYNTCamera.PIXEL_FORMAT_RGBX
+     *
+     * */
+    public int type;
 
 Depth image type
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -69,6 +96,32 @@ Get distance array（only the flag is "DEPTH"）
 
     public int[] getDistanceInts()
 
+Get distance array（only the flag is "DEPTH"）
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: java
+
+    /**
+     * get distance table（int）
+     *
+     * @param max   Max(mm), if more than  max, go to be 0.
+     *
+     * */
+    public int[] getDistanceInts(int max)
+    
+Get distance array（only the flag is "DEPTH"）
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: java
+
+    /**
+     * get distance table（int）
+     *
+     * @param min   Min(mm)
+     * @param max   Max(mm), if more than  max, go to be 0.
+     *
+     * */
+    public int[] getDistanceInts(int min, int max)
 
 Get distance array（only the flag is "DEPTH"）
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -76,6 +129,33 @@ Get distance array（only the flag is "DEPTH"）
 .. code:: java
 
     public byte[] getDistanceShorts()
+
+Get distance array（only the flag is "DEPTH"）
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: java
+
+    /**
+     * get distance table（int）
+     *
+     * @param max   Max(mm), if more than  max, go to be 0.
+     *
+     * */
+    public byte[] getDistanceShorts(int max)
+
+Get distance array（only the flag is "DEPTH"）
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: java
+
+    /**
+     * get distance table（int）
+     *
+     * @param min   Min(mm)
+     * @param max   Max(mm), if more than  max, go to be 0.
+     *
+     * */
+    public byte[] getDistanceShorts(int min, int max)
 
 
 Get distance（only the flag is "DEPTH"）
