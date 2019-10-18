@@ -120,7 +120,7 @@ bool Channels::IsHidTracking() const {
   return is_hid_tracking_;
 }
 
-bool Channels::StartHidTracking() {
+bool Channels::StartHidTracking(device_desc_t *desc) {
   if (!is_hid_opened_) {
     LOGW("WARNING:: hid device was not opened.");
     return false;
@@ -131,9 +131,9 @@ bool Channels::StartHidTracking() {
   }
 
   is_hid_tracking_ = true;
-  hid_track_thread_ = std::thread([this]() {
+  hid_track_thread_ = std::thread([&desc, this]() {
     while (is_hid_tracking_) {
-      DoHidTrack();
+      DoHidTrack(desc);
     }
   });
 
@@ -202,7 +202,7 @@ void Channels::CloseHid() {
   is_hid_opened_ = false;
 }
 
-bool Channels::DoHidTrack() {
+bool Channels::DoHidTrack(device_desc_t *desc) {
   static imu_packets_t imu_packets;
   static img_packets_t img_packets;
   static gps_packets_t gps_packets;
@@ -212,7 +212,7 @@ bool Channels::DoHidTrack() {
   gps_packets.clear();
   dis_packets.clear();
 
-  if (!DoHidDataExtract(imu_packets, img_packets,
+  if (!DoHidDataExtract(desc, imu_packets, img_packets,
         gps_packets, dis_packets)) {
     return false;
   }
@@ -246,18 +246,30 @@ void print_imu_data(const ImuDataPacket& imu_data) {
   std::cout << std::dec;
   if (imu_data.flag == MYNTEYE_IMU_ACCEL) {
     std::cout << "    [accel] stamp: " << imu_data.timestamp
-      << ", x: " << imu_data.accel_or_gyro[0] * 12.f / 0x10000
-      << ", y: " << imu_data.accel_or_gyro[1] * 12.f / 0x10000
-      << ", z: " << imu_data.accel_or_gyro[2] * 12.f / 0x10000
-      << ", temp: " << imu_data.temperature * 0.125 + 23
+      << ", x: " << imu_data.accel[0]
+      << ", y: " << imu_data.accel[1]
+      << ", z: " << imu_data.accel[2]
+      << ", temp: " << imu_data.temperature
       << std::endl;
   } else if (imu_data.flag == MYNTEYE_IMU_GYRO) {
     std::cout << "    [gyro] stamp: " << imu_data.timestamp
-      << ", x: " << imu_data.accel_or_gyro[0] * 2000.f / 0x10000
-      << ", y: " << imu_data.accel_or_gyro[1] * 2000.f / 0x10000
-      << ", z: " << imu_data.accel_or_gyro[2] * 2000.f / 0x10000
-      << ", temp: " << imu_data.temperature * 0.125 + 23
+      << ", x: " << imu_data.gyro[0]
+      << ", y: " << imu_data.gyro[1]
+      << ", z: " << imu_data.gyro[2]
+      << ", temp: " << imu_data.temperature
       << std::endl;
+  } else if (imu_data.flag == MYNTEYE_IMU_ACCEL_GYRO_CALIB) {
+    std::cout << "    imu stamp: " << imu_data.timestamp
+      << ",[accel] x: " << imu_data.accel[0]
+      << ", y: " << imu_data.accel[1]
+      << ", z: " << imu_data.accel[2]
+      << ",[gyro], x: " << imu_data.gyro[0]
+      << ", y: " << imu_data.gyro[1]
+      << ", z: " << imu_data.gyro[2]
+      << ", temp: " << imu_data.temperature
+      << std::endl;
+  } else {
+    std::cout << "unknown imu type" << std::endl;
   }
 }
 
@@ -307,7 +319,7 @@ void detect_img_info_stamp(const ImgInfoPacket& img_info) {
 }
 #endif
 
-bool Channels::DoHidDataExtract(imu_packets_t &imu, img_packets_t &img,
+bool Channels::DoHidDataExtract(device_desc_t *desc, imu_packets_t &imu, img_packets_t &img,
     gps_packets_t &gps, dis_packets_t &dis) {
   std::uint8_t data[PACKET_SIZE * 2]{};
   std::fill(data, data + PACKET_SIZE * 2, 0);
@@ -339,8 +351,7 @@ bool Channels::DoHidDataExtract(imu_packets_t &imu, img_packets_t &img,
     std::cout << std::endl;
 #endif
 
-    for (int offset = 3; offset <= PACKET_SIZE - DATA_SIZE;
-        offset += DATA_SIZE) {
+    for (int offset = 3; offset <= PACKET_SIZE - DATA_SIZE;) {
 #ifdef PACKET_PRINT
       std::cout << "  data[" << static_cast<int>(*(packet + offset)) << "]: ";
       std::copy(packet + offset, packet + offset + DATA_SIZE,
@@ -349,8 +360,16 @@ bool Channels::DoHidDataExtract(imu_packets_t &imu, img_packets_t &img,
 #endif
 
       std::uint8_t header = *(packet + offset);
-      if (header == ACCEL || header == GYRO) {
-        auto&& imu_data = ImuDataPacket(packet + offset);
+      std::uint8_t length = *(packet + offset + 1) + 2;
+      static float temperature = 0.f;
+      if (header == ACCEL || header == GYRO || header == ACCEL_AND_GYRO) {
+        ImuDataPacket imu_data;
+        if (desc != nullptr && (Version(1,4) < (desc->firmware_version))) {
+          imu_data = ImuDataPacket(true, packet + offset);
+          imu_data.temperature = temperature;
+        } else {
+          imu_data = ImuDataPacket(false, packet + offset);
+        }
         imu.push_back(imu_data);
 #ifdef PACKET_PRINT
         print_imu_data(imu_data);
@@ -373,8 +392,12 @@ bool Channels::DoHidDataExtract(imu_packets_t &imu, img_packets_t &img,
       } else if (header == LOCATION) {
         auto&& gps_data = GPSDataPacket(packet + offset);
         gps.push_back(gps_data);
-        break;
+      } else if (header == TEMPERATURE) {
+        // Temperature update frequency is very low and changes slowly
+        auto&& temperature_data = TemperaturePacket(packet + offset);
+        temperature = temperature_data.temperature;
       }
+      offset += length;
     }
   }
 

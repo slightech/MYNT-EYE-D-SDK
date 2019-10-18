@@ -79,6 +79,7 @@ struct MYNTEYE_API ImgInfo {
 
 #define MYNTEYE_IMU_ACCEL 1
 #define MYNTEYE_IMU_GYRO 2
+#define MYNTEYE_IMU_ACCEL_GYRO_CALIB 10
 
 /**
  * @ingroup datatypes
@@ -89,6 +90,7 @@ struct MYNTEYE_API ImuData {
    * Data type
    *   MYNTEYE_IMU_ACCEL: accelerometer
    *   MYNTEYE_IMU_GYRO: gyroscope
+   *   MYNTEYE_IMU_ACCEL_GYRO_CALIB: calib accelerometer and gyroscope
    * */
   std::uint8_t flag;
 
@@ -96,13 +98,13 @@ struct MYNTEYE_API ImuData {
   std::uint64_t timestamp;
 
   /** temperature */
-  double temperature;
+  float temperature;
 
   /** Imu accelerometer data for 3-axis: X, Y, X. */
-  double accel[3];
+  float accel[3];
 
   /** Imu gyroscope data for 3-axis: X, Y, Z. */
-  double gyro[3];
+  float gyro[3];
 
   void Reset() {
     flag = 0;

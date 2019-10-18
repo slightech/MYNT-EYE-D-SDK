@@ -56,22 +56,87 @@ struct ImgInfoPacket {
 struct ImuDataPacket {
   std::uint8_t flag;
   std::uint32_t timestamp;
-  std::int16_t temperature;
-  std::int16_t accel_or_gyro[3];
+  float temperature;
+  float accel[3];
+  float gyro[3];
 
   ImuDataPacket() = default;
-  explicit ImuDataPacket(std::uint8_t *data) {
-    from_data(data);
+  explicit ImuDataPacket(bool is_v2, std::uint8_t *data) {
+    if(is_v2)
+      from_data_v2(data);
+    else
+      from_data_v1(data);
   }
 
-  void from_data(std::uint8_t *data) {
+  void from_data_v1(std::uint8_t *data) {
+    std::uint16_t temp;
+    std::uint16_t accel_or_gyro[3];
     flag = *data + 1;
     timestamp =
         *(data + 2) | *(data + 3) << 8 | *(data + 4) << 16 | *(data + 5) << 24;
     accel_or_gyro[0] = *(data + 6) | *(data + 7) << 8;
     accel_or_gyro[1] = *(data + 8) | *(data + 9) << 8;
     accel_or_gyro[2] = *(data + 10) | *(data + 11) << 8;
-    temperature = *(data + 12) | *(data + 13) << 8;
+    temp = *(data + 12) | *(data + 13) << 8;
+    temperature = temp * 0.125 + 23;
+    if (flag == 1) {
+      accel[0] = accel_or_gyro[0] * 12.f / 0x10000;
+      accel[1] = accel_or_gyro[1] * 12.f / 0x10000;
+      accel[2] = accel_or_gyro[2] * 12.f / 0x10000;
+      gyro[0] = 0.f;
+      gyro[1] = 0.f;
+      gyro[2] = 0.f;
+    } else if (flag == 2) {
+      accel[0] = 0.f;
+      accel[1] = 0.f;
+      accel[2] = 0.f;
+      gyro[0] = accel_or_gyro[0] * 2000.f / 0x10000;
+      gyro[1] = accel_or_gyro[1] * 2000.f / 0x10000;
+      gyro[2] = accel_or_gyro[2] * 2000.f / 0x10000;
+    } else {
+      accel[0] = 0.f;
+      accel[1] = 0.f;
+      accel[2] = 0.f;
+      gyro[0] = 0.f;
+      gyro[1] = 0.f;
+      gyro[2] = 0.f;
+    }
+  }
+
+  void from_data_v2(std::uint8_t *data) {
+    flag = *data + 1;
+    timestamp =
+        *(data + 2) | *(data + 3) << 8 | *(data + 4) << 16 | *(data + 5) << 24;
+    if (flag == 1) {
+      accel[0] = *((float*)(data + 6));
+      accel[1] = *((float*)(data + 10));
+      accel[2] = *((float*)(data + 14));
+      gyro[0] = 0.f;
+      gyro[1] = 0.f;
+      gyro[2] = 0.f;
+    } else if (flag == 2) {
+      accel[0] = 0.f;
+      accel[1] = 0.f;
+      accel[2] = 0.f;
+      gyro[0] = *((float*)(data + 6));
+      gyro[1] = *((float*)(data + 10));
+      gyro[2] = *((float*)(data + 14));
+    } else if (flag == 10) {
+      accel[0] = *((float*)(data + 6));
+      accel[1] = *((float*)(data + 10));
+      accel[2] = *((float*)(data + 14));
+      gyro[0] = *((float*)(data + 18));
+      gyro[1] = *((float*)(data + 22));
+      gyro[2] = *((float*)(data + 26));
+    } else {
+      accel[0] = 0.f;
+      accel[1] = 0.f;
+      accel[2] = 0.f;
+      gyro[0] = 0.f;
+      gyro[1] = 0.f;
+      gyro[2] = 0.f;
+    }
+
   }
 };
 #pragma pack(pop)
@@ -139,6 +204,28 @@ struct ObstacleDisPacket {
     detection_time = *(data + 2) | *(data + 3) << 8 |
       *(data + 4) << 16 | *(data + 5) << 24;
     distance = *(data + 6) | *(data + 7) << 8;
+  }
+};
+#pragma pack(pop)
+
+/**
+ * @ingroup datatypes
+ * temperature packet.
+ */
+#pragma pack(push, 1)
+struct TemperaturePacket {
+  std::uint32_t timestamp;
+  std::uint32_t temperature;
+
+  TemperaturePacket() = default;
+  explicit TemperaturePacket(std::uint8_t *data) {
+    from_data(data);
+  }
+
+  void from_data(std::uint8_t *data) {
+    timestamp =
+        *(data + 2) | *(data + 3) << 8 | *(data + 4) << 16 | *(data + 5) << 24;
+    temperature = *((float*)(data + 6));
   }
 };
 #pragma pack(pop)

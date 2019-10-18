@@ -498,7 +498,7 @@ bool CameraPrivate::StartDataTracking() {
   if (channels_->IsHidTracking()) return true;
 
   // Start hid tracking will callback imu data & image info
-  return channels_->StartHidTracking();
+  return channels_->StartHidTracking(descriptors_.get());
 }
 
 void CameraPrivate::StopDataTracking() {
