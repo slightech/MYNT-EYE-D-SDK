@@ -146,6 +146,6 @@ int main(int argc, char const* argv[]) {
   }
 
   cam.Close();
-  cv::destroyAllWindows();
+
   return 0;
 }
