@@ -304,6 +304,6 @@ int main(int argc, char const* argv[]) {
   }
   cam.Close();
   counter.PrintCountInfo();
-  cv::destroyAllWindows();
+
   return 0;
 }

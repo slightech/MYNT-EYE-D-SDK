@@ -187,6 +187,6 @@ int main(int argc, char const *argv[]) {
   }
 
   api->Close();
-  cv::destroyAllWindows();
+
   return 0;
 }
