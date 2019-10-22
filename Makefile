@@ -28,7 +28,6 @@ help:
 	@echo "  make build     build project"
 	@echo "  make install   build and install"
 	@echo "  make samples   build samples"
-	@echo "  make tools     build tools"
 	@echo "  make ros       build ros wrapper"
 	@echo "  make apidoc    build api doc"
 	@echo "  make pkg       package sdk"
@@ -105,14 +104,6 @@ samples: install
 	@$(call cmake_build,./samples/_build)
 
 .PHONY: samples
-
-# tools
-
-tools: install
-	@$(call echo,Make $@)
-	@$(call cmake_build,./tools/_build)
-
-.PHONY: tools
 
 # ros
 
