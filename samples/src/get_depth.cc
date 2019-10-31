@@ -172,8 +172,8 @@ int main(int argc, char const* argv[]) {
 
     // Depth mode: colorful(default), gray, raw
     // Note: must set DEPTH_RAW to get raw depth values
-    params.depth_mode = DepthMode::DEPTH_RAW;
-
+    // params.depth_mode = DepthMode::DEPTH_RAW;
+    params.depth_mode = DepthMode::DEPTH_GRAY;
     // Stream mode: left color only
     // params.stream_mode = StreamMode::STREAM_640x480;  // vga
     params.stream_mode = StreamMode::STREAM_1280x720;  // hd
@@ -247,7 +247,14 @@ int main(int argc, char const* argv[]) {
 
     auto image_depth = cam.GetStreamData(ImageType::IMAGE_DEPTH);
     if (image_depth.img) {
-      cv::Mat depth = image_depth.img->To(ImageFormat::DEPTH_RAW)->ToMat();
+      cv::Mat depth;
+      if (params.depth_mode == DepthMode::DEPTH_COLORFUL) {
+          depth = image_depth.img->To(ImageFormat::DEPTH_BGR)->ToMat();
+        } else {
+          depth = image_depth.img->ToMat();
+        }
+      // std::cout << "A" << std::endl;
+      // cv::cvtColor(depth, depth, cv::COLOR_BGR2GRAY);
 
       cv::setMouseCallback("depth", OnDepthMouseCallback, &depth_region);
       // Note: DrawRect will change some depth values to show the rect.

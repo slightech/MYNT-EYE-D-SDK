@@ -175,7 +175,8 @@ Image::pointer Device::GetImageDepth() {
         ColorPaletteGenerator::UpdateD11DisplayImage_DIB24(
             m_GrayPaletteD11, depth_buf_, depth_image_buf_->data(),
             depth_img_width, depth_img_height);
-      } else if (depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS) {
+      } else if (depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS ||
+                depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS_RAW) {
         ColorPaletteGenerator::UpdateD8bitsDisplayImage_DIB24(
             m_GrayPalette, depth_buf_, depth_image_buf_->data(),
             depth_img_width, depth_img_height);
