@@ -77,7 +77,7 @@ class DepthRegion {
 
     int space = std::move(elem_space);
     int n = 2 * n_ + 1;
-    cv::Mat im(space*n, space*n, CV_8UC3, cv::Scalar(255,255,255));
+    cv::Mat im(space*n, space*n, CV_8UC3, cv::Scalar(255, 255, 255));
 
     int x, y;
     std::string str;
@@ -91,8 +91,8 @@ class DepthRegion {
 
         str = elem2string(depth.at<T>(y, x));
 
-        cv::Scalar color(0,0,0);
-        if (i == 0 && j == 0) color = cv::Scalar(0,0,255);
+        cv::Scalar color(0, 0, 0);
+        if (i == 0 && j == 0) color = cv::Scalar(0, 0, 255);
 
         cv::Size sz = cv::getTextSize(str,
           cv::FONT_HERSHEY_PLAIN, 1, 1, &baseline);
@@ -154,26 +154,22 @@ MYNTEYE_USE_NAMESPACE
 
 void disp2Depth(cv::Mat dispMap, const StreamIntrinsics &in_l,
                 const StreamExtrinsics &ex, cv::Mat depthMap) {
-  int type = dispMap.type();
-  cout <<"type: " << (type == CV_8UC1) << endl;
   float fx = in_l.left.fx;
-  // float fy = in_l.left.fy;
-  // float cx = in_l.left.cx;
-  // float cy = in_l.left.cy;
   float baseline = fabs(ex.translation[0]);
 
-  if (true) {
-    const float PI = 3.14159265358;
+  if (dispMap.type() == CV_8UC1) {
     int height = dispMap.rows;
     int width = dispMap.cols;
-
-    uchar* dispData = (uchar*)dispMap.data;
-    ushort* depthData = (ushort*)depthMap.data;
+    uchar* dispData = reinterpret_cast<uchar *>(dispMap.data);
+    ushort* depthData = reinterpret_cast<ushort*>(depthMap.data);
     for (int i = 0; i < height; i++) {
       for (int j = 0; j < width; j++) {
         int id = i*width + j;
-        if (!dispData[id])  continue;
-        depthData[id] = ushort( (float)fx *baseline / ((float)dispData[id]) );
+        int val = dispData[id];
+        if (val == 0 || val > 200) {
+          continue;
+        }
+        depthData[id] = static_cast<ushort>(fx *baseline / val);
       }
     }
   } else {
@@ -204,8 +200,9 @@ int main(int argc, char const* argv[]) {
 
     // Depth mode: colorful(default), gray, raw
     // Note: must set DEPTH_RAW to get raw depth values
-    // params.depth_mode = DepthMode::DEPTH_RAW;
-    params.depth_mode = DepthMode::DEPTH_RAW;
+    params.depth_mode = DepthMode::DEPTH_RAW;          // USB2.0 Not Support
+    // params.depth_mode = DepthMode::DEPTH_GRAY;
+    // params.depth_mode = DepthMode::DEPTH_COLORFUL;
     // Stream mode: left color only
     // params.stream_mode = StreamMode::STREAM_640x480;  // vga
     params.stream_mode = StreamMode::STREAM_1280x720;  // hd
@@ -297,21 +294,22 @@ int main(int argc, char const* argv[]) {
 
       cv::setMouseCallback("depth", OnDepthMouseCallback, &depth_region);
       // Note: DrawRect will change some depth values to show the rect.
-      depth_region.DrawRect(depth);
-
       if (params.depth_mode == DepthMode::DEPTH_RAW) {
-        cv::imshow("depth", depth);
         depth_region.ShowElems<ushort>(depth, [](const ushort& elem) {
           return std::to_string(elem);
         }, 80, depth_info);
+        depth_region.DrawRect(depth);
+        cv::imshow("depth", depth);
       } else if (params.depth_mode == DepthMode::DEPTH_GRAY) {
-        cv::Mat depth2(depth.size(), CV_16UC1);
+        cv::Mat depth2 = cv::Mat::zeros(depth.size(), CV_16UC1);
         cv::cvtColor(depth, depth, CV_BGR2GRAY);
         disp2Depth(depth, hd_intrinsics, hd_extrinsics, depth2);
-        cv::imshow("depth", depth2);
+        cv::imshow("disp", depth);
         depth_region.ShowElems<ushort>(depth2, [](const ushort& elem) {
           return std::to_string(elem);
         }, 80, depth_info);
+        depth_region.DrawRect(depth2);
+        cv::imshow("depth", depth2);
       }
     }
 
