@@ -147,9 +147,41 @@ void OnDepthMouseCallback(int event, int x, int y, int flags, void* userdata) {
 
 }  // namespace
 
+
 using namespace std;
 
 MYNTEYE_USE_NAMESPACE
+
+void disp2Depth(cv::Mat dispMap, const StreamIntrinsics &in_l,
+                const StreamExtrinsics &ex, cv::Mat depthMap) {
+  int type = dispMap.type();
+  cout <<"type: " << (type == CV_8UC1) << endl;
+  float fx = in_l.left.fx;
+  // float fy = in_l.left.fy;
+  // float cx = in_l.left.cx;
+  // float cy = in_l.left.cy;
+  float baseline = fabs(ex.translation[0]);
+
+  if (true) {
+    const float PI = 3.14159265358;
+    int height = dispMap.rows;
+    int width = dispMap.cols;
+
+    uchar* dispData = (uchar*)dispMap.data;
+    ushort* depthData = (ushort*)depthMap.data;
+    for (int i = 0; i < height; i++) {
+      for (int j = 0; j < width; j++) {
+        int id = i*width + j;
+        if (!dispData[id])  continue;
+        depthData[id] = ushort( (float)fx *baseline / ((float)dispData[id]) );
+      }
+    }
+  } else {
+    cout << "wrong type" << std::endl;
+  }
+}
+
+
 
 int main(int argc, char const* argv[]) {
   Camera cam;
@@ -173,7 +205,7 @@ int main(int argc, char const* argv[]) {
     // Depth mode: colorful(default), gray, raw
     // Note: must set DEPTH_RAW to get raw depth values
     // params.depth_mode = DepthMode::DEPTH_RAW;
-    params.depth_mode = DepthMode::DEPTH_GRAY;
+    params.depth_mode = DepthMode::DEPTH_RAW;
     // Stream mode: left color only
     // params.stream_mode = StreamMode::STREAM_640x480;  // vga
     params.stream_mode = StreamMode::STREAM_1280x720;  // hd
@@ -193,6 +225,13 @@ int main(int argc, char const* argv[]) {
 
   cam.Open(params);
 
+  bool ok;
+  auto hd_intrinsics = cam.GetStreamIntrinsics(params.stream_mode, &ok);
+  auto hd_extrinsics = cam.GetStreamExtrinsics(params.stream_mode, &ok);
+  if (!ok) {
+    cerr << "Error: Get intrinsics or extrinsics failed" << endl;
+    return 0;
+  }
   cout << endl;
   if (!cam.IsOpened()) {
     cerr << "Error: Open camera failed" << endl;
@@ -250,11 +289,9 @@ int main(int argc, char const* argv[]) {
       cv::Mat depth;
       if (params.depth_mode == DepthMode::DEPTH_COLORFUL) {
           depth = image_depth.img->To(ImageFormat::DEPTH_BGR)->ToMat();
-        } else if (params.depth_mode == DepthMode::DEPTH_GRAY) {
+      } else {
           depth = image_depth.img->ToMat();
-        } else if (params.depth_mode == DepthMode::DEPTH_RAW) {
-          depth = image_depth.img->To(ImageFormat::DEPTH_RAW)->ToMat();
-        }
+      }
       // std::cout << "A" << std::endl;
       // cv::cvtColor(depth, depth, cv::COLOR_BGR2GRAY);
 
@@ -264,13 +301,14 @@ int main(int argc, char const* argv[]) {
 
       if (params.depth_mode == DepthMode::DEPTH_RAW) {
         cv::imshow("depth", depth);
-
         depth_region.ShowElems<ushort>(depth, [](const ushort& elem) {
           return std::to_string(elem);
         }, 80, depth_info);
       } else if (params.depth_mode == DepthMode::DEPTH_GRAY) {
+        cv::Mat depth2(depth.size(), CV_16UC1);
         cv::cvtColor(depth, depth, CV_BGR2GRAY);
-        cv::imshow("depth", depth);
+        disp2Depth(depth, hd_intrinsics, hd_extrinsics, depth2);
+        cv::imshow("depth", depth2);
         depth_region.ShowElems<ushort>(depth2, [](const ushort& elem) {
           return std::to_string(elem);
         }, 80, depth_info);
