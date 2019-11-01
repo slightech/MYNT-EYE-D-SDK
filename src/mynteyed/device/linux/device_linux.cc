@@ -89,7 +89,7 @@ Image::pointer Device::GetImageDepth() {
 
   bool depth_raw;
   if (dtc_ == DEPTH_IMG_COLORFUL_TRANSFER ||
-      dtc_ == DEPTH_IMG_GRAY_TRANSFER) {
+      dtc_ == DEPTH_IMG_GRAY_TRANSFER || IsUSB2()) {
     depth_raw = false;
 
     if (depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS ||
