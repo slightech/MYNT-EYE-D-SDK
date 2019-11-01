@@ -378,7 +378,7 @@ bool Device::Open(const OpenParams& params) {
 
   if (params.framerate > 0) framerate_ = params.framerate;
   if (IsUSB2() && params.depth_mode == DepthMode::DEPTH_RAW) {
-    LOGE("USB 2.0 doesn't support depth_mode DEPTH_RAW");
+    LOGE("USB 2.0 only support params.depth_mode | DEPTH_GRAY | DEPTH_COLORFUL |, please adjust params");  // NOLINT
     return false;
   }
 #ifdef MYNTEYE_OS_LINUX

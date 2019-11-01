@@ -166,7 +166,7 @@ void disp2Depth(cv::Mat dispMap, const StreamIntrinsics &in_l,
       for (int j = 0; j < width; j++) {
         int id = i*width + j;
         int val = dispData[id];
-        if (val == 0 || val > 200) {
+        if (val == 0) {
           continue;
         }
         depthData[id] = static_cast<ushort>(fx *baseline / val);
