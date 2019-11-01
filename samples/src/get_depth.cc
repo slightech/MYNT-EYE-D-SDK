@@ -250,8 +250,10 @@ int main(int argc, char const* argv[]) {
       cv::Mat depth;
       if (params.depth_mode == DepthMode::DEPTH_COLORFUL) {
           depth = image_depth.img->To(ImageFormat::DEPTH_BGR)->ToMat();
-        } else {
+        } else if (params.depth_mode == DepthMode::DEPTH_GRAY) {
           depth = image_depth.img->ToMat();
+        } else if (params.depth_mode == DepthMode::DEPTH_RAW) {
+          depth = image_depth.img->To(ImageFormat::DEPTH_RAW)->ToMat();
         }
       // std::cout << "A" << std::endl;
       // cv::cvtColor(depth, depth, cv::COLOR_BGR2GRAY);
@@ -259,11 +261,20 @@ int main(int argc, char const* argv[]) {
       cv::setMouseCallback("depth", OnDepthMouseCallback, &depth_region);
       // Note: DrawRect will change some depth values to show the rect.
       depth_region.DrawRect(depth);
-      cv::imshow("depth", depth);
 
-      depth_region.ShowElems<ushort>(depth, [](const ushort& elem) {
-        return std::to_string(elem);
-      }, 80, depth_info);
+      if (params.depth_mode == DepthMode::DEPTH_RAW) {
+        cv::imshow("depth", depth);
+
+        depth_region.ShowElems<ushort>(depth, [](const ushort& elem) {
+          return std::to_string(elem);
+        }, 80, depth_info);
+      } else if (params.depth_mode == DepthMode::DEPTH_GRAY) {
+        cv::cvtColor(depth, depth, CV_BGR2GRAY);
+        cv::imshow("depth", depth);
+        depth_region.ShowElems<ushort>(depth2, [](const ushort& elem) {
+          return std::to_string(elem);
+        }, 80, depth_info);
+      }
     }
 
     char key = static_cast<char>(cv::waitKey(1));
