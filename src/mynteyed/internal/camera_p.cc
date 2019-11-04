@@ -196,10 +196,10 @@ StreamIntrinsics CameraPrivate::GetStreamIntrinsics(
   }
   in.right.width = calib->InImgWidth/2;
   in.right.height = calib->InImgHeight;
-  in.right.fx = calib->NewCamMat1[0];
-  in.right.fy = calib->NewCamMat1[5];
-  in.right.cx = calib->NewCamMat1[2];
-  in.right.cy = calib->NewCamMat1[6];
+  in.right.fx = calib->NewCamMat2[0];
+  in.right.fy = calib->NewCamMat2[5];
+  in.right.cx = calib->NewCamMat2[2];
+  in.right.cy = calib->NewCamMat2[6];
   for (int i = 0; i < 5; i++) {
     in.right.coeffs[i] = calib->CamDist2[i];
   }
