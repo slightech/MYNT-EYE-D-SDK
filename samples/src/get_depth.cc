@@ -310,6 +310,16 @@ int main(int argc, char const* argv[]) {
         }, 80, depth_info);
         depth_region.DrawRect(depth2);
         cv::imshow("depth", depth2);
+      } else if (params.depth_mode == DepthMode::DEPTH_COLORFUL) {
+        cv::Mat depth2 = cv::Mat::zeros(depth.size(), CV_16UC1);
+        cv::imshow("colorful_depth", depth);
+        cv::cvtColor(depth, depth, CV_BGR2GRAY);
+        disp2Depth(depth, hd_intrinsics, hd_extrinsics, depth2);
+        depth_region.ShowElems<ushort>(depth2, [](const ushort& elem) {
+          return std::to_string(elem);
+        }, 80, depth_info);
+        depth_region.DrawRect(depth2);
+        cv::imshow("depth", depth2);
       }
     }
 
