@@ -156,7 +156,7 @@ void disp2Depth(cv::Mat dispMap, const StreamIntrinsics &in_l,
                 const StreamExtrinsics &ex, cv::Mat depthMap) {
   float fx = in_l.left.fx;
   float baseline = fabs(ex.translation[0]);
-
+  float res = fx * baseline;
   if (dispMap.type() == CV_8UC1) {
     int height = dispMap.rows;
     int width = dispMap.cols;
@@ -169,7 +169,7 @@ void disp2Depth(cv::Mat dispMap, const StreamIntrinsics &in_l,
         if (val == 0) {
           continue;
         }
-        depthData[id] = static_cast<ushort>(fx *baseline / val);
+        depthData[id] = static_cast<ushort>(res / val);
       }
     }
   } else {
@@ -199,10 +199,10 @@ int main(int argc, char const* argv[]) {
     // params.color_mode = ColorMode::COLOR_RECTIFIED;
 
     // Depth mode: colorful(default), gray, raw
-    // Note: must set DEPTH_RAW to get raw depth values
-    params.depth_mode = DepthMode::DEPTH_RAW;          // USB2.0 Not Support
+    // raw: depth image (16bit)(Only USB3.0 Supports)
+    // gray: disparity image (8bit)
+    params.depth_mode = DepthMode::DEPTH_RAW;
     // params.depth_mode = DepthMode::DEPTH_GRAY;
-    // params.depth_mode = DepthMode::DEPTH_COLORFUL;
     // Stream mode: left color only
     // params.stream_mode = StreamMode::STREAM_640x480;  // vga
     params.stream_mode = StreamMode::STREAM_1280x720;  // hd
@@ -310,19 +310,8 @@ int main(int argc, char const* argv[]) {
         }, 80, depth_info);
         depth_region.DrawRect(depth2);
         cv::imshow("depth", depth2);
-      } else if (params.depth_mode == DepthMode::DEPTH_COLORFUL) {
-        cv::Mat depth2 = cv::Mat::zeros(depth.size(), CV_16UC1);
-        cv::imshow("colorful_depth", depth);
-        cv::cvtColor(depth, depth, CV_BGR2GRAY);
-        disp2Depth(depth, hd_intrinsics, hd_extrinsics, depth2);
-        depth_region.ShowElems<ushort>(depth2, [](const ushort& elem) {
-          return std::to_string(elem);
-        }, 80, depth_info);
-        depth_region.DrawRect(depth2);
-        cv::imshow("depth", depth2);
       }
     }
-
     char key = static_cast<char>(cv::waitKey(1));
     if (key == 27 || key == 'q' || key == 'Q') {  // ESC/Q
       break;
