@@ -467,8 +467,8 @@ void Device::ImgCallback(EtronDIImageType::Value imgType, int imgId,
           p->stream_depth_info_ptr_[p->depth_res_index_].nWidth);
       unsigned int depth_img_height = (unsigned int)(
           p->stream_depth_info_ptr_[p->depth_res_index_].nHeight);
-      if (depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS ||
-          depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS_RAW) {
+      if (p->depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS ||
+          p->depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS_RAW) {
         depth_img_width = depth_img_width * 2;
       }
       p->depth_image_buf_ = ImageDepth::Create(ImageFormat::DEPTH_RAW,
@@ -547,10 +547,10 @@ Image::pointer Device::GetImageDepth() {
         // return clone as it will be changed in imgcallback
         return depth_image_buf_->Clone();
       case DepthMode::DEPTH_GRAY: {
-        if (depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS ||
-            depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS_RAW) {
-          depth_img_width = depth_img_width * 2;
-        }
+        // if (depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS ||
+        //     depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS_RAW) {
+        //   depth_img_width = depth_img_width * 2;
+        // }
         static auto depth_gray_buf = ImageDepth::Create(
             ImageFormat::DEPTH_GRAY_24,
             depth_img_width, depth_img_height, true);
