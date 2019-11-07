@@ -427,7 +427,7 @@ bool Device::Open(const OpenParams& params) {
   LOGI("-- Framerate: %d", framerate_);
 
   EtronDI_SetDepthDataType(handle_, &dev_sel_info_, depth_data_type_);
-  LOGI("SetDepthDataType: %d", depth_data_type_);
+  DBG_LOGI("SetDepthDataType: %d", depth_data_type_);
 
   LOGI("-- Color Stream: %dx%d %s",
       stream_color_info_ptr_[color_res_index_].nWidth,

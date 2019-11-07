@@ -88,10 +88,6 @@ void Device::AdaptU2Raw(unsigned char *src, unsigned char *dst,
     depth[i] = ZD_table[src[i]];
     depth[i + 1] = depth[i];
   }
-  // for (int i = 0; i < width * height; i += 2) {
-  //   depth[i] = src[i / 2];
-  //   depth[i + 1] = depth[i];
-  // }
 }
 
 Image::pointer Device::GetImageDepth() {

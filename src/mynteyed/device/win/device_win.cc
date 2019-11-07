@@ -470,9 +470,12 @@ void Device::ImgCallback(EtronDIImageType::Value imgType, int imgId,
       if (p->depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS ||
           p->depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS_RAW) {
         depth_img_width = depth_img_width * 2;
-      }
-      p->depth_image_buf_ = ImageDepth::Create(ImageFormat::DEPTH_RAW,
+        p->depth_image_buf_ = ImageDepth::Create(ImageFormat::DEPTH_GRAY,
           depth_img_width, depth_img_height, true);
+      } else {
+        p->depth_image_buf_ = ImageDepth::Create(ImageFormat::DEPTH_RAW,
+            depth_img_width, depth_img_height, true);
+      }
     } else {
       p->depth_image_buf_->ResetBuffer();
     }
@@ -523,6 +526,15 @@ Image::pointer Device::GetImageColor() {
   return nullptr;
 }
 
+void Device::AdaptU2Raw(unsigned char *src, unsigned char *dst,
+    int width, int height) {
+  unsigned short * depth = (unsigned short *)dst;   // NOLINT
+  for (int i = 0; i < width * height; i += 2) {
+    depth[i] = ZD_table[src[i]];
+    depth[i + 1] = depth[i];
+  }
+}
+
 Image::pointer Device::GetImageDepth() {
   // LOGI("Get image depth");
   std::unique_lock<std::mutex> lock(depth_mtx_);
@@ -544,13 +556,20 @@ Image::pointer Device::GetImageDepth() {
 
     switch (depth_mode_) {
       case DepthMode::DEPTH_RAW:
-        // return clone as it will be changed in imgcallback
-        return depth_image_buf_->Clone();
+        if (depth_image_buf_->format() == ImageFormat::DEPTH_GRAY) {
+          static auto depth_raw_buf = ImageDepth::Create(
+              ImageFormat::DEPTH_RAW,
+              depth_img_width * 2, depth_img_height, true);
+          depth_raw_buf->ResetBuffer();
+          depth_raw_buf->set_frame_id(depth_image_buf_->frame_id());
+          AdaptU2Raw(depth_image_buf_->data(), depth_raw_buf->data(),
+              depth_img_width * 2, depth_img_height);
+          return depth_raw_buf;
+        } else {
+          // return clone as it will be changed in imgcallback
+          return depth_image_buf_->Clone();
+        }
       case DepthMode::DEPTH_GRAY: {
-        // if (depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS ||
-        //     depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS_RAW) {
-        //   depth_img_width = depth_img_width * 2;
-        // }
         static auto depth_gray_buf = ImageDepth::Create(
             ImageFormat::DEPTH_GRAY_24,
             depth_img_width, depth_img_height, true);
