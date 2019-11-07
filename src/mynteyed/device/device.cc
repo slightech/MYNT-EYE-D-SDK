@@ -286,6 +286,17 @@ bool Device::SetAutoWhiteBalanceEnabled(bool enabled) {
   return ok;
 }
 
+void Device::ComputeZDTable(StreamMode stream_mode) {
+  auto info = GetCameraCalibration(stream_mode);
+  float fx = info->CamMat1[0];
+  float baseline = -info->TranMat[0];
+  float res = fx * baseline;
+  // std::cout << "fx:" << fx << "  baseline: " << baseline << std::endl;
+  ZD_table[0] = 0;
+  for (int i = 1; i < 256; i++) {
+    ZD_table[i] = static_cast<std::uint16_t>(res / i);
+  }
+}
 void Device::SetInfraredDepthOnly(const OpenParams& params) {
   if (!params.ir_depth_only) {
     EtronDI_EnableInterleave(handle_, &dev_sel_info_, false);
@@ -437,27 +448,7 @@ bool Device::Open(const OpenParams& params) {
   ReleaseBuf();
 
   int ret = OpenDevice(params.dev_mode);
-    ZDTABLEINFO zdTableInfo;
-  unsigned char buf[512];
-  int nBufferLength = 512;
-  int nActualLength = 0;
-  ret = EtronDI_GetZDTable(handle_, &dev_sel_info_, buf,
-      nBufferLength, &nActualLength, &zdTableInfo);
-  if (ret != ETronDI_OK) {
-    LOGE("Get ZD table failed.");
-    return false;
-  }
-  for (int i = 0; i < 256; i++) {
-    int zdIndex;
-    int zValueSize = sizeof(std::uint16_t);
-    zdIndex = i * zValueSize;
-    ZD_table[i] = (buf[zdIndex] << 8) + buf[zdIndex+1];
-    if (zdIndex > 512 - zValueSize) {
-      zdIndex = 512 - zValueSize;
-    }
-    // std::cout << "disparity:" << i
-    //           << "-> depth(mm):"<< ZD_table[i] << std::endl;
-  }
+
   if (ETronDI_OK == ret) {
     is_device_opened_ = true;
     OnInitColorPalette(params.colour_depth_value);
@@ -465,6 +456,7 @@ bool Device::Open(const OpenParams& params) {
       // depth device must be opened.
       SyncCameraCalibrations();
     }
+    ComputeZDTable(params.stream_mode);
     return true;
   } else {
     is_device_opened_ = false;

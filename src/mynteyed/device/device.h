@@ -263,7 +263,8 @@ class Device {
   OpenParams open_params_;
 
   bool u2_dep_raw;
-  std::uint16_t ZD_table[512];
+  std::uint16_t ZD_table[256];
+  void ComputeZDTable(StreamMode stream_mode);
   void AdaptU2Raw(unsigned char *src, unsigned char *dst,
       int width, int height);
 
