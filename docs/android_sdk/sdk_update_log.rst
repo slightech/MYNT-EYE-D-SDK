@@ -1,13 +1,19 @@
 Update Log
 =======================
 
+v1.3.9 - 2019-11-07
+----------------------
+
+- Add local log file
+- Fix: no color data back within no preview mode
+
 v1.3.2 - 2019-10-11
 ----------------------
 
 - Supports D-1000 (imu, usb 2.0/3.0)
 - Improve pointcloud register
 - Support get right frame
-- add interface to get depth array converted from framedata
+- Add interface to get depth array converted from framedata
 - Improve preview frame
 - Fix some issue
 
