@@ -262,6 +262,11 @@ class Device {
 
   OpenParams open_params_;
 
+  bool u2_dep_raw;
+  std::uint16_t ZD_table[512];
+  void AdaptU2Raw(unsigned char *src, unsigned char *dst,
+      int width, int height);
+
   bool color_device_opened_;
   bool depth_device_opened_;
 

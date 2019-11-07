@@ -81,6 +81,19 @@ Image::pointer Device::GetImageColor() {
   return color_image_buf_;
 }
 
+void Device::AdaptU2Raw(unsigned char *src, unsigned char *dst,
+    int width, int height) {
+  unsigned short * depth = (unsigned short *)dst;   // NOLINT
+  for (int i = 0; i < width * height; i += 2) {
+    depth[i] = ZD_table[src[i]];
+    depth[i + 1] = depth[i];
+  }
+  // for (int i = 0; i < width * height; i += 2) {
+  //   depth[i] = src[i / 2];
+  //   depth[i + 1] = depth[i];
+  // }
+}
+
 Image::pointer Device::GetImageDepth() {
   unsigned int depth_img_width  = (unsigned int)(
       stream_depth_info_ptr_[depth_res_index_].nWidth);
@@ -88,18 +101,21 @@ Image::pointer Device::GetImageDepth() {
       stream_depth_info_ptr_[depth_res_index_].nHeight);
 
   bool depth_raw;
+  if (IsUSB2()) {
+      depth_img_width = depth_img_width * 2;
+  }
   if (dtc_ == DEPTH_IMG_COLORFUL_TRANSFER ||
       dtc_ == DEPTH_IMG_GRAY_TRANSFER) {
     depth_raw = false;
 
-    if (depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS ||
-        depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS_RAW) {
-      depth_img_width = depth_img_width * 2;
-    }
-
     if (!depth_image_buf_) {
-      depth_buf_ = (unsigned char*)calloc(
-          depth_img_width * depth_img_height * 2, sizeof(unsigned char));
+      if (!IsUSB2()) {
+        depth_buf_ = (unsigned char*)calloc(
+          depth_img_width * depth_img_height * 3, sizeof(unsigned char));
+      } else {
+        depth_buf_ = (unsigned char*)calloc(
+          depth_img_width / 2 * depth_img_height * 3, sizeof(unsigned char));
+      }
 
       if (dtc_ == DEPTH_IMG_COLORFUL_TRANSFER) {
         depth_image_buf_ = ImageDepth::Create(ImageFormat::DEPTH_RGB,
@@ -113,6 +129,10 @@ Image::pointer Device::GetImageDepth() {
     }
   } else {  // DEPTH_IMG_NON_TRANSFER
     depth_raw = true;
+    if (IsUSB2()) {
+      depth_buf_ = (unsigned char*)calloc(
+          depth_img_width * depth_img_height, sizeof(unsigned char));
+    }
     if (!depth_image_buf_) {
       depth_image_buf_ = ImageDepth::Create(ImageFormat::DEPTH_RAW,
           depth_img_width, depth_img_height, true);
@@ -122,7 +142,7 @@ Image::pointer Device::GetImageDepth() {
   }
 
   int ret = EtronDI_GetDepthImage(handle_, &dev_sel_info_,
-      depth_raw ? depth_image_buf_->data() : depth_buf_,
+      (depth_raw && !IsUSB2()) ? depth_image_buf_->data() : depth_buf_,
       &depth_image_size_, &depth_serial_number_, depth_data_type_);
 
   if (ETronDI_OK != ret) {
@@ -145,6 +165,10 @@ Image::pointer Device::GetImageDepth() {
   depth_image_buf_->set_frame_id(depth_serial_number_);
 
   if (depth_raw) {
+    if (IsUSB2()) {
+      AdaptU2Raw(depth_buf_, depth_image_buf_->data(),
+          depth_img_width, depth_img_height);
+    }
     return depth_image_buf_;
   } else {
     if (dtc_ == DEPTH_IMG_COLORFUL_TRANSFER) {

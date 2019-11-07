@@ -118,6 +118,7 @@ void Device::Init() {
   // default frame rate
   framerate_ = 10;
 
+  u2_dep_raw = false;
   color_device_opened_ = false;
   depth_device_opened_ = false;
   is_device_opened_ = false;
@@ -377,10 +378,10 @@ bool Device::Open(const OpenParams& params) {
   SetAutoWhiteBalanceEnabled(params.state_awb);
 
   if (params.framerate > 0) framerate_ = params.framerate;
-  if (IsUSB2() && params.depth_mode == DepthMode::DEPTH_RAW) {
-    LOGE("USB 2.0 only supports depth_mode DEPTH_GRAY | DEPTH_COLORFUL, please adjusts params.");  // NOLINT
-    return false;
-  }
+  // if (IsUSB2() && params.depth_mode == DepthMode::DEPTH_RAW) {
+  //   LOGE("USB 2.0 only supports depth_mode DEPTH_GRAY | DEPTH_COLORFUL, please adjusts params.");  // NOLINT
+  //   return false;
+  // }
 #ifdef MYNTEYE_OS_LINUX
   std::string dtc_name = "Unknown";
   switch (params.depth_mode) {
@@ -436,7 +437,27 @@ bool Device::Open(const OpenParams& params) {
   ReleaseBuf();
 
   int ret = OpenDevice(params.dev_mode);
-
+    ZDTABLEINFO zdTableInfo;
+  unsigned char buf[512];
+  int nBufferLength = 512;
+  int nActualLength = 0;
+  ret = EtronDI_GetZDTable(handle_, &dev_sel_info_, buf,
+      nBufferLength, &nActualLength, &zdTableInfo);
+  if (ret != ETronDI_OK) {
+    LOGE("Get ZD table failed.");
+    return false;
+  }
+  for (int i = 0; i < 256; i++) {
+    int zdIndex;
+    int zValueSize = sizeof(std::uint16_t);
+    zdIndex = i * zValueSize;
+    ZD_table[i] = (buf[zdIndex] << 8) + buf[zdIndex+1];
+    if (zdIndex > 512 - zValueSize) {
+      zdIndex = 512 - zValueSize;
+    }
+    // std::cout << "disparity:" << i
+    //           << "-> depth(mm):"<< ZD_table[i] << std::endl;
+  }
   if (ETronDI_OK == ret) {
     is_device_opened_ = true;
     OnInitColorPalette(params.colour_depth_value);
