@@ -1,4 +1,4 @@
-#include "writer/device_writer.h"
+#include "device_writer.h"
 
 MYNTEYE_USE_NAMESPACE
 

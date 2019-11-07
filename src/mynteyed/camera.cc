@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+#include <iomanip>
 #include "mynteyed/camera.h"
 
 #include "mynteyed/internal/camera_p.h"
@@ -318,4 +319,78 @@ bool Camera::HidFirmwareUpdate(const char* filepath) {
 
 void Camera::ControlReconnectStatus(const bool &status) {
   p_->ControlReconnectStatus(status);
+}
+
+StreamRequest Camera::SelectStreamRequest(bool *ok) const {
+  DeviceInfo dev_info;
+  const Camera &cam = *this;
+  StreamRequest params;
+// select
+  std::cout << std::endl;
+  std::string dashes(80, '-');
+
+  std::vector<DeviceInfo> dev_infos = this->GetDeviceInfos();
+  size_t n = dev_infos.size();
+  if (n <= 0) {
+    std::cerr << "Error: Device not found" << std::endl;
+    *ok = false;
+    return params;
+  }
+
+  std::cout << dashes << std::endl;
+  std::cout << "Index | Device Information" << std::endl;
+  std::cout << dashes << std::endl;
+  for (auto &&info : dev_infos) {
+    std::cout << std::setw(5) << info.index << " | " << info << std::endl;
+  }
+  std::cout << dashes << std::endl;
+
+  if (n == 1) {
+    dev_info = dev_infos[0];
+    std::cout << "Auto select a device to open, index: 0" << std::endl;
+  } else {
+    size_t i;
+    std::cout << "Please select a device to open, index: ";
+    std::cin >> i;
+    std::cout << std::endl;
+    if (i < 0 || i >= n) {
+      std::cerr << "Error: Index out of range" << std::endl;
+      *ok = false;
+      return params;
+    }
+    dev_info = dev_infos[i];
+  }
+
+  uint32_t dev_index = dev_info.index;
+// print
+
+  std::vector<StreamInfo> color_infos;
+  std::vector<StreamInfo> depth_infos;
+  cam.GetStreamInfos(dev_index, &color_infos, &depth_infos);
+
+  std::cout << dashes << std::endl;
+  std::cout << "Index | Color Stream Information" << std::endl;
+  std::cout << dashes << std::endl;
+  for (auto &&info : color_infos) {
+    std::cout << std::setw(5) << info.index << " | " << info << std::endl;
+  }
+
+  std::cout << dashes << std::endl;
+  std::cout << "Index | Depth Stream Information" << std::endl;
+  std::cout << dashes << std::endl;
+  for (auto &&info : depth_infos) {
+    std::cout << std::setw(5) << info.index << " | " << info << std::endl;
+  }
+  std::cout << dashes << std::endl;
+
+  std::cout << "Open device: " << dev_info.index << ", "
+            << dev_info.name << std::endl
+            << std::endl;
+
+  params.framerate = 10;
+  params.depth_mode = DepthMode::DEPTH_RAW;
+  params.stream_mode = StreamMode::STREAM_1280x720;
+  params.ir_intensity = 4;
+  *ok = true;
+  return params;
 }

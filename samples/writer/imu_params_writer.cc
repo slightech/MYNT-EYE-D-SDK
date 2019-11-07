@@ -1,4 +1,4 @@
-#include "writer/device_writer.h"
+#include "device_writer.h"
 
 MYNTEYE_USE_NAMESPACE
 
@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
   auto &&device = std::make_shared<Camera>();
 
   tools::DeviceWriter writer(device);
-  writer.WriteDescriptors(filepath);
+  writer.WriteImuParams(filepath);
 
   return 0;
 }

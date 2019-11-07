@@ -65,6 +65,8 @@ class MYNTEYE_API Channels {
     FRAME,
     DISTANCE,
     LOCATION,
+    TEMPERATURE,
+    ACCEL_AND_GYRO = 9
   } data_id_t;
 
   using device_desc_t = device::Descriptors;
@@ -95,7 +97,7 @@ class MYNTEYE_API Channels {
   bool IsHidOpened() const;
   bool IsHidTracking() const;
 
-  bool StartHidTracking();
+  bool StartHidTracking(device_desc_t *desc);
   bool StopHidTracking();
 
   bool GetFiles(device_desc_t *desc,
@@ -121,8 +123,8 @@ class MYNTEYE_API Channels {
   void DetectHid();
 
  private:
-  bool DoHidTrack();
-  bool DoHidDataExtract(imu_packets_t &imu, img_packets_t &img,
+  bool DoHidTrack(device_desc_t *desc);
+  bool DoHidDataExtract(device_desc_t *desc, imu_packets_t &imu, img_packets_t &img,
       gps_packets_t &gps, dis_packets_t &dis);  // NOLINT
 
   bool PullFileData(bool device_info,

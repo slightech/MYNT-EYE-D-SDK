@@ -20,7 +20,7 @@
 #include "mynteyed/utils.h"
 #include "mynteyed/util/times.h"
 
-#include "dataset/dataset.h"
+#include "dataset.h"
 
 MYNTEYE_USE_NAMESPACE
 

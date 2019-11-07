@@ -85,6 +85,15 @@ set(MYNTEYE_DLL_SEARCH_PATHS
   ${OpenCV_LIB_SEARCH_PATH}
 )
 
+make_executable(check_frame_rate
+  SRCS
+    src/check_frame_rate.cc
+    src/util/cam_utils.cc
+    src/util/cv_painter.cc
+  LINK_LIBS mynteye_depth ${OpenCV_LIBS}
+  DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
+)
+
 make_executable(get_image
   SRCS
     src/get_image.cc
@@ -124,6 +133,15 @@ make_executable(get_depth_with_filter
 make_executable(get_imu
   SRCS
     src/get_imu.cc
+    src/util/cam_utils.cc
+    src/util/cv_painter.cc
+  LINK_LIBS mynteye_depth ${OpenCV_LIBS}
+  DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
+)
+
+make_executable(get_from_callbacks_api
+  SRCS
+    src/get_from_callbacks_api.cc
     src/util/cam_utils.cc
     src/util/cv_painter.cc
   LINK_LIBS mynteye_depth ${OpenCV_LIBS}
@@ -241,3 +259,27 @@ if(PCL_FOUND)
     DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
   )
 endif()
+
+# targets
+
+set(OUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/_output")
+
+include_directories(
+  ${OpenCV_INCLUDE_DIRS}
+  ${CMAKE_CURRENT_LIST_DIR}
+)
+
+set(MYNTEYE_DLL_SEARCH_PATHS
+  ${PRO_DIR}/_install/bin
+  ${PRO_DIR}/_install/bin/3rdparty
+  ${OpenCV_LIB_SEARCH_PATH}
+)
+
+
+# record
+
+add_subdirectory(dataset)
+
+# writer
+
+add_subdirectory(writer)

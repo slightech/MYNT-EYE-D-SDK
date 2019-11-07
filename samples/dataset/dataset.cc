@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#include "dataset/dataset.h"
+#include "dataset.h"
 #include "mynteyed/util/files.h"
 
 #ifdef WITH_OPENCV2
@@ -83,7 +83,7 @@ void Dataset::SaveStreamData(const ImageType &type,
     ++count;
     std::stringstream ss;
     ss << writer->outdir << MYNTEYE_OS_SEP << std::dec
-       << std::setw(IMAGE_FILENAME_WIDTH) << std::setfill('0') << count << ".png";
+       << std::setw(IMAGE_FILENAME_WIDTH) << std::setfill('0') << seq << ".png";
     cv::imwrite(ss.str(), data.img->To(ImageFormat::COLOR_BGR)->ToMat());
   }
 }

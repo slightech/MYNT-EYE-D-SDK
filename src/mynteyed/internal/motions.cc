@@ -104,27 +104,14 @@ void Motions::SetMotionCallback(motion_callback_t callback) {
 void Motions::OnImuDataCallback(const ImuDataPacket& packet) {
   auto &&imu = std::make_shared<ImuData>();
   imu->flag = packet.flag;
-  imu->temperature = static_cast<double>(packet.temperature * 0.125 + 23);
+  imu->temperature = packet.temperature;
   imu->timestamp = packet.timestamp;
-
-  if (imu->flag == MYNTEYE_IMU_ACCEL) {
-    imu->accel[0] = packet.accel_or_gyro[0] * 12.f / 0x10000;
-    imu->accel[1] = packet.accel_or_gyro[1] * 12.f / 0x10000;
-    imu->accel[2] = packet.accel_or_gyro[2] * 12.f / 0x10000;
-    imu->gyro[0] = 0;
-    imu->gyro[1] = 0;
-    imu->gyro[2] = 0;
-  } else if (imu->flag == MYNTEYE_IMU_GYRO) {
-    imu->accel[0] = 0;
-    imu->accel[1] = 0;
-    imu->accel[2] = 0;
-    imu->gyro[0] = packet.accel_or_gyro[0] * 2000.f / 0x10000;
-    imu->gyro[1] = packet.accel_or_gyro[1] * 2000.f / 0x10000;
-    imu->gyro[2] = packet.accel_or_gyro[2] * 2000.f / 0x10000;
-  } else {
-    LOGW("Unaccpected imu, flag=%d is wrong", imu->flag);
-    return;
-  }
+  imu->accel[0] = packet.accel[0];
+  imu->accel[1] = packet.accel[1];
+  imu->accel[2] = packet.accel[2];
+  imu->gyro[0] = packet.gyro[0];
+  imu->gyro[1] = packet.gyro[1];
+  imu->gyro[2] = packet.gyro[2];
 
   if (motion_count_ < 20) {
     ++motion_count_;

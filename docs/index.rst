@@ -12,12 +12,14 @@ MYNT® EYE D SDK
 
    product/contents
    sdk/contents
+   android_sdk/contents
    firmware/contents
    tools/contents
    openproject/contents
    apidoc/contents
+   android_api/contents
    support/contents
-
+   
 ..
   Indices and tables
   ==================

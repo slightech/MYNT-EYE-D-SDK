@@ -25,149 +25,138 @@
 
 MYNTEYE_USE_NAMESPACE
 
-int main(int argc, char const* argv[]) {
-  Camera cam;
-  DeviceInfo dev_info;
-  if (!util::select(cam, &dev_info)) {
-    return 1;
-  }
-  util::print_stream_infos(cam, dev_info.index);
+int main(int argc, char const *argv[]) {
+  auto api = API::Create();
+  bool ok;
+  auto &&request = api->SelectStreamRequest(&ok);
 
-  std::cout << "Open device: " << dev_info.index << ", "
-      << dev_info.name << std::endl << std::endl;
-
-  OpenParams params(dev_info.index);
   {
     // Framerate: 10(default), [0,60], [0,30](STREAM_2560x720)
-    params.framerate = 30;
+    request.framerate = 30;
 
     // Device mode, default DEVICE_ALL
     //   DEVICE_COLOR: IMAGE_LEFT_COLOR ✓ IMAGE_RIGHT_COLOR ? IMAGE_DEPTH x
     //   DEVICE_DEPTH: IMAGE_LEFT_COLOR x IMAGE_RIGHT_COLOR x IMAGE_DEPTH ✓
     //   DEVICE_ALL:   IMAGE_LEFT_COLOR ✓ IMAGE_RIGHT_COLOR ? IMAGE_DEPTH ✓
     // Note: ✓: available, x: unavailable, ?: depends on #stream_mode
-    // params.dev_mode = DeviceMode::DEVICE_ALL;
-
     // Color mode: raw(default), rectified
-    // params.color_mode = ColorMode::COLOR_RECTIFIED;
+    // request.color_mode = ColorMode::COLOR_RECTIFIED;
 
     // Depth mode: colorful(default), gray, raw
-    // params.depth_mode = DepthMode::DEPTH_GRAY;
+    // request.depth_mode = DepthMode::DEPTH_GRAY;
 
     // Stream mode: left color only
-    // params.stream_mode = StreamMode::STREAM_640x480;  // vga
-    // params.stream_mode = StreamMode::STREAM_1280x720;  // hd
+    // request.stream_mode = StreamMode::STREAM_640x480;  // vga
+    // request.stream_mode = StreamMode::STREAM_1280x720;  // hd
     // Stream mode: left+right color
-    // params.stream_mode = StreamMode::STREAM_1280x480;  // vga
-    params.stream_mode = StreamMode::STREAM_2560x720;  // hd
-
+    // request.stream_mode = StreamMode::STREAM_1280x480;  // vga
+    request.stream_mode = StreamMode::STREAM_2560x720;
     // Auto-exposure: true(default), false
-    // params.state_ae = false;
+    // request.state_ae = false;
 
     // Auto-white balance: true(default), false
-    // params.state_awb = false;
+    // request.state_awb = false;
 
     // Infrared intensity: 0(default), [0,10]
-    params.ir_intensity = 4;
   }
 
-  // Enable what process logics
-  // cam.EnableProcessMode(ProcessMode::PROC_IMU_ALL);
-
   // Enable image infos
-  cam.EnableImageInfo(false);
-
+  api->EnableImageInfo(false);
   // Enable motion datas
-  cam.EnableMotionDatas(0);
+  api->EnableMotionDatas(0);
 
   // Callbacks
   std::mutex mutex;
   {
     // Set image info callback
-    cam.SetImgInfoCallback([&mutex](const std::shared_ptr<ImgInfo>& info) {
+    api->SetImgInfoCallback([&mutex](const std::shared_ptr<ImgInfo> &info) {
       std::lock_guard<std::mutex> _(mutex);
       std::cout << "  [img_info] fid: " << info->frame_id
-          << ", stamp: " << info->timestamp
-          << ", expos: " << info->exposure_time << std::endl
-          << std::flush;
+                << ", stamp: " << info->timestamp
+                << ", expos: " << info->exposure_time << std::endl
+                << std::flush;
     });
 
-    std::vector<ImageType> types {
-      ImageType::IMAGE_LEFT_COLOR,
-      ImageType::IMAGE_RIGHT_COLOR,
-      ImageType::IMAGE_DEPTH,
+    std::vector<Stream> types {
+        Stream::IMAGE_LEFT_COLOR,
+        Stream::IMAGE_RIGHT_COLOR,
+        Stream::IMAGE_DEPTH,
     };
-    for (auto&& type : types) {
+    for (auto &&type : types) {
       // Set stream data callback
-      cam.SetStreamCallback(type, [&mutex](const StreamData& data) {
+      api->SetStreamCallback(type, [&mutex](const StreamData &data) {
         std::lock_guard<std::mutex> _(mutex);
         std::cout << "  [" << data.img->type() << "] fid: "
-            << data.img->frame_id() << std::endl
-            << std::flush;
+                  << data.img->frame_id() << std::endl
+                  << std::flush;
       });
     }
 
     // Set motion data callback
-    cam.SetMotionCallback([&mutex](const MotionData& data) {
+    api->SetMotionCallback([&mutex](const MotionData &data) {
       std::lock_guard<std::mutex> _(mutex);
       if (data.imu->flag == MYNTEYE_IMU_ACCEL) {
         std::cout << "[accel] stamp: " << data.imu->timestamp
-          << ", x: " << data.imu->accel[0]
-          << ", y: " << data.imu->accel[1]
-          << ", z: " << data.imu->accel[2]
-          << ", temp: " << data.imu->temperature
-          << std::endl;
+                  << ", x: " << data.imu->accel[0]
+                  << ", y: " << data.imu->accel[1]
+                  << ", z: " << data.imu->accel[2]
+                  << ", temp: " << data.imu->temperature
+                  << std::endl;
       } else if (data.imu->flag == MYNTEYE_IMU_GYRO) {
         std::cout << "[gyro] stamp: " << data.imu->timestamp
-          << ", x: " << data.imu->gyro[0]
-          << ", y: " << data.imu->gyro[1]
-          << ", z: " << data.imu->gyro[2]
-          << ", temp: " << data.imu->temperature
-          << std::endl;
+                  << ", x: " << data.imu->gyro[0]
+                  << ", y: " << data.imu->gyro[1]
+                  << ", z: " << data.imu->gyro[2]
+                  << ", temp: " << data.imu->temperature
+                  << std::endl;
       }
       std::cout << std::flush;
     });
   }
 
-  cam.Open(params);
+  api->ConfigStreamRequest(request);
 
   std::cout << std::endl;
-  if (!cam.IsOpened()) {
+  if (!api->IsOpened()) {
     std::cerr << "Error: Open camera failed" << std::endl;
     return 1;
   }
-  std::cout << "Open device success" << std::endl << std::endl;
+  std::cout << "Open device success" << std::endl
+            << std::endl;
 
   std::cout << "Press ESC/Q on Windows to terminate" << std::endl;
 
-  bool is_left_ok = cam.IsStreamDataEnabled(ImageType::IMAGE_LEFT_COLOR);
-  bool is_right_ok = cam.IsStreamDataEnabled(ImageType::IMAGE_RIGHT_COLOR);
-  bool is_depth_ok = cam.IsStreamDataEnabled(ImageType::IMAGE_DEPTH);
+  bool is_left_ok = api->Supports(Stream::IMAGE_LEFT_COLOR);
+  bool is_right_ok = api->Supports(Stream::IMAGE_RIGHT_COLOR);
+  bool is_depth_ok = api->Supports(Stream::IMAGE_DEPTH);
 
-  if (is_left_ok) cv::namedWindow("left color");
-  if (is_right_ok) cv::namedWindow("right color");
-  if (is_depth_ok) cv::namedWindow("depth");
+  if (is_left_ok)
+    cv::namedWindow("left color");
+  if (is_right_ok)
+    cv::namedWindow("right color");
+  if (is_depth_ok)
+    cv::namedWindow("depth");
 
   CVPainter painter;
   util::Counter counter;
   for (;;) {
-    cam.WaitForStream();
+    api->WaitForStreams();
     counter.Update();
 
     if (is_left_ok) {
-      auto left_color = cam.GetStreamData(ImageType::IMAGE_LEFT_COLOR);
+      auto left_color = api->GetStreamData(Stream::IMAGE_LEFT_COLOR);
       if (left_color.img) {
         cv::Mat left = left_color.img->To(ImageFormat::COLOR_BGR)->ToMat();
         painter.DrawSize(left, CVPainter::TOP_LEFT);
         painter.DrawStreamData(left, left_color, CVPainter::TOP_RIGHT);
         painter.DrawInformation(left, util::to_string(counter.fps()),
-            CVPainter::BOTTOM_RIGHT);
+                                CVPainter::BOTTOM_RIGHT);
         cv::imshow("left color", left);
       }
     }
 
     if (is_right_ok) {
-      auto right_color = cam.GetStreamData(ImageType::IMAGE_RIGHT_COLOR);
+      auto right_color = api->GetStreamData(Stream::IMAGE_RIGHT_COLOR);
       if (right_color.img) {
         cv::Mat right = right_color.img->To(ImageFormat::COLOR_BGR)->ToMat();
         painter.DrawSize(right, CVPainter::TOP_LEFT);
@@ -177,10 +166,10 @@ int main(int argc, char const* argv[]) {
     }
 
     if (is_depth_ok) {
-      auto image_depth = cam.GetStreamData(ImageType::IMAGE_DEPTH);
+      auto image_depth = api->GetStreamData(Stream::IMAGE_DEPTH);
       if (image_depth.img) {
         cv::Mat depth;
-        if (params.depth_mode == DepthMode::DEPTH_COLORFUL) {
+        if (request.depth_mode == DepthMode::DEPTH_COLORFUL) {
           depth = image_depth.img->To(ImageFormat::DEPTH_BGR)->ToMat();
         } else {
           depth = image_depth.img->ToMat();
@@ -197,7 +186,7 @@ int main(int argc, char const* argv[]) {
     }
   }
 
-  cam.Close();
+  api->Close();
 
   return 0;
 }
