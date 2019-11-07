@@ -91,7 +91,7 @@ class DepthRegion {
 
         str = elem2string(depth.at<T>(y, x));
 
-        cv::Scalar color(0, 0, 0);
+        cv::Scalar color(0,0,0);
         if (i == 0 && j == 0) color = cv::Scalar(0, 0, 255);
 
         cv::Size sz = cv::getTextSize(str,
@@ -147,37 +147,9 @@ void OnDepthMouseCallback(int event, int x, int y, int flags, void* userdata) {
 
 }  // namespace
 
-
 using namespace std;
 
 MYNTEYE_USE_NAMESPACE
-
-void disp2Depth(cv::Mat dispMap, const StreamIntrinsics &in_l,
-                const StreamExtrinsics &ex, cv::Mat depthMap) {
-  float fx = in_l.left.fx;
-  float baseline = fabs(ex.translation[0]);
-  float res = fx * baseline;
-  if (dispMap.type() == CV_8UC1) {
-    int height = dispMap.rows;
-    int width = dispMap.cols;
-    uchar* dispData = reinterpret_cast<uchar *>(dispMap.data);
-    ushort* depthData = reinterpret_cast<ushort*>(depthMap.data);
-    for (int i = 0; i < height; i++) {
-      for (int j = 0; j < width; j++) {
-        int id = i*width + j;
-        int val = dispData[id];
-        if (val == 0) {
-          continue;
-        }
-        depthData[id] = static_cast<ushort>(res / val);
-      }
-    }
-  } else {
-    cout << "wrong type" << std::endl;
-  }
-}
-
-
 
 int main(int argc, char const* argv[]) {
   Camera cam;
@@ -199,10 +171,9 @@ int main(int argc, char const* argv[]) {
     // params.color_mode = ColorMode::COLOR_RECTIFIED;
 
     // Depth mode: colorful(default), gray, raw
-    // raw: depth image (16bit)(Only USB3.0 Supports)
-    // gray: disparity image (8bit)
+    // Note: must set DEPTH_RAW to get raw depth values
     params.depth_mode = DepthMode::DEPTH_RAW;
-    // params.depth_mode = DepthMode::DEPTH_GRAY;
+
     // Stream mode: left color only
     // params.stream_mode = StreamMode::STREAM_640x480;  // vga
     params.stream_mode = StreamMode::STREAM_1280x720;  // hd
@@ -222,13 +193,6 @@ int main(int argc, char const* argv[]) {
 
   cam.Open(params);
 
-  bool ok;
-  auto hd_intrinsics = cam.GetStreamIntrinsics(params.stream_mode, &ok);
-  auto hd_extrinsics = cam.GetStreamExtrinsics(params.stream_mode, &ok);
-  if (!ok) {
-    cerr << "Error: Get intrinsics or extrinsics failed" << endl;
-    return 0;
-  }
   cout << endl;
   if (!cam.IsOpened()) {
     cerr << "Error: Open camera failed" << endl;
@@ -283,35 +247,18 @@ int main(int argc, char const* argv[]) {
 
     auto image_depth = cam.GetStreamData(ImageType::IMAGE_DEPTH);
     if (image_depth.img) {
-      cv::Mat depth;
-      if (params.depth_mode == DepthMode::DEPTH_COLORFUL) {
-          depth = image_depth.img->To(ImageFormat::DEPTH_BGR)->ToMat();
-      } else {
-          depth = image_depth.img->ToMat();
-      }
-      // std::cout << "A" << std::endl;
-      // cv::cvtColor(depth, depth, cv::COLOR_BGR2GRAY);
+      cv::Mat depth = image_depth.img->To(ImageFormat::DEPTH_RAW)->ToMat();
 
       cv::setMouseCallback("depth", OnDepthMouseCallback, &depth_region);
       // Note: DrawRect will change some depth values to show the rect.
-      if (params.depth_mode == DepthMode::DEPTH_RAW) {
-        depth_region.ShowElems<ushort>(depth, [](const ushort& elem) {
-          return std::to_string(elem);
-        }, 80, depth_info);
-        depth_region.DrawRect(depth);
-        cv::imshow("depth", depth);
-      } else if (params.depth_mode == DepthMode::DEPTH_GRAY) {
-        cv::Mat depth2 = cv::Mat::zeros(depth.size(), CV_16UC1);
-        cv::cvtColor(depth, depth, CV_BGR2GRAY);
-        disp2Depth(depth, hd_intrinsics, hd_extrinsics, depth2);
-        cv::imshow("disp", depth);
-        depth_region.ShowElems<ushort>(depth2, [](const ushort& elem) {
-          return std::to_string(elem);
-        }, 80, depth_info);
-        depth_region.DrawRect(depth2);
-        cv::imshow("depth", depth2);
-      }
+      depth_region.DrawRect(depth);
+      cv::imshow("depth", depth);
+
+      depth_region.ShowElems<ushort>(depth, [](const ushort& elem) {
+        return std::to_string(elem);
+      }, 80, depth_info);
     }
+
     char key = static_cast<char>(cv::waitKey(1));
     if (key == 27 || key == 'q' || key == 'Q') {  // ESC/Q
       break;
