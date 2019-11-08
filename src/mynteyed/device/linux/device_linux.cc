@@ -105,14 +105,8 @@ Image::pointer Device::GetImageDepth() {
     depth_raw = false;
 
     if (!depth_image_buf_) {
-      if (!IsUSB2()) {
-        depth_buf_ = (unsigned char*)calloc(
-          depth_img_width * depth_img_height * 3, sizeof(unsigned char));
-      } else {
-        depth_buf_ = (unsigned char*)calloc(
-          depth_img_width / 2 * depth_img_height * 3, sizeof(unsigned char));
-      }
-
+      depth_buf_ = (unsigned char*)calloc(
+          depth_img_width * depth_img_height * 2, sizeof(unsigned char));
       if (dtc_ == DEPTH_IMG_COLORFUL_TRANSFER) {
         depth_image_buf_ = ImageDepth::Create(ImageFormat::DEPTH_RGB,
             depth_img_width, depth_img_height, true);
