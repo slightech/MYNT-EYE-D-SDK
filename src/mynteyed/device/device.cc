@@ -957,10 +957,6 @@ void Device::SyncCameraCalibrations() {
 void Device::ReleaseBuf() {
   color_image_buf_ = nullptr;
   depth_image_buf_ = nullptr;
-  if (!depth_buf_) {
-    delete depth_buf_;
-    depth_buf_ = nullptr;
-  }
 }
 
 void Device::CompatibleUSB2(const OpenParams& params) {

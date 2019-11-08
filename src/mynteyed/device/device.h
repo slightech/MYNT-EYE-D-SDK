@@ -229,7 +229,6 @@ class Device {
   image_size_t depth_image_size_ = 0;
   Image::pointer color_image_buf_ = nullptr;
   Image::pointer depth_image_buf_ = nullptr;
-  unsigned char* depth_buf_ = nullptr;
 
 #ifdef MYNTEYE_OS_WIN
   bool is_color_ok_;

@@ -95,43 +95,20 @@ Image::pointer Device::GetImageDepth() {
   unsigned int depth_img_height = (unsigned int)(
       stream_depth_info_ptr_[depth_res_index_].nHeight);
 
-  bool depth_raw;
-  if (IsUSB2()) {
-      depth_img_width = depth_img_width * 2;
-  }
-  if (depth_mode_ == DepthMode::DEPTH_COLORFUL ||
-      depth_mode_ == DepthMode::DEPTH_GRAY) {
-    depth_raw = false;
+  bool is_8bits = depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS
+      || depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS_RAW;
 
-    if (!depth_image_buf_) {
-      depth_buf_ = (unsigned char*)calloc(
-          depth_img_width * depth_img_height * 2, sizeof(unsigned char));
-      if (depth_mode_ == DepthMode::DEPTH_COLORFUL) {
-        depth_image_buf_ = ImageDepth::Create(ImageFormat::DEPTH_RGB,
-            depth_img_width, depth_img_height, true);
-      } else {  // DEPTH_GRAY
-        depth_image_buf_ = ImageDepth::Create(ImageFormat::DEPTH_GRAY_24,
-            depth_img_width, depth_img_height, true);
-      }
-    } else {
-      depth_image_buf_->ResetBuffer();
-    }
-  } else {  // DEPTH_RAW
-    depth_raw = true;
-    if (IsUSB2()) {
-      depth_buf_ = (unsigned char*)calloc(
-          depth_img_width * depth_img_height, sizeof(unsigned char));
-    }
-    if (!depth_image_buf_) {
-      depth_image_buf_ = ImageDepth::Create(ImageFormat::DEPTH_RAW,
-          depth_img_width, depth_img_height, true);
-    } else {
-      depth_image_buf_->ResetBuffer();
-    }
+  // create depth raw buffer
+  if (!depth_image_buf_) {
+    depth_image_buf_ = ImageDepth::Create(ImageFormat::DEPTH_RAW,
+        depth_img_width, depth_img_height, true);
+  } else {
+    depth_image_buf_->ResetBuffer();
   }
 
+  // get depth buffer
   int ret = EtronDI_GetDepthImage(handle_, &dev_sel_info_,
-      (depth_raw && !IsUSB2()) ? depth_image_buf_->data() : depth_buf_,
+      depth_image_buf_->data(),
       &depth_image_size_, &depth_serial_number_, depth_data_type_);
 
   if (ETronDI_OK != ret) {
@@ -153,49 +130,52 @@ Image::pointer Device::GetImageDepth() {
 
   depth_image_buf_->set_frame_id(depth_serial_number_);
 
-  if (depth_raw) {
-    if (IsUSB2()) {
-      AdaptU2Raw(depth_buf_, depth_image_buf_->data(),
+  if (is_8bits) {  // 8bits, usb2 (depth width is half, wanted need x2)
+    depth_img_width = depth_img_width * 2;
+  }
+  if (depth_mode_ == DepthMode::DEPTH_RAW) {
+    if (is_8bits) {  // 8bits, usb2
+      static auto depth_raw_buf = ImageDepth::Create(ImageFormat::DEPTH_RAW,
+          depth_img_width, depth_img_height, true);
+      depth_raw_buf->ResetBuffer();
+      depth_raw_buf->set_frame_id(depth_image_buf_->frame_id());
+      AdaptU2Raw(depth_image_buf_->data(), depth_raw_buf->data(),
+          depth_img_width, depth_img_height);
+      return depth_raw_buf;
+    } else {  // 14bits, usb3
+      return depth_image_buf_;
+    }
+  } else if (depth_mode_ == DepthMode::DEPTH_COLORFUL) {
+    static auto depth_rgb_buf = ImageDepth::Create(ImageFormat::DEPTH_RGB,
+        depth_img_width, depth_img_height, true);
+    depth_rgb_buf->ResetBuffer();
+    depth_rgb_buf->set_frame_id(depth_image_buf_->frame_id());
+    if (is_8bits) {  // 8bits, usb2
+      ColorPaletteGenerator::UpdateD8bitsDisplayImage_DIB24(
+          m_ColorPalette, depth_image_buf_->data(), depth_rgb_buf->data(),
+          depth_img_width, depth_img_height);
+    } else {  // 14bits, usb3
+      ColorPaletteGenerator::UpdateZ14DisplayImage_DIB24(
+          m_ColorPaletteZ14, depth_image_buf_->data(), depth_rgb_buf->data(),
           depth_img_width, depth_img_height);
     }
-    return depth_image_buf_;
-  } else {
-    if (depth_mode_ == DepthMode::DEPTH_COLORFUL) {
-      if (depth_data_type_ == ETronDI_DEPTH_DATA_14_BITS ||
-          depth_data_type_ == ETronDI_DEPTH_DATA_14_BITS_RAW) {
-        ColorPaletteGenerator::UpdateZ14DisplayImage_DIB24(
-            m_ColorPaletteZ14, depth_buf_, depth_image_buf_->data(),
-            depth_img_width, depth_img_height);
-      } else if (depth_data_type_ == ETronDI_DEPTH_DATA_11_BITS ||
-                 depth_data_type_ == ETronDI_DEPTH_DATA_11_BITS_RAW) {
-        ColorPaletteGenerator::UpdateD11DisplayImage_DIB24(
-            m_ColorPaletteD11, depth_buf_, depth_image_buf_->data(),
-            depth_img_width, depth_img_height);
-      } else if (depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS ||
-          depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS_RAW) {
-        ColorPaletteGenerator::UpdateD8bitsDisplayImage_DIB24(
-            m_ColorPalette, depth_buf_, depth_image_buf_->data(),
-            depth_img_width, depth_img_height);
-      }
-    } else {  // DEPTH_GRAY
-      if (depth_data_type_ == ETronDI_DEPTH_DATA_14_BITS ||
-          depth_data_type_ == ETronDI_DEPTH_DATA_14_BITS_RAW) {
-        ColorPaletteGenerator::UpdateZ14DisplayImage_DIB24(
-            m_GrayPaletteZ14, depth_buf_, depth_image_buf_->data(),
-            depth_img_width, depth_img_height);
-      } else if (depth_data_type_ == ETronDI_DEPTH_DATA_11_BITS ||
-                 depth_data_type_ == ETronDI_DEPTH_DATA_11_BITS_RAW) {
-        ColorPaletteGenerator::UpdateD11DisplayImage_DIB24(
-            m_GrayPaletteD11, depth_buf_, depth_image_buf_->data(),
-            depth_img_width, depth_img_height);
-      } else if (depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS ||
-                depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS_RAW) {
-        ColorPaletteGenerator::UpdateD8bitsDisplayImage_DIB24(
-            m_GrayPalette, depth_buf_, depth_image_buf_->data(),
-            depth_img_width, depth_img_height);
-      }
+    return depth_rgb_buf;
+  } else {  // DEPTH_GRAY
+    static auto depth_gray_buf = ImageDepth::Create(
+        ImageFormat::DEPTH_GRAY_24,
+        depth_img_width, depth_img_height, true);
+    depth_gray_buf->ResetBuffer();
+    depth_gray_buf->set_frame_id(depth_image_buf_->frame_id());
+    if (is_8bits) {  // 8bits, usb2
+      ColorPaletteGenerator::UpdateD8bitsDisplayImage_DIB24(
+          m_GrayPalette, depth_image_buf_->data(), depth_gray_buf->data(),
+          depth_img_width, depth_img_height);
+    } else {  // 14bits, usb3
+      ColorPaletteGenerator::UpdateZ14DisplayImage_DIB24(
+          m_GrayPaletteZ14, depth_image_buf_->data(), depth_gray_buf->data(),
+          depth_img_width, depth_img_height);
     }
-    return depth_image_buf_;
+    return depth_gray_buf;
   }
 }
 
