@@ -90,6 +90,15 @@ ErrorCode CameraPrivate::Open(const OpenParams& params) {
     return ErrorCode::ERROR_FAILURE;
   }
 
+  auto info = device_->GetDeviceInfo();
+  if (descriptors_->serial_number == info->sn) {
+    std::cout << descriptors_->serial_number << "matched\n";
+  } else {
+    LOGI("imu channal sn: %s dosen't match the device sn: %s\n",
+        descriptors_->serial_number.c_str(),
+        info->sn.c_str());
+  }
+
   if (ok) {
     NotifyDataTrackStateChanged();
     // Enable streams according to device mode
