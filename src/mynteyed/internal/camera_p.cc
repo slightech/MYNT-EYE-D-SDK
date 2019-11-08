@@ -92,9 +92,9 @@ ErrorCode CameraPrivate::Open(const OpenParams& params) {
 
   auto info = device_->GetDeviceInfo();
   if (descriptors_->serial_number == info->sn) {
-    std::cout << descriptors_->serial_number << "matched\n";
+    DBG_LOGD("%smatched\n", descriptors_->serial_number);
   } else {
-    LOGI("imu channal sn: %s dosen't match the device sn: %s\n",
+    DBG_LOGD("imu channal sn: %s dosen't match the device sn: %s\n",
         descriptors_->serial_number.c_str(),
         info->sn.c_str());
   }

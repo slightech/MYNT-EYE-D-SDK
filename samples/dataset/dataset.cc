@@ -34,7 +34,8 @@ MYNTEYE_BEGIN_NAMESPACE
 
 namespace tools {
 
-Dataset::Dataset(std::string outdir) : outdir_(std::move(outdir)) {
+Dataset::Dataset(std::string outdir): motion_count_(0),
+                                      outdir_(std::move(outdir)) {
   std::cout << __func__ << std::endl;
   if (!files::mkdir(outdir_)) {
     std::cout << "Create directory failed: " << outdir_ << std::endl;
