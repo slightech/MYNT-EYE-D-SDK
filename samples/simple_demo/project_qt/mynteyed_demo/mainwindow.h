@@ -22,6 +22,7 @@ class MainWindow : public QMainWindow
     Q_PROPERTY(bool depthEnabled READ isDepthEnabled)
 
 public:
+    MainWindow() = default;
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 

@@ -823,7 +823,9 @@ bool Device::GetCameraCalibrationFile(int index, const std::string& filename) {
     }
     fprintf(pfile, "\n");
   }
-  fclose(pfile);
+  if(pfile != nullptr) {
+    fclose(pfile);
+  }
   return true;
 }
 
