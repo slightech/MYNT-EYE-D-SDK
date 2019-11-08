@@ -248,8 +248,6 @@ class Device {
   RGBQUAD color_palette_z14_[16384];
   RGBQUAD gray_palette_z14_[16384];
 #else  // MYNTEYE_OS_LINUX
-  DEPTH_TRANSFER_CTRL dtc_;
-
   RGBQUAD m_ColorPalette[256];
   RGBQUAD m_GrayPalette[256];
   RGBQUAD m_ColorPaletteD11[2048];

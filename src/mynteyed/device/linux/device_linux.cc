@@ -32,7 +32,6 @@ MYNTEYE_USE_NAMESPACE
 static const int MAX_FAILED_COUNT = 150;
 
 void Device::OnInit() {
-  dtc_ = DEPTH_IMG_NON_TRANSFER;
 }
 
 // int ret = EtronDI_Get2Image(handle_, &dev_sel_info_,
@@ -100,24 +99,24 @@ Image::pointer Device::GetImageDepth() {
   if (IsUSB2()) {
       depth_img_width = depth_img_width * 2;
   }
-  if (dtc_ == DEPTH_IMG_COLORFUL_TRANSFER ||
-      dtc_ == DEPTH_IMG_GRAY_TRANSFER) {
+  if (depth_mode_ == DepthMode::DEPTH_COLORFUL ||
+      depth_mode_ == DepthMode::DEPTH_GRAY) {
     depth_raw = false;
 
     if (!depth_image_buf_) {
       depth_buf_ = (unsigned char*)calloc(
           depth_img_width * depth_img_height * 2, sizeof(unsigned char));
-      if (dtc_ == DEPTH_IMG_COLORFUL_TRANSFER) {
+      if (depth_mode_ == DepthMode::DEPTH_COLORFUL) {
         depth_image_buf_ = ImageDepth::Create(ImageFormat::DEPTH_RGB,
             depth_img_width, depth_img_height, true);
-      } else {  // DEPTH_IMG_GRAY_TRANSFER
+      } else {  // DEPTH_GRAY
         depth_image_buf_ = ImageDepth::Create(ImageFormat::DEPTH_GRAY_24,
             depth_img_width, depth_img_height, true);
       }
     } else {
       depth_image_buf_->ResetBuffer();
     }
-  } else {  // DEPTH_IMG_NON_TRANSFER
+  } else {  // DEPTH_RAW
     depth_raw = true;
     if (IsUSB2()) {
       depth_buf_ = (unsigned char*)calloc(
@@ -161,7 +160,7 @@ Image::pointer Device::GetImageDepth() {
     }
     return depth_image_buf_;
   } else {
-    if (dtc_ == DEPTH_IMG_COLORFUL_TRANSFER) {
+    if (depth_mode_ == DepthMode::DEPTH_COLORFUL) {
       if (depth_data_type_ == ETronDI_DEPTH_DATA_14_BITS ||
           depth_data_type_ == ETronDI_DEPTH_DATA_14_BITS_RAW) {
         ColorPaletteGenerator::UpdateZ14DisplayImage_DIB24(
@@ -178,7 +177,7 @@ Image::pointer Device::GetImageDepth() {
             m_ColorPalette, depth_buf_, depth_image_buf_->data(),
             depth_img_width, depth_img_height);
       }
-    } else {  // DEPTH_IMG_GRAY_TRANSFER
+    } else {  // DEPTH_GRAY
       if (depth_data_type_ == ETronDI_DEPTH_DATA_14_BITS ||
           depth_data_type_ == ETronDI_DEPTH_DATA_14_BITS_RAW) {
         ColorPaletteGenerator::UpdateZ14DisplayImage_DIB24(
@@ -212,7 +211,7 @@ int Device::OpenDevice(const DeviceMode& dev_mode) {
           stream_color_info_ptr_[color_res_index_].nWidth,
           stream_color_info_ptr_[color_res_index_].nHeight,
           stream_color_info_ptr_[color_res_index_].bFormatMJPG,
-          0, 0, dtc_, false, NULL, &frame_rate);
+          0, 0, DEPTH_IMG_NON_TRANSFER, false, NULL, &frame_rate);
       break;
     case DeviceMode::DEVICE_DEPTH:
       color_device_opened_ = false;

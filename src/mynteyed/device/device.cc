@@ -473,24 +473,6 @@ bool Device::Open(const OpenParams& params) {
   //   LOGE("USB 2.0 only supports depth_mode DEPTH_GRAY | DEPTH_COLORFUL, please adjusts params.");  // NOLINT
   //   return false;
   // }
-#ifdef MYNTEYE_OS_LINUX
-  std::string dtc_name = "Unknown";
-  switch (params.depth_mode) {
-    case DepthMode::DEPTH_GRAY:
-      dtc_ = DEPTH_IMG_GRAY_TRANSFER;
-      dtc_name = "Gray";
-      break;
-    case DepthMode::DEPTH_COLORFUL:
-      dtc_ = DEPTH_IMG_COLORFUL_TRANSFER;
-      dtc_name = "Colorful";
-      break;
-    case DepthMode::DEPTH_RAW:
-    default:
-      dtc_ = DEPTH_IMG_NON_TRANSFER;
-      dtc_name = "Raw";
-      break;
-  }
-#endif
   depth_mode_ = params.depth_mode;
 
   stream_info_dev_index_ = params.dev_index;
