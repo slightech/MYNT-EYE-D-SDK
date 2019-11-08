@@ -65,6 +65,8 @@ class Device {
 
   /** Get all device infos */
   void GetDeviceInfos(std::vector<DeviceInfo>* dev_infos);
+  /** Get all device info */
+  std::shared_ptr<DeviceInfo> GetDeviceInfo();
 
   /** Get all stream infos */
   void GetStreamInfos(const std::int32_t& dev_index,

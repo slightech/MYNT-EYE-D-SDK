@@ -172,8 +172,19 @@ void Device::GetDeviceInfos(std::vector<DeviceInfo>* dev_infos) {
 
     char sz_buf[256];
     int actual_length = 0;
+    std::string s_sn = "null";
+    unsigned char serial_n[512];
+    int len;
     if (ETronDI_OK == EtronDI_GetFwVersion(
-        handle_, &dev_sel_info, sz_buf, 256, &actual_length)) {
+        handle_, &dev_sel_info, sz_buf, 256, &actual_length) &&
+        ETronDI_OK == EtronDI_GetSerialNumber(
+        handle_, &dev_sel_info, serial_n, 512, &len)) {
+      char tmp[25];
+      memset(tmp, '\0', sizeof(tmp));
+      for (int i = 0; i < len / 2; i++) {
+        tmp[i] = serial_n[i * 2];
+      }
+      s_sn = tmp;
       DeviceInfo info;
       info.index = i;
       info.name = p_dev_info[i].strDevName;
@@ -182,11 +193,80 @@ void Device::GetDeviceInfos(std::vector<DeviceInfo>* dev_infos) {
       info.vid = p_dev_info[i].wVID;
       info.chip_id = p_dev_info[i].nChipID;
       info.fw_version = sz_buf;
+      info.sn = s_sn;
       dev_infos->push_back(std::move(info));
     }
   }
 
   free(p_dev_info);
+}
+
+std::shared_ptr<DeviceInfo> Device::GetDeviceInfo() {
+  if (dev_sel_info_.index == -1) {
+    LOGE("GetDevices: dev_sel_info_ is -1.");
+    return nullptr;
+  }
+  int num = 0;
+  int count = 0;
+  while (true) {
+    if (num > 0 && num < 3) {
+      EtronDI_Release(&handle_);
+      EtronDI_Init(&handle_, false);
+      LOGI("\n");
+    } else if (num >= 3) {
+      break;
+    }
+    count = EtronDI_GetDeviceNumber(handle_);
+    if (count <= 0) {
+      num++;
+    } else {
+      break;
+    }
+    DBG_LOGD("GetDevices: %d", count);
+  }
+
+  DEVSELINFO dev_sel_info;
+  DEVINFORMATION* p_dev_info =
+      (DEVINFORMATION*)malloc(sizeof(DEVINFORMATION) * count);  // NOLINT
+
+  for (int i = 0; i < count; i++) {
+    dev_sel_info.index = i;
+
+    EtronDI_GetDeviceInfo(handle_, &dev_sel_info, p_dev_info+i);
+
+    char sz_buf[256];
+    int actual_length = 0;
+    std::string s_sn = "null";
+    unsigned char serial_n[512];
+    int len;
+    if (ETronDI_OK == EtronDI_GetFwVersion(
+        handle_, &dev_sel_info, sz_buf, 256, &actual_length) &&
+        ETronDI_OK == EtronDI_GetSerialNumber(
+        handle_, &dev_sel_info, serial_n, 512, &len)) {
+      char tmp[25];
+      memset(tmp, '\0', sizeof(tmp));
+      for (int i = 0; i < len / 2; i++) {
+        tmp[i] = serial_n[i * 2];
+      }
+      s_sn = tmp;
+      DeviceInfo info;
+      info.index = i;
+      info.name = p_dev_info[i].strDevName;
+      info.type = p_dev_info[i].nDevType;
+      info.pid = p_dev_info[i].wPID;
+      info.vid = p_dev_info[i].wVID;
+      info.chip_id = p_dev_info[i].nChipID;
+      info.fw_version = sz_buf;
+      info.sn = s_sn;
+      if (i == dev_sel_info_.index) {
+        free(p_dev_info);
+        return std::make_shared<DeviceInfo>(info);
+      }
+    }
+  }
+
+  free(p_dev_info);
+  return nullptr;
 }
 
 void Device::GetStreamInfos(const std::int32_t& dev_index,
