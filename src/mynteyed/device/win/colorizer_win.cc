@@ -425,10 +425,10 @@ void ColorizerWin::Init(float z14_far,
   // ToDo
 }
 
-Image::pointer ColorizerWin::Process(
-    const Image::pointer& depth_buf,
-    const DepthMode& depth_mode) {
-  CachedDepthBuffer(depth_buf);
+Image::pointer ColorizerWin::Process(const Image::pointer& depth_buf,
+    const DepthMode& depth_mode, bool from_user) {
+  // Cache depth buf if from internal
+  if (!from_user) CachedDepthBuffer(depth_buf);
 
   int depth_width = depth_buf->width();
   int depth_height = depth_buf->height();

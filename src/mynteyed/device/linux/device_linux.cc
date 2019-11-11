@@ -112,7 +112,7 @@ Image::pointer Device::GetImageDepth() {
 
   depth_image_buf_->set_frame_id(depth_serial_number_);
 
-  return colorizer_->Process(depth_image_buf_, depth_mode_);
+  return colorizer_->Process(depth_image_buf_, depth_mode_, false);
 }
 
 int Device::OpenDevice(const DeviceMode& dev_mode) {

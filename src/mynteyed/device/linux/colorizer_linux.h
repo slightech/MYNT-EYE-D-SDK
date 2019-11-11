@@ -18,7 +18,7 @@ class ColorizerLinux : public ColorizerPrivate {
       std::shared_ptr<CameraCalibration> calib_params) override;
 
   Image::pointer Process(const Image::pointer& depth_buf,
-        const DepthMode& depth_mode) override;
+      const DepthMode& depth_mode, bool from_user) override;
 
  private:
   RGBQUAD m_ColorPalette[256];

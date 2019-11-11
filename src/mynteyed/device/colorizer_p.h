@@ -38,7 +38,7 @@ class ColorizerPrivate : public Colorizer {
 
   // process depth buf to expected depth data
   virtual Image::pointer Process(const Image::pointer& depth_buf,
-        const DepthMode& depth_mode) = 0;
+        const DepthMode& depth_mode, bool from_user) = 0;
 
  protected:
   void ComputeZDTable(std::shared_ptr<CameraCalibration> calib_params);

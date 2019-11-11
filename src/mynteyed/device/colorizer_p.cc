@@ -35,11 +35,11 @@ Image::pointer ColorizerPrivate::Process(
     return depth_raw->To(ImageFormat::DEPTH_GRAY);
   } else if (out_format == ImageFormat::DEPTH_GRAY_24) {
     // by color palette
-    return Process(depth_buf, DepthMode::DEPTH_GRAY);
+    return Process(depth_buf, DepthMode::DEPTH_GRAY, true);
   } else if (out_format == ImageFormat::DEPTH_BGR
       || out_format == ImageFormat::DEPTH_RGB) {
     // by color palette
-    auto &&depth_rgb = Process(depth_buf, DepthMode::DEPTH_COLORFUL);
+    auto &&depth_rgb = Process(depth_buf, DepthMode::DEPTH_COLORFUL, true);
     if (out_format == ImageFormat::DEPTH_BGR) {
       return depth_rgb->To(ImageFormat::DEPTH_BGR);
     } else {

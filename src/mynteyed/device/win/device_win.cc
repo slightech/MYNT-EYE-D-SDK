@@ -135,7 +135,7 @@ Image::pointer Device::GetImageDepth() {
     device_status_[DEPTH_DEVICE] = true;
     is_actual_[DEPTH_DEVICE] = true;
 
-    return colorizer_->Process(depth_image_buf_, depth_mode_);
+    return colorizer_->Process(depth_image_buf_, depth_mode_, false);
   }
 
   return nullptr;
