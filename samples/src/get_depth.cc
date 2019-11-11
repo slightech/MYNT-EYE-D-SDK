@@ -247,14 +247,15 @@ int main(int argc, char const* argv[]) {
 
     auto image_depth = cam.GetStreamData(ImageType::IMAGE_DEPTH);
     if (image_depth.img) {
-      cv::Mat depth = image_depth.img->To(ImageFormat::DEPTH_RAW)->ToMat();
+      auto &&depth_raw = image_depth.img->To(ImageFormat::DEPTH_RAW);
+      auto &&depth_color = cam.GetColorizer()->Process(depth_raw, ImageFormat::DEPTH_BGR)->ToMat();
 
       cv::setMouseCallback("depth", OnDepthMouseCallback, &depth_region);
-      // Note: DrawRect will change some depth values to show the rect.
-      depth_region.DrawRect(depth);
-      cv::imshow("depth", depth);
+      depth_region.DrawRect(depth_color);
+      cv::imshow("depth", depth_color);
 
-      depth_region.ShowElems<ushort>(depth, [](const ushort& elem) {
+      // pass depth_raw to get real depth value
+      depth_region.ShowElems<ushort>(depth_raw->ToMat(), [](const ushort& elem) {
         return std::to_string(elem);
       }, 80, depth_info);
     }
