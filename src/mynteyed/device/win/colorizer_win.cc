@@ -408,7 +408,7 @@ void ColorizerWin::Init(float z14_far,
     std::shared_ptr<CameraCalibration> calib_params) {
   ColorizerPrivate::Init(z14_far, is_8bits, calib_params);
 
-  float m_zFar = z14_Far;
+  float m_zFar = z14_far;
   float m_zNear = Z14_NEAR;
   int m_d11Far = D11_FAR;
   int m_d11Near = D11_NEAR;
@@ -442,22 +442,22 @@ Image::pointer ColorizerWin::Process(
       static auto depth_raw_buf = ImageDepth::Create(ImageFormat::DEPTH_RAW,
           depth_width, depth_height, true);
       depth_raw_buf->ResetBuffer();
-      depth_raw_buf->set_frame_id(depth_image_buf_->frame_id());
-      AdaptU2Raw(depth_image_buf_->data(), depth_raw_buf->data(),
+      depth_raw_buf->set_frame_id(depth_buf->frame_id());
+      AdaptU2Raw(depth_buf->data(), depth_raw_buf->data(),
           depth_width, depth_height);
       return depth_raw_buf;
     } else {
       // return clone as it will be changed in imgcallback
-      return depth_image_buf_->Clone();
+      return depth_buf->Clone();
     }
   } else if (depth_mode == DepthMode::DEPTH_COLORFUL) {
     // ImageFormat::DEPTH_RGB
     static auto depth_rgb_buf = ImageDepth::Create(ImageFormat::DEPTH_RGB,
         depth_width, depth_height, true);
     depth_rgb_buf->ResetBuffer();
-    depth_rgb_buf->set_frame_id(depth_image_buf_->frame_id());
+    depth_rgb_buf->set_frame_id(depth_buf->frame_id());
     UpdateZ14DisplayImage_DIB24(m_ColorPaletteZ14,
-        depth_image_buf_->data(), depth_rgb_buf->data(),
+        depth_buf->data(), depth_rgb_buf->data(),
         depth_width, depth_height);
     return depth_rgb_buf;
   } else if (depth_mode == DepthMode::DEPTH_GRAY) {
@@ -465,9 +465,9 @@ Image::pointer ColorizerWin::Process(
     static auto depth_gray_buf = ImageDepth::Create(ImageFormat::DEPTH_GRAY_24,
         depth_width, depth_height, true);
     depth_gray_buf->ResetBuffer();
-    depth_gray_buf->set_frame_id(depth_image_buf_->frame_id());
+    depth_gray_buf->set_frame_id(depth_buf->frame_id());
     UpdateZ14DisplayImage_DIB24(m_GrayPaletteZ14,
-        depth_image_buf_->data(), depth_gray_buf->data(),
+        depth_buf->data(), depth_gray_buf->data(),
         depth_width, depth_height);
     return depth_gray_buf;
   }

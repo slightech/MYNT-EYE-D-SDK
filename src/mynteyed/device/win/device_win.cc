@@ -25,7 +25,7 @@ MYNTEYE_USE_NAMESPACE
 void Device::OnInit() {
   is_color_ok_ = false;
   is_depth_ok_ = false;
-  colorizer_ = std::make_shared<ColorizerLinux>();
+  colorizer_ = std::make_shared<ColorizerWin>();
 }
 
 void Device::ImgCallback(EtronDIImageType::Value imgType, int imgId,

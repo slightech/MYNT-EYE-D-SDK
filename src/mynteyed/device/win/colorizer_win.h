@@ -4,11 +4,11 @@
 
 #include <Windows.h>
 
-#include "mynteyed/device/colorizer.h"
+#include "mynteyed/device/colorizer_p.h"
 
 MYNTEYE_BEGIN_NAMESPACE
 
-class ColorizerWin : public Colorizer {
+class ColorizerWin : public ColorizerPrivate {
  public:
   ColorizerWin() = default;
   virtual ~ColorizerWin() = default;
