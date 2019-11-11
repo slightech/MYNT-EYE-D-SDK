@@ -122,6 +122,7 @@ set(MYNTEYE_DEPTH mynteye_depth)
 
 set(MYNTEYE_DEPTH_SRCS
   src/mynteyed/data/channels.cc
+  src/mynteyed/device/colorizer_p.cc
   src/mynteyed/device/convertor.cc
   src/mynteyed/device/data_caches.cc
   src/mynteyed/device/device_info.cc
@@ -153,12 +154,14 @@ if(OS_WIN)
     src/mynteyed/data/hid/hid_win.cc
     src/mynteyed/device/win/device_win.cc
     src/mynteyed/device/win/color_palette_generator.cc
+    src/mynteyed/device/win/colorizer_win.cc
   )
 else()
   list(APPEND MYNTEYE_DEPTH_SRCS
     src/mynteyed/data/hid/hid_linux.cc
-    src/mynteyed/device/linux/color_palette_generator.cc
     src/mynteyed/device/linux/device_linux.cc
+    src/mynteyed/device/linux/color_palette_generator.cc
+    src/mynteyed/device/linux/colorizer_linux.cc
   )
 endif()
 

@@ -22,6 +22,7 @@
 #include <vector>
 #include <string>
 
+#include "mynteyed/device/colorizer.h"
 #include "mynteyed/device/device_info.h"
 #include "mynteyed/device/image.h"
 #include "mynteyed/device/open_params.h"
@@ -277,6 +278,9 @@ class MYNTEYE_API Camera {
   void SetDistanceCallback(distance_callback_t callback, bool async = true);
 
   void WaitForStream();
+
+  /** Get colorizer for depth */
+  std::shared_ptr<Colorizer> GetColorizer() const;
 
   /** Update auxiliary chip firmware. */
   bool AuxiliaryChipFirmwareUpdate(const char *filepath);

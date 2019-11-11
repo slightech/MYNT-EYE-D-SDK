@@ -83,14 +83,19 @@ StreamIntrinsics Camera::GetStreamIntrinsics(
   switch (stream_mode) {
     case StreamMode::STREAM_640x480:
       cam_in = {640, 480, 979.8, 942.8, 682.3 / 2, 254.9, {0, 0, 0, 0, 0}};
+      break;
     case StreamMode::STREAM_1280x480:
       cam_in = {640, 480, 979.8, 942.8, 682.3, 254.9, {0, 0, 0, 0, 0}};
+      break;
     case StreamMode::STREAM_1280x720:
       cam_in = {1280, 720, 979.8, 942.8, 682.3, 254.9 * 2, {0, 0, 0, 0, 0}};
+      break;
     case StreamMode::STREAM_2560x720:
       cam_in = {1280, 720, 979.8, 942.8, 682.3 * 2, 254.9 * 2, {0, 0, 0, 0, 0}};
+      break;
     default:
       cam_in = {1280, 720, 979.8, 942.8, 682.3, 254.9 * 2, {0, 0, 0, 0, 0}};
+      break;
   }
   return {cam_in, cam_in};
 }
@@ -300,6 +305,10 @@ std::shared_ptr<CameraCalibration> Camera::GetCameraCalibration(
 
 void Camera::WaitForStream() {
   return p_->WaitForStream();
+}
+
+std::shared_ptr<Colorizer> Camera::GetColorizer() const {
+  return p_->GetColorizer();
 }
 
 bool Camera::AuxiliaryChipFirmwareUpdate(const char* filepath) {

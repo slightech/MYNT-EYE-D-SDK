@@ -610,7 +610,7 @@ bool Channels::PullFileData(bool device_desc,
     packets_num = buffer[0] | buffer[1] << 8;
 
     std::uint8_t length = buffer[2];
-    if (length <= 0) { return false; }
+    if (length == std::uint8_t(0)) { return false; }
 
     if (buffer[3 + length] != check_sum(&buffer[3], length)) {
       LOGE("%s %d:: Check error. please retry.",

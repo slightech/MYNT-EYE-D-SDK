@@ -249,6 +249,9 @@ class MYNTEYE_API CameraPrivate {
   std::string GetSerialNumber() const;
 
   void WaitForStream();
+  
+  /** Get colorizer for depth */
+  std::shared_ptr<Colorizer> GetColorizer() const;
 
   /** Update auxiliary chip firmware. */
   bool AuxiliaryChipFirmwareUpdate(const char* filepath);

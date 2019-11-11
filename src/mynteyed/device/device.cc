@@ -18,6 +18,8 @@
 #include "mynteyed/device/device.h"
 #include "mynteyed/util/log.h"
 
+#include "colorizer_p.h"
+
 MYNTEYE_USE_NAMESPACE
 
 static const int MAX_STREAM_COUNT = 64;
@@ -171,8 +173,19 @@ void Device::GetDeviceInfos(std::vector<DeviceInfo>* dev_infos) {
 
     char sz_buf[256];
     int actual_length = 0;
+    std::string s_sn = "null";
+    unsigned char serial_n[512];
+    int len;
     if (ETronDI_OK == EtronDI_GetFwVersion(
-        handle_, &dev_sel_info, sz_buf, 256, &actual_length)) {
+        handle_, &dev_sel_info, sz_buf, 256, &actual_length) &&
+        ETronDI_OK == EtronDI_GetSerialNumber(
+        handle_, &dev_sel_info, serial_n, 512, &len)) {
+      char tmp[25];
+      memset(tmp, '\0', sizeof(tmp));
+      for (int i = 0; i < len / 2; i++) {
+        tmp[i] = serial_n[i * 2];
+      }
+      s_sn = tmp;
       DeviceInfo info;
       info.index = i;
       info.name = p_dev_info[i].strDevName;
@@ -181,11 +194,80 @@ void Device::GetDeviceInfos(std::vector<DeviceInfo>* dev_infos) {
       info.vid = p_dev_info[i].wVID;
       info.chip_id = p_dev_info[i].nChipID;
       info.fw_version = sz_buf;
+      info.sn = s_sn;
       dev_infos->push_back(std::move(info));
     }
   }
 
   free(p_dev_info);
+}
+
+std::shared_ptr<DeviceInfo> Device::GetDeviceInfo() {
+  if (dev_sel_info_.index == -1) {
+    LOGE("GetDevices: dev_sel_info_ is -1.");
+    return nullptr;
+  }
+  int num = 0;
+  int count = 0;
+  while (true) {
+    if (num > 0 && num < 3) {
+      EtronDI_Release(&handle_);
+      EtronDI_Init(&handle_, false);
+      LOGI("\n");
+    } else if (num >= 3) {
+      break;
+    }
+    count = EtronDI_GetDeviceNumber(handle_);
+    if (count <= 0) {
+      num++;
+    } else {
+      break;
+    }
+    DBG_LOGD("GetDevices: %d", count);
+  }
+
+  DEVSELINFO dev_sel_info;
+  DEVINFORMATION* p_dev_info =
+      (DEVINFORMATION*)malloc(sizeof(DEVINFORMATION) * count);  // NOLINT
+
+  for (int i = 0; i < count; i++) {
+    dev_sel_info.index = i;
+
+    EtronDI_GetDeviceInfo(handle_, &dev_sel_info, p_dev_info+i);
+
+    char sz_buf[256];
+    int actual_length = 0;
+    std::string s_sn = "null";
+    unsigned char serial_n[512];
+    int len;
+    if (ETronDI_OK == EtronDI_GetFwVersion(
+        handle_, &dev_sel_info, sz_buf, 256, &actual_length) &&
+        ETronDI_OK == EtronDI_GetSerialNumber(
+        handle_, &dev_sel_info, serial_n, 512, &len)) {
+      char tmp[25];
+      memset(tmp, '\0', sizeof(tmp));
+      for (int i = 0; i < len / 2; i++) {
+        tmp[i] = serial_n[i * 2];
+      }
+      s_sn = tmp;
+      DeviceInfo info;
+      info.index = i;
+      info.name = p_dev_info[i].strDevName;
+      info.type = p_dev_info[i].nDevType;
+      info.pid = p_dev_info[i].wPID;
+      info.vid = p_dev_info[i].wVID;
+      info.chip_id = p_dev_info[i].nChipID;
+      info.fw_version = sz_buf;
+      info.sn = s_sn;
+      if (i == dev_sel_info_.index) {
+        free(p_dev_info);
+        return std::make_shared<DeviceInfo>(info);
+      }
+    }
+  }
+
+  free(p_dev_info);
+  return nullptr;
 }
 
 void Device::GetStreamInfos(const std::int32_t& dev_index,
@@ -377,28 +459,10 @@ bool Device::Open(const OpenParams& params) {
   SetAutoWhiteBalanceEnabled(params.state_awb);
 
   if (params.framerate > 0) framerate_ = params.framerate;
-  if (IsUSB2() && params.depth_mode == DepthMode::DEPTH_RAW) {
-    LOGE("USB 2.0 only supports depth_mode DEPTH_GRAY | DEPTH_COLORFUL, please adjusts params.");  // NOLINT
-    return false;
-  }
-#ifdef MYNTEYE_OS_LINUX
-  std::string dtc_name = "Unknown";
-  switch (params.depth_mode) {
-    case DepthMode::DEPTH_GRAY:
-      dtc_ = DEPTH_IMG_GRAY_TRANSFER;
-      dtc_name = "Gray";
-      break;
-    case DepthMode::DEPTH_COLORFUL:
-      dtc_ = DEPTH_IMG_COLORFUL_TRANSFER;
-      dtc_name = "Colorful";
-      break;
-    case DepthMode::DEPTH_RAW:
-    default:
-      dtc_ = DEPTH_IMG_NON_TRANSFER;
-      dtc_name = "Raw";
-      break;
-  }
-#endif
+  // if (IsUSB2() && params.depth_mode == DepthMode::DEPTH_RAW) {
+  //   LOGE("USB 2.0 only supports depth_mode DEPTH_GRAY | DEPTH_COLORFUL, please adjusts params.");  // NOLINT
+  //   return false;
+  // }
   depth_mode_ = params.depth_mode;
 
   stream_info_dev_index_ = params.dev_index;
@@ -415,7 +479,7 @@ bool Device::Open(const OpenParams& params) {
   LOGI("-- Framerate: %d", framerate_);
 
   EtronDI_SetDepthDataType(handle_, &dev_sel_info_, depth_data_type_);
-  LOGI("SetDepthDataType: %d", depth_data_type_);
+  DBG_LOGI("SetDepthDataType: %d", depth_data_type_);
 
   LOGI("-- Color Stream: %dx%d %s",
       stream_color_info_ptr_[color_res_index_].nWidth,
@@ -439,11 +503,14 @@ bool Device::Open(const OpenParams& params) {
 
   if (ETronDI_OK == ret) {
     is_device_opened_ = true;
-    OnInitColorPalette(params.colour_depth_value);
     if (depth_device_opened_) {
       // depth device must be opened.
       SyncCameraCalibrations();
     }
+    bool is_8bits = depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS
+        || depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS_RAW;  // usb2, 8bits
+    colorizer_->Init(params.colour_depth_value, is_8bits,
+        GetCameraCalibration(params.stream_mode));
     return true;
   } else {
     is_device_opened_ = false;
@@ -1680,7 +1747,9 @@ bool Device::GetCameraCalibrationFile(int index, const std::string& filename) {
     }
     fprintf(pfile, "\n");
   }
-  fclose(pfile);
+  if(pfile != nullptr) {
+    fclose(pfile);
+  }
   return true;
 }
 
@@ -1758,10 +1827,6 @@ void Device::SyncCameraCalibrations() {
 void Device::ReleaseBuf() {
   color_image_buf_ = nullptr;
   depth_image_buf_ = nullptr;
-  if (!depth_buf_) {
-    delete depth_buf_;
-    depth_buf_ = nullptr;
-  }
 }
 
 void Device::CompatibleUSB2(const OpenParams& params) {
@@ -2139,6 +2204,10 @@ float Device::GetSensorTemperature() {
   // LOGI("GetSensorTemperature data: %d, calib: %d",
   //     tempsens_data, tempsens_calib);
   return 55 + 0.7 * (tempsens_data - tempsens_calib);
+}
+
+std::shared_ptr<ColorizerPrivate> Device::GetColorizer() const {
+  return colorizer_;
 }
 
 bool Device::IsIRDepthOnly() {

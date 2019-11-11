@@ -29,6 +29,7 @@
 #include "mynteyed/stubs/global.h"
 
 MYNTEYE_BEGIN_NAMESPACE
+
 struct ImageProfile {
   size_t width;
   size_t height;

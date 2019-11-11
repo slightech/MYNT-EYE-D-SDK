@@ -19,6 +19,7 @@
 #include <utility>
 
 #include "mynteyed/data/channels.h"
+#include "mynteyed/device/colorizer_p.h"
 #include "mynteyed/device/device.h"
 #include "mynteyed/internal/image_utils.h"
 #include "mynteyed/internal/motions.h"
@@ -88,6 +89,15 @@ ErrorCode CameraPrivate::Open(const OpenParams& params) {
   bool ok = device_->Open(params);
   if (!ok) {
     return ErrorCode::ERROR_FAILURE;
+  }
+
+  auto info = device_->GetDeviceInfo();
+  if (descriptors_->serial_number == info->sn) {
+    DBG_LOGD("%smatched\n", descriptors_->serial_number);
+  } else {
+    DBG_LOGD("imu channal sn: %s dosen't match the device sn: %s\n",
+        descriptors_->serial_number.c_str(),
+        info->sn.c_str());
   }
 
   if (ok) {
@@ -653,6 +663,10 @@ void CameraPrivate::WaitForStream() {
 #ifdef MYNTEYE_OS_LINUX
   streams_->WaitForStreamData();
 #endif
+}
+
+std::shared_ptr<Colorizer> CameraPrivate::GetColorizer() const {
+  return device_->GetColorizer();
 }
 
 bool CameraPrivate::AuxiliaryChipFirmwareUpdate(const char* filepath) {

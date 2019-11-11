@@ -28,12 +28,6 @@
 
 #include "mynteyed/stubs/global.h"
 
-#ifdef MYNTEYE_OS_WIN
-#include <Windows.h>
-#else  // MYNTEYE_OS_LINUX
-#include "mynteyed/device/linux/color_palette_generator.h"
-#endif
-
 #include "mynteyed/device/device_info.h"
 #include "mynteyed/device/open_params.h"
 #include "mynteyed/device/stream_info.h"
@@ -43,6 +37,8 @@
 #include "mynteyed/device/image.h"
 
 MYNTEYE_BEGIN_NAMESPACE
+
+class ColorizerPrivate;
 
 class Device {
  public:
@@ -66,6 +62,8 @@ class Device {
 
   /** Get all device infos */
   void GetDeviceInfos(std::vector<DeviceInfo>* dev_infos);
+  /** Get all device info */
+  std::shared_ptr<DeviceInfo> GetDeviceInfo();
 
   /** Get all stream infos */
   void GetStreamInfos(const std::int32_t& dev_index,
@@ -153,6 +151,9 @@ class Device {
   /** Get sensor temperature */
   float GetSensorTemperature();
 
+  /** Get colorizer for depth */
+  std::shared_ptr<ColorizerPrivate> GetColorizer() const;
+
   bool IsIRDepthOnly();
 
   bool Restart();
@@ -210,8 +211,6 @@ class Device {
 
   bool IsUSB2();
 
-  void OnInitColorPalette(const float &z14_Far);
-
   int GetStreamIndex(PETRONDI_STREAM_INFO stream_info_ptr,
     int width, int height, bool mjpg);
 
@@ -242,7 +241,11 @@ class Device {
   image_size_t depth_image_size_ = 0;
   Image::pointer color_image_buf_ = nullptr;
   Image::pointer depth_image_buf_ = nullptr;
-  unsigned char* depth_buf_ = nullptr;
+
+  std::vector<std::shared_ptr<CameraCalibration>> camera_calibrations_;
+
+  OpenParams open_params_;
+  DepthMode depth_mode_;
 
 #ifdef MYNTEYE_OS_WIN
   bool is_color_ok_;
@@ -251,31 +254,7 @@ class Device {
   std::condition_variable depth_condition_;
   std::mutex color_mtx_;
   std::mutex depth_mtx_;
-  unsigned char m_ColorPalette[256][4];
-  unsigned char m_GrayPalette[256][4];
-  RGBQUAD m_ColorPaletteD11[2048];
-  RGBQUAD m_GrayPaletteD11[2048];
-  RGBQUAD m_ColorPaletteZ14[16384];
-  RGBQUAD m_GrayPaletteZ14[16384];
-
-  RGBQUAD color_palette_z14_[16384];
-  RGBQUAD gray_palette_z14_[16384];
-#else  // MYNTEYE_OS_LINUX
-  DEPTH_TRANSFER_CTRL dtc_;
-
-  RGBQUAD m_ColorPalette[256];
-  RGBQUAD m_GrayPalette[256];
-  RGBQUAD m_ColorPaletteD11[2048];
-  RGBQUAD m_GrayPaletteD11[2048];
-  RGBQUAD m_ColorPaletteZ14[16384];
-  RGBQUAD m_GrayPaletteZ14[16384];
 #endif
-
-  DepthMode depth_mode_;
-
-  std::vector<std::shared_ptr<CameraCalibration>> camera_calibrations_;
-
-  OpenParams open_params_;
 
   bool color_device_opened_;
   bool depth_device_opened_;
@@ -291,6 +270,8 @@ class Device {
   std::map<data_type_t, bool> is_actual_;
   int check_times_;
   bool is_disconnect_;
+
+  std::shared_ptr<ColorizerPrivate> colorizer_;
 };
 
 MYNTEYE_END_NAMESPACE
