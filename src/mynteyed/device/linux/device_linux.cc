@@ -20,18 +20,12 @@
 #include "mynteyed/device/convertor.h"
 #include "mynteyed/util/log.h"
 
-// #define Z14_FAR  16383
-#define Z14_NEAR 0
-#define D11_FAR  0
-#define D11_NEAR 2047
-#define D8_FAR   0
-#define D8_NEAR  255
+#include "colorizer_linux.h"
 
 MYNTEYE_USE_NAMESPACE
 
-static const int MAX_FAILED_COUNT = 150;
-
 void Device::OnInit() {
+  colorizer_ = std::make_shared<ColorizerLinux>();
 }
 
 // int ret = EtronDI_Get2Image(handle_, &dev_sel_info_,
@@ -80,23 +74,11 @@ Image::pointer Device::GetImageColor() {
   return color_image_buf_;
 }
 
-void Device::AdaptU2Raw(unsigned char *src, unsigned char *dst,
-    int width, int height) {
-  unsigned short * depth = (unsigned short *)dst;   // NOLINT
-  for (int i = 0; i < width * height; i += 2) {
-    depth[i] = ZD_table[src[i]];
-    depth[i + 1] = depth[i];
-  }
-}
-
 Image::pointer Device::GetImageDepth() {
   unsigned int depth_img_width  = (unsigned int)(
       stream_depth_info_ptr_[depth_res_index_].nWidth);
   unsigned int depth_img_height = (unsigned int)(
       stream_depth_info_ptr_[depth_res_index_].nHeight);
-
-  bool is_8bits = depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS
-      || depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS_RAW;
 
   // create depth raw buffer
   if (!depth_image_buf_) {
@@ -130,53 +112,7 @@ Image::pointer Device::GetImageDepth() {
 
   depth_image_buf_->set_frame_id(depth_serial_number_);
 
-  if (is_8bits) {  // 8bits, usb2 (depth width is half, wanted need x2)
-    depth_img_width = depth_img_width * 2;
-  }
-  if (depth_mode_ == DepthMode::DEPTH_RAW) {
-    if (is_8bits) {  // 8bits, usb2
-      static auto depth_raw_buf = ImageDepth::Create(ImageFormat::DEPTH_RAW,
-          depth_img_width, depth_img_height, true);
-      depth_raw_buf->ResetBuffer();
-      depth_raw_buf->set_frame_id(depth_image_buf_->frame_id());
-      AdaptU2Raw(depth_image_buf_->data(), depth_raw_buf->data(),
-          depth_img_width, depth_img_height);
-      return depth_raw_buf;
-    } else {  // 14bits, usb3
-      return depth_image_buf_;
-    }
-  } else if (depth_mode_ == DepthMode::DEPTH_COLORFUL) {
-    static auto depth_rgb_buf = ImageDepth::Create(ImageFormat::DEPTH_RGB,
-        depth_img_width, depth_img_height, true);
-    depth_rgb_buf->ResetBuffer();
-    depth_rgb_buf->set_frame_id(depth_image_buf_->frame_id());
-    if (is_8bits) {  // 8bits, usb2
-      ColorPaletteGenerator::UpdateD8bitsDisplayImage_DIB24(
-          m_ColorPalette, depth_image_buf_->data(), depth_rgb_buf->data(),
-          depth_img_width, depth_img_height);
-    } else {  // 14bits, usb3
-      ColorPaletteGenerator::UpdateZ14DisplayImage_DIB24(
-          m_ColorPaletteZ14, depth_image_buf_->data(), depth_rgb_buf->data(),
-          depth_img_width, depth_img_height);
-    }
-    return depth_rgb_buf;
-  } else {  // DEPTH_GRAY
-    static auto depth_gray_buf = ImageDepth::Create(
-        ImageFormat::DEPTH_GRAY_24,
-        depth_img_width, depth_img_height, true);
-    depth_gray_buf->ResetBuffer();
-    depth_gray_buf->set_frame_id(depth_image_buf_->frame_id());
-    if (is_8bits) {  // 8bits, usb2
-      ColorPaletteGenerator::UpdateD8bitsDisplayImage_DIB24(
-          m_GrayPalette, depth_image_buf_->data(), depth_gray_buf->data(),
-          depth_img_width, depth_img_height);
-    } else {  // 14bits, usb3
-      ColorPaletteGenerator::UpdateZ14DisplayImage_DIB24(
-          m_GrayPaletteZ14, depth_image_buf_->data(), depth_gray_buf->data(),
-          depth_img_width, depth_img_height);
-    }
-    return depth_gray_buf;
-  }
+  return colorizer_->Process(depth_image_buf_, depth_mode_);
 }
 
 int Device::OpenDevice(const DeviceMode& dev_mode) {
@@ -217,42 +153,6 @@ int Device::OpenDevice(const DeviceMode& dev_mode) {
     default:
       throw_error("ERROR:: DeviceMode is unknown.");
   }
-}
-
-void Device::OnInitColorPalette(const float &z14_Far) {
-  float m_zFar = z14_Far;
-  float m_zNear = Z14_NEAR;
-  float m_d11Far = D11_FAR;
-  float m_d11Near = D11_NEAR;
-  float m_d8Far = D8_FAR;
-  float m_d8Near = D8_NEAR;
-  /*
-     float m_zFar = far_;
-     float m_zNear = near_;
-     float m_d11Far = far_;
-     float m_d11Near = near_;
-     float m_d8Far = far_;
-     float m_d8Near = near_;
-
-     float m_zFar = far_;
-     float m_zNear = near_;
-     */
-  int m_nDepthColorMapMode = 4;  // for customer
-
-  ColorPaletteGenerator::DmColorMode(
-      m_ColorPalette, m_nDepthColorMapMode, m_d8Far, m_d8Near);
-  ColorPaletteGenerator::DmGrayMode(
-      m_GrayPalette, m_nDepthColorMapMode, m_d8Far, m_d8Near);
-
-  ColorPaletteGenerator::DmColorMode11(
-      m_ColorPaletteD11, m_nDepthColorMapMode, m_d11Far, m_d11Near);
-  ColorPaletteGenerator::DmGrayMode11(
-      m_GrayPaletteD11, m_nDepthColorMapMode, m_d11Far, m_d11Near);
-  // SetBaseGrayPaletteD11(m_GrayPaletteD11);
-
-  ColorPaletteGenerator::DmColorMode14(m_ColorPaletteZ14, m_zFar, m_zNear);
-  ColorPaletteGenerator::DmGrayMode14(m_GrayPaletteZ14, m_zFar, m_zNear);
-  // SetBaseGrayPaletteZ14(m_GrayPaletteZ14, zFar);
 }
 
 bool Device::Restart() {

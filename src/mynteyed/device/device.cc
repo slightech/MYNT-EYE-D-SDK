@@ -18,6 +18,8 @@
 #include "mynteyed/device/device.h"
 #include "mynteyed/util/log.h"
 
+#include "colorizer_p.h"
+
 MYNTEYE_USE_NAMESPACE
 
 static const int MAX_STREAM_COUNT = 64;
@@ -118,7 +120,6 @@ void Device::Init() {
   // default frame rate
   framerate_ = 10;
 
-  u2_dep_raw = false;
   color_device_opened_ = false;
   depth_device_opened_ = false;
   is_device_opened_ = false;
@@ -366,17 +367,6 @@ bool Device::SetAutoWhiteBalanceEnabled(bool enabled) {
   return ok;
 }
 
-void Device::ComputeZDTable(StreamMode stream_mode) {
-  auto info = GetCameraCalibration(stream_mode);
-  float fx = info->CamMat1[0];
-  float baseline = -info->TranMat[0];
-  float res = fx * baseline;
-  // std::cout << "fx:" << fx << "  baseline: " << baseline << std::endl;
-  ZD_table[0] = 0;
-  for (int i = 1; i < 256; i++) {
-    ZD_table[i] = static_cast<std::uint16_t>(res / i);
-  }
-}
 void Device::SetInfraredDepthOnly(const OpenParams& params) {
   if (!params.ir_depth_only) {
     EtronDI_EnableInterleave(handle_, &dev_sel_info_, false);
@@ -513,12 +503,14 @@ bool Device::Open(const OpenParams& params) {
 
   if (ETronDI_OK == ret) {
     is_device_opened_ = true;
-    OnInitColorPalette(params.colour_depth_value);
     if (depth_device_opened_) {
       // depth device must be opened.
       SyncCameraCalibrations();
     }
-    ComputeZDTable(params.stream_mode);
+    bool is_8bits = depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS
+        || depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS_RAW;  // usb2, 8bits
+    colorizer_->Init(params.colour_depth_value, is_8bits,
+        GetCameraCalibration(params.stream_mode));
     return true;
   } else {
     is_device_opened_ = false;
@@ -1295,6 +1287,10 @@ std::string Device::GetSerialNumber() const {
   return s;
 }
 
+std::shared_ptr<ColorizerPrivate> Device::GetColorizer() const {
+  return colorizer_;
+}
+
 bool Device::IsIRDepthOnly() {
   return ir_depth_only_enabled_;
 }
@@ -1379,4 +1375,3 @@ bool Device::UpdateDeviceStatus() {
 bool Device::DepthDeviceOpened() {
   return depth_device_opened_;
 }
-
