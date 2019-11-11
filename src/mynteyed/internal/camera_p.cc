@@ -19,6 +19,7 @@
 #include <utility>
 
 #include "mynteyed/data/channels.h"
+#include "mynteyed/device/colorizer_p.h"
 #include "mynteyed/device/device.h"
 #include "mynteyed/internal/image_utils.h"
 #include "mynteyed/internal/motions.h"
@@ -658,6 +659,10 @@ void CameraPrivate::WaitForStream() {
 #ifdef MYNTEYE_OS_LINUX
   streams_->WaitForStreamData();
 #endif
+}
+
+std::shared_ptr<Colorizer> CameraPrivate::GetColorizer() const {
+  return device_->GetColorizer();
 }
 
 bool CameraPrivate::AuxiliaryChipFirmwareUpdate(const char* filepath) {

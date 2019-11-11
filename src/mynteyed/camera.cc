@@ -298,6 +298,10 @@ void Camera::WaitForStream() {
   return p_->WaitForStream();
 }
 
+std::shared_ptr<Colorizer> Camera::GetColorizer() const {
+  return p_->GetColorizer();
+}
+
 bool Camera::AuxiliaryChipFirmwareUpdate(const char* filepath) {
   return p_->AuxiliaryChipFirmwareUpdate(filepath);
 }
