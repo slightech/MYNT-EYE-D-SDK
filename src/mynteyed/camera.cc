@@ -25,7 +25,7 @@ Camera::Camera() : p_(new CameraPrivate()) {
 
 Camera::~Camera() {
   DBG_LOGD(__func__);
-  p_.release();
+  p_.reset(nullptr);
 }
 
 std::vector<DeviceInfo> Camera::GetDeviceInfos() const {
