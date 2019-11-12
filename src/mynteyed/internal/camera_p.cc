@@ -653,7 +653,7 @@ void CameraPrivate::Reconnect() {
     reconnect_times_ = 0;
 }
 
-void CameraPrivate::WaitForStream() {
+void CameraPrivate::WaitForStreams() {
 #ifdef MYNTEYE_OS_WIN
   if (!streams_->WaitForStreamData() && enable_reconnect_) {
     // control whether connect

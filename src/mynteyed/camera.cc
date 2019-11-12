@@ -303,9 +303,15 @@ std::shared_ptr<CameraCalibration> Camera::GetCameraCalibration(
   return p_->GetCameraCalibration(stream_mode);
 }
 
-void Camera::WaitForStream() {
-  return p_->WaitForStream();
+void Camera::WaitForStreams() {
+  return p_->WaitForStreams();
 }
+
+#ifdef MYNTEYE_DEPRECATED_COMPAT
+void Camera::WaitForStream() {
+  return WaitForStreams();
+}
+#endif
 
 std::shared_ptr<Colorizer> Camera::GetColorizer() const {
   return p_->GetColorizer();

@@ -248,7 +248,7 @@ class MYNTEYE_API CameraPrivate {
   /** Get serial number */
   std::string GetSerialNumber() const;
 
-  void WaitForStream();
+  void WaitForStreams();
   
   /** Get colorizer for depth */
   std::shared_ptr<Colorizer> GetColorizer() const;
