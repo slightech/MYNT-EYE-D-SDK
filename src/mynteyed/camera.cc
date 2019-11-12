@@ -294,8 +294,12 @@ std::vector<DistanceData> Camera::GetDistanceDatas() {
   return std::move(p_->GetDistanceDatas());
 }
 
-void Camera::WaitForStream() {
+void Camera::WaitForStreams() {
   return p_->WaitForStream();
+}
+
+void Camera::WaitForStream() {
+  return WaitForStreams();
 }
 
 std::shared_ptr<Colorizer> Camera::GetColorizer() const {

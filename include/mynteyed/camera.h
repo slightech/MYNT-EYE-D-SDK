@@ -37,9 +37,6 @@ using Stream = ImageType;
 
 class MYNTEYE_API Camera {
  public:
-  /*
-  Camera
-*/
   using img_info_callback_t =
       std::function<void(const std::shared_ptr<ImgInfo> &info)>;
   using stream_callback_t = std::function<void(const StreamData &data)>;
@@ -262,7 +259,9 @@ class MYNTEYE_API Camera {
   /** Set distance data callback. */
   void SetDistanceCallback(distance_callback_t callback, bool async = true);
 
+#ifdef MYNTEYE_DEPRECATED_COMPAT
   void WaitForStream();
+#endif
 
   /** Get colorizer for depth */
   std::shared_ptr<Colorizer> GetColorizer() const;
@@ -281,29 +280,19 @@ class MYNTEYE_API Camera {
    * */
   void ControlReconnectStatus(const bool &status);
 
-/*
-  API
-*/
-  /** The enable/disable switch callback. */
-  // using stream_switch_callback_t = std::function<void(const Stream &stream)>;
-  /**
-   * Get the device info.
-   */
   StreamRequest SelectStreamRequest(bool *ok) const;
 
   void ConfigStreamRequest(const StreamRequest &request) {
     Open(request);
   }
-    /**
+  /**
    * Supports the stream or not.
-   */
+   **/
   bool Supports(const Stream &stream) const {
     return IsStreamDataEnabled(stream);
   }
 
-  void WaitForStreams() {
-    WaitForStream();
-  }
+  void WaitForStreams();
 
   static std::shared_ptr<Camera> Create() {
     return std::make_shared<Camera>();
