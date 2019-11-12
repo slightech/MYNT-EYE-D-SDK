@@ -105,6 +105,7 @@ Device::~Device() {
   free(stream_color_info_ptr_);
   free(stream_depth_info_ptr_);
   Close();
+  colorizer_ = nullptr;
 }
 
 void Device::Init() {

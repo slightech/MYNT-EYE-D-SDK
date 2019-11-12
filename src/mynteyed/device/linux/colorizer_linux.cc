@@ -55,49 +55,46 @@ Image::pointer ColorizerLinux::Process(const Image::pointer& depth_buf,
   if (depth_mode == DepthMode::DEPTH_RAW) {
     // ImageFormat::DEPTH_RAW
     if (is_8bits_) {  // 8bits, usb2
-      static auto depth_raw_buf = ImageDepth::Create(ImageFormat::DEPTH_RAW,
-          depth_width, depth_height, true);
-      depth_raw_buf->ResetBuffer();
-      depth_raw_buf->set_frame_id(depth_buf->frame_id());
-      AdaptU2Raw(depth_buf->data(), depth_raw_buf->data(),
+      auto depth_raw = ImageDepth::Create(ImageFormat::DEPTH_RAW,
+          depth_width, depth_height, false);
+      depth_raw->set_frame_id(depth_buf->frame_id());
+      AdaptU2Raw(depth_buf->data(), depth_raw->data(),
           depth_width, depth_height);
-      return depth_raw_buf;
+      return depth_raw;
     } else {  // 14bits, usb3
       return depth_buf;
     }
   } else if (depth_mode == DepthMode::DEPTH_COLORFUL) {
     // ImageFormat::DEPTH_RGB
-    static auto depth_rgb_buf = ImageDepth::Create(ImageFormat::DEPTH_RGB,
-        depth_width, depth_height, true);
-    depth_rgb_buf->ResetBuffer();
-    depth_rgb_buf->set_frame_id(depth_buf->frame_id());
+    auto depth_rgb = ImageDepth::Create(ImageFormat::DEPTH_RGB,
+        depth_width, depth_height, false);
+    depth_rgb->set_frame_id(depth_buf->frame_id());
     if (is_8bits_) {  // 8bits, usb2
       ColorPaletteGenerator::UpdateD8bitsDisplayImage_DIB24(
-          m_ColorPalette, depth_buf->data(), depth_rgb_buf->data(),
+          m_ColorPalette, depth_buf->data(), depth_rgb->data(),
           depth_width, depth_height);
     } else {  // 14bits, usb3
       ColorPaletteGenerator::UpdateZ14DisplayImage_DIB24(
-          m_ColorPaletteZ14, depth_buf->data(), depth_rgb_buf->data(),
+          m_ColorPaletteZ14, depth_buf->data(), depth_rgb->data(),
           depth_width, depth_height);
     }
-    return depth_rgb_buf;
+    return depth_rgb;
   } else if (depth_mode == DepthMode::DEPTH_GRAY) {
     // ImageFormat::DEPTH_GRAY_24
-    static auto depth_gray_buf = ImageDepth::Create(
+    auto depth_gray = ImageDepth::Create(
         ImageFormat::DEPTH_GRAY_24,
-        depth_width, depth_height, true);
-    depth_gray_buf->ResetBuffer();
-    depth_gray_buf->set_frame_id(depth_buf->frame_id());
+        depth_width, depth_height, false);
+    depth_gray->set_frame_id(depth_buf->frame_id());
     if (is_8bits_) {  // 8bits, usb2
       ColorPaletteGenerator::UpdateD8bitsDisplayImage_DIB24(
-          m_GrayPalette, depth_buf->data(), depth_gray_buf->data(),
+          m_GrayPalette, depth_buf->data(), depth_gray->data(),
           depth_width, depth_height);
     } else {  // 14bits, usb3
       ColorPaletteGenerator::UpdateZ14DisplayImage_DIB24(
-          m_GrayPaletteZ14, depth_buf->data(), depth_gray_buf->data(),
+          m_GrayPaletteZ14, depth_buf->data(), depth_gray->data(),
           depth_width, depth_height);
     }
-    return depth_gray_buf;
+    return depth_gray;
   } else {
     LOGE("Colorizer unaccepted depth mode: %s", depth_mode);
     return nullptr;
