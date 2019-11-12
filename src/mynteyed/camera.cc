@@ -295,12 +295,14 @@ std::vector<DistanceData> Camera::GetDistanceDatas() {
 }
 
 void Camera::WaitForStreams() {
-  return p_->WaitForStream();
+  return p_->WaitForStreams();
 }
 
+#ifdef MYNTEYE_DEPRECATED_COMPAT
 void Camera::WaitForStream() {
   return WaitForStreams();
 }
+#endif
 
 std::shared_ptr<Colorizer> Camera::GetColorizer() const {
   return p_->GetColorizer();

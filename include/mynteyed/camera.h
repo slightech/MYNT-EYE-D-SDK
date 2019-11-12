@@ -259,6 +259,8 @@ class MYNTEYE_API Camera {
   /** Set distance data callback. */
   void SetDistanceCallback(distance_callback_t callback, bool async = true);
 
+  void WaitForStreams();
+  
 #ifdef MYNTEYE_DEPRECATED_COMPAT
   void WaitForStream();
 #endif
@@ -291,8 +293,6 @@ class MYNTEYE_API Camera {
   bool Supports(const Stream &stream) const {
     return IsStreamDataEnabled(stream);
   }
-
-  void WaitForStreams();
 
   static std::shared_ptr<Camera> Create() {
     return std::make_shared<Camera>();
