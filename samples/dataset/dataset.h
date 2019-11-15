@@ -46,11 +46,10 @@ class Dataset {
   writer_t GetMotionWriter();
   writer_t GetStreamWriter(const ImageType &type);
 
-  std::string outdir_;
-
   writer_t motion_writer_;
   std::map<ImageType, writer_t> stream_writers_;
   std::size_t motion_count_;
+  std::string outdir_;
   std::map<ImageType, std::size_t> stream_count_;
 };
 
