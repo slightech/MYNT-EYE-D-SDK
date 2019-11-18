@@ -510,8 +510,9 @@ bool Device::Open(const OpenParams& params) {
     }
     bool is_8bits = depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS
         || depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS_RAW;  // usb2, 8bits
-    colorizer_->Init(params.colour_depth_value, is_8bits,
-        GetCameraCalibration(params.stream_mode));
+    if (!stream_color_info_ptr_[color_res_index_].bFormatMJPG)
+      colorizer_->Init(params.colour_depth_value, is_8bits,
+          GetCameraCalibration(params.stream_mode));
     return true;
   } else {
     is_device_opened_ = false;
