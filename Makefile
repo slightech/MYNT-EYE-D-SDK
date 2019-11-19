@@ -17,6 +17,7 @@ MKFILE_DIR := $(patsubst %/,%,$(dir $(MKFILE_PATH)))
 include CommonDefs.mk
 
 SUDO ?= sudo
+CMAKE_BUILD_EXTRA_OPTIONS ?=
 
 .DEFAULT_GOAL := all
 
@@ -58,9 +59,9 @@ init:
 build:
 	@$(call echo,Make $@)
 ifeq ($(HOST_OS),Win)
-	@$(call cmake_build,./_build,..,-DCMAKE_INSTALL_PREFIX=$(MKFILE_DIR)/_install)
+	@$(call cmake_build,./_build,..,-DCMAKE_INSTALL_PREFIX=$(MKFILE_DIR)/_install $(CMAKE_BUILD_EXTRA_OPTIONS))
 else
-	@$(call cmake_build,./_build,..)
+	@$(call cmake_build,./_build,..,$(CMAKE_BUILD_EXTRA_OPTIONS))
 endif
 
 .PHONY: build
@@ -221,3 +222,4 @@ host:
 	@echo LDD: $(LDD)
 	@echo FIND: $(FIND)
 	@echo PKGNAME: $(PKGNAME)
+	@echo CMAKE_BUILD_EXTRA_OPTIONS: $(CMAKE_BUILD_EXTRA_OPTIONS)
