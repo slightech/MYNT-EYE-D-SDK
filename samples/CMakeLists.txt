@@ -103,6 +103,15 @@ make_executable(get_image
   DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
 )
 
+make_executable(get_image_by_sn
+  SRCS
+    src/get_image_by_sn.cc
+    src/util/cam_utils.cc
+    src/util/cv_painter.cc
+  LINK_LIBS mynteye_depth ${OpenCV_LIBS}
+  DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
+)
+
 make_executable(get_stereo_image
   SRCS
     src/get_stereo_image.cc
