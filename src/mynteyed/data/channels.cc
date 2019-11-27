@@ -71,7 +71,8 @@ void CheckSpecVersion(const Version *spec_version) {
 Channels::Channels() : img_callback_(nullptr),
   imu_callback_(nullptr),
   gps_callback_(nullptr),
-  dis_callback_(nullptr) {
+  dis_callback_(nullptr),
+  enable_imu_correspondence(false) {
   hid_ = std::make_shared<hid::hid_device>();
   Detect();
   Open();
@@ -212,7 +213,6 @@ bool Channels::DoHidTrack(device_desc_t *desc) {
   img_packets.clear();
   gps_packets.clear();
   dis_packets.clear();
-
   if (!DoHidDataExtract(desc, imu_packets, img_packets,
         gps_packets, dis_packets)) {
     return false;
@@ -364,7 +364,7 @@ bool Channels::DoHidDataExtract(device_desc_t *desc, imu_packets_t &imu, img_pac
       static float temperature = 0.f;
       if (header == ACCEL || header == GYRO || header == ACCEL_AND_GYRO) {
         ImuDataPacket imu_data;
-        if (desc != nullptr && (Version(1, 4) < desc->firmware_version)) {
+        if (desc != nullptr && (Version(1, 1) <= desc->spec_version)) {
           imu_data = ImuDataPacket(true, packet + offset);
           imu_data.temperature = temperature;
         } else {
@@ -400,7 +400,6 @@ bool Channels::DoHidDataExtract(device_desc_t *desc, imu_packets_t &imu, img_pac
       offset += length;
     }
   }
-
   return true;
 }
 

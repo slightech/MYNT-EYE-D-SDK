@@ -79,7 +79,7 @@ struct MYNTEYE_API ImgInfo {
 
 #define MYNTEYE_IMU_ACCEL 1
 #define MYNTEYE_IMU_GYRO 2
-#define MYNTEYE_IMU_ACCEL_GYRO_CALIB 10
+#define MYNTEYE_IMU_ACCEL_GYRO_CALIB 11
 
 /**
  * @ingroup datatypes

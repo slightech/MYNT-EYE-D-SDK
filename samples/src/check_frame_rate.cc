@@ -287,6 +287,11 @@ int main(int argc, char const* argv[]) {
             //   << ", z: " << data.imu->gyro[2]
             //   << ", temp: " << data.imu->temperature
             //   << std::endl;
+          } else if (data.imu->flag == MYNTEYE_IMU_ACCEL_GYRO_CALIB) {
+            imu_record.push_back("\n[accel] stamp: ", data.imu->timestamp);
+            imu_record.push_back("\n[gyro] stamp: ", data.imu->timestamp);
+            counter.IncrAccelCount();
+            counter.IncrGyroCount();
           } else {
             std::cerr << "Imu type is unknown" << std::endl;
           }

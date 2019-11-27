@@ -121,7 +121,7 @@ struct ImuDataPacket {
       gyro[0] = *((float*)(data + 6));
       gyro[1] = *((float*)(data + 10));
       gyro[2] = *((float*)(data + 14));
-    } else if (flag == 10) {
+    } else if (flag == 11) {
       accel[0] = *((float*)(data + 6));
       accel[1] = *((float*)(data + 10));
       accel[2] = *((float*)(data + 14));
@@ -136,7 +136,6 @@ struct ImuDataPacket {
       gyro[1] = 0.f;
       gyro[2] = 0.f;
     }
-
   }
 };
 #pragma pack(pop)
