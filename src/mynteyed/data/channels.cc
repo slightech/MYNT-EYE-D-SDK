@@ -50,7 +50,7 @@ void CheckSpecVersion(const Version *spec_version) {
     return;
   }
 
-  std::vector<std::string> spec_versions{"1.0"};
+  std::vector<std::string> spec_versions{"1.0", "1.1"};
   for (auto &&spec_ver : spec_versions) {
     if (*spec_version == Version(spec_ver)) {
       return;  // supported
