@@ -3,6 +3,14 @@
 Change Log
 ============
 
+2019-12-4 v1.9.0
+----------------------
+
+1. Use device to process imu before sdk. 
+2. Change samples location and doc.
+3. Fix usb2.0 some bugs.
+4. Add api and sample for mynteye-s-sdk style.
+
 2019-08-26 v1.8.0
 ----------------------
 
