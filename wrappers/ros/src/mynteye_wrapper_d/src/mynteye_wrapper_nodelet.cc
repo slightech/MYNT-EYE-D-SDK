@@ -1040,6 +1040,19 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
           + motion_intrinsics->gyro.y[0];
       res.gyro[2] -= motion_intrinsics->gyro.z[1] * temp
           + motion_intrinsics->gyro.z[0];
+    } else if (res.flag == 11) {
+      res.accel[0] -= motion_intrinsics->accel.x[1] * temp
+          + motion_intrinsics->accel.x[0];
+      res.accel[1] -= motion_intrinsics->accel.y[1] * temp
+          + motion_intrinsics->accel.y[0];
+      res.accel[2] -= motion_intrinsics->accel.z[1] * temp
+          + motion_intrinsics->accel.z[0];
+      res.gyro[0] -= motion_intrinsics->gyro.x[1] * temp
+          + motion_intrinsics->gyro.x[0];
+      res.gyro[1] -= motion_intrinsics->gyro.y[1] * temp
+          + motion_intrinsics->gyro.y[0];
+      res.gyro[2] -= motion_intrinsics->gyro.z[1] * temp
+          + motion_intrinsics->gyro.z[0];
     }
     return res;
   }
