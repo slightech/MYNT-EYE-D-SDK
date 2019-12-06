@@ -109,6 +109,7 @@ int main(int argc, char const *argv[]) {
         } else if (motion.imu->flag == MYNTEYE_IMU_GYRO) {
           ++gyro_count;
         } else if (motion.imu->flag == MYNTEYE_IMU_ACCEL_GYRO_CALIB) {
+          ++accel_count;
           ++gyro_count;
         } else {
           continue;
