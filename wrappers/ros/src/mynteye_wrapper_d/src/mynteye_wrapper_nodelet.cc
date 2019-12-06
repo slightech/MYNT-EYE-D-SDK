@@ -83,6 +83,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   int skip_tag;
   int skip_tmp_left_tag;
   int skip_tmp_right_tag;
+  Version spec_version;
 
   pthread_mutex_t mutex_sub_result;
   pthread_mutex_t mutex_color;
@@ -271,9 +272,10 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     nh_ns.getParamCached("imu_processed_topic", imu_processed_topic);
 
     // MYNTEYE objects
+    std::vector<DeviceInfo> dev_infos;
     mynteye.reset(new Camera);
     {
-      std::vector<DeviceInfo> dev_infos = mynteye->GetDeviceInfos();
+      dev_infos = mynteye->GetDeviceInfos();
       size_t n = dev_infos.size();
       if (n <= 0 || dev_index < 0 || dev_index >= n) {
         NODELET_ERROR_STREAM("Device not found, index: " << dev_index);
@@ -290,6 +292,7 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
       params.dev_index = dev_index;
     }
+    spec_version = mynteye->GetDescriptors()->spec_version;
     {
       std::vector<StreamInfo> color_infos;
       std::vector<StreamInfo> depth_infos;
@@ -507,6 +510,14 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
             publishImu(sub_result_imu, sub_result_imu_processed, sub_result_temp);
           }
         } else if (data.imu->flag == MYNTEYE_IMU_GYRO) {
+          imu_gyro = data.imu;
+          if (imu_timestamp_align) {
+            publishAlignImu(sub_result_imu, sub_result_imu_processed, sub_result_temp);
+          } else {
+            publishImu(sub_result_imu, sub_result_imu_processed, sub_result_temp);
+          }
+        } else if (data.imu->flag == MYNTEYE_IMU_ACCEL_GYRO_CALIB) {
+          imu_accel = data.imu;
           imu_gyro = data.imu;
           if (imu_timestamp_align) {
             publishAlignImu(sub_result_imu, sub_result_imu_processed, sub_result_temp);
@@ -750,7 +761,9 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
   void publishAlignImu(bool imu_sub,
       bool imu_processed_sub, bool temp_sub) {
-    timestampAlign();
+    if (spec_version <= Version(1, 0)) {
+      timestampAlign();
+    }
 
     if (imu_accel == nullptr || imu_gyro == nullptr) {
       return;
@@ -1013,6 +1026,13 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
       for (int i = 0; i < 3; i++) {
         res.gyro[i] = d[i][0];
       }
+    } else if (res.flag == 11) {
+      res.accel[0] = data.accel[0];
+      res.accel[1] = data.accel[1];
+      res.accel[2] = data.accel[2];
+      res.gyro[0] = data.gyro[0];
+      res.gyro[1] = data.gyro[1];
+      res.gyro[2] = data.gyro[2];
     }
     return res;
   }
