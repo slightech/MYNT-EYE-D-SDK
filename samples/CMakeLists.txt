@@ -103,6 +103,12 @@ make_executable(get_image
   DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
 )
 
+make_executable(get_device_info 
+    SRCS src/get_device_info.cc
+    LINK_LIBS mynteye_depth
+    DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
+)
+
 make_executable(get_image_by_sn
   SRCS
     src/get_image_by_sn.cc
