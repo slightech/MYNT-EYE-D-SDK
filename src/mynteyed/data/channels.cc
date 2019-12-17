@@ -460,6 +460,10 @@ std::size_t from_data(Channels::device_desc_t *desc, const std::uint8_t *data) {
   desc->nominal_baseline = _from_data<std::uint16_t>(data + i);
   i += 2;
 
+  if ((desc->spec_version >= Version(1, 1))) {
+    desc->serial_number = desc->serial_number.substr(0, 20);
+  }
+
   return i;
 }
 

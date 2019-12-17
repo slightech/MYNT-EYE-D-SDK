@@ -15,8 +15,8 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  dir.append(MYNTEYE_OS_SEP "SN")
-     .append(descs->serial_number);
+  auto sn = descs->serial_number;
+  dir.append(MYNTEYE_OS_SEP "SN").append(sn);
 
   tools::DeviceWriter writer(device);
   writer.SaveAllDatas(dir);
