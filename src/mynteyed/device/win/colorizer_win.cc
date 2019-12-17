@@ -432,18 +432,19 @@ Image::pointer ColorizerWin::Process(const Image::pointer& depth_buf,
 
   int depth_width = depth_buf->width();
   int depth_height = depth_buf->height();
+  ImageDepth::pointer depth_raw;
   if (is_8bits_) {  // 8bits, usb2 (depth width is half, wanted need x2)
     depth_width = depth_width * 2;
+    depth_raw = ImageDepth::Create(ImageFormat::DEPTH_RAW,
+          depth_width, depth_height, false);
+    depth_raw->set_frame_id(depth_buf->frame_id());
+    AdaptU2Raw(depth_buf->data(), depth_raw->data(),
+          depth_width, depth_height);
   }
 
   if (depth_mode == DepthMode::DEPTH_RAW) {
     // ImageFormat::DEPTH_RAW
     if (is_8bits_) {  // 8bits, usb2
-      auto depth_raw = ImageDepth::Create(ImageFormat::DEPTH_RAW,
-          depth_width, depth_height, false);
-      depth_raw->set_frame_id(depth_buf->frame_id());
-      AdaptU2Raw(depth_buf->data(), depth_raw->data(),
-          depth_width, depth_height);
       return depth_raw;
     } else {
       // return clone as it will be changed in imgcallback
@@ -455,7 +456,7 @@ Image::pointer ColorizerWin::Process(const Image::pointer& depth_buf,
         depth_width, depth_height, false);
     depth_rgb->set_frame_id(depth_buf->frame_id());
     UpdateZ14DisplayImage_DIB24(m_ColorPaletteZ14,
-        depth_buf->data(), depth_rgb->data(),
+        is_8bits ? depth_raw->data() : depth_buf->data(), depth_rgb->data(),
         depth_width, depth_height);
     return depth_rgb;
   } else if (depth_mode == DepthMode::DEPTH_GRAY) {
@@ -464,7 +465,7 @@ Image::pointer ColorizerWin::Process(const Image::pointer& depth_buf,
         depth_width, depth_height, false);
     depth_gray->set_frame_id(depth_buf->frame_id());
     UpdateZ14DisplayImage_DIB24(m_GrayPaletteZ14,
-        depth_buf->data(), depth_gray->data(),
+        is_8bits ? depth_raw->data() : depth_buf->data(), depth_gray->data(),
         depth_width, depth_height);
     return depth_gray;
   }
