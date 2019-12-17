@@ -85,15 +85,6 @@ set(MYNTEYE_DLL_SEARCH_PATHS
   ${OpenCV_LIB_SEARCH_PATH}
 )
 
-make_executable(check_frame_rate
-  SRCS
-    src/check_frame_rate.cc
-    src/util/cam_utils.cc
-    src/util/cv_painter.cc
-  LINK_LIBS mynteye_depth ${OpenCV_LIBS}
-  DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
-)
-
 make_executable(get_image
   SRCS
     src/get_image.cc
@@ -107,15 +98,6 @@ make_executable(get_device_info
     SRCS src/get_device_info.cc
     LINK_LIBS mynteye_depth
     DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
-)
-
-make_executable(get_image_by_sn
-  SRCS
-    src/get_image_by_sn.cc
-    src/util/cam_utils.cc
-    src/util/cv_painter.cc
-  LINK_LIBS mynteye_depth ${OpenCV_LIBS}
-  DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
 )
 
 make_executable(get_stereo_image
@@ -154,15 +136,6 @@ make_executable(get_imu
   DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
 )
 
-make_executable(get_from_callbacks_api
-  SRCS
-    src/get_from_callbacks_api.cc
-    src/util/cam_utils.cc
-    src/util/cv_painter.cc
-  LINK_LIBS mynteye_depth ${OpenCV_LIBS}
-  DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
-)
-
 make_executable(get_from_callbacks
   SRCS
     src/get_from_callbacks.cc
@@ -188,13 +161,6 @@ make_executable(get_img_params
   DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
 )
 
-make_executable(set_img_params
-  SRCS
-    src/set_img_params.cc
-  LINK_LIBS mynteye_depth ${OpenCV_LIBS}
-  DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
-)
-
 make_executable(get_imu_params
   SRCS
     src/get_imu_params.cc
@@ -212,15 +178,6 @@ make_executable(get_gps
 make_executable(get_ultrasonic
   SRCS
     src/get_ultrasonic.cc
-  LINK_LIBS mynteye_depth ${OpenCV_LIBS}
-  DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
-)
-
-make_executable(get_sensor_temp
-  SRCS
-    src/get_sensor_temp.cc
-    src/util/cam_utils.cc
-    src/util/cv_painter.cc
   LINK_LIBS mynteye_depth ${OpenCV_LIBS}
   DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
 )

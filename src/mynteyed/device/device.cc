@@ -486,8 +486,12 @@ bool Device::Open(const OpenParams& params) {
       stream_color_info_ptr_[color_res_index_].nWidth,
       stream_color_info_ptr_[color_res_index_].nHeight,
       stream_color_info_ptr_[color_res_index_].bFormatMJPG ? "MJPG" : "YUYV");
+  int depth_width = stream_depth_info_ptr_[depth_res_index_].nWidth;
+  if (IsUSB2()) {
+    depth_width *= 2;
+  }
   LOGI("-- Depth Stream: %dx%d %s",
-      stream_depth_info_ptr_[depth_res_index_].nWidth,
+      depth_width,
       stream_depth_info_ptr_[depth_res_index_].nHeight,
       stream_depth_info_ptr_[depth_res_index_].bFormatMJPG ? "MJPG" : "YUYV");
 
@@ -510,7 +514,7 @@ bool Device::Open(const OpenParams& params) {
     }
     bool is_8bits = depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS
         || depth_data_type_ == ETronDI_DEPTH_DATA_8_BITS_RAW;  // usb2, 8bits
-    if (!stream_color_info_ptr_[color_res_index_].bFormatMJPG)
+    if (!stream_color_info_ptr_[color_res_index_].bFormatMJPG && is_8bits)
       colorizer_->Init(params.colour_depth_value, is_8bits,
           GetCameraCalibration(params.stream_mode));
     return true;
