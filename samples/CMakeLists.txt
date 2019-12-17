@@ -130,15 +130,6 @@ make_executable(get_imu
   DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
 )
 
-make_executable(get_from_callbacks_api
-  SRCS
-    src/get_from_callbacks_api.cc
-    src/util/cam_utils.cc
-    src/util/cv_painter.cc
-  LINK_LIBS mynteye_depth ${OpenCV_LIBS}
-  DLL_SEARCH_PATHS ${MYNTEYE_DLL_SEARCH_PATHS}
-)
-
 make_executable(get_from_callbacks
   SRCS
     src/get_from_callbacks.cc
