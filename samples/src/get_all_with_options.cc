@@ -125,7 +125,7 @@ int main(int argc, char const* argv[]) {
 
   Camera cam;
   OpenParams params;
-  util::Counter counter;
+  util::Counter counter(options.get("framerate"));
 
   DeviceInfo dev_info;
   {
@@ -306,11 +306,13 @@ int main(int argc, char const* argv[]) {
   CVPainter painter;
   for (;;) {
     cam.WaitForStream();
-    counter.Update();
-
+    auto allow_count = false;
+    
     if (is_left_ok) {
       auto left_color = cam.GetStreamData(ImageType::IMAGE_LEFT_COLOR);
       if (left_color.img) {
+        allow_count = true;
+       
         cv::Mat mat = left_color.img->To(ImageFormat::COLOR_BGR)->ToMat();
         painter.DrawSize(mat, CVPainter::TOP_LEFT);
         painter.DrawStreamData(mat, left_color, CVPainter::TOP_RIGHT);
@@ -323,16 +325,18 @@ int main(int argc, char const* argv[]) {
     if (is_right_ok) {
       auto right_color = cam.GetStreamData(ImageType::IMAGE_RIGHT_COLOR);
       if (right_color.img) {
+        allow_count = true;
         cv::Mat mat = right_color.img->To(ImageFormat::COLOR_BGR)->ToMat();
         painter.DrawSize(mat, CVPainter::TOP_LEFT);
         painter.DrawStreamData(mat, right_color, CVPainter::TOP_RIGHT);
         cv::imshow("right color", mat);
-      }
+      } 
     }
 
     if (is_depth_ok) {
       auto image_depth = cam.GetStreamData(ImageType::IMAGE_DEPTH);
       if (image_depth.img) {
+        allow_count = true;
         cv::Mat depth;
         if (params.depth_mode == DepthMode::DEPTH_COLORFUL) {
           depth = image_depth.img->To(ImageFormat::DEPTH_BGR)->ToMat();
@@ -342,9 +346,13 @@ int main(int argc, char const* argv[]) {
         painter.DrawSize(depth, CVPainter::TOP_LEFT);
         painter.DrawStreamData(depth, image_depth, CVPainter::TOP_RIGHT);
         cv::imshow("depth", depth);
-      }
+      } 
     }
-
+    if (allow_count == true)
+    {
+      counter.Update();
+    }
+  
     char key = static_cast<char>(cv::waitKey(1));
     if (key == 27 || key == 'q' || key == 'Q') {  // ESC/Q
       break;

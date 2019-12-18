@@ -80,18 +80,26 @@ int main(int argc, char const* argv[]) {
   cv::Mat depth;
   for (;;) {
     cam.WaitForStream();
-    counter.Update();
+    auto allow_count = false;
 
     auto image_color = cam.GetStreamData(ImageType::IMAGE_LEFT_COLOR);
     auto image_depth = cam.GetStreamData(ImageType::IMAGE_DEPTH);
     if (image_color.img && color.empty()) {
+      allow_count = true;
       color = image_color.img->To(ImageFormat::COLOR_BGR)->ToMat();
     }
     if (image_depth.img && depth.empty()) {
+      allow_count = true;
       depth = image_depth.img->To(ImageFormat::DEPTH_RAW)->ToMat();
     }
 
     if (color.empty() || depth.empty()) { continue; }
+
+    if (allow_count == true)
+    {
+      counter.Update();
+    }
+    
 
     viewer.Update(color, depth);
 

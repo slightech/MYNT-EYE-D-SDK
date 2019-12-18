@@ -230,10 +230,11 @@ int main(int argc, char const* argv[]) {
   util::Counter counter;
   for (;;) {
     cam.WaitForStream();
-    counter.Update();
+    auto allow_count = false;
 
     auto image_color = cam.GetStreamData(ImageType::IMAGE_LEFT_COLOR);
     if (image_color.img) {
+      allow_count = true;
       cv::Mat color = image_color.img->To(ImageFormat::COLOR_BGR)->ToMat();
       painter.DrawSize(color, CVPainter::TOP_LEFT);
       painter.DrawStreamData(color, image_color, CVPainter::TOP_RIGHT);
@@ -247,6 +248,7 @@ int main(int argc, char const* argv[]) {
 
     auto image_depth = cam.GetStreamData(ImageType::IMAGE_DEPTH);
     if (image_depth.img) {
+      allow_count = true;
       auto &&depth_raw = image_depth.img->To(ImageFormat::DEPTH_RAW);
       auto &&depth_color = cam.GetColorizer()->Process(depth_raw, ImageFormat::DEPTH_BGR)->ToMat();
 
@@ -259,6 +261,12 @@ int main(int argc, char const* argv[]) {
         return std::to_string(elem);
       }, 80, depth_info);
     }
+
+    if (allow_count == true)
+    {
+      counter.Update();
+    }
+    
 
     char key = static_cast<char>(cv::waitKey(1));
     if (key == 27 || key == 'q' || key == 'Q') {  // ESC/Q

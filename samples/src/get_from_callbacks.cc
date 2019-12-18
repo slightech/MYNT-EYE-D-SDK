@@ -165,11 +165,12 @@ int main(int argc, char const* argv[]) {
   util::Counter counter;
   for (;;) {
     cam.WaitForStream();
-    counter.Update();
+    auto allow_count = false;
 
     if (is_left_ok) {
       auto left_color = cam.GetStreamData(ImageType::IMAGE_LEFT_COLOR);
       if (left_color.img) {
+        allow_count = true;
         cv::Mat left = left_color.img->To(ImageFormat::COLOR_BGR)->ToMat();
         painter.DrawSize(left, CVPainter::TOP_LEFT);
         painter.DrawStreamData(left, left_color, CVPainter::TOP_RIGHT);
@@ -182,6 +183,7 @@ int main(int argc, char const* argv[]) {
     if (is_right_ok) {
       auto right_color = cam.GetStreamData(ImageType::IMAGE_RIGHT_COLOR);
       if (right_color.img) {
+        allow_count = true;
         cv::Mat right = right_color.img->To(ImageFormat::COLOR_BGR)->ToMat();
         painter.DrawSize(right, CVPainter::TOP_LEFT);
         painter.DrawStreamData(right, right_color, CVPainter::TOP_RIGHT);
@@ -192,6 +194,7 @@ int main(int argc, char const* argv[]) {
     if (is_depth_ok) {
       auto image_depth = cam.GetStreamData(ImageType::IMAGE_DEPTH);
       if (image_depth.img) {
+        allow_count = true;
         cv::Mat depth;
         if (params.depth_mode == DepthMode::DEPTH_COLORFUL) {
           depth = image_depth.img->To(ImageFormat::DEPTH_BGR)->ToMat();
@@ -203,6 +206,12 @@ int main(int argc, char const* argv[]) {
         cv::imshow("depth", depth);
       }
     }
+
+    if (allow_count == true)
+    {
+      counter.Update();
+    }
+    
 
     char key = static_cast<char>(cv::waitKey(1));
     if (key == 27 || key == 'q' || key == 'Q') {  // ESC/Q
