@@ -25,7 +25,7 @@
 #include "util/cv_painter.h"
 
 namespace {
-
+static cv::Mat cv_in_left, cv_in_left_inv;
 class DepthRegion {
  public:
   explicit DepthRegion(std::uint32_t n)
@@ -71,8 +71,9 @@ class DepthRegion {
   void ShowElems(const cv::Mat& depth,
       std::function<std::string(const T& elem)> elem2string,
       int elem_space = 40,
-      std::function<std::string(const cv::Mat& depth, const cv::Point& point,
-          const std::uint32_t& n)> getinfo = nullptr) {
+      std::function<std::string(
+          const cv::Mat &depth, const cv::Point &point, const std::uint32_t &n,
+          double X, double Y, double Z)>getinfo = nullptr) {
     if (!show_) return;
 
     int space = std::move(elem_space);
@@ -82,6 +83,15 @@ class DepthRegion {
     int x, y;
     std::string str;
     int baseline = 0;
+
+    // calculate (X, Y, Z) in left camera coordinate
+    cv::Mat mouse_left_cor(3, 1, CV_64FC1), mouse_img_cor(3, 1, CV_64FC1);
+    mouse_img_cor.at<double>(0, 0) = static_cast<double>(point_.x);
+    mouse_img_cor.at<double>(0, 1) = static_cast<double>(point_.y);
+    mouse_img_cor.at<double>(0, 2) = 1.0;
+    double Z = depth.at<T>(point_.y, point_.x);
+    mouse_left_cor = cv_in_left_inv *Z * mouse_img_cor;
+
     for (int i = -n_; i <= n; ++i) {
       x = point_.x + i;
       if (x < 0 || x >= depth.cols) continue;
@@ -105,7 +115,11 @@ class DepthRegion {
     }
 
     if (getinfo) {
-      std::string info = getinfo(depth, point_, n_);
+      double x, y, z;
+      x = mouse_left_cor.at<double>(0, 0);
+      y = mouse_left_cor.at<double>(1, 0);
+      z = mouse_left_cor.at<double>(2, 0);
+      std::string info = getinfo(depth, point_, n_,  x, y, z);
       if (!info.empty()) {
         cv::Size sz = cv::getTextSize(info,
           cv::FONT_HERSHEY_PLAIN, 1, 1, &baseline);
@@ -192,7 +206,12 @@ int main(int argc, char const* argv[]) {
   }
 
   cam.Open(params);
-
+  auto stream_intrinsics = cam.GetStreamIntrinsics(params.stream_mode);
+  cv_in_left = cv::Mat::eye(3, 3, CV_64F);
+  cv_in_left.at<double>(0, 0) = stream_intrinsics.left.fx;
+  cv_in_left.at<double>(1, 1) = stream_intrinsics.left.fy;
+  cv_in_left.at<double>(0, 2) = stream_intrinsics.left.cx;
+  cv_in_left.at<double>(1, 2) = stream_intrinsics.left.cy;
   cout << endl;
   if (!cam.IsOpened()) {
     cerr << "Error: Open camera failed" << endl;
@@ -201,14 +220,15 @@ int main(int argc, char const* argv[]) {
   cout << "Open device success" << endl << endl;
 
   cout << "Press ESC/Q on Windows to terminate" << endl;
-
+  cv_in_left_inv = cv_in_left.inv();
   cv::namedWindow("color");
   cv::namedWindow("depth");
   cv::namedWindow("region");
 
   DepthRegion depth_region(3);
   auto depth_info = [](
-      const cv::Mat& depth, const cv::Point& point, const std::uint32_t& n) {
+      const cv::Mat &depth, const cv::Point &point, const std::uint32_t &n,
+          double X, double Y, double Z) {
     /*
     int row_beg = point.y - n, row_end = point.y + n + 1;
     int col_beg = point.x - n, col_end = point.x + n + 1;
@@ -221,8 +241,9 @@ int main(int argc, char const* argv[]) {
       << endl << endl;
     */
     std::ostringstream os;
-    os << "depth pos: [" << point.y << ", " << point.x << "]"
-      << "±" << n << ", unit: mm";
+    os << "depth pos(" << n << "): [" << point.y << ", " << point.x << "]"
+       << " camera pos: [" << X << ", " << Y
+       << ", " << Z << "]" << ", unit: mm";
     return os.str();
   };
 
