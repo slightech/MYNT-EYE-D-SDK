@@ -123,7 +123,7 @@ int main(int argc, char const* argv[]) {
   DepthRegion depth_region(3);
 
   CVPainter painter;
-  util::Counter counter;
+  util::Counter counter(params.framerate);
   for (;;) {
     cam.WaitForStream();
     counter.Update();

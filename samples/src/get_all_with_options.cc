@@ -125,7 +125,7 @@ int main(int argc, char const* argv[]) {
 
   Camera cam;
   OpenParams params;
-  util::Counter counter(options.get("framerate"));
+  util::Counter counter(static_cast<int>(options.get("framerate")));
 
   DeviceInfo dev_info;
   {

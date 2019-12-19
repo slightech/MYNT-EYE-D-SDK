@@ -75,7 +75,7 @@ int main(int argc, char const* argv[]) {
 
   CVPainter painter;
   PCViewer viewer(stream_intrinsics.left, CAMERA_FACTOR);
-  util::Counter counter;
+  util::Counter counter(params.framerate);
   cv::Mat color;
   cv::Mat depth;
   for (;;) {

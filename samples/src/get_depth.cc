@@ -248,7 +248,7 @@ int main(int argc, char const* argv[]) {
   };
 
   CVPainter painter;
-  util::Counter counter;
+  util::Counter counter(params.framerate);
   for (;;) {
     cam.WaitForStream();
     auto allow_count = false;
