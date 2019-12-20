@@ -4,7 +4,6 @@ SDK Samples
 .. toctree::
    :maxdepth: 2
 
-   tools/contents
    get_stereo_image
    get_image
    get_depth
@@ -17,3 +16,6 @@ SDK Samples
    set_open_params
    camera_control_params
    depth_filter
+   record_data
+   save_all_infos
+   write_imu_params

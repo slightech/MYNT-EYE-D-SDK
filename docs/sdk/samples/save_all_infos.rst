@@ -46,5 +46,5 @@ Saved contents:
          └─imu.params
 
 Complete code samples，see
-`save_all_infos.cc <https://github.com/slightech/MYNT-EYE-D-SDK/blob/master/tools/writer/save_all_infos.cc>`__
+`save_all_infos.cc <https://github.com/slightech/MYNT-EYE-D-SDK/blob/master/samples/writer/save_all_infos.cc>`__
 .

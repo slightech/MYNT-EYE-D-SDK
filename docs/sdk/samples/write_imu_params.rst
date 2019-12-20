@@ -11,13 +11,13 @@ Reference commands:
 
 .. code-block:: bash
 
-   ./samples/_output/bin/writer/imu_params_writer tools/writer/config/imu.params
+   ./samples/_output/bin/writer/imu_params_writer samples/writer/config/imu.params
 
    # Windows
-   .\samples\_output\bin\writer\imu_params_writer.bat tools\writer\config\imu.params
+   .\samples\_output\bin\writer\imu_params_writer.bat samples\writer\config\imu.params
 
 The path of parameters file can be found in
-`tools/writer/config/imu.params <https://github.com/slightech/MYNT-EYE-D-SDK/blob/master/tools/writer/config/imu.params>`__
+`samples/writer/config/imu.params <https://github.com/slightech/MYNT-EYE-D-SDK/blob/master/samples/writer/config/imu.params>`__
 . If you calibrated the parameters yourself, you can edit the file and
 run above commands to write them into the device.
 
@@ -25,5 +25,5 @@ run above commands to write them into the device.
    ``save_all_infos`` to backup parameters.
 
 Complete code samples，see
-`imu_params_writer.cc <https://github.com/slightech/MYNT-EYE-D-SDK/blob/master/tools/writer/imu_params_writer.cc>`__
+`imu_params_writer.cc <https://github.com/slightech/MYNT-EYE-D-SDK/blob/master/samples/writer/imu_params_writer.cc>`__
 .
