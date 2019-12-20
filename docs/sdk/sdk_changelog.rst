@@ -6,10 +6,11 @@ Change Log
 2019-12-4 v1.9.0
 ----------------------
 
-1. Use device to process imu before sdk. 
-2. Change samples location and doc.
-3. Fix usb2.0 some bugs.
-4. Add api and sample for mynteye-s-sdk style.
+1. Add firmware_version:1.6 supports. 
+2. Add USB2.0 depth stream supports.
+3. Adjust samples location.
+4. Add sample get_device_info.
+5. Add left camera coordinate calculation to sample get_depth.
 
 2019-08-26 v1.8.0
 ----------------------
