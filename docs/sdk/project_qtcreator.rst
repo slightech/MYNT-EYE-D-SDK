@@ -7,7 +7,7 @@ This tutorial will create a Qt project with Qt Creator to start using
 SDK.
 
    You could find the project demo in
-   ``<sdk>/platforms/projects/qtcreator`` directory.
+   ``<sdk>/samples/simple_demo/qtcreator`` directory.
 
 Preparation
 -----------

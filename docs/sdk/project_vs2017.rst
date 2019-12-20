@@ -7,7 +7,7 @@ This tutorial will create a project with Visual Studio 2017 to start
 using SDK.
 
    You could find the project demo in
-   ``<sdk>/platforms/projects/vs2017`` directory.
+   ``<sdk>/samples/simple_demo/project_vs2017`` directory.
 
 Preparation
 -----------

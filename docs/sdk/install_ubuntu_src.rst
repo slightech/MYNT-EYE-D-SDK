@@ -196,28 +196,7 @@ part.
 
 ROS installation and operation steps, refer to :ref:`install_ros` 以及 :ref:`install_ros_usage` .
 
-5. Package
-----------
-
-If you wanna package with specified OpenCV version:
-
-.. code-block:: bash
-
-   cd <sdk>  # local path of SDK
-   make cleanall
-   export OpenCV_DIR=<install prefix>
-
-   export OpenCV_DIR=/usr/local
-   export OpenCV_DIR=$HOME/opencv-2.4.13.3
-
-Packaging:
-
-.. code-block:: bash
-
-   cd <sdk>  # local path of SDK
-   make pkg
-
-6. Clean
+5. Clean
 --------
 
 .. code-block:: bash

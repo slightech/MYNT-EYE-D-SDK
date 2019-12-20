@@ -170,7 +170,7 @@ Open “x64 Native Tools Command Prompt for VS 2017”(suggested for Visual Stud
 
 .. code-block:: bat
 
-   ./samples/_output/bin/get_stereo_image.bat
+   .\samples\_output\bin\get_stereo_image.bat
 
 3) get_depth shows the left camera image, 16UC1 depthmap and depth
    value(mm) on mouse pointed pixel
