@@ -10,19 +10,19 @@ Reference run command on Linux:
 
 .. code-block:: bash
 
-   ./tools/_output/bin/dataset/record
+   ./samples/_output/bin/dataset/record
 
 Reference run command on Windows:
 
 .. code-block:: bash
 
-   .\tools\_output\bin\dataset\record.bat
+   .\samples\_output\bin\dataset\record.bat
 
 Reference run results on Linux:
 
 .. code-block:: bash
 
-   $ ./tools/_output/bin/dataset/record
+   $ ./samples/_output/bin/dataset/record
    Saved 1007 imgs, 20040 imus to ./dataset
    I0513 21:29:38.608772 11487 record.cc:118] Time beg: 2018-05-13 21:28:58.255395, end: 2018-05-13 21:29:38.578696, cost: 40323.3ms
    I0513 21:29:38.608853 11487 record.cc:121] Img count: 1007, fps: 24.9732

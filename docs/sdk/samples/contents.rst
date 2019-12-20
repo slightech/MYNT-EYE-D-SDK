@@ -4,6 +4,7 @@ SDK Samples
 .. toctree::
    :maxdepth: 2
 
+   tools/contents
    get_stereo_image
    get_image
    get_depth

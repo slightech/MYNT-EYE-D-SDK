@@ -11,10 +11,10 @@ Reference commands:
 
 .. code-block:: bash
 
-   ./tools/_output/bin/writer/imu_params_writer tools/writer/config/imu.params
+   ./samples/_output/bin/writer/imu_params_writer tools/writer/config/imu.params
 
    # Windows
-   .\tools\_output\bin\writer\imu_params_writer.bat tools\writer\config\imu.params
+   .\samples\_output\bin\writer\imu_params_writer.bat tools\writer\config\imu.params
 
 The path of parameters file can be found in
 `tools/writer/config/imu.params <https://github.com/slightech/MYNT-EYE-D-SDK/blob/master/tools/writer/config/imu.params>`__

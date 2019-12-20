@@ -10,12 +10,12 @@ Reference commands:
 
 .. code-block:: bash
 
-   ./tools/_output/bin/writer/save_all_infos
+   ./samples/_output/bin/writer/save_all_infos
 
 .. code-block:: bat
 
    # Windows
-   .\tools\_output\bin\writer\save_all_infos.bat
+   .\samples\_output\bin\writer\save_all_infos.bat
 
 Reference result on Linux:
 
