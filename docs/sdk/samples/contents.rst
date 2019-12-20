@@ -13,6 +13,7 @@ SDK Samples
    get_all_with_options
    get_image_params
    get_imu_params
+   get_device_info
    set_open_params
    camera_control_params
    depth_filter
