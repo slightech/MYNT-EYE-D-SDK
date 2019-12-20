@@ -6,6 +6,16 @@ Change Log
 Auxiliary Chip Firmware
 ------------------------
 
+2019-12-xx v1.6.3
+~~~~~~~~~~~~~~~~~~~~
+
+MYNTEYE-D-auxiliary-chip-1.6.3.bin
+
+1. Update protocol version
+
+2. Fix and optimize some other issues
+
+
 2019-08-26 v1.4.2
 ~~~~~~~~~~~~~~~~~~~
 
