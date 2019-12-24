@@ -28,6 +28,7 @@
 #include <functional>
 #include <utility>
 #include <iomanip>
+#include <array>
 #include "mynteyed/filter/base_filter.h"
 
 MYNTEYE_BEGIN_NAMESPACE
