@@ -207,11 +207,9 @@ int main(int argc, char const* argv[]) {
       }
     }
 
-    if (allow_count == true)
-    {
+    if (allow_count == true) {
       counter.Update();
     }
-    
 
     char key = static_cast<char>(cv::waitKey(1));
     if (key == 27 || key == 'q' || key == 'Q') {  // ESC/Q

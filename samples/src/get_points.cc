@@ -95,11 +95,9 @@ int main(int argc, char const* argv[]) {
 
     if (color.empty() || depth.empty()) { continue; }
 
-    if (allow_count == true)
-    {
+    if (allow_count == true) {
       counter.Update();
     }
-    
 
     viewer.Update(color, depth);
 

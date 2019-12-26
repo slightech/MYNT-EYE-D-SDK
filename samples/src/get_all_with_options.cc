@@ -307,12 +307,12 @@ int main(int argc, char const* argv[]) {
   for (;;) {
     cam.WaitForStream();
     auto allow_count = false;
-    
+
     if (is_left_ok) {
       auto left_color = cam.GetStreamData(ImageType::IMAGE_LEFT_COLOR);
       if (left_color.img) {
         allow_count = true;
-       
+
         cv::Mat mat = left_color.img->To(ImageFormat::COLOR_BGR)->ToMat();
         painter.DrawSize(mat, CVPainter::TOP_LEFT);
         painter.DrawStreamData(mat, left_color, CVPainter::TOP_RIGHT);
@@ -330,7 +330,7 @@ int main(int argc, char const* argv[]) {
         painter.DrawSize(mat, CVPainter::TOP_LEFT);
         painter.DrawStreamData(mat, right_color, CVPainter::TOP_RIGHT);
         cv::imshow("right color", mat);
-      } 
+      }
     }
 
     if (is_depth_ok) {
@@ -346,13 +346,12 @@ int main(int argc, char const* argv[]) {
         painter.DrawSize(depth, CVPainter::TOP_LEFT);
         painter.DrawStreamData(depth, image_depth, CVPainter::TOP_RIGHT);
         cv::imshow("depth", depth);
-      } 
+      }
     }
-    if (allow_count == true)
-    {
+    if (allow_count == true) {
       counter.Update();
     }
-  
+
     char key = static_cast<char>(cv::waitKey(1));
     if (key == 27 || key == 'q' || key == 'Q') {  // ESC/Q
       break;

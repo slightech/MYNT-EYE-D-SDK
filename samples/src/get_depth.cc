@@ -101,7 +101,7 @@ class DepthRegion {
 
         str = elem2string(depth.at<T>(y, x));
 
-        cv::Scalar color(0,0,0);
+        cv::Scalar color(0, 0, 0);
         if (i == 0 && j == 0) color = cv::Scalar(0, 0, 255);
 
         cv::Size sz = cv::getTextSize(str,
@@ -126,7 +126,7 @@ class DepthRegion {
 
         cv::putText(im, info,
           cv::Point(5, 5 + sz.height),
-          cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar(255,0,255), 1);
+          cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar(255, 0, 255), 1);
       }
     }
 
