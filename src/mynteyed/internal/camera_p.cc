@@ -287,7 +287,8 @@ void CameraPrivate::EnableProcessMode(const ProcessMode& mode) {
 }
 
 void CameraPrivate::EnableProcessMode(const std::int32_t& mode) {
-  motions_->EnableProcessMode(mode);
+  if (Version(1, 6) > descriptors_->firmware_version)
+    motions_->EnableProcessMode(mode);
 }
 
 bool CameraPrivate::IsImageInfoSupported() const {
