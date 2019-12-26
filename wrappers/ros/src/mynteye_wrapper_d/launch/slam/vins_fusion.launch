@@ -46,7 +46,7 @@
   <arg name="color_mode" default="$(arg color_raw)" />
   <!-- Note: must set DEPTH_RAW to get raw depth values for points -->
   <arg name="depth_mode" default="$(arg depth_raw)" />
-  <arg name="stream_mode" default="$(arg stream_1280x480)" />
+  <arg name="stream_mode" default="$(arg stream_2560x720)" />
   <arg name="color_stream_format" default="$(arg stream_yuyv)" />
   <arg name="depth_stream_format" default="$(arg stream_yuyv)" />
   <arg name="depth_type" default="$(arg type_mono16)" />
@@ -125,6 +125,8 @@
       args="0 0 0 $(arg pi/2) 0 $(arg pi) $(arg base_frame) $(arg temp_frame) 50" />
   <node pkg="tf" type="static_transform_publisher" name="b2imu_processed_broadcaster"
       args="0 0 0 $(arg pi/2) 0 $(arg pi) $(arg base_frame) $(arg imu_frame_processed) 50" />
+  
+  <arg name="mesh_file" default="D-0315.obj" />
 
   <node name="mynteye_wrapper_d_node" pkg="mynteye_wrapper_d" type="mynteye_wrapper_d_node" output="screen">
 
@@ -174,6 +176,7 @@
     <param name="temp_topic"        value="$(arg temp_topic)" />
     <param name="imu_processed_topic"         value="$(arg imu_processed_topic)" />
 
+    <param name="mesh_file" value="$(arg mesh_file)" />
     <param name="ros_output_framerate"     value="2" />
   </node>
 
