@@ -683,6 +683,10 @@ void CameraPrivate::WatchDog() {
   watch_thread_ = std::thread([this](){
     Rate rate(100);
     while (true) {
+     if (device_ == nullptr) {
+       std::cout << "dog exit\n";
+       break;
+     }
      if (!device_->UpdateDeviceStatus()) {
        Reconnect();
      }
