@@ -431,6 +431,9 @@ void Device::SetInfraredIntensity(const std::uint16_t &value) {
 }
 
 bool Device::Open(const OpenParams& params) {
+  if (!IsInitDevice()) {
+    Init();
+  }
   open_params_ = params;
   stream_info_dev_index_ = params.dev_index;
 

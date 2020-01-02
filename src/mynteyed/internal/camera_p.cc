@@ -124,7 +124,7 @@ ErrorCode CameraPrivate::Open(const OpenParams& params) {
     streams_->OnCameraOpen();
 #ifdef MYNTEYE_OS_LINUX
     // control whether reconnect
-    if (enable_reconnect_) {
+    if (enable_reconnect_ && !watch_thread_.joinable()) {
       WatchDog();
     }
 #endif
@@ -684,7 +684,7 @@ void CameraPrivate::WatchDog() {
     Rate rate(100);
     while (true) {
      if (device_ == nullptr) {
-       std::cout << "dog exit\n";
+      //  std::cout << "dog exit\n";
        break;
      }
      if (!device_->UpdateDeviceStatus()) {
