@@ -249,6 +249,7 @@ int main(int argc, char const* argv[]) {
 
   CVPainter painter;
   util::Counter counter(params.framerate);
+  auto colorize = cam.GetColorizer();
   for (;;) {
     cam.WaitForStream();
     auto allow_count = false;
@@ -271,23 +272,24 @@ int main(int argc, char const* argv[]) {
     if (image_depth.img) {
       allow_count = true;
       auto &&depth_raw = image_depth.img->To(ImageFormat::DEPTH_RAW);
-      auto &&depth_color = cam.GetColorizer()->Process(depth_raw, ImageFormat::DEPTH_BGR)->ToMat();
+      auto &&depth_color =
+          colorize->Process(depth_raw, ImageFormat::DEPTH_BGR)->ToMat();
 
       cv::setMouseCallback("depth", OnDepthMouseCallback, &depth_region);
       depth_region.DrawRect(depth_color);
       cv::imshow("depth", depth_color);
 
       // pass depth_raw to get real depth value
-      depth_region.ShowElems<ushort>(depth_raw->ToMat(), [](const ushort& elem) {
-        return std::to_string(elem);
-      }, 80, depth_info);
+      depth_region.ShowElems<ushort>(
+          depth_raw->ToMat(),
+          [](const ushort& elem) {
+            return std::to_string(elem);
+          }, 80, depth_info);
     }
 
-    if (allow_count == true)
-    {
+    if (allow_count == true) {
       counter.Update();
     }
-    
 
     char key = static_cast<char>(cv::waitKey(1));
     if (key == 27 || key == 'q' || key == 'Q') {  // ESC/Q
