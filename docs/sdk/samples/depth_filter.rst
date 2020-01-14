@@ -38,4 +38,4 @@ Method port protocol is as follows：
 .. tip::
 
     When using, instantiate a ``Filter`` ,then use it directly in the image processing loop ``ProcessFrame`` .
-    The image will adapt to the image infoemation in real time. You can also use the ``TurnOn/TurnOff`` switch in real time.
+    The image will adapt to the image information in real time. You can also use the ``TurnOn/TurnOff`` switch in real time.

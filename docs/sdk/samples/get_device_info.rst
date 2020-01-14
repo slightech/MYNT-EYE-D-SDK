@@ -3,7 +3,7 @@
 Get Device Info
 ==============================
 
-Use ``util::select()`` to get current
+Use ``util::select()`` to select device and get
 device Info.
 
 Reference code snippet:
