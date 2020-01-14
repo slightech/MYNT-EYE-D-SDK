@@ -198,8 +198,6 @@ int main(int argc, char const* argv[]) {
     params.dev_mode = static_cast<DeviceMode>(val);
     if (!in_range("color_mode", 0, 1, &val)) return 2;
     params.color_mode = static_cast<ColorMode>(val);
-    if (!in_range("depth_mode", 0, 2, &val)) return 2;
-    params.depth_mode = static_cast<DepthMode>(val);
     if (!in_range("stream_mode", 0, 3, &val)) return 2;
     params.stream_mode = static_cast<StreamMode>(val);
     if (!in_range("color_stream_format", 0, 1, &val)) return 2;
@@ -338,11 +336,7 @@ int main(int argc, char const* argv[]) {
       if (image_depth.img) {
         allow_count = true;
         cv::Mat depth;
-        if (params.depth_mode == DepthMode::DEPTH_COLORFUL) {
-          depth = image_depth.img->To(ImageFormat::DEPTH_BGR)->ToMat();
-        } else {
-          depth = image_depth.img->ToMat();
-        }
+        depth = image_depth.img->ToMat();
         painter.DrawSize(depth, CVPainter::TOP_LEFT);
         painter.DrawStreamData(depth, image_depth, CVPainter::TOP_RIGHT);
         cv::imshow("depth", depth);

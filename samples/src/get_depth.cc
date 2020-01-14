@@ -184,10 +184,6 @@ int main(int argc, char const* argv[]) {
     // Color mode: raw(default), rectified
     // params.color_mode = ColorMode::COLOR_RECTIFIED;
 
-    // Depth mode: colorful(default), gray, raw
-    // Note: must set DEPTH_RAW to get raw depth values
-    params.depth_mode = DepthMode::DEPTH_RAW;
-
     // Stream mode: left color only
     // params.stream_mode = StreamMode::STREAM_640x480;  // vga
     params.stream_mode = StreamMode::STREAM_1280x720;  // hd

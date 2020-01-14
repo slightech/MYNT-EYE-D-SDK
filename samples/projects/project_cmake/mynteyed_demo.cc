@@ -19,7 +19,6 @@ int main(int argc, char const *argv[]) {
     << dev_info.name << std::endl << std::endl;
 
   OpenParams params(dev_info.index);
-  params.depth_mode = DepthMode::DEPTH_COLORFUL;
   params.stream_mode = StreamMode::STREAM_2560x720;
   params.ir_intensity = 4;
   params.framerate = 30;

@@ -57,11 +57,6 @@ struct MYNTEYE_API OpenParams {
   ColorMode color_mode;
 
   /**
-   * Depth mode, default DEPTH_COLORFUL.
-   */
-  DepthMode depth_mode;
-
-  /**
    * Stream mode of color & depth, default STREAM_1280x720.
    */
   StreamMode stream_mode;

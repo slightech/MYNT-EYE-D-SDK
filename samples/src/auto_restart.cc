@@ -50,9 +50,6 @@ int main(int argc, char const* argv[]) {
   // Color mode: raw(default), rectified
   // params.color_mode = ColorMode::COLOR_RECTIFIED;
 
-  // Depth mode: colorful(default), gray, raw
-  // params.depth_mode = DepthMode::DEPTH_GRAY;
-
   // Stream mode: left color only
   // params.stream_mode = StreamMode::STREAM_640x480;  // vga
   params.stream_mode = StreamMode::STREAM_1280x720;  // hd
@@ -131,11 +128,7 @@ int main(int argc, char const* argv[]) {
       if (image_depth.img) {
         allow_count = true;
         cv::Mat depth;
-        if (params.depth_mode == DepthMode::DEPTH_COLORFUL) {
-          depth = image_depth.img->To(ImageFormat::DEPTH_BGR)->ToMat();
-        } else {
-          depth = image_depth.img->ToMat();
-        }
+        depth = image_depth.img->ToMat();
         painter.DrawSize(depth, CVPainter::TOP_LEFT);
         painter.DrawStreamData(depth, image_depth, CVPainter::TOP_RIGHT);
         cv::imshow("depth", depth);

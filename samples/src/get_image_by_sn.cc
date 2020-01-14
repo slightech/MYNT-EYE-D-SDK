@@ -24,10 +24,52 @@
 
 MYNTEYE_USE_NAMESPACE
 
+bool select_by_sn(const Camera &cam, DeviceInfo *info, std::string sn) {
+  std::cout << std::endl;
+  std::string dashes(80, '-');
+
+  std::vector<DeviceInfo> dev_infos = cam.GetDeviceInfos();
+  size_t n = dev_infos.size();
+  if (n <= 0) {
+    std::cerr << "Error: Device not found" << std::endl;
+    return false;
+  }
+
+  std::cout << dashes << std::endl;
+  std::cout << "Index | Device Information" << std::endl;
+  std::cout << dashes << std::endl;
+  for (auto &&info : dev_infos) {
+    std::cout << std::setw(5) << info.index << " | " << info << std::endl;
+  }
+  std::cout << dashes << std::endl;
+
+  if (n == 1) {
+    *info = dev_infos[0];
+    std::cout << "Auto select a device to open, index: 0" << std::endl;
+  } else {
+    for (auto &i : dev_infos) {
+      if (i.sn == sn) {
+        *info = i;
+        return true;
+      }
+    }
+
+    std::cout << "Can't find device with corresponding serial number!"
+              << std::endl;
+    return false;
+  }
+
+  return true;
+}
+
 int main(int argc, char const* argv[]) {
   Camera cam;
   DeviceInfo dev_info;
-  if (!util::select(cam, &dev_info)) {
+  std::string sn = "20373347344D500400350034";
+  if (argc == 2) {
+    sn = argv[1];
+  }
+  if (!select_by_sn(cam, &dev_info, sn)) {
     return 1;
   }
   util::print_stream_infos(cam, dev_info.index);
@@ -37,8 +79,8 @@ int main(int argc, char const* argv[]) {
 
   OpenParams params(dev_info.index);
   {
-    // Framerate: 30(default), [0,60], [30](STREAM_2560x720)
-    params.framerate = 30;
+    // Framerate: 10(default usb3.0) 5(default usb2.0), [0,60], [30](STREAM_2560x720)
+    params.framerate = 10;
 
     // Device mode, default DEVICE_ALL
     //   DEVICE_COLOR: IMAGE_LEFT_COLOR ✓ IMAGE_RIGHT_COLOR ? IMAGE_DEPTH x
@@ -50,12 +92,13 @@ int main(int argc, char const* argv[]) {
     // Color mode: raw(default), rectified
     // params.color_mode = ColorMode::COLOR_RECTIFIED;
 
+
     // Stream mode: left color only
     // params.stream_mode = StreamMode::STREAM_640x480;  // vga
-    // params.stream_mode = StreamMode::STREAM_1280x720;  // hd
+    params.stream_mode = StreamMode::STREAM_1280x720;  // hd
     // Stream mode: left+right color
     // params.stream_mode = StreamMode::STREAM_1280x480;  // vga
-    params.stream_mode = StreamMode::STREAM_2560x720;  // hd
+    // params.stream_mode = StreamMode::STREAM_2560x720;  // hd
 
     // Auto-exposure: true(default), false
     // params.state_ae = false;
@@ -98,23 +141,20 @@ int main(int argc, char const* argv[]) {
   std::cout << "Press ESC/Q on Windows to terminate" << std::endl;
 
   bool is_left_ok = cam.IsStreamDataEnabled(ImageType::IMAGE_LEFT_COLOR);
-  bool is_right_ok = cam.IsStreamDataEnabled(ImageType::IMAGE_RIGHT_COLOR);
   bool is_depth_ok = cam.IsStreamDataEnabled(ImageType::IMAGE_DEPTH);
 
   if (is_left_ok) cv::namedWindow("left color");
-  if (is_right_ok) cv::namedWindow("right color");
   if (is_depth_ok) cv::namedWindow("depth");
 
   CVPainter painter;
-  util::Counter counter(params.framerate);
+  util::Counter counter;
   for (;;) {
     cam.WaitForStream();
-    auto allow_count = false;
+    counter.Update();
 
     if (is_left_ok) {
       auto left_color = cam.GetStreamData(ImageType::IMAGE_LEFT_COLOR);
       if (left_color.img) {
-        allow_count = true;
         cv::Mat left = left_color.img->To(ImageFormat::COLOR_BGR)->ToMat();
         painter.DrawSize(left, CVPainter::TOP_LEFT);
         painter.DrawStreamData(left, left_color, CVPainter::TOP_RIGHT);
@@ -124,31 +164,15 @@ int main(int argc, char const* argv[]) {
       }
     }
 
-    if (is_right_ok) {
-      auto right_color = cam.GetStreamData(ImageType::IMAGE_RIGHT_COLOR);
-      if (right_color.img) {
-        allow_count = true;
-        cv::Mat right = right_color.img->To(ImageFormat::COLOR_BGR)->ToMat();
-        painter.DrawSize(right, CVPainter::TOP_LEFT);
-        painter.DrawStreamData(right, right_color, CVPainter::TOP_RIGHT);
-        cv::imshow("right color", right);
-      }
-    }
-
     if (is_depth_ok) {
       auto image_depth = cam.GetStreamData(ImageType::IMAGE_DEPTH);
       if (image_depth.img) {
-        allow_count = true;
         cv::Mat depth;
         depth = image_depth.img->ToMat();
         painter.DrawSize(depth, CVPainter::TOP_LEFT);
         painter.DrawStreamData(depth, image_depth, CVPainter::TOP_RIGHT);
         cv::imshow("depth", depth);
       }
-    }
-
-    if (allow_count == true) {
-      counter.Update();
     }
 
     char key = static_cast<char>(cv::waitKey(1));

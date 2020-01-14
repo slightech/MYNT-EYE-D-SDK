@@ -331,7 +331,6 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     params.framerate = framerate;
     params.dev_mode = static_cast<DeviceMode>(dev_mode);
     params.color_mode = static_cast<ColorMode>(color_mode);
-    params.depth_mode = static_cast<DepthMode>(depth_mode);
     params.stream_mode = static_cast<StreamMode>(stream_mode);
     params.color_stream_format =
         static_cast<StreamFormat>(color_stream_format);
@@ -656,35 +655,24 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     auto&& info = depth_info_ptr;
     if (info) info->header.stamp = header.stamp;
     if (info) info->header.frame_id = depth_frame_id;
-    if (params.depth_mode == DepthMode::DEPTH_RAW) {
-      auto&& mat = data.img->To(ImageFormat::DEPTH_RAW)->ToMat();
-      if (depth_type == 0) {
-        pub_depth.publish(
-            cv_bridge::CvImage(header, enc::MONO16, mat).toImageMsg(), info);
-      } else if (depth_type == 1) {
-        pub_depth.publish(
-            cv_bridge::CvImage(header, enc::TYPE_16UC1, mat).toImageMsg(), info);
-      }
-      pthread_mutex_lock(&mutex_sub_result);
-      bool sub_result_points = sub_result.points;
-      pthread_mutex_unlock(&mutex_sub_result);
-      if (sub_result_points) {
-        pthread_mutex_lock(&mutex_color);
-        points_depth = mat;
-        // publishPoints(header.stamp);
-        pthread_mutex_unlock(&mutex_color);
-      }
-    } else if (params.depth_mode == DepthMode::DEPTH_GRAY) {
-      auto&& mat = data.img->To(ImageFormat::DEPTH_GRAY_24)->ToMat();
+    auto&& mat = data.img->To(ImageFormat::DEPTH_RAW)->ToMat();
+    if (depth_type == 0) {
       pub_depth.publish(
-          cv_bridge::CvImage(header, enc::BGR8, mat).toImageMsg(), info);
-    } else if (params.depth_mode == DepthMode::DEPTH_COLORFUL) {
-      auto&& mat = data.img->To(ImageFormat::DEPTH_BGR)->ToMat();
+          cv_bridge::CvImage(header, enc::MONO16, mat).toImageMsg(), info);
+    } else if (depth_type == 1) {
       pub_depth.publish(
-          cv_bridge::CvImage(header, enc::BGR8, mat).toImageMsg(), info);
-    } else {
-      NODELET_ERROR_STREAM("Depth mode unsupported");
+          cv_bridge::CvImage(header, enc::TYPE_16UC1, mat).toImageMsg(), info);
     }
+    pthread_mutex_lock(&mutex_sub_result);
+    bool sub_result_points = sub_result.points;
+    pthread_mutex_unlock(&mutex_sub_result);
+    if (sub_result_points) {
+      pthread_mutex_lock(&mutex_color);
+      points_depth = mat;
+      // publishPoints(header.stamp);
+      pthread_mutex_unlock(&mutex_color);
+    }
+
   }
 
   void publishPoints(ros::Time stamp) {

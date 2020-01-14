@@ -463,11 +463,8 @@ bool Device::Open(const OpenParams& params) {
   SetAutoWhiteBalanceEnabled(params.state_awb);
 
   if (params.framerate > 0) framerate_ = params.framerate;
-  // if (IsUSB2() && params.depth_mode == DepthMode::DEPTH_RAW) {
-  //   LOGE("USB 2.0 only supports depth_mode DEPTH_GRAY | DEPTH_COLORFUL, please adjusts params.");  // NOLINT
-  //   return false;
-  // }
-  depth_mode_ = params.depth_mode;
+
+  depth_mode_ = DepthMode::DEPTH_RAW;
 
   stream_info_dev_index_ = params.dev_index;
   if (!UpdateStreamInfos()) {

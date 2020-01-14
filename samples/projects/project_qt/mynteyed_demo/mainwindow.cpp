@@ -130,8 +130,6 @@ void MainWindow::openCamera()
             // Color mode: raw(default), rectified
             //params.color_mode = ColorMode::COLOR_RECTIFIED;
 
-            // Depth mode: colorful(default), gray, raw
-            //params.depth_mode = DepthMode::DEPTH_GRAY;
 
             // Stream mode: left color only
             //params.stream_mode = StreamMode::STREAM_640x480;  // vga
@@ -242,8 +240,7 @@ void MainWindow::setupUi(const OpenParams &params)
 {
     leftEnabled = cam.IsStreamDataEnabled(ImageType::IMAGE_LEFT_COLOR);
     rightEnabled= cam.IsStreamDataEnabled(ImageType::IMAGE_RIGHT_COLOR);
-    depthEnabled = cam.IsStreamDataEnabled(ImageType::IMAGE_DEPTH) &&
-            params.depth_mode == DepthMode::DEPTH_COLORFUL;
+    depthEnabled = cam.IsStreamDataEnabled(ImageType::IMAGE_DEPTH);
 
     qint32 width, height;
     if (params.stream_mode == StreamMode::STREAM_640x480 ||

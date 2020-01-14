@@ -403,7 +403,6 @@ StreamRequest Camera::SelectStreamRequest(bool *ok) const {
             << std::endl;
 
   params.framerate = 10;
-  params.depth_mode = DepthMode::DEPTH_RAW;
   params.stream_mode = StreamMode::STREAM_1280x720;
   params.ir_intensity = 4;
   *ok = true;
