@@ -55,12 +55,6 @@ int main(int argc, char const* argv[]) {
       .metavar("MODE").help("Color mode, default %default (COLOR_RAW)"
           "\n  0: COLOR_RAW, color raw"
           "\n  1: COLOR_RECTIFIED, color rectified");
-  op_group.add_option("--dm").dest("depth_mode")
-      .type("int").set_default(2)
-      .metavar("MODE").help("Depth mode, default %default (DEPTH_COLORFUL)"
-          "\n  0: DEPTH_RAW"
-          "\n  1: DEPTH_GRAY"
-          "\n  2: DEPTH_COLORFUL");
   op_group.add_option("--sm").dest("stream_mode")
       .type("int").set_default(2)
       .metavar("MODE").help("Stream mode of color & depth, "
