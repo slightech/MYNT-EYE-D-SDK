@@ -1,7 +1,8 @@
-Get Depth Image
+Get Depth Image(Compatible With USB2.0)
 ===============
 
-Depth images belongs to the upper layer of synthetic data.
+In this sample you can learn how to display depth image and compute left
+camera coordinate from depth image.
 
 You can change ``depth_mode`` to change the display of the depth image.
 
@@ -17,26 +18,32 @@ Reference code snippet:
 
 .. code-block:: c++
 
-   auto image_depth = cam.GetStreamData(ImageType::IMAGE_DEPTH);
-   if (image_depth.img) {
-     cv::Mat depth = image_depth.img->To(ImageFormat::DEPTH_RAW)->ToMat();
+    auto image_depth = cam.GetStreamData(ImageType::IMAGE_DEPTH);
+    if (image_depth.img) {
+      allow_count = true;
+      auto &&depth_raw = image_depth.img->To(ImageFormat::DEPTH_RAW);
+      auto &&depth_color =
+          colorize->Process(depth_raw, ImageFormat::DEPTH_BGR)->ToMat();
 
-     cv::setMouseCallback("depth", OnDepthMouseCallback, &depth_region);
-     // Note: DrawRect will change some depth values to show the rect.
-     depth_region.DrawRect(depth);
-     cv::imshow("depth", depth);
+      cv::setMouseCallback("depth", OnDepthMouseCallback, &depth_region);
+      depth_region.DrawRect(depth_color);
+      cv::imshow("depth", depth_color);
 
-     depth_region.ShowElems<ushort>(depth, [](const ushort& elem) {
-       return std::to_string(elem);
-     }, 80, depth_info);
-   }
+      // pass depth_raw to get real depth value
+      depth_region.ShowElems<ushort>(
+          depth_raw->ToMat(),
+          [](const ushort& elem) {
+            return std::to_string(elem);
+          }, 80, depth_info);
+    }
 
 The above code uses OpenCV to display the image. When the display window
 is selected, pressing ESC/Q will end the program.
 
 .. note::
 
-  `get_depth` sample only support  `DEPTH_RAW` mode.You can modify ``depth_mode`` parameter of other samples to get depth images 。
+  You can use function ToMat() to convert raw depth frame to other format such
+  as gray and colorful(raw:CV_16UC1, gray & colorful:CV).
 
 Complete code examples, see
 `get_depth.cc <https://github.com/slightech/MYNT-EYE-D-SDK/blob/master/samples/src/get_depth.cc>`__.
