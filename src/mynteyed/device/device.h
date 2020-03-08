@@ -128,6 +128,11 @@ class Device {
    * value -- exposure time value
    * */
   bool SetExposureTime(const float &value);
+  /** Set exposure time
+   * value -- exposure time value
+   * sensor -- ALL, LEFT, RIGHT
+   * */
+  bool SetExposureTime(const float &value, const SensorMode &sensor);
   /** Get exposure time
    * value -- return exposure time value
    * */

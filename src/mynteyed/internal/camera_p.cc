@@ -535,6 +535,10 @@ void CameraPrivate::SetExposureTime(const float &value) {
   device_->SetExposureTime(value);
 }
 
+void CameraPrivate::SetExposureTime(const float &value, const SensorMode &sensor) {
+  device_->SetExposureTime(value, sensor);
+}
+
 void CameraPrivate::GetExposureTime(float &value) {
   device_->GetExposureTime(value);
 }

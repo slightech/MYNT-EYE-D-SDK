@@ -176,6 +176,11 @@ class MYNTEYE_API CameraPrivate {
    * value -- exposure time value
    * */
   void SetExposureTime(const float &value);
+  /** Set exposure time
+   * value -- exposure time value
+   * sensor -- SensorMode::ALL, LEFT, RIGHT
+   * */
+  void SetExposureTime(const float &value, const SensorMode &sensor);
   /** Get exposure time
    * value -- return exposure time value
    * */
