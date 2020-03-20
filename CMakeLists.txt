@@ -332,3 +332,13 @@ install(EXPORT mynteyed-targets
 # summary
 
 include(${MYNTEYE_ROOT}/cmake/Summary.cmake)
+
+
+set(CPACK_GENERATOR "DEB")
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Blue ocean obotics.")
+set(CPACK_PACKAGE_VERSION ${VERSION})
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "MYNT eye D library.")
+set(CPACK_PACKAGE_DESCRIPTION "Camera library for MYNTEYE D.")
+set(CPACK_DEBIAN_PACKAGE_SECTION "Development")
+
+include(CPack)
