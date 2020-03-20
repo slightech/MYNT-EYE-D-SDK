@@ -99,6 +99,8 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
   ros::Publisher pub_imu_processed;
   ros::Publisher pub_mesh_;  // < The publisher for camera mesh.
 
+  ros::Timer timer_;
+
   visualization_msgs::Marker mesh_msg_;  // < Mesh message.
   ros::ServiceServer get_params_service_;
 
@@ -343,6 +345,10 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
 
     mynteye->EnableProcessMode(ProcessMode::PROC_NONE);
 
+    // timer to update nodelet
+    ros::Duration timer_period(1.0 / framerate);
+    timer_ = nh_ns.createTimer(timer_period, boost::bind(&MYNTEYEWrapperNodelet::updateCb, this, _1));
+
     // Image publishers
 
     image_transport::ImageTransport it_mynteye(nh);
@@ -375,15 +381,13 @@ class MYNTEYEWrapperNodelet : public nodelet::Nodelet {
     detectSubscribers();
     // open device
     openDevice();
-
-    // loop
-    ros::Rate loop_rate(framerate);
-    while (nh_ns.ok()) {
-      publishMesh();
-      detectSubscribers();
-      loop_rate.sleep();
-    }
   }
+
+  void updateCb(const ros::TimerEvent& event){
+    publishMesh();
+    detectSubscribers();
+  }
+
 
   void detectSubscribers() {
     bool left_mono_sub = pub_left_mono.getNumSubscribers() > 0;
