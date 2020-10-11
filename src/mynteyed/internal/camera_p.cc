@@ -297,7 +297,7 @@ bool CameraPrivate::IsImageInfoSupported() const {
 
 void CameraPrivate::EnableImageInfo(bool sync) {
   if (!channels_->IsAvaliable()) {
-    LOGW("Data channel is unavaliable, could not track image info.");
+    LOGW("Data channel is unavailable, could not track image info.");
     return;
   }
   streams_->EnableImageInfo(sync);
