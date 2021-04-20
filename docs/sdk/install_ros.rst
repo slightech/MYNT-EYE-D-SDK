@@ -58,13 +58,13 @@ ROS Kinetic (Ubuntu 16.04)
 .. code-block:: bash
 
    source ./wrappers/ros/devel/setup.bash
-   roslaunch mynteye_wrapper_d display.launch
+   roslaunch mynt_eye_ros_wrapper display.launch
 
 **Publish:**
 
 .. code-block:: bash
 
    source ./wrappers/ros/devel/setup.bash
-   roslaunch mynteye_wrapper_d mynteye.launch
+   roslaunch mynt_eye_ros_wrapper mynteye.launch
 
 
